@@ -1,0 +1,21 @@
+.navbar-nav > .nav-item {
+    border: 0;
+    padding: 0;
+    padding-right: 2rem;
+}
+
+.navbar-nav > .nav-item:last-child {
+    padding-right: 0rem;
+}
+
+.navbar-nav > .nav-item > .active {    
+    border: 0;
+    border-bottom: 1px;
+    border-color: white;
+    border-style: solid;
+}
+
+.navbar-nav > .nav-item > div > .nav-link {
+    color: white;
+    font-size: 7pt;
+}

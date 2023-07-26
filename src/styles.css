@@ -1,1 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
+@import "~bootstrap/dist/css/bootstrap.css";
+@import "~bootstrap-icons/font/bootstrap-icons.min.css";
+
+* {
+    font-family: 'Huevetica Neue';
+    font-weight: normal;
+    font-size: 7pt;
+}

@@ -1,18 +1,32 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-
 import { AppComponent } from './app.component';
+import { ContentLayoutComponent } from './layout/content-layout/content-layout.component';
+import { AuthLayoutComponent } from './layout/auth-layout/auth-layout.component';
+import { AppRoutingModule } from './app-routing.module';
+import { CoreModule } from '@app/core.module';
+import { SharedModule } from '@shared/shared.module';
+import { SidebarComponent } from './layout/sidebar/sidebar.component';
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
   imports: [
+    // angular modules
     BrowserModule,
-    NgbModule
+
+    // core & shared
+    CoreModule,
+    SharedModule,
+
+    // app module
+    AppRoutingModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  declarations: [
+    AppComponent,
+    ContentLayoutComponent,
+    AuthLayoutComponent,
+    SidebarComponent
+  ]
 })
 export class AppModule { }
