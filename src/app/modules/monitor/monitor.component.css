@@ -1,0 +1,11 @@
+.view-mode-btn {
+    width: 45pt;
+    height: 16pt;
+}
+
+.event-thumbnail {
+    height: auto; 
+    width: auto; 
+    max-width: 300px; 
+    max-height: 300px;
+}

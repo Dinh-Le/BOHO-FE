@@ -1,1 +1,26 @@
-<p>monitor works!</p>
+<div  style="display: grid; grid-template-rows: 23pt 1fr; row-gap: 1px; column-gap: 1px;" class="bg-dark w-100 h-100">
+    <div class="d-flex justify-content-between align-items-center p-1">
+        <div>
+            <select class="bg-primary text-white p-1"
+                style="height: 16pt; width: 57pt; outline: none; border-radius: 10%;">
+                <option selected>Today</option>
+            </select>
+            <i class="bi bi-funnel-fill text-white ms-2"></i>
+        </div>
+        <div style="width: 237pt;">
+            <app-search-input class="w-100"></app-search-input>
+        </div>
+        <div class="me-5">
+            <button class="view-mode-btn btn btn-primary mx-1">Ô lưới</button>
+            <button class="view-mode-btn btn btn-secondary mx-1">Bản đồ</button>
+            <button class="view-mode-btn btn btn-secondary mx-1">Danh sách</button>
+        </div>
+    </div>
+    <div class="bg-dark" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; column-gap: 0.3rem; row-gap: 0.3rem; overflow-y: scroll;" >
+        <div *ngFor="let event of events" class="bg-primary" style="height: 300px;">
+            <img class="event-thumbnail" [src]="event.thummnailUrl">
+            <div class="text-white">{{event.eventType}}</div>
+            <div class="text-white">{{event.timestamp}}</div>
+        </div>
+    </div>
+</div>

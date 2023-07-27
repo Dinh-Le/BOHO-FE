@@ -4,7 +4,29 @@
         <app-search-input></app-search-input>
     </div>
     <div class="bg-dark text-light">
-        Menu
+        <div class="p-1">
+            <div *ngFor="let server of servers">
+                <div class="d-flex node-container" (click)="server.expanded = !server.expanded">
+                    <i class="bi" [ngClass]="server.expanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+                    <span class="node-title">{{server.name}}</span>
+                </div>
+
+                <div *ngFor="let camera of server.cameras" class="nodes-container"
+                    [ngClass]="server.expanded ? '':'d-none'">
+                    <div class="d-flex node-container" (click)="camera.expanded = !camera.expanded">
+                        <i class="bi" [ngClass]="camera.expanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+                        <span class="node-title">{{camera.name}}</span>
+                    </div>
+
+                    <div *ngFor="let channel of camera.channels" class="nodes-container"
+                        [ngClass]="camera.expanded ? '':'d-none'">
+                        <div class="d-flex node-container">
+                            <i class="bi bi-camera-video-fill text-primary"></i>
+                            <span class="node-title">{{channel.name}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
