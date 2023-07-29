@@ -1,0 +1,23 @@
+.event-thumbnail {
+    height: auto;
+    width: auto;
+    max-width: 300px;
+    max-height: 300px;
+}
+
+.playback-dialog-footer>button {
+    height: 15pt;
+    width: 60pt;
+}
+
+::ng-deep .event-playback-dialog>.modal-content {
+    width: 445pt !important;
+}
+
+.video-player {
+    width: 443pt;
+    height: 249pt;
+    padding: 1px;
+    display: block;
+    margin: auto;
+}

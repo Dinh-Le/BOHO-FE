@@ -3,9 +3,15 @@
     height: 16pt;
 }
 
-.event-thumbnail {
-    height: auto; 
-    width: auto; 
-    max-width: 300px; 
-    max-height: 300px;
+.toolbar {
+    height: 23pt;
+}
+
+.view-wrapper {
+    /* navbar: 34pt, toolbar: 23pt, row-gap: 1px * 2 */
+    height: calc(100vh - 34pt - 23pt - 2px) !important;
+}
+
+.scroll-y {
+    overflow-y: scroll;
 }
