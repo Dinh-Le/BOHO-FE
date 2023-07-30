@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { tick } from '@angular/core/testing';
 import { NavigationEnd, Router } from '@angular/router';
+import { LoadingService } from '@app/loading.service';
 import { filter } from 'rxjs';
 
 interface NavItem {
@@ -14,7 +16,6 @@ interface NavItem {
   styleUrls: ['./content-layout.component.css']
 })
 export class ContentLayoutComponent implements OnInit {
-
   navItems: NavItem[] = [
     {
       active: false,
@@ -38,7 +39,10 @@ export class ContentLayoutComponent implements OnInit {
     },
   ]
 
-  constructor(router: Router) {
+  constructor(
+    router: Router,
+    private loadingService: LoadingService
+  ) {
     router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(event => {
@@ -47,6 +51,14 @@ export class ContentLayoutComponent implements OnInit {
           item.active = item.path === currentPath;
         }
       });
+  }
+
+  get loading() {
+    return this.loadingService.loading;
+  }
+
+  get loadingConfig() {
+    return this.loadingService.config;
   }
 
   ngOnInit(): void {

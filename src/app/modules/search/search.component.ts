@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { LoadingService } from '@app/loading.service';
 
 @Component({
   selector: 'app-search',
@@ -7,4 +8,12 @@ import { Component } from '@angular/core';
 })
 export class SearchComponent {
 
+  constructor(
+    private loadingService: LoadingService
+  ) {}
+
+  search() {
+    this.loadingService.loading = true;
+    setTimeout(() => this.loadingService.loading = false, 3000);
+  }
 }

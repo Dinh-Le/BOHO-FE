@@ -4576,6 +4576,13 @@ neo-async@^2.6.2:
   resolved "https://registry.npmjs.org/neo-async/-/neo-async-2.6.2.tgz"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
+ngx-loading@^15.0.0:
+  version "15.0.0"
+  resolved "https://registry.yarnpkg.com/ngx-loading/-/ngx-loading-15.0.0.tgz#f747878831b5ceb865fbb83a3bd676a889ecb1c7"
+  integrity sha512-8/+3+ILdOCfnxc/WV0lwKTpThoM4mekI2coO1MkEI+Bc7iW8x3X82ruYPG7fbHBibIo36YrOXzM3DPHJptimZw==
+  dependencies:
+    tslib "^2.3.0"
+
 nice-napi@^1.0.2:
   version "1.0.2"
   resolved "https://registry.npmjs.org/nice-napi/-/nice-napi-1.0.2.tgz"

@@ -7,18 +7,21 @@ import { AppRoutingModule } from './app-routing.module';
 import { CoreModule } from '@app/core.module';
 import { SharedModule } from '@shared/shared.module';
 import { SidebarComponent } from './layout/sidebar/sidebar.component';
+import { NgxLoadingModule } from 'ngx-loading';
 
 @NgModule({
   imports: [
     // angular modules
     BrowserModule,
 
+    NgxLoadingModule.forRoot({}),
+
     // core & shared
     CoreModule,
     SharedModule,
 
     // app module
-    AppRoutingModule
+    AppRoutingModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
