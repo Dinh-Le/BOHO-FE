@@ -1,0 +1,6 @@
+.events-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    column-gap: 0.3rem;
+    row-gap: 0.3rem;
+}

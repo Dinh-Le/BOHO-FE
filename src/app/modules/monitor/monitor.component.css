@@ -1,0 +1,17 @@
+.view-mode-btn {
+    width: 45pt;
+    height: 16pt;
+}
+
+.toolbar {
+    height: 23pt;
+}
+
+.view-wrapper {
+    /* navbar: 34pt, toolbar: 23pt, row-gap: 1px * 2 */
+    height: calc(100vh - 34pt - 23pt - 2px) !important;
+}
+
+.scroll-y {
+    overflow-y: scroll;
+}
