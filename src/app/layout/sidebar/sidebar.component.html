@@ -1,32 +1,91 @@
-<div class="w-100 h-100" style="display: grid; grid-template-rows: 23pt 33pt 1fr; row-gap: 1px;">
-    <div class="bg-dark"></div>
-    <div class="bg-dark">
-        <app-search-input></app-search-input>
+<div class="bg-dark h-100 d-flex flex-column p-2">
+  <div class="d-flex justify-content-between">
+    <span class="text-white">Tự động ẩn</span>
+    <div class="form-check form-switch">
+      <input class="form-check-input bg-dark" type="checkbox" />
     </div>
-    <div class="bg-dark text-light">
-        <div class="p-1">
-            <div *ngFor="let server of servers">
-                <div class="d-flex node-container" (click)="server.expanded = !server.expanded">
-                    <i class="bi" [ngClass]="server.expanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
-                    <span class="node-title">{{server.name}}</span>
-                </div>
-
-                <div *ngFor="let camera of server.cameras" class="nodes-container"
-                    [ngClass]="server.expanded ? '':'d-none'">
-                    <div class="d-flex node-container" (click)="camera.expanded = !camera.expanded">
-                        <i class="bi" [ngClass]="camera.expanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
-                        <span class="node-title">{{camera.name}}</span>
-                    </div>
-
-                    <div *ngFor="let channel of camera.channels" class="nodes-container"
-                        [ngClass]="camera.expanded ? '':'d-none'">
-                        <div class="d-flex node-container">
-                            <i class="bi bi-camera-video-fill text-primary"></i>
-                            <span class="node-title">{{channel.name}}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  </div>
+  <div class="border-bottom d-flex justify-content-around pb-1 mt-4">
+    <a
+      href="javascript:"
+      class="col"
+      class="border-primary"
+      [ngClass]="{ 'border-bottom': mode === 'by-group' }"
+      (click)="mode = 'by-group'"
+      >Xem nhóm</a
+    >
+    <a
+      href="javascript:"
+      class="border-primary"
+      [ngClass]="{ 'border-bottom': mode === 'by-node' }"
+      (click)="mode = 'by-node'"
+      >Xem node</a
+    >
+  </div>
+  <div class="bg-dark text-light flex-grow-1">
+    <div class="p-1">
+      <div *ngFor="let server of servers">
+        <div class="d-flex node-container">
+          <a href="javascript:0" (click)="server.expanded = !server.expanded"
+            ><i
+              class="bi"
+              [ngClass]="
+                server.expanded ? 'bi-chevron-down' : 'bi-chevron-right'
+              "
+            ></i
+          ></a>
+          <input
+            type="checkbox"
+            class="ps-1"
+            [(ngModel)]="server.selected"
+            (ngModelChange)="onServerSelectionChanged(server)"
+          />
+          <i class="bi bi-folder-fill text-white ps-1"></i>
+          <span class="node-title">{{ server.name }}</span>
         </div>
+
+        <div
+          *ngFor="let camera of server.cameras"
+          class="nodes-container"
+          [ngClass]="server.expanded ? '' : 'd-none'"
+        >
+          <div class="d-flex node-container">
+            <a href="javascript:0" (click)="camera.expanded = !camera.expanded">
+              <i
+                class="bi"
+                [ngClass]="
+                  camera.expanded ? 'bi-chevron-down' : 'bi-chevron-right'
+                "
+              ></i>
+            </a>
+
+            <input
+              type="checkbox"
+              class="ps-1"
+              [(ngModel)]="camera.selected"
+              (ngModelChange)="onCameraSelectionChanged(camera, server)"
+            />
+            <i class="bi bi-folder-fill text-white ps-1"></i>
+            <span class="node-title">{{ camera.name }}</span>
+          </div>
+
+          <div
+            *ngFor="let channel of camera.channels"
+            class="nodes-container"
+            [ngClass]="camera.expanded ? '' : 'd-none'"
+          >
+            <div class="d-flex node-container">
+              <input
+                type="checkbox"
+                class="ps-1"
+                [(ngModel)]="channel.selected"
+              />
+              <i class="bi bi-camera-video-fill text-primary ps-1"></i>
+              <span class="node-title">{{ channel.name }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>

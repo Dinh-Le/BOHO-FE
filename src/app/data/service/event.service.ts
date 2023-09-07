@@ -2,19 +2,47 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { EventInfo } from '../schema/event-info';
 
+
 @Injectable({
   providedIn: 'root'
 })
 export class EventService {
   events: EventInfo[] = [];
+  humanEventInfo: EventInfo = {
+    thumbnailUrl: `\/assets\/images\/human.png`,
+    videoUrl: '\/assets\/videos\/event.mp4',
+    eventType: 'Phat hien nguoi',
+    timestamp: new Date().toISOString(),
+    level: 'normal',
+    object: 'human',
+    address: 'Sanh sieu thi Coop',
+    favorite: false,
+    seen: true,
+  };
+  carEventInfo: EventInfo = {
+    thumbnailUrl: `\/assets\/images\/car.png`,
+    videoUrl: '\/assets\/videos\/event.mp4',
+    eventType: 'Phat hien xe trong danh sach den',
+    timestamp: new Date().toISOString(),
+    level: 'high',
+    object: 'car',
+    licencePlate: '51H-95175',
+    address: 'Nga 4 H Dieu - TV Dien',
+    favorite: true,
+    seen: false,
+  };
 
-  constructor() { 
-    this.events = Array(100).fill(0).map(_ => Object.assign({}, {
-      thumbnailUrl: 'https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcTirTLZGJkc8CsFcR-FTUBvCuK0oW4Qlbi5zSZqfjdo8HBf8xWkrYv9M2QP0Ekpc9HGXe8l39aQZx95Od8',
-      videoUrl: '\/assets\/videos\/event.mp4',
-      eventType: 'Lovely cat',
-      timestamp: new Date().toISOString(),
-    }));
+  constructor() {
+    this.events = Array(82)
+      .fill(0)
+      .map(
+        (_, index) => Object.assign(
+          {},
+          index % 2 == 0 
+            ? this.humanEventInfo 
+            : this.carEventInfo
+        )
+      );
   }
 
   findAll(): Observable<EventInfo[]> {

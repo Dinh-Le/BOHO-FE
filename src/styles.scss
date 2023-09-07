@@ -1,0 +1,15 @@
+/* You can add global styles to this file, and also import other style files */
+@import "./variables";
+@import "../node_modules/bootstrap/scss/bootstrap.scss";
+@import "../node_modules/bootstrap-icons/font/bootstrap-icons.scss";
+@import "~leaflet/dist/leaflet.css";
+
+* {
+  font-family: "Arial";
+  font-weight: normal;
+  font-size: 14px;
+}
+
+.w-18 {
+  width: 18%;
+}

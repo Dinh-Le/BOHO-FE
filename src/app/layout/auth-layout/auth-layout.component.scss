@@ -1,0 +1,10 @@
+@import "../../../../node_modules/bootstrap/scss/bootstrap.scss";
+
+:host {
+  @extend .d-flex;
+  @extend .justify-content-center !optional;
+  @extend .align-content-center !optional;
+  @extend .flex-column !optional;
+  @extend .flex-wrap !optional;
+  @extend .vh-100;
+}

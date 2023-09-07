@@ -1,56 +1,24 @@
-import { Component, OnInit } from '@angular/core';
-import { tick } from '@angular/core/testing';
-import { NavigationEnd, Router } from '@angular/router';
-import { LoadingService } from '@app/loading.service';
-import { filter } from 'rxjs';
-
-interface NavItem {
-  active: boolean;
-  title: string;
-  path: string;
-}
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { LoadingService } from '@app/services/loading.service';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { SidebarState } from 'src/app/state/sidebar.state';
 
 @Component({
   selector: 'app-content-layout',
   templateUrl: './content-layout.component.html',
-  styleUrls: ['./content-layout.component.css']
+  styleUrls: ['./content-layout.component.scss'],
 })
 export class ContentLayoutComponent implements OnInit {
-  navItems: NavItem[] = [
-    {
-      active: false,
-      title: 'Giám sát',
-      path: '/monitor'
-    },
-    {
-      active: false,
-      title: 'Tìm kiếm',
-      path: '/search'
-    },
-    {
-      active: false,
-      title: 'Báo cáo',
-      path: '/reports'
-    },
-    {
-      active: false,
-      title: 'Cài đặt',
-      path: '/settings'
-    },
-  ]
+  sidebarVisible: boolean;
+  sidebar$: Observable<SidebarState>;
 
   constructor(
-    router: Router,
+    store: Store<{ sidebar: SidebarState }>,
     private loadingService: LoadingService
   ) {
-    router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(event => {
-        const currentPath = (event as NavigationEnd).url;
-        for (const item of this.navItems) {
-          item.active = item.path === currentPath;
-        }
-      });
+    this.sidebar$ = store.select('sidebar');
+    this.sidebarVisible = true;
   }
 
   get loading() {
@@ -62,5 +30,8 @@ export class ContentLayoutComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.sidebar$.subscribe(
+      (newState) => (this.sidebarVisible = newState.state)
+    );
   }
 }

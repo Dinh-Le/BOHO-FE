@@ -1,0 +1,119 @@
+<div class="bg-dark border border-white">
+  <ng-template #content let-modal>
+    <div class="bg-dark">
+      <div class="d-flex justify-content-between align-items-center px-2">
+        <div style="font-size: 24px">Chi tiết sự kiện</div>
+        <a href="#" (click)="modal.dismiss(); (false)">
+          <i class="bi bi-x-lg"></i>
+        </a>
+      </div>
+      <div class="d-flex">
+        <img class="event-thumbnail" [src]="data.thumbnailUrl" />
+        <div
+          class="ms-2"
+          style="font-size: 14px; font-weight: normal; width: 300px"
+        >
+          <div style="font-size: 16px; font-weight: bold">
+            Chi tiết đối tượng
+          </div>
+          <div>Kênh: [Kênh video]</div>
+          <div>Khu vực: [watching zone]</div>
+          <div>Thời gian: yyyy-mm-dd hh:mm:ss</div>
+          <div>Đối tượng: [Object's ID]</div>
+          <div>Loại: [Object's class]</div>
+          <div>Màu sắc: [Object's colour]</div>
+          <div>Vi phạm: [Rule name]</div>
+          <div>Mức độ: [Serverity]</div>
+        </div>
+      </div>
+      <div class="d-flex px-2 mt-2">
+        <div class="w-100">
+          <div class="progress-bar"></div>
+          <div class="d-flex justify-content-center mt-4">
+            <a href="javascript:"><i class="fs-2 bi bi-skip-start"></i></a>
+            <a href="javascript:"><i class="fs-2 bi bi-skip-end"></i></a>
+            <a href="javascript:"><i class="fs-2 bi bi-skip-backward"></i></a>
+            <a href="javascript:"><i class="fs-2 bi bi-caret-left"></i></a>
+            <span style="font-size: 24px">hh:mm:ss</span>
+            <a href="javascript:"><i class="fs-2 bi bi-caret-right"></i></a>
+            <a href="javascript:"><i class="fs-2 bi bi-fast-forward"></i></a>
+          </div>
+        </div>
+        <div style="width: 300px"><span></span></div>
+      </div>
+      <div class="d-flex justify-content-end m-3">
+        <div ngbDropdown class="d-inline-block">
+          <button
+            type="button"
+            class="btn btn-sm btn-primary text-white mx-1"
+            ngbDropdownToggle
+          >
+            Xem video
+          </button>
+          <div ngbDropdownMenu>
+            <a href="javascript:" class="text-dark" ngbDropdownItem>Xem live</a>
+            <a href="javascript:" class="text-dark" ngbDropdownItem>Xem lại</a>
+          </div>
+        </div>
+        <div ngbDropdown class="d-inline-block">
+          <button
+            type="button"
+            class="btn btn-sm btn-primary text-white mx-1"
+            ngbDropdownToggle
+          >
+            Công nhận
+          </button>
+          <div ngbDropdownMenu>
+            <a href="javascript:" class="text-dark" ngbDropdownItem>Thật</a>
+            <a href="javascript:" class="text-dark" ngbDropdownItem>Giả</a>
+          </div>
+        </div>
+        <div ngbDropdown class="d-inline-block">
+          <button
+            type="button"
+            class="btn btn-sm btn-primary text-white mx-1"
+            ngbDropdownToggle
+          >
+            Xuất ra file
+          </button>
+          <div ngbDropdownMenu>
+            <a href="javascript:" class="text-dark" ngbDropdownItem>pdf</a>
+            <a href="javascript:" class="text-dark" ngbDropdownItem>zip</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="text-center">
+    <img
+      class="event-thumbnail"
+      [src]="data.thumbnailUrl"
+      (click)="showEventPlaybackDialog(content)"
+    />
+  </div>
+
+  <div
+    class="d-flex justify-content-between p-1"
+    [ngClass]="eventInfoBackgroundClass"
+  >
+    <div class="d-flex justify-content-between flex-column">
+      <div>{{ data.timestamp }}</div>
+      <div>{{ data.address }}</div>
+      <div>{{ data.eventType }}</div>
+    </div>
+    <div class="d-flex justify-content-between flex-column">
+      <div class="text-end">
+        <span class="me-1 licence-plate" *ngIf="data.licencePlate">{{
+          data.licencePlate
+        }}</span>
+        <i class="bi bi-car-front" *ngIf="data.object === 'car'"></i>
+        <i class="bi bi-person" *ngIf="data.object === 'human'"></i>
+      </div>
+      <div class="text-end">
+        <i class="bi bi-star-fill text-warning"></i>
+        <i class="ms-2 bi bi-check-circle"></i>
+      </div>
+    </div>
+  </div>
+</div>

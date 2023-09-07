@@ -2,26 +2,30 @@ import { Component } from '@angular/core';
 
 interface CameraChannel {
   name: string;
+  selected?: boolean;
 }
 
 interface Camera {
   name: string;
   expanded?: boolean;
   channels: CameraChannel[];
+  selected?: boolean;
 }
 
 interface Server {
   name: string;
   expanded?: boolean;
   cameras: Camera[];
+  selected?: boolean;
 }
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.css']
+  styleUrls: ['./sidebar.component.scss'],
 })
 export class SidebarComponent {
+  mode: string = 'by-group';
   servers: Server[] = [
     {
       name: 'Node name A',
@@ -140,4 +144,18 @@ export class SidebarComponent {
       ],
     },
   ];
+
+  onServerSelectionChanged(server: Server) {
+    server.cameras.forEach((camera) => {
+      camera.selected = server.selected;
+      this.onCameraSelectionChanged(camera);
+    });
+  }
+
+  onCameraSelectionChanged(camera: Camera, server?: Server) {
+    camera.channels.forEach((channel) => (channel.selected = camera.selected));
+    if (!camera.selected && server) {
+      server.selected = false;
+    }
+  }
 }

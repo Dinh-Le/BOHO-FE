@@ -1,0 +1,47 @@
+* {
+  font-size: 14px !important;
+}
+
+.my-pagination {
+  display: flex;
+  align-items: center;
+  align-content: flex-start;
+}
+
+.my-pagination a {
+  color: white;
+  text-decoration: none;
+  padding: 2px 2px;
+  outline: none;
+  border: none;
+}
+
+.my-pagination a:hover:not(.active) {
+  color: black;
+  background-color: lightgray;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  text-align: center;
+}
+
+.my-pagination a.active {
+  background-color: lightskyblue;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  color: black;
+  margin: auto;
+  padding: 0;
+}
+
+.view-wrapper {
+  /* navbar: 51px, toolbar: 34px * 2, row-gap: 1px * 2 */
+  height: calc(100vh - 51px - 34px * 2 - 2px) !important;
+}
+
+.scroll-y {
+  overflow-y: scroll;
+}

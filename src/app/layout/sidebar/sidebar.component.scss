@@ -1,0 +1,23 @@
+.nodes-container {
+  padding-left: 20px;
+}
+
+// .node-container:hover {
+//   background-color: lightgray;
+// }
+
+.node-title {
+  padding-left: 5px;
+}
+
+@import "../../../../node_modules/bootstrap/scss/bootstrap.scss";
+
+div,
+span {
+  @extend .text-white;
+}
+
+a {
+  @extend .text-white;
+  @extend .text-decoration-none;
+}
