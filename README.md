@@ -26,6 +26,10 @@ Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To u
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
 
-## Docker account
+## Docker
 
 Password: dckr_pat_L6B99ubtix1Y10vJoLrU-E1kFVM
+
+## Build docker image
+
+docker buildx build --platform linux/amd64 -t blackrookie/boho:v1.0 --push .
