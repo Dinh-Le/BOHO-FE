@@ -15,7 +15,7 @@
           [ngClass]="
             viewMode === 'map-view' ? 'btn-primary' : 'btn-outline-primary'
           "
-          class="btn btn-outline-primary text-white"
+          class="btn btn-outline-primary text-white ms-1"
           (click)="setMapView()"
         >
           Bản đồ
@@ -27,38 +27,25 @@
           [ngClass]="
             viewMode === 'list-view' ? 'btn-primary' : 'btn-outline-primary'
           "
-          class="btn me-2 text-white"
+          class="btn text-white ms-1"
         >
           Danh sách
         </button>
       </div>
-      <div ngbDropdown class="d-inline-block">
-        <button
-          type="button"
-          class="btn text-white"
-          [ngClass]="currentStartTime ? 'btn-primary' : 'btn-outline-primary'"
-          ngbDropdownToggle
-        >
-          Thời gian
-        </button>
-        <div ngbDropdownMenu>
-          <button
-            [ngClass]="item.selected ? 'bg-primary' : ''"
-            *ngFor="let item of startTimeDropdownItems"
-            ngbDropdownItem
-            (click)="
-              currentStartTime = onSelectionChanged(item, currentStartTime)
-            "
-          >
-            {{ item.label }}
-          </button>
-        </div>
-      </div>
+
+      <div style="width: 2px" class="bg-white mx-2"></div>
+
+      <app-select
+        [items]="startTimeDropdownItems"
+        label="Thời gian"
+        [formControl]="startTimeFormControl"
+      ></app-select>
       <app-select
         [items]="objectDropdownItems"
         label="Đối tượng"
         [multiple]="true"
         [formControl]="objectsFormControl"
+        class="ms-1"
       ></app-select>
       <app-select
         [items]="colourDropdownItems"
@@ -66,6 +53,7 @@
         [multiple]="true"
         [formControl]="coloursFormControl"
         [dropdownItemTemplate]="colourDropDownItemTemplate"
+        class="ms-1"
       ></app-select>
       <ng-template
         #colourDropDownItemTemplate
@@ -85,12 +73,14 @@
         label="Vi phạm"
         [multiple]="true"
         [formControl]="rulesFormControl"
+        class="ms-1"
       ></app-select>
       <app-select
         [items]="severitiesDropdownItems"
         label="Mức độ"
         [multiple]="true"
         [formControl]="severitiesFormControl"
+        class="ms-1"
       ></app-select>
     </div>
 
@@ -122,7 +112,12 @@
       </div>
     </div>
 
-    <div class="bg-dark text-white my-pagination">
+    <app-pagination
+      [totalPages]="10"
+      [windowSize]="5"
+      [totalItems]="1200"
+    ></app-pagination>
+    <!-- <div class="bg-dark text-white my-pagination">
       <span class="fw-bold">12,000 ket qua</span>
       <a href="javascript:0" (click)="first()"
         ><i class="fw-bold bi-chevron-bar-left"></i
@@ -142,7 +137,7 @@
       <a href="javascript:0" (click)="last()"
         ><i class="fw-bold bi-chevron-bar-right"></i
       ></a>
-    </div>
+    </div> -->
   </div>
   <div
     [ngSwitch]="viewMode"

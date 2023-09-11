@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-pagination',
@@ -7,15 +7,56 @@ import { Component, Input } from '@angular/core';
 })
 export class PaginationComponent {
   @Input()
-  total: number = 0;
+  totalItems: number = 0;
 
-  first() {}
+  @Input()
+  totalPages: number = 0;
 
-  previous() {}
+  @Input()
+  windowSize: number = 5;
 
-  selectPage() {}
+  currentPage: number = 1;
 
-  next() {}
+  @Output()
+  changed = new EventEmitter<number>();
 
-  last() {}
+  get halfWindowSize(): number {
+    return Math.floor(this.windowSize / 2);
+  }
+
+  get pages(): number[] {
+    if (this.totalPages <= this.windowSize) {
+      return Array(this.totalPages)
+        .fill(0)
+        .map((_, index) => index);
+    }
+
+    let start = Math.min(
+      Math.max(1, this.currentPage - this.halfWindowSize),
+      this.totalPages - this.windowSize
+    );
+    return Array(this.windowSize)
+      .fill(start)
+      .map((base, index) => base + index);
+  }
+
+  first() {
+    this.currentPage = 1;
+  }
+
+  previous() {
+    this.currentPage = Math.max(1, this.currentPage - 1);
+  }
+
+  selectPage(page: number) {
+    this.currentPage = page;
+  }
+
+  next() {
+    this.currentPage = Math.min(this.totalPages - 1, this.currentPage + 1);
+  }
+
+  last() {
+    this.currentPage = this.totalPages - 1;
+  }
 }

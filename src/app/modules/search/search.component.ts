@@ -39,37 +39,37 @@ export class SearchComponent implements OnInit {
   startTimeDropdownItems: ItemModel[] = [
     {
       label: '5p trước',
-      value: '',
+      value: '5m',
       data: () => moment().subtract(5, 'minute'),
     },
     {
       label: '10p trước',
-      value: '',
+      value: '10m',
       data: () => moment().subtract(10, 'minute'),
     },
     {
       label: '30p trước',
-      value: '',
+      value: '30m',
       data: () => moment().subtract(30, 'minute'),
     },
     {
       label: '1h trước',
-      value: '',
+      value: '1h',
       data: () => moment().subtract(1, 'hour'),
     },
     {
       label: 'Hôm nay',
-      value: '',
+      value: 'today',
       data: () => moment().startOf('day'),
     },
     {
       label: 'Hôm qua',
-      value: '',
+      value: 'yester',
       data: () => moment().startOf('day').subtract(1, 'day'),
     },
     {
       label: 'Tuần qua',
-      value: '',
+      value: 'last-week',
       data: () => moment().startOf('week'),
     },
   ];
@@ -199,12 +199,12 @@ export class SearchComponent implements OnInit {
   gridViewFormControl: FormControl = new FormControl(
     this.gridColumnSelectItems[0]
   );
+  startTimeFormControl: FormControl = new FormControl(null);
   objectsFormControl: FormControl = new FormControl([]);
   coloursFormControl: FormControl = new FormControl([]);
   severitiesFormControl: FormControl = new FormControl([]);
   rulesFormControl: FormControl = new FormControl([]);
   statusFormControl: FormControl = new FormControl(this.statusDropdownItems[0]);
-  currentStartTime: ItemModel | undefined;
   currentPage = 5;
   viewMode: string = 'grid-view';
 
