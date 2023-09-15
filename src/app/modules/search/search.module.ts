@@ -2,7 +2,11 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SearchComponent } from './search.component';
 import { SearchRoutingModule } from './search-routing.module';
-import { NgbDropdownModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbDropdownModule,
+  NgbPaginationModule,
+  NgbTooltipModule,
+} from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from '@shared/shared.module';
 import { ListViewComponent } from './components/list-view/list-view.component';
 import { MapViewComponent } from './components/map-view/map-view.component';
@@ -12,8 +16,6 @@ import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PaginationComponent } from './components/pagination/pagination.component';
 
-
-
 @NgModule({
   declarations: [
     SearchComponent,
@@ -21,7 +23,7 @@ import { PaginationComponent } from './components/pagination/pagination.componen
     MapViewComponent,
     GridViewComponent,
     EventComponent,
-    PaginationComponent
+    PaginationComponent,
   ],
   imports: [
     CommonModule,
@@ -29,9 +31,10 @@ import { PaginationComponent } from './components/pagination/pagination.componen
     ReactiveFormsModule,
     NgbDropdownModule,
     NgbPaginationModule,
+    NgbTooltipModule,
     SharedModule,
     SearchRoutingModule,
-    LeafletModule
-  ]
+    LeafletModule,
+  ],
 })
-export class SearchModule { }
+export class SearchModule {}

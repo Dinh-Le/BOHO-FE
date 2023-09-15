@@ -197,7 +197,7 @@ export class SearchComponent implements OnInit {
   ];
 
   gridViewFormControl: FormControl = new FormControl(
-    this.gridColumnSelectItems[0]
+    this.gridColumnSelectItems[3]
   );
   startTimeFormControl: FormControl = new FormControl(null);
   objectsFormControl: FormControl = new FormControl([]);
