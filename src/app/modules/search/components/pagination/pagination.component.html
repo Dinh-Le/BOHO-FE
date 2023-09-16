@@ -1,16 +1,16 @@
 <div class="bg-dark text-white my-pagination">
-  <span class="fw-bold">12,000 ket qua</span>
+  <span class="fw-bold">{{ totalItems }} kết quả</span>
   <a
     href="javascript:0"
     (click)="first()"
-    [ngClass]="{ 'pe-none': currentPage == 0 }"
+    [ngClass]="{ 'pe-none text-secondary': currentPage == 1 }"
     class="mx-1"
     ><i class="fw-bold bi-chevron-bar-left"></i
   ></a>
   <a
     href="javascript:0"
     (click)="previous()"
-    [ngClass]="{ 'pe-none': currentPage == 0 }"
+    [ngClass]="{ 'pe-none text-secondary': currentPage == 1 }"
     class="mx-1"
     ><i class="fw-bold bi bi-chevron-double-left"></i
   ></a>
@@ -26,14 +26,14 @@
   <a
     href="javascript:0"
     (click)="next()"
-    [ngClass]="{ 'pe-none': currentPage == totalPages }"
+    [ngClass]="{ 'pe-none text-secondary': currentPage == totalPages }"
     class="mx-1"
     ><i class="fw-bold bi bi-chevron-double-right"></i
   ></a>
   <a
     href="javascript:0"
     (click)="last()"
-    [ngClass]="{ 'pe-none': currentPage == totalPages }"
+    [ngClass]="{ 'pe-none text-secondary': currentPage == totalPages }"
     class="mx-1"
     ><i class="fw-bold bi-chevron-bar-right"></i
   ></a>

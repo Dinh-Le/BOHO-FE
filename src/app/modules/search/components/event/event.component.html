@@ -83,7 +83,7 @@
     </div>
   </div>
 </ng-template>
-<div class="bg-dark border border-white h-100 d-flex flex-column">
+<div class="h-100 d-flex flex-column">
   <div class="text-center flex-grow-1 d-flex align-items-center">
     <img
       class="event-thumbnail"
@@ -95,6 +95,7 @@
   <div
     style="display: grid; grid-template-columns: minmax(0, 1fr) auto"
     [ngClass]="eventInfoBackgroundClass"
+    class="p-2"
   >
     <div class="d-flex justify-content-between flex-column">
       <div class="text-truncate" [ngbTooltip]="data.timestamp">

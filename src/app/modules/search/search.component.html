@@ -113,9 +113,9 @@
     </div>
 
     <app-pagination
-      [totalPages]="10"
-      [windowSize]="5"
-      [totalItems]="1200"
+      [pageLength]="paginationInfo.pageLength"
+      [totalItems]="paginationInfo.totalItems"
+      [(ngModel)]="paginationInfo.currentPage"
     ></app-pagination>
   </div>
   <div
@@ -126,6 +126,7 @@
     <app-grid-view
       *ngSwitchCase="'grid-view'"
       [cols]="currentGridColumns"
+      [events]="currentEvents"
     ></app-grid-view>
     <app-map-view *ngSwitchCase="'map-view'"></app-map-view>
     <app-list-view *ngSwitchCase="'list-view'"></app-list-view>

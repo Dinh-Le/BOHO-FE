@@ -7,7 +7,7 @@ import { anonymous, isAuthenticated } from '@app/guards';
 const routes: Routes = [
   {
     path: '',
-    canActivate: [isAuthenticated],
+    // canActivate: [isAuthenticated],
     component: ContentLayoutComponent,
     children: [
       {

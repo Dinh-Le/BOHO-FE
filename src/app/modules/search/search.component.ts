@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { LoadingService } from '@app/services/loading.service';
 import { SelectItemModel } from '@shared/models/select-item-model';
 import * as moment from 'moment';
+import { EventInfo } from 'src/app/data/schema/event-info';
+import { EventService } from 'src/app/data/service/event.service';
 
 interface ItemModel {
   label: string;
@@ -18,6 +20,9 @@ interface ItemModel {
   styleUrls: ['./search.component.scss'],
 })
 export class SearchComponent implements OnInit {
+  private eventService = inject(EventService);
+  private loadingService = inject(LoadingService);
+
   gridColumnSelectItems: SelectItemModel[] = [
     {
       label: '2 cot',
@@ -205,11 +210,18 @@ export class SearchComponent implements OnInit {
   severitiesFormControl: FormControl = new FormControl([]);
   rulesFormControl: FormControl = new FormControl([]);
   statusFormControl: FormControl = new FormControl(this.statusDropdownItems[0]);
-  currentPage = 5;
   viewMode: string = 'grid-view';
-  pageSize: number = 50;
 
-  constructor(private loadingService: LoadingService) {}
+  paginationInfo: {
+    currentPage: number;
+    pageLength: number;
+    totalItems: number;
+  } = {
+    currentPage: 1,
+    pageLength: 30,
+    totalItems: 0,
+  };
+  events: EventInfo[] = [];
 
   ngOnInit(): void {
     this.gridViewFormControl.valueChanges.subscribe((value) => {
@@ -217,6 +229,29 @@ export class SearchComponent implements OnInit {
         this.viewMode = 'grid-view';
       }
     });
+
+    this.eventService.findAll().subscribe((events) => {
+      this.events = events;
+      this.paginationInfo.totalItems = this.events.length;
+    });
+  }
+
+  get currentEvents(): (EventInfo | null)[] {
+    let startIndex =
+      (this.paginationInfo.currentPage - 1) * this.paginationInfo.pageLength;
+    let endIndex = startIndex + this.paginationInfo.pageLength;
+
+    let currentEvents: (EventInfo | null)[] = this.events.slice(
+      startIndex,
+      endIndex
+    );
+
+    if (currentEvents.length < this.paginationInfo.pageLength) {
+      let n = this.paginationInfo.pageLength - currentEvents.length;
+      currentEvents.push(...Array(n).fill(null));
+    }
+
+    return currentEvents;
   }
 
   get currentGridColumns() {
@@ -231,5 +266,9 @@ export class SearchComponent implements OnInit {
   search() {
     this.loadingService.loading = true;
     setTimeout(() => (this.loadingService.loading = false), 3000);
+  }
+
+  onPageChanged(value: number) {
+    this.paginationInfo.currentPage = value;
   }
 }
