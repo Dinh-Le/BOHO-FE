@@ -2,27 +2,31 @@
   <div class="d-flex justify-content-between">
     <span class="text-white">Tự động ẩn</span>
     <div class="form-check form-switch">
-      <input class="form-check-input bg-dark" type="checkbox" />
+      <input
+        class="form-check-input bg-dark"
+        type="checkbox"
+        [(ngModel)]="autoHideEnabled"
+      />
     </div>
   </div>
   <div class="border-bottom d-flex justify-content-around pb-1 mt-4">
     <a
       href="javascript:"
       class="col"
-      class="border-primary"
+      class="border-primary border-2"
       [ngClass]="{ 'border-bottom': mode === 'by-group' }"
       (click)="mode = 'by-group'"
       >Xem nhóm</a
     >
     <a
       href="javascript:"
-      class="border-primary"
+      class="border-primary border-2"
       [ngClass]="{ 'border-bottom': mode === 'by-node' }"
       (click)="mode = 'by-node'"
       >Xem node</a
     >
   </div>
-  <div class="bg-dark text-light flex-grow-1">
+  <div class="bg-dark text-light flex-grow-1 mt-2">
     <div class="p-1">
       <div *ngFor="let server of servers">
         <div class="d-flex node-container">

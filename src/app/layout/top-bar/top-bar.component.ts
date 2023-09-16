@@ -51,7 +51,8 @@ export class TopBarComponent {
       });
   }
 
-  toggleSidebar() {
+  toggleSidebar(event: Event) {
     this.store.dispatch(SidebarActions.toggle());
+    event.stopPropagation();
   }
 }

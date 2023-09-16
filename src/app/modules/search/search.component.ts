@@ -207,6 +207,7 @@ export class SearchComponent implements OnInit {
   statusFormControl: FormControl = new FormControl(this.statusDropdownItems[0]);
   currentPage = 5;
   viewMode: string = 'grid-view';
+  pageSize: number = 50;
 
   constructor(private loadingService: LoadingService) {}
 
@@ -231,47 +232,4 @@ export class SearchComponent implements OnInit {
     this.loadingService.loading = true;
     setTimeout(() => (this.loadingService.loading = false), 3000);
   }
-
-  onSelectionChanged(
-    value: ItemModel,
-    selectedValue: ItemModel | ItemModel[] | undefined,
-    handler?: () => void
-  ): any {
-    if (Array.isArray(selectedValue)) {
-      const index = selectedValue.findIndex((e) => e.value === value.value);
-
-      if (index === -1) {
-        selectedValue.push(value);
-        value.class = 'bg-primary';
-        value.selected = true;
-      } else {
-        selectedValue.splice(index, 1);
-        value.class = '';
-        value.selected = false;
-      }
-    } else {
-      if (selectedValue !== undefined) {
-        selectedValue.selected = false;
-      }
-
-      selectedValue = value;
-      selectedValue.selected = true;
-    }
-
-    if (handler) {
-      handler.bind(this)();
-    }
-
-    return selectedValue;
-  }
-
-  first() {}
-
-  previous() {}
-
-  selectPage() {}
-
-  next() {}
-
-  last() {}
 }

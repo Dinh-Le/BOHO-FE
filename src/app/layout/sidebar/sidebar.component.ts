@@ -1,4 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, HostListener } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { SidebarActions } from 'src/app/state/sidebar.action';
+import { SidebarState } from 'src/app/state/sidebar.state';
 
 interface CameraChannel {
   name: string;
@@ -144,6 +147,12 @@ export class SidebarComponent {
       ],
     },
   ];
+  autoHideEnabled: boolean = false;
+
+  constructor(
+    private eRef: ElementRef,
+    private store: Store<{ sidebar: SidebarState }>
+  ) {}
 
   onServerSelectionChanged(server: Server) {
     server.cameras.forEach((camera) => {
@@ -156,6 +165,15 @@ export class SidebarComponent {
     camera.channels.forEach((channel) => (channel.selected = camera.selected));
     if (!camera.selected && server) {
       server.selected = false;
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  clickout(event: Event) {
+    if (!this.eRef.nativeElement.contains(event.target)) {
+      if (this.autoHideEnabled) {
+        this.store.dispatch(SidebarActions.hide());
+      }
     }
   }
 }
