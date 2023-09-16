@@ -21,3 +21,8 @@ a {
   @extend .text-white;
   @extend .text-decoration-none;
 }
+
+.camera-menu-container {
+  overflow-y: scroll;
+  height: calc(100vh - 49px - 3.7rem - 22.75px - 27.5px);
+}

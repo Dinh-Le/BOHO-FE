@@ -146,6 +146,122 @@ export class SidebarComponent {
         },
       ],
     },
+    {
+      name: 'Node name A',
+      expanded: true,
+      cameras: [
+        {
+          name: 'Channel group 1',
+          expanded: true,
+          channels: [
+            {
+              name: 'Channel name 1',
+            },
+            {
+              name: 'Channel name 2',
+            },
+          ],
+        },
+        {
+          name: 'Channel group 2',
+          channels: [
+            {
+              name: 'Channel name 1',
+            },
+            {
+              name: 'Channel name 2',
+            },
+          ],
+        },
+        {
+          name: 'Channel group 3',
+          channels: [
+            {
+              name: 'Channel name 1',
+            },
+            {
+              name: 'Channel name 2',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'Node name B',
+      cameras: [
+        {
+          name: 'Channel group 1',
+          channels: [
+            {
+              name: 'Channel name 1',
+            },
+            {
+              name: 'Channel name 2',
+            },
+          ],
+        },
+        {
+          name: 'Channel group 2',
+          channels: [
+            {
+              name: 'Channel name 1',
+            },
+            {
+              name: 'Channel name 2',
+            },
+          ],
+        },
+        {
+          name: 'Channel group 3',
+          channels: [
+            {
+              name: 'Channel name 1',
+            },
+            {
+              name: 'Channel name 2',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'Node name C',
+      cameras: [
+        {
+          name: 'Channel group 1',
+          channels: [
+            {
+              name: 'Channel name 1',
+            },
+            {
+              name: 'Channel name 2',
+            },
+          ],
+        },
+        {
+          name: 'Channel group 2',
+          channels: [
+            {
+              name: 'Channel name 1',
+            },
+            {
+              name: 'Channel name 2',
+            },
+          ],
+        },
+        {
+          name: 'Channel group 3',
+          channels: [
+            {
+              name: 'Channel name 1',
+            },
+            {
+              name: 'Channel name 2',
+            },
+          ],
+        },
+      ],
+    },
   ];
   autoHideEnabled: boolean = false;
 

@@ -1,4 +1,7 @@
-<div class="bg-dark h-100 d-flex flex-column p-2">
+<div
+  class="bg-dark h-100 p-2"
+  style="display: grid; grid-template-rows: auto auto minmax(500px, 1fr)"
+>
   <div class="d-flex justify-content-between">
     <span class="text-white">Tự động ẩn</span>
     <div class="form-check form-switch">
@@ -26,7 +29,7 @@
       >Xem node</a
     >
   </div>
-  <div class="bg-dark text-light flex-grow-1 mt-2">
+  <div class="bg-dark text-light mt-2 camera-menu-container">
     <div class="p-1">
       <div *ngFor="let server of servers">
         <div class="d-flex node-container">
@@ -45,7 +48,7 @@
             (ngModelChange)="onServerSelectionChanged(server)"
           />
           <i class="bi bi-folder-fill text-white ps-1"></i>
-          <span class="node-title">{{ server.name }}</span>
+          <span class="text-truncate node-title">{{ server.name }}</span>
         </div>
 
         <div
@@ -70,7 +73,7 @@
               (ngModelChange)="onCameraSelectionChanged(camera, server)"
             />
             <i class="bi bi-folder-fill text-white ps-1"></i>
-            <span class="node-title">{{ camera.name }}</span>
+            <span class="text-truncate node-title">{{ camera.name }}</span>
           </div>
 
           <div
@@ -85,7 +88,7 @@
                 [(ngModel)]="channel.selected"
               />
               <i class="bi bi-camera-video-fill text-primary ps-1"></i>
-              <span class="node-title">{{ channel.name }}</span>
+              <span class="text-truncate node-title">{{ channel.name }}</span>
             </div>
           </div>
         </div>
