@@ -1,0 +1,10 @@
+@import "../../../../../variables";
+
+.event-thumbnail {
+  height: 100%;
+  width: auto;
+}
+
+:host {
+  background: $body-bg;
+}

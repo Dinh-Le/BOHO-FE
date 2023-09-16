@@ -210,7 +210,7 @@ export class SearchComponent implements OnInit {
   severitiesFormControl: FormControl = new FormControl([]);
   rulesFormControl: FormControl = new FormControl([]);
   statusFormControl: FormControl = new FormControl(this.statusDropdownItems[0]);
-  viewMode: string = 'grid-view';
+  viewMode: string = 'list-view';
 
   paginationInfo: {
     currentPage: number;
@@ -258,9 +258,13 @@ export class SearchComponent implements OnInit {
     return (this.gridViewFormControl.value as SelectItemModel)?.value || '0';
   }
 
-  setMapView() {
-    this.viewMode = 'map-view';
-    this.gridViewFormControl.setValue(null);
+  setViewMode(mode: string) {
+    if (mode != this.viewMode) {
+      this.viewMode = mode;
+      if (mode !== 'grid-view') {
+        this.gridViewFormControl.setValue(null);
+      }
+    }
   }
 
   search() {

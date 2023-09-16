@@ -16,7 +16,7 @@
             viewMode === 'map-view' ? 'btn-primary' : 'btn-outline-primary'
           "
           class="btn btn-outline-primary text-white ms-1"
-          (click)="setMapView()"
+          (click)="setViewMode('map-view')"
         >
           Bản đồ
         </button>
@@ -28,6 +28,7 @@
             viewMode === 'list-view' ? 'btn-primary' : 'btn-outline-primary'
           "
           class="btn text-white ms-1"
+          (click)="setViewMode('list-view')"
         >
           Danh sách
         </button>
@@ -121,7 +122,7 @@
   <div
     [ngSwitch]="viewMode"
     class="view-wrapper"
-    [ngClass]="{ 'scroll-y': viewMode === 'grid-view' }"
+    [ngClass]="{ 'scroll-y': viewMode !== 'map-view' }"
   >
     <app-grid-view
       *ngSwitchCase="'grid-view'"
@@ -129,7 +130,10 @@
       [events]="currentEvents"
     ></app-grid-view>
     <app-map-view *ngSwitchCase="'map-view'"></app-map-view>
-    <app-list-view *ngSwitchCase="'list-view'"></app-list-view>
+    <app-list-view
+      *ngSwitchCase="'list-view'"
+      [events]="currentEvents"
+    ></app-list-view>
     <div *ngSwitchDefault>Unsupported view mode</div>
   </div>
 </div>

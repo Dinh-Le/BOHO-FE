@@ -1,1 +1,31 @@
-<p class="text-white">list-view works!</p>
+<div *ngFor="let item of events" style="background: inherit" class="py-1">
+  <div
+    class="d-flex align-items-center p-1"
+    style="height: 100px; gap: 0.2rem"
+    [ngClass]="getEventInfoBackgroundClass(item?.level)"
+  >
+    <a class="btn"><i class="bi bi-star-fill text-warning"></i></a>
+    <a class="btn"><i class="bi bi-check-circle"></i></a>
+    <div class="text-center d-flex align-items-center h-100">
+      <img class="event-thumbnail" [src]="item?.thumbnailUrl" />
+    </div>
+    <div class="ps-5 pe-3 d-flex justify-content-between flex-grow-1 h-100">
+      <div class="h-100">
+        <div class="fs-20">{{ item?.address }}</div>
+        <div class="fs-16 mt-2">{{ item?.eventType }}</div>
+      </div>
+      <div class="h-100 d-flex flex-column justify-content-between">
+        <div class="fs-20">{{ item?.timestamp }}</div>
+        <div class="d-flex justify-content-end">
+          <span
+            class="me-3 licence-plate text-nowrap fs-16"
+            *ngIf="item?.licencePlate"
+            >{{ item?.licencePlate }}</span
+          >
+          <div class="car-side-32" *ngIf="item?.object === 'car'"></div>
+          <div class="person-walking-32" *ngIf="item?.object === 'human'"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
