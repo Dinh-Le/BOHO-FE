@@ -1,6 +1,15 @@
-import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ComponentRef,
+  Input,
+  OnInit,
+  ViewContainerRef,
+  inject,
+} from '@angular/core';
 import * as Leaflet from 'leaflet';
 import { EventInfo } from 'src/app/data/schema/event-info';
+import { EventComponent } from '../event/event.component';
 
 @Component({
   selector: 'app-map-view',
@@ -8,6 +17,8 @@ import { EventInfo } from 'src/app/data/schema/event-info';
   styleUrls: ['./map-view.component.scss'],
 })
 export class MapViewComponent {
+  private viewContainerRef: ViewContainerRef = inject(ViewContainerRef);
+
   map!: Leaflet.Map;
   markers: Leaflet.Marker[] = [];
   options: Leaflet.MapOptions = {
@@ -55,52 +66,19 @@ export class MapViewComponent {
         .addTo(this.map)
         .bindPopup(`<b>${data.position.lat},  ${data.position.lng}</b>`);
       marker.on('mouseover', (event: Leaflet.LeafletMouseEvent) => {
+        const eventComponentRef: ComponentRef<EventComponent> =
+          this.viewContainerRef.createComponent(EventComponent);
+        eventComponentRef.instance.data = this.events[index]!;
+        eventComponentRef.hostView.detectChanges();
+
         const marker = event.target as Leaflet.Marker;
-        const eventInfo = this.events[0];
-        const popupContent = `
-        <div class="h-100 d-flex flex-column w-100">
-          <div class="text-center flex-grow-1 d-flex align-items-center">
-            <img
-              class="h-auto w-100"
-              src="${eventInfo?.thumbnailUrl}"
-            />
-          </div>
-          <div
-            style="display: grid; grid-template-columns: minmax(0, 1fr) auto;"
-            class="p-2 bg-danger"
-          >
-            <div class="d-flex justify-content-between flex-column">
-              <div class="text-truncate">
-                ${eventInfo?.timestamp}
-              </div>
-              <div class="text-truncate">
-                ${eventInfo?.address}
-              </div>
-              <div class="text-truncate">
-                ${eventInfo?.eventType}
-              </div>
-            </div>
-            <div class="d-flex flex-column justify-content-between">
-              <div class="text-end d-flex">
-                <span
-                  class="me-1 licence-plate text-nowrap"
-                  >${eventInfo?.licencePlate || ' '}</span
-                >
-                <div class="car-side-32"></div>
-              </div>
-              <div class="text-end">
-                <i class="bi bi-star-fill text-warning"></i>
-                <i class="ms-2 bi bi-check-circle"></i>
-              </div>
-            </div>
-          </div>
-        </div>`;
-        marker.bindPopup(popupContent, {
+        marker.bindPopup(eventComponentRef.location.nativeElement, {
           maxWidth: 500,
           minWidth: 500,
           closeButton: false,
           className: 'event-popup',
         });
+
         marker.openPopup();
       });
       this.map.panTo(data.position);
