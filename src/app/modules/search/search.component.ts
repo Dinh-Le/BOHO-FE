@@ -210,7 +210,7 @@ export class SearchComponent implements OnInit {
   severitiesFormControl: FormControl = new FormControl([]);
   rulesFormControl: FormControl = new FormControl([]);
   statusFormControl: FormControl = new FormControl(this.statusDropdownItems[0]);
-  viewMode: string = 'list-view';
+  viewMode: string = 'map-view';
 
   paginationInfo: {
     currentPage: number;
@@ -246,7 +246,10 @@ export class SearchComponent implements OnInit {
       endIndex
     );
 
-    if (currentEvents.length < this.paginationInfo.pageLength) {
+    if (
+      this.viewMode === 'grid-view' &&
+      currentEvents.length < this.paginationInfo.pageLength
+    ) {
       let n = this.paginationInfo.pageLength - currentEvents.length;
       currentEvents.push(...Array(n).fill(null));
     }

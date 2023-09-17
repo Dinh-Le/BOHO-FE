@@ -24,5 +24,7 @@ a {
 
 .camera-menu-container {
   overflow-y: scroll;
-  height: calc(100vh - 49px - 3.7rem - 22.75px - 27.5px);
+  height: calc(
+    100vh - 49px - 0.2rem - 0.5rem * 2 - 22.75px - 1.5rem - 27.5px - 0.5rem
+  );
 }

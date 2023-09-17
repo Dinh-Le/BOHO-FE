@@ -9,4 +9,8 @@ export interface EventInfo {
   object: string;
   favorite: boolean;
   seen: boolean;
+  location?: {
+    lat: string;
+    lng: string;
+  };
 }

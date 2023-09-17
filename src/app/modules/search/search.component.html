@@ -129,7 +129,10 @@
       [cols]="currentGridColumns"
       [events]="currentEvents"
     ></app-grid-view>
-    <app-map-view *ngSwitchCase="'map-view'"></app-map-view>
+    <app-map-view
+      *ngSwitchCase="'map-view'"
+      [events]="currentEvents"
+    ></app-map-view>
     <app-list-view
       *ngSwitchCase="'list-view'"
       [events]="currentEvents"

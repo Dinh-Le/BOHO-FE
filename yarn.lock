@@ -4604,7 +4604,7 @@ launch-editor@^2.6.0:
     picocolors "^1.0.0"
     shell-quote "^1.7.3"
 
-leaflet@^1.9.4:
+leaflet@^1.1.0, leaflet@^1.9.4:
   version "1.9.4"
   resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-1.9.4.tgz#23fae724e282fa25745aff82ca4d394748db7d8d"
   integrity sha512-nxS1ynzJOmOlHp+iL3FyWqK89GtNL8U8rvlMOsQdTTssxZwCXh8N2NB3GDQOL+YR3XnWyZAxwQixURb+FA74PA==
@@ -5048,6 +5048,13 @@ ngx-loading@^15.0.0:
   integrity sha512-8/+3+ILdOCfnxc/WV0lwKTpThoM4mekI2coO1MkEI+Bc7iW8x3X82ruYPG7fbHBibIo36YrOXzM3DPHJptimZw==
   dependencies:
     tslib "^2.3.0"
+
+ngx.leaflet.offline@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/ngx.leaflet.offline/-/ngx.leaflet.offline-1.1.2.tgz#1ca30691b31a408e51cb57a1bf2d95aa35c18b8d"
+  integrity sha512-vhB3J064qg1p49QvFnDXYtKWn771M9zTTCq4kJosKhUCJjOnvUp5WJ7NGcO/uPwsWANVQOhXdph4qxmr/FIYwg==
+  dependencies:
+    leaflet "^1.1.0"
 
 nice-napi@^1.0.2:
   version "1.0.2"

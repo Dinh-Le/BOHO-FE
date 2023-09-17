@@ -1,0 +1,23 @@
+@import "../../../../../variables";
+
+:host {
+  display: flex;
+  gap: 0.5rem;
+  background: $body-bg;
+  height: calc(100vh - 49px - 0.2rem - 33.78px * 2);
+  padding-top: 0.4rem;
+}
+
+::ng-deep .event-popup .leaflet-popup-content-wrapper {
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+::ng-deep .event-popup .leaflet-popup-content-wrapper .leaflet-popup-content {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+::ng-deep .event-popup .leaflet-popup-tip {
+  display: none;
+}
