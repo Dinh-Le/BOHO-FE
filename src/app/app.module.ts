@@ -14,6 +14,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { sidebarReducer } from './state/sidebar.reducer';
 import { TopBarComponent } from './layout/top-bar/top-bar.component';
+import { DataModule } from './data/data.module';
+import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   imports: [
@@ -29,11 +31,13 @@ import { TopBarComponent } from './layout/top-bar/top-bar.component';
     StoreModule.forRoot({ sidebar: sidebarReducer }),
 
     // core & shared
-    CoreModule,
+    CoreModule.forRoot(),
+    DataModule.forRoot(),
     SharedModule,
 
     // app module
     AppRoutingModule,
+    NgbToastModule,
   ],
   providers: [{ provide: LocationStrategy, useClass: PathLocationStrategy }],
   bootstrap: [AppComponent],

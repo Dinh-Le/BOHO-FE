@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { JWTTokenService } from '../../core/services/jwt-token.service';
-import { BOHOEndpoints } from '../constants/endpoints';
+import { BOHOEndpoints } from '../schema/boho-v2/endpoints';
 import {
   LoginResponse,
   UpdatePasswordRequest,
   UserCredentials,
-} from '../schema/user';
-import { ResponseBase } from '../schema/response-base';
+} from '../schema/boho-v2/user';
+import { ResponseBase } from '../schema/boho-v2/response-base';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {

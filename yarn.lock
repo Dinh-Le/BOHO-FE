@@ -1623,6 +1623,13 @@
   dependencies:
     tslib "^2.3.0"
 
+"@ngrx/component-store@^16.2.0":
+  version "16.2.0"
+  resolved "https://registry.yarnpkg.com/@ngrx/component-store/-/component-store-16.2.0.tgz#507667c91ddc1f4d0568bdab3729fd45c6383992"
+  integrity sha512-XpLt2AY6BiITv/pQjr0ATNMRflxY0XWy/DRMaTvoR7DPH5o3E/wojbogpj9lDi07rTWmONlvmbUuUoF5QmKB0Q==
+  dependencies:
+    tslib "^2.0.0"
+
 "@ngrx/store@^16.2.0":
   version "16.2.0"
   resolved "https://registry.yarnpkg.com/@ngrx/store/-/store-16.2.0.tgz#2e3a336740e472b751f3f0765e09a429019c3523"

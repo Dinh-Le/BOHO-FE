@@ -1,0 +1,795 @@
+var token;
+
+/////////////////// login ///////////////////
+$.ajax({
+    type:"post",                
+    url:"http://211.230.189.173:5500/login",
+    async:false,
+    dataType:"json",
+    headers: {                            
+        'content-type':'application/json',
+        'Authorization': 'None'
+    },
+    data: JSON.stringify({
+        name: 'root',
+        password: 'Goback@2021'
+    }),
+    success: function(data){
+        token = data['data'];
+    },
+    error : function(e) {
+        console.info("Error");
+    },
+    done : function(e) {
+        console.info("DONE");
+    }
+})
+/////////////////// login ///////////////////
+
+
+/////////////////// device ///////////////////
+
+function device_reg(button){
+    // console.log(button.parent().parent().find('input'));
+    var input_value = button.parent().parent().find('input');
+
+    $.ajax({
+        type:"post",                
+        url:"http://211.230.189.173:5500/device",
+        async:false,
+        dataType:"json",
+        headers: {                            
+            'content-type':'application/json',
+            'Authorization': 'Bearer ' +token
+        },
+        data: JSON.stringify({
+            "device" : {
+                "type" : input_value[0]['value'],
+                "name" : input_value[1]['value'],
+                "location": {
+                    "lat": input_value[2]['value'],
+                    "long": input_value[3]['value']
+                },
+                "region" : input_value[4]['value'],
+                "meta_data" : {
+                    "ip" : input_value[5]['value'],
+                    "http_port" : input_value[6]['value'],
+                    "rtsp_port" : input_value[7]['value'],
+                    "user" : input_value[8]['value'],
+                    "password" : input_value[9]['value']
+                }
+            }
+        }),
+        success: function(data){
+            alert("The device has been registered.");
+            location.href='device_list';
+        },
+        error : function(e) {
+            console.info("Error");
+        },
+        done : function(e) {
+            console.info("DONE");
+        }
+    })
+}
+
+function device_edit(button){
+    console.log(button.parent().parent().find('input'));
+    var input_value = button.parent().parent().find('input');
+    var id = input_value[0]['value'];
+
+    console.log(`"device_id" : `+input_value[0]['value']+`
+    "device" : {
+        "type" : `+input_value[1]['value']+`,
+        "name" : `+input_value[2]['value']+`,
+        "location": {
+            "lat": `+input_value[3]['value']+`,
+            "long": `+input_value[4]['value']+`
+        },
+        "region" : `+input_value[5]['value']+`,
+        "meta_data" : {
+            "ip" : `+input_value[6]['value']+`,
+            "http_port" : `+input_value[7]['value']+`,
+            "rtsp_port" : `+input_value[8]['value']+`,
+            "user" : `+input_value[9]['value']+`,
+            "password" : `+input_value[10]['value']+`
+        }
+    }`)
+    $.ajax({
+        type:"patch",                
+        url:"http://211.230.189.173:5500/device/"+id,
+        async:false,
+        dataType:"json",
+        headers: {                            
+            'content-type':'application/json',
+            'Authorization': 'Bearer '+token
+        },
+        data: JSON.stringify({
+            "device" : {
+                "type" : input_value[1]['value'],
+                "name" : input_value[2]['value'],
+                "location": {
+                    "lat": input_value[3]['value'],
+                    "long": input_value[4]['value']
+                },
+                "region" : input_value[5]['value'],
+                "meta_data" : {
+                    "ip" : input_value[6]['value'],
+                    "http_port" : input_value[7]['value'],
+                    "rtsp_port" : input_value[8]['value'],
+                    "user" : input_value[9]['value'],
+                    "password" : input_value[10]['value']
+                }
+            }
+        }),
+        success: function(data){
+            console.log(data)
+            alert("success!");
+            window.location.reload();
+        },
+        error : function(e) {
+            console.info("Error");
+        },
+        done : function(e) {
+            console.info("DONE");
+        }
+    })
+
+}
+
+/////////////////// device ///////////////////
+
+/////////////////// common ///////////////////
+
+// $.ajax({
+//     type:"post",                
+//     url:"http://211.230.189.173:5500/configs/common",
+//     async:false,
+//     dataType:"json",
+//     headers: {                            
+//         'content-type':'application/json',
+//         'Authorization': 'Bearer ' +token
+//     },
+//     data: JSON.stringify({
+//         "device_id" : "fc3f0cb0-baa6-4ea0-a82c-5d4af0cc62cd",
+//         "videos" : {
+//             "resolution" : {
+//                 "width" : 100,
+//                 "height" : 100
+//             },
+//             "fps" : 100,  
+//             "dbe" : 100,  
+//             "extension" : "test"
+//         },
+//         "stream" : {
+//                     "resolution" : {
+//                 "width" : 100,
+//                 "height" : 100
+//             },
+//             "channel" : "test" 
+//         }
+
+//         // {
+//         //     "device_id" : "fc3f0cb0-baa6-4ea0-a82c-5d4af0cc62cd",
+//         //     "videos" : {
+//         //         "resolution" : {
+//         //             "width" : 1280,
+//         //             "height" : 720
+//         //         },
+//         //         "fps" : 20,
+//         //         "dbe" : 5,
+//         //         "extension" : "webm"
+//         //     },
+//         //     "stream" : {
+//         //                 "resolution" : {
+//         //             "width" : 1280,
+//         //             "height" : 720
+//         //         },
+//         //         "channel" : "cam0_0"
+//         //     }
+//         // }
+//     }),
+//     success: function(data){
+//         console.log(data);
+//     },
+//     error : function(e) {
+//         console.info("Error");
+//     },
+//     done : function(e) {
+//         console.info("DONE");
+//     }
+// })
+
+function common_edit(button) {
+    console.log(button.parent().parent().find('input'));
+    var input_value = button.parent().parent().find('input');
+    var id = input_value[0]['value'];
+
+    $.ajax({
+        type:"patch",                
+        url:"http://211.230.189.173:5500/configs/common",
+        async:false,
+        dataType:"json",
+        headers: {                            
+            'content-type':'application/json',
+            'Authorization': 'Bearer ' +token
+        },
+        data: JSON.stringify({
+            "device_id" : "fc3f0cb0-baa6-4ea0-a82c-5d4af0cc62cd",
+            "videos" : {
+                "resolution" : {
+                    "width" : input_value[0]['value'],
+                    "height" : input_value[1]['value']
+                },
+                "fps" : input_value[2]['value'],  // frame per second
+                "dbe" : input_value[3]['value'],  // duration before event
+                "extension" : input_value[4]['value']
+            },
+            "stream" : {
+                        "resolution" : {
+                    "width" : input_value[5]['value'],
+                    "height" : input_value[6]['value']
+                },
+                "channel" : input_value[7]['value'] // each camera have 3 channels
+            }
+        }),
+        success: function(data){
+            console.log(data);
+            window.location.reload();
+        },
+        error : function(e) {
+            console.info("Error");
+        },
+        done : function(e) {
+            console.info("DONE");
+        }
+    })
+}
+
+// /////////////////// common ///////////////////
+
+// /////////////////// lane ///////////////////
+
+// $.ajax({
+//     type:"post",                
+//     url:"http://211.230.189.173:5500/configs/lanes",
+//     async:false,
+//     dataType:"json",
+//     headers: {                            
+//         'content-type':'application/json',
+//         'Authorization': 'Bearer ' +token
+//     },
+//     data: JSON.stringify({
+//         "device_id" : "fc3f0cb0-baa6-4ea0-a82c-5d4af0cc62cd",
+//         "lanes" : {
+//             "lane1" : {
+//                 "name" : "test",
+//                 "vehicle_properties" : {
+//                     "1": {
+//                             "speed_limit" : 80,
+//                             "type" : "test"
+//                         },
+//                     "2" :  {
+//                             "speed_limit" : 80,
+//                             "type" : "test"
+//                         }
+//                                 },
+//                 "direction" : "test",
+//                 "points" : [[1345,473],[1246,472]] 
+//             }
+//         }
+//     }),
+//     success: function(data){
+//         console.log(data);
+//     },
+//     error : function(e) {
+//         console.info("Error");
+//     },
+//     done : function(e) {
+//         console.info("DONE");
+//     }
+// })
+
+function lane_edit(button, error_flag) {    
+    // console.log(button.parent().parent().find('input[type=text]'));
+    var input = button.parent().parent();
+    var properties = button.parent().parent().find('input.property');
+    var device_id = button.nextAll('input')[0]['value'];
+
+    // console.log(device_id)
+
+    function vehicle_properties_func(properties) {
+        var vehicle_properties = '';
+        var j = 1;
+        for(var i=0; i<properties.length; i+=2){
+            if(i == properties.length/2 || properties.length/2 == 1) {
+                vehicle_properties += `"`+j+`": {
+                    "speed_limit" : `+properties[i]['value']+`,
+                    "type" : "`+properties[i+1]['value']+`"
+                }`    
+            } else {
+                vehicle_properties += `"`+j+`": {
+                    "speed_limit" : `+properties[i]['value']+`,
+                    "type" : "`+properties[i+1]['value']+`"
+                },`
+            }
+            j++;
+        }
+        return vehicle_properties;
+    }
+
+    var lane_properties = '';
+    for(var i=0; i<$('.lane').length; i++){
+        if(i == $('.lane').length-1){
+            lane_properties += `"lane`+(i+1)+`" : {
+                "name" : "`+$('input.lane_name')[i]['value']+`",
+                "vehicle_properties" : {
+                    `+vehicle_properties_func($('input.property'+i))+`
+                             },
+                "direction" : "`+$('input.lane_direction')[i]['value']+`",
+                "points" : [`+$('input.lane_points')[i]['value']+`] 
+            }`    
+        } else {
+            lane_properties += `"lane`+(i+1)+`" : {
+                "name" : "`+$('input.lane_name')[i]['value']+`",
+                "vehicle_properties" : {
+                    `+vehicle_properties_func($('input.property'+i))+`
+                             },
+                "direction" : "`+$('input.lane_direction')[i]['value']+`",
+                "points" : [`+$('input.lane_points')[i]['value']+`] 
+            },`
+        }
+    }
+
+    // console.log(typeof(lane_properties))
+    lane_properties = `"device_id" : "`+device_id+`",
+                        "lanes" : {
+                            `+lane_properties+`
+                        }`
+    lane_properties = "{"+lane_properties+"}"
+    console.log(lane_properties)
+    lane_properties = JSON.parse(lane_properties)
+
+    if(error_flag = 1){
+        console.log("add")
+        $.ajax({
+            type:"post",                
+            url:"http://211.230.189.173:5500/configs/lanes",
+            async:false,
+            dataType:"json",
+            headers: {                            
+                'content-type':'application/json',
+                'Authorization': 'Bearer ' +token
+            },
+            data: JSON.stringify(
+                lane_properties
+            ),
+            success: function(data){
+                console.log(data['data']);
+            },
+            error : function(e) {
+                console.info("Error");
+            },
+            done : function(e) {
+                console.info("DONE");
+            }
+        })
+
+    } else {
+        console.log("edit")
+        // $.ajax({
+        //     type:"patch",                
+        //     url:"http://211.230.189.173:5500/configs/lanes",
+        //     async:false,
+        //     dataType:"json",
+        //     headers: {                            
+        //         'content-type':'application/json',
+        //         'Authorization': 'Bearer ' +token
+        //     },
+        //     data: JSON.stringify({
+        //         "device_id" : "a8451179-10e4-4ac5-9e9b-e7a00cffeb5d",
+        //         "lanes" : {
+        //             // "lane1" : {
+        //             //     "name" : input_value[0]['value'],
+        //             //     "vehicle_properties" : {
+        //             //         vehicle_properties
+        //             //                     },
+        //             //     "direction" : input.find('input#direction')[0]['value'],
+        //             //     "points" : input.find('input#points')[0]['value'] 
+        //             // }
+        //             lane_properties
+        //         }
+        //     }),
+        //     success: function(data){
+        //         console.log(data['data']);
+        //     },
+        //     error : function(e) {
+        //         console.info("Error");
+        //     },
+        //     done : function(e) {
+        //         console.info("DONE");
+        //     }
+        // })
+        
+    }
+
+}
+
+/////////////////// lane ///////////////////
+
+function get_info () {
+    // var common_element = element.parent().nextAll()[1]['children']
+    // console.log(common_element);
+    var wa_setting;
+    $.ajax({
+        type:"get",                
+        url:"http://211.230.189.173:5500/configs/common",
+        async:false,
+        dataType:"json",
+        headers: {                            
+            'content-type':'application/json',
+            'Authorization': 'Bearer ' +token
+        },
+        success: function(data){
+            // console.log(data);
+            wa_setting = data['data']['data'][0]['config_data'];
+            // console.log(wa_setting);
+        },
+        error : function(e) {
+            console.info("Error");
+        },
+        done : function(e) {
+            console.info("DONE");
+        }
+    })
+
+    var device_list;
+    $.ajax({
+        type:"get",                
+        url:"http://211.230.189.173:5500/devices",
+        async:false,
+        dataType:"json",
+        headers: {                            
+            'content-type':'application/json',
+            'Authorization': 'Bearer ' +token
+        },
+        success: function(data){
+            console.log(data);
+            device_list = data['data'];
+        },
+        error : function(e) {
+            console.info("Error");
+        },
+        done : function(e) {
+            console.info("DONE");
+        }
+    })
+
+    var lane_setting, error_flag;
+    var property ='';
+    var point = '';
+    $.ajax({
+        type:"get",                
+        // url:"http://211.230.189.173:5500/configs/lanes/926beb51-0b27-4f5b-82b8-baa4fb61e027",
+        url:"http://211.230.189.173:5500/configs/lanes/a8451179-10e4-4ac5-9e9b-e7a00cffeb5d",
+        // url:"http://211.230.189.173:5500/configs/lanes/cc537d3d-50b9-4ea0-a07c-27890eebe93b",
+        // url:"http://211.230.189.173:5500/configs/lanes/6cfcd88a-30d8-4d7d-9ad3-9ddf70af1e5b",
+        async:false,
+        dataType:"json",
+        headers: {                            
+            'content-type':'application/json',
+            'Authorization': 'Bearer ' +token
+        },
+        success: function(data){
+            lane_setting = data['data']['data'][0];
+            error_flag = 0;
+            // console.log(lane_setting)
+            // console.log(Object.keys(lane_setting['vehicle_properties']).length)
+            for(var i=1; i<Object.keys(lane_setting['vehicle_properties']).length+1; i++){
+                property += `<tr>
+                                <td><input type="radio" name="property_select" id=""></td>
+                                <td><input class="property0" type="text" value="`+lane_setting['vehicle_properties'][i]['speed_limit']+`"></td>
+                                <td><input class="property0" type="text" value="`+lane_setting['vehicle_properties'][i]['type']+`"></td>
+                            </tr>`
+            }
+
+            for(var i=0; i<lane_setting['points'].length; i++){
+                // console.log(i)
+                if(i == 0) {
+                    point += `[`+lane_setting['points'][i][0]+`,`+lane_setting['points'][i][1]+`]`;
+                } else {
+                    point += `,[`+lane_setting['points'][i][0]+`,`+lane_setting['points'][i][1]+`]`;
+                }
+            }
+            
+        },
+        error : function(e) {
+            error_flag = 1;
+            lane_setting = '', lane_setting['direction'] = '', lane_setting['name'] = '';
+            property += `<tr>
+                            <td><input type="radio" name="property_select" id=""></td>
+                            <td><input class="property0" type="text" value=""></td>
+                            <td><input class="property0" type="text" value=""></td>
+                        </tr>`
+            console.info("Error");
+        },
+        done : function(e) {
+            console.info("DONE");
+        },
+        complete : function(e) {
+            lane_setting = lane_setting;
+            property = property;
+            point = point;
+            lane_setting['direction'] = lane_setting['direction'];
+            lane_setting['name'] = lane_setting['name'];
+        }
+    })
+
+    for(var i=1; i<device_list.length; i++){
+        var content;
+        if(device_list[i]['name']!='WA Camera'){
+            content = `<li class="list-group-item" onclick="div_open($(this))">
+                            <a href="javascript:void(0)" style="color: #000;">
+                                <div class="media">
+                                    <div class="pr-0 pr-sm-20 align-self-center" style="margin-right: 5px;">
+                                        <span class="material-icons">photo_camera</span>
+                                    </div>
+                                    <div class="media-body align-self-center">
+                                        <h5 class="mt-0">`+device_list[i]['name']+`</h5>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <div class="list-group-item device-info">
+                            <h1 class="setting-h1">Edit Device</h1>
+                            <hr class="hr-border">
+                            <input type="hidden" value="`+device_list[i]['id']+`">
+                            <div class="row setting-form">
+                                <div class="col-2"><h3 class="setting-h3">Device Type</h3></div>
+                                <div class="col-10"><input id="name" type="text" value="`+device_list[i]['type']+`"></div>
+                            </div>
+                            <div class="row setting-form">
+                                <div class="col-2"><h3 class="setting-h3">Device Name</h3></div>
+                                <div class="col-10"><input id="name" type="text" value="`+device_list[i]['name']+`"></div>
+                            </div>
+                            <div class="row setting-form">
+                                <div class="col-2"><h3 class="setting-h3">Location</h3></div>
+                                <div class="col-10">
+                                    <div class="setting-form-text">Lat : <input id="lat" type="text" value="`+device_list[i]['location']['lat']+`"></div>
+                                    <div class="setting-form setting-form-text">Long : <input id="long" type="text" value="`+device_list[i]['location']['long']+`"></div>
+                                </div>
+                            </div>
+                            <div class="row setting-form">
+                                <div class="col-2"><h3 class="setting-h3">Region</h3></div>
+                                <div class="col-10"><input id="region" type="text" value="`+device_list[i]['region']+`"></div>
+                            </div>
+                            <div class="row setting-form">
+                                <div class="col-2"><h3 class="setting-h3">IP</h3></div>
+                                <div class="col-10"><input id="ip" type="text" value="`+device_list[i]['meta_data']['ip']+`"></div>
+                            </div>
+                            <div class="row setting-form">
+                                <div class="col-2"><h3 class="setting-h3">HTTP Port</h3></div>
+                                <div class="col-10"><input id="http" type="text" value="`+device_list[i]['meta_data']['http_port']+`"></div>
+                            </div>
+                            <div class="row setting-form">
+                                <div class="col-2"><h3 class="setting-h3">RTSP Port</h3></div>
+                                <div class="col-10"><input id="rtsp" type="text" value="`+device_list[i]['meta_data']['rtsp_port']+`"></div>
+                            </div>
+                            <div class="row setting-form">
+                                <div class="col-2"><h3 class="setting-h3">User</h3></div>
+                                <div class="col-10"><input id="user" type="text" value="`+device_list[i]['meta_data']['user']+`"></div>
+                            </div>
+                            <div class="row setting-form">
+                                <div class="col-2"><h3 class="setting-h3">Password</h3></div>
+                                <div class="col-10"><input id="password" type="text" value="`+device_list[i]['meta_data']['password']+`"></div>
+                            </div>
+                            <hr class="hr-border">
+                            <div class="row setting-form" style="width: fit-content; margin: auto;">
+                                <button class="btn btn-primary save_btn" style="margin-right: 10px;" onclick="device_edit($(this))">save</button>
+                                <button class="btn btn-default">cancle</button>
+                            </div>
+                        </div>`
+        } else {
+            content = `<li class="list-group-item" onclick="div_open($(this))">
+                            <a href="javascript:void(0)" style="color: #000;">
+                                <div class="media">
+                                    <div class="pr-0 pr-sm-20 align-self-center" style="margin-right: 5px;">
+                                        <span class="material-icons">photo_camera</span>
+                                    </div>
+                                    <div class="media-body align-self-center">
+                                        <h5 class="mt-0">`+device_list[i]['name']+`</h5>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <div class="list-group-item device-info">
+                            <div class="tab_container">
+                                <ul class="tabs" data-id="`+device_list[i]['id']+`">
+                                    <li id="tab_device" class="tab-link current" data-tab="tab-device">Device</li>
+                                    <li id="tab_common" class="tab-link" data-tab="tab-common" onclick="get_common($(this))">Common</li>
+                                    <li id="tab_lane" class="tab-link" data-tab="tab-lane" onclick="">Lane</li>
+                                </ul>
+                                <div id="tab-device" class="tab-content current">
+                                    <h1 class="setting-h1">Edit Device</h1>
+                                    <hr class="hr-border">
+                                    <input type="hidden" value="`+device_list[i]['id']+`">
+                                    <div class="row setting-form">
+                                        <div class="col-2"><h3 class="setting-h3">Device Type</h3></div>
+                                        <div class="col-10"><input id="name" type="text" value="`+device_list[i]['type']+`"></div>
+                                    </div>
+                                    <div class="row setting-form">
+                                        <div class="col-2"><h3 class="setting-h3">Device Name</h3></div>
+                                        <div class="col-10"><input id="name" type="text" value="`+device_list[i]['name']+`"></div>
+                                    </div>
+                                    <div class="row setting-form">
+                                        <div class="col-2"><h3 class="setting-h3">Location</h3></div>
+                                        <div class="col-10">
+                                            <div class="setting-form-text">Lat : <input id="lat" type="text" value="`+device_list[i]['location']['lat']+`"></div>
+                                            <div class="setting-form setting-form-text">Long : <input id="long" type="text" value="`+device_list[i]['location']['long']+`"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row setting-form">
+                                        <div class="col-2"><h3 class="setting-h3">Region</h3></div>
+                                        <div class="col-10"><input id="region" type="text" value="`+device_list[i]['region']+`"></div>
+                                    </div>
+                                    <div class="row setting-form">
+                                        <div class="col-2"><h3 class="setting-h3">IP</h3></div>
+                                        <div class="col-10"><input id="ip" type="text" value="`+device_list[i]['meta_data']['ip']+`"></div>
+                                    </div>
+                                    <div class="row setting-form">
+                                        <div class="col-2"><h3 class="setting-h3">HTTP Port</h3></div>
+                                        <div class="col-10"><input id="http" type="text" value="`+device_list[i]['meta_data']['http_port']+`"></div>
+                                    </div>
+                                    <div class="row setting-form">
+                                        <div class="col-2"><h3 class="setting-h3">RTSP Port</h3></div>
+                                        <div class="col-10"><input id="rtsp" type="text" value="`+device_list[i]['meta_data']['rtsp_port']+`"></div>
+                                    </div>
+                                    <div class="row setting-form">
+                                        <div class="col-2"><h3 class="setting-h3">User</h3></div>
+                                        <div class="col-10"><input id="user" type="text" value="`+device_list[i]['meta_data']['user']+`"></div>
+                                    </div>
+                                    <div class="row setting-form">
+                                        <div class="col-2"><h3 class="setting-h3">Password</h3></div>
+                                        <div class="col-10"><input id="password" type="text" value="`+device_list[i]['meta_data']['password']+`"></div>
+                                    </div>
+                                    <hr class="hr-border">
+                                    <div class="row setting-form" style="width: fit-content; margin: auto;">
+                                        <button class="btn btn-primary save_btn" style="margin-right: 10px;" onclick="device_edit($(this))">save</button>
+                                        <button class="btn btn-default">cancle</button>
+                                    </div>
+                                </div>
+
+                                <div id="tab-common" class="tab-content">
+                                    <h1 class="setting-h1">Edit Common Configs</h1>
+                                    <hr class="hr-border">
+                                    <div class="row">
+                                        <div class="col-2">
+                                            <h3 class="setting-h3">Videos</h3>
+                                        </div>
+                                        <div class="col-10 row">
+                                            <div class="col-2">Resolution</div>
+                                            <div class="col-10">
+                                                <div class="setting-form-text">Width : <input id="v_width" type="text" value="`+wa_setting['videos']['resolution']['width']+`"></div>
+                                                <div class="setting-form setting-form-text">Height : <input id="v_height" type="text" value="`+wa_setting['videos']['resolution']['height']+`"></div>
+                                            </div>
+                                            <div class="col-12 setting-form row">
+                                                <div class="col-2">FPS</div>
+                                                <div class="col-10"><input id="fps" type="text" value="`+wa_setting['videos']['fps']+`"></div>
+                                            </div>
+                                            <div class="col-12 setting-form row">
+                                                <div class="col-2">dbe</div>
+                                                <div class="col-10"><input id="dbe" type="text" value="`+wa_setting['videos']['dbe']+`"></div>
+                                            </div>
+                                            <div class="col-12 setting-form row">
+                                                <div class="col-2">extension</div>
+                                                <div class="col-10"><input id="extension" type="text" value="`+wa_setting['videos']['extension']+`"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="hr-border">
+                                    <div class="row">
+                                        <div class="col-2">
+                                            <h3 class="setting-h3">Stream</h3>
+                                        </div>
+                                        <div class="col-10 row">
+                                            <div class="col-12 setting-form row">
+                                                <div class="col-2">Resolution</div>
+                                                <div class="col-10">
+                                                    <div class="setting-form-text">Width : <input id="s_width" type="text" value="`+wa_setting['stream']['resolution']['width']+`"></div>
+                                                    <div class="setting-form setting-form-text">Height : <input id="s_height" type="text" value="`+wa_setting['stream']['resolution']['height']+`"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 setting-form row">
+                                                <div class="col-2">channel</div>
+                                                <div class="col-10"><input id="channel" type="text" value="`+wa_setting['stream']['channel']+`"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="hr-border">
+                                    <div class="row setting-form" style="width: fit-content; margin: auto;">
+                                        <button  class="btn btn-primary" style="margin-right: 10px;" onclick="common_edit($(this))">save</button>
+                                        <button id="cancle-btn" class="btn btn-default">cancle</button>
+                                    </div>
+                                </div>
+
+                                <div id="tab-lane" class="tab-content">
+                                    <h1 class="setting-h1">Edit lanes</h1>
+                                    <hr class="hr-border">
+                                    <div id="lane-container" class="col-12 row">
+                                        <div class="lane col-12 row">
+                                            <div class="col-2 row">
+                                                <div style="width: fit-content; margin: auto;">
+                                                    <label>
+                                                        <input type="checkbox" name="lane_select" style="width: fit-content; margin-right:7px;">lane1
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-10 row">
+                                                <div class="col-12 row setting-form">
+                                                    <div class="col-2">Name</div>
+                                                    <div class="col-10"><input class="lane_name" type="text" value="`+lane_setting['name']+`"></div>
+                                                </div>
+                                                <div class="col-12 row setting-form">
+                                                    <div class="col-2">vehicle properties</div>
+                                                    <div class="col-10">
+                                                        <div id="property-container" class="row">
+                                                            <div class="row col-12">
+                                                                <table id="lane-setting-table" class="table" style="text-align: center; width: 70%;">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th></th>
+                                                                            <th>Speed Limit</th>
+                                                                            <th>Type</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody id="property_tbody">`
+                                                                    +property+
+                                                                        // <tr>
+                                                                        //     <td><input type="radio" name="property_select" id=""></td>
+                                                                        //     <td><input type="text" value="`+lane_setting['vehicle_properties'][1]['speed_limit']+`"></td>
+                                                                        //     <td><input type="text" value="`+lane_setting['vehicle_properties'][1]['type']+`"></td>
+                                                                        // </tr>
+                                                                        // <tr>
+                                                                        //     <td><input type="radio" name="property_select" id=""></td>
+                                                                        //     <td><input type="text" value="`+lane_setting['vehicle_properties'][2]['speed_limit']+`"></td>
+                                                                        //     <td><input type="text" value="`+lane_setting['vehicle_properties'][2]['type']+`"></td>
+                                                                        // </tr>
+                                                                    `</tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                        <button class="btn" onclick="add_property($(this))">add</button>
+                                                        <button class="btn" onclick="remove_property($(this))">remove</button>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 row setting-form">
+                                                    <div class="col-2">direction</div>
+                                                    <div class="col-10"><input class="lane_direction" type="text" value="`+lane_setting['direction']+`"></div>
+                                                </div>
+                                                <div class="col-12 row setting-form">
+                                                    <div class="col-2">points</div>
+                                                    <div class="col-10"><input class="lane_points" type="text" value="`+point+`"></div>
+                                                </div>
+                                            </div>
+                                            <hr class="col-12 hr-border">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <button id="add-lane" class="btn bnt-add btn-default" onclick="add_lane()">add</button>
+                                        <button id="remove-lane" class="btn bnt-add btn-default" onclick="remove_lane($(this))">remove</button>
+                                    </div>
+                                    <hr class="hr-border">
+                                    <div class="row setting-form" style="width: fit-content; margin: auto;">
+                                        <button id="save-btn" class="btn btn-primary" style="margin-right: 10px;" onclick="lane_edit($(this), `+error_flag+`)">save</button>
+                                        <button class="btn btn-default">cancle</button>
+                                        <input type="hidden" value="`+device_list[i]['id']+`">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`
+
+        }
+        
+        $('.list-group').append(content);
+    }
+}

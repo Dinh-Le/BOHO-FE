@@ -1,9 +1,7 @@
 import {
-  AfterViewInit,
   Component,
   ComponentRef,
   Input,
-  OnInit,
   ViewContainerRef,
   inject,
 } from '@angular/core';
@@ -68,6 +66,8 @@ export class MapViewComponent {
       marker.on('mouseover', (event: Leaflet.LeafletMouseEvent) => {
         const eventComponentRef: ComponentRef<EventComponent> =
           this.viewContainerRef.createComponent(EventComponent);
+
+        // set data and call detectChanges() to re-render
         eventComponentRef.instance.data = this.events[index]!;
         eventComponentRef.hostView.detectChanges();
 

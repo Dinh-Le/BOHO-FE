@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { LoadingService } from '@app/services/loading.service';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
