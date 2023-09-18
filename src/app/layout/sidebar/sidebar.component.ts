@@ -125,10 +125,8 @@ export class SidebarComponent implements OnInit {
         .pipe(
           catchError((_, response) => response),
           finalize(() => {
-            console.log('finalize');
             camera.isLoading = false;
             camera.isLoaded = true;
-            console.log(camera);
           })
         )
         .subscribe((response) => {
@@ -143,7 +141,6 @@ export class SidebarComponent implements OnInit {
             ];
             camera.isExpandable = true;
             camera.isSelectable = true;
-            console.log(camera);
           } else {
             this.toastService.showError(response.message);
           }
