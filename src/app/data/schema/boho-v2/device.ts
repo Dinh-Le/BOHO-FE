@@ -3,7 +3,7 @@ import { ResponseBase } from './response-base';
 export interface Device {
   id: string;
   node_id: string;
-  device_metadata: {
+  device_metadata?: {
     ip: string;
     http_port: string;
     rtsp_port: string;
@@ -14,7 +14,7 @@ export interface Device {
     lat: string;
     long: string;
   };
-  type: string;
+  type?: string;
   region: string;
 }
 

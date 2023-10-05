@@ -35,16 +35,16 @@ export interface EngineMetadata {
 
 export interface Node {
   id: string;
-  location: {
+  name: string;
+  type?: string;
+  ip?: string;
+  location?: {
     lat: string;
     lon: string;
   };
-  name: string;
-  type: string;
-  ip: string;
-  node_metadata: NodeMetadata;
-  connection_metadata: ConnectionMetadata;
-  engine_metadata: EngineMetadata;
+  node_metadata?: NodeMetadata;
+  connection_metadata?: ConnectionMetadata;
+  engine_metadata?: EngineMetadata;
 }
 
 export interface CreateNodeRequest extends Omit<Node, 'id'> {}

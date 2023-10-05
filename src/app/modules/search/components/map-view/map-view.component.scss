@@ -21,3 +21,38 @@
 ::ng-deep .event-popup .leaflet-popup-tip {
   display: none;
 }
+
+::ng-deep .ptz-unseen {
+  border-width: 3px;
+  border-color: rgb(237, 91, 89);
+  border-style: solid;
+  border-radius: 50%;
+
+  background: rgb(236, 67, 145);
+  text-align: center;
+}
+
+::ng-deep .camera-icon-container {
+  border-width: 3px;
+  border-color: rgb(237, 91, 89);
+  border-style: solid;
+  border-radius: 50%;
+  text-align: center;
+
+  i {
+    color: white;
+  }
+
+  img {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+::ng-deep .event-unseen {
+  background: rgb(236, 67, 145);
+}
+
+::ng-deep .event-seen {
+  background: #3c3b3e;
+}

@@ -5,6 +5,7 @@ import { SidebarState } from './sidebar.state';
 export const initialState: SidebarState = {
   state: true,
   autoHideEnabled: false,
+  devices: [],
 };
 
 export const sidebarReducer = createReducer(
@@ -18,5 +19,24 @@ export const sidebarReducer = createReducer(
   on(SidebarActions.autoHideSidebarChanged, (_state, { value }) => ({
     ..._state,
     autoHideEnabled: value,
-  }))
+  })),
+  on(SidebarActions.addDevice, (_state, { device }) => ({
+    ..._state,
+    devices: [..._state.devices, device],
+  })),
+  on(SidebarActions.removeDevice, (_state, { device }) => ({
+    ..._state,
+    devices: _state.devices.filter((e) => e.id != device.id),
+  })),
+  on(SidebarActions.addDevices, (_state, { devices }) => ({
+    ..._state,
+    devices: [..._state.devices, ...devices],
+  })),
+  on(SidebarActions.removeDevices, (_state, { devices }) => {
+    const deviceIds: Set<string> = new Set(devices.map((e) => e.id));
+    return {
+      ..._state,
+      devices: _state.devices.filter((e) => !deviceIds.has(e.id)),
+    };
+  })
 );

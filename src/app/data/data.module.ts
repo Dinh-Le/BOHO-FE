@@ -1,14 +1,19 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
-import { DeviceService, DeviceData } from './service/device.service';
-import { CameraData, CameraService } from './service/camera.service';
-import { NodeData, NodeService } from './service/node.service';
+import { DeviceData } from './service/device.service';
+import { CameraData } from './service/camera.service';
+import { NodeData } from './service/node.service';
+import {
+  MockCameraService,
+  MockDeviceService,
+  MockNodeService,
+} from './service/mock.service';
 
 const providers = [
-  { provide: DeviceData, useClass: DeviceService },
-  { provide: CameraData, useClass: CameraService },
-  { provide: NodeData, useClass: NodeService },
+  { provide: DeviceData, useClass: MockDeviceService },
+  { provide: CameraData, useClass: MockCameraService },
+  { provide: NodeData, useClass: MockNodeService },
 ];
 
 @NgModule({

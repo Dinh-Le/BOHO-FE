@@ -7,7 +7,8 @@ import {
 } from '@angular/core';
 import { ToastService } from '@app/services/toast.service';
 import { Store } from '@ngrx/store';
-import { catchError, finalize, tap } from 'rxjs';
+import { catchError, finalize } from 'rxjs';
+import { Device } from 'src/app/data/schema/boho-v2/device';
 import { CameraData } from 'src/app/data/service/camera.service';
 import { DeviceData } from 'src/app/data/service/device.service';
 import { NodeData } from 'src/app/data/service/node.service';
@@ -26,6 +27,7 @@ interface Camera {
   id: string;
   serverId: string;
   name: string;
+  device: Device;
   expanded?: boolean;
   channels: CameraChannel[];
   selected?: boolean;
@@ -65,8 +67,8 @@ export class SidebarComponent implements OnInit {
   autoHideEnabled: boolean = false;
 
   ngOnInit(): void {
-    this.nodeService.findAll().subscribe((reponse) => {
-      this.servers = reponse.data.map((node) => ({
+    this.nodeService.findAll().subscribe((response) => {
+      this.servers = response.data.map((node) => ({
         id: node.id,
         name: node.name,
         cameras: [],
@@ -82,34 +84,7 @@ export class SidebarComponent implements OnInit {
 
   toggleServer(server: Server) {
     if (!server.isLoaded) {
-      server.isLoading = true;
-      server.isExpandable = false;
-      server.isSelectable = false;
-      this.deviceService
-        .findAll(server.id)
-        .pipe(
-          catchError((_, response) => response),
-          finalize(() => {
-            server.isLoading = false;
-            server.isLoaded = true;
-          })
-        )
-        .subscribe((response) => {
-          if (response.success) {
-            server.cameras = response.data.map((device) => ({
-              id: device.id,
-              name: device.region,
-              channels: [],
-              serverId: server.id,
-              isExpandable: true,
-              isSelectable: false,
-            }));
-            server.isExpandable = true;
-            server.isSelectable = true;
-          } else {
-            this.toastService.showError(response.message);
-          }
-        });
+      this.loadServer(server);
     }
 
     server.expanded = !server.expanded;
@@ -117,50 +92,34 @@ export class SidebarComponent implements OnInit {
 
   toggleCamera(camera: Camera) {
     if (!camera.isLoaded) {
-      camera.isLoading = true;
-      camera.isExpandable = false;
-      camera.isSelectable = false;
-      this.cameraService
-        .findAll(camera.serverId, camera.id)
-        .pipe(
-          catchError((_, response) => response),
-          finalize(() => {
-            camera.isLoading = false;
-            camera.isLoaded = true;
-          })
-        )
-        .subscribe((response) => {
-          if (response.success) {
-            camera.channels = [
-              {
-                id: response.data.id,
-                name: response.data.manufacture,
-                cameraId: camera.id,
-                serverId: camera.serverId,
-              },
-            ];
-            camera.isExpandable = true;
-            camera.isSelectable = true;
-          } else {
-            this.toastService.showError(response.message);
-          }
-        });
+      this.loadCamera(camera);
     }
 
     camera.expanded = !camera.expanded;
   }
 
-  onServerSelectionChanged(server: Server) {
+  onServerSelectionChanged(server: Server): void {
     server.cameras.forEach((camera) => {
-      camera.selected = server.selected;
-      this.onCameraSelectionChanged(camera);
+      if (camera.selected != server.selected) {
+        camera.selected = server.selected;
+        this.onCameraSelectionChanged(camera);
+      }
     });
   }
 
-  onCameraSelectionChanged(camera: Camera, server?: Server) {
+  onCameraSelectionChanged(camera: Camera, server?: Server): void {
     camera.channels.forEach((channel) => (channel.selected = camera.selected));
+
     if (!camera.selected && server) {
       server.selected = false;
+    }
+
+    if (camera.selected) {
+      this.store.dispatch(SidebarActions.addDevice({ device: camera.device }));
+    } else {
+      this.store.dispatch(
+        SidebarActions.removeDevice({ device: camera.device })
+      );
     }
   }
 
@@ -171,5 +130,69 @@ export class SidebarComponent implements OnInit {
         this.store.dispatch(SidebarActions.hide());
       }
     }
+  }
+
+  private loadServer(server: Server): void {
+    server.isLoading = true;
+    server.isExpandable = false;
+    server.isSelectable = false;
+    this.deviceService
+      .findAll(server.id)
+      .pipe(
+        catchError((_, response) => response),
+        finalize(() => {
+          server.isLoading = false;
+          server.isLoaded = true;
+        })
+      )
+      .subscribe((response) => {
+        if (response.success) {
+          server.cameras = response.data.map((device) => ({
+            id: device.id,
+            name: device.region,
+            channels: [],
+            device: device,
+            serverId: server.id,
+            isExpandable: true,
+            isSelectable: false,
+          }));
+          server.isExpandable = true;
+          server.isSelectable = true;
+        } else {
+          this.toastService.showError(response.message);
+        }
+      });
+  }
+
+  private loadCamera(camera: Camera): void {
+    camera.isLoading = true;
+    camera.isExpandable = false;
+    camera.isSelectable = false;
+
+    this.cameraService
+      .findAll(camera.serverId, camera.id)
+      .pipe(
+        catchError((_, response) => response),
+        finalize(() => {
+          camera.isLoading = false;
+          camera.isLoaded = true;
+        })
+      )
+      .subscribe((response) => {
+        if (response.success) {
+          camera.channels = [
+            {
+              id: response.data.id,
+              name: response.data.manufacture,
+              cameraId: camera.id,
+              serverId: camera.serverId,
+            },
+          ];
+          camera.isExpandable = true;
+          camera.isSelectable = true;
+        } else {
+          this.toastService.showError(response.message);
+        }
+      });
   }
 }
