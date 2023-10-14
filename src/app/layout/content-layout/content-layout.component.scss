@@ -5,7 +5,24 @@
   row-gap: 0.2rem;
 }
 
-.sidebar-and-main-container {
-  display: grid;
-  grid-template-columns: 0.18fr 1fr auto auto;
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  float: none;
+  margin-top: 52px;
+}
+
+.main-content {
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  float: none;
+  margin-top: 52px;
 }

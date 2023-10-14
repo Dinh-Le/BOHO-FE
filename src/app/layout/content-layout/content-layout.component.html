@@ -1,11 +1,14 @@
 <app-top-bar></app-top-bar>
-<div class="sidebar-and-main-container">
-  <app-sidebar
-    class="pe-2"
-    [ngClass]="{ 'd-none': !sidebarVisible }"
-  ></app-sidebar>
-  <main [ngStyle]="{ 'grid-column': sidebarVisible ? 'span 1' : 'span 2' }">
-    <router-outlet></router-outlet>
-  </main>
-</div>
+<app-sidebar
+  class="pe-2 sidebar"
+  [ngClass]="{ 'd-none': !sidebarVisible }"
+></app-sidebar>
+<main
+  class="main-content"
+  [ngStyle]="{
+    marginLeft: sidebarVisible ? '250px' : '0px'
+  }"
+>
+  <router-outlet></router-outlet>
+</main>
 <ngx-loading [show]="loading" [config]="loadingConfig"></ngx-loading>
