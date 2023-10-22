@@ -1,0 +1,22 @@
+<div class="menu-container">
+  <div
+    *ngFor="let item of menuItems"
+    class="mx-2 menu-item"
+    [ngClass]="
+      item.selected
+        ? 'border-1 border-bottom border-primary pe-none'
+        : 'pe-auto'
+    "
+  >
+    <a
+      class="text-white text-decoration-none"
+      (click)="handleMenuItemClicked(item)"
+    >
+      <i class="bi" [ngClass]="item.icon"></i>
+      {{ item.title }}
+    </a>
+  </div>
+</div>
+<div class="content-wrapper">
+  <router-outlet></router-outlet>
+</div>

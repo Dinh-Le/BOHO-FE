@@ -6,18 +6,8 @@ import { FormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
-  declarations: [
-    SearchInputComponent,
-    SelectComponent,
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    NgbModule
-  ],
-  exports: [
-    SearchInputComponent,
-    SelectComponent,
-  ]
+  declarations: [SearchInputComponent, SelectComponent],
+  imports: [CommonModule, FormsModule, NgbModule],
+  exports: [SearchInputComponent, SelectComponent],
 })
-export class SharedModule { }
+export class SharedModule {}

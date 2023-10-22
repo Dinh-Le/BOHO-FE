@@ -25,6 +25,7 @@
     "@ngrx/component-store": "^16.2.0",
     "@ngrx/store": "^16.2.0",
     "@popperjs/core": "^2.11.8",
+    "@types/uuid": "^9.0.6",
     "angular-datatables": "^16.0.0",
     "bootstrap": "^5.3.0",
     "bootstrap-icons": "^1.10.5",
@@ -35,6 +36,7 @@
     "ngx.leaflet.offline": "^1.1.2",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
+    "uuid": "^9.0.1",
     "zone.js": "~0.13.1"
   },
   "devDependencies": {

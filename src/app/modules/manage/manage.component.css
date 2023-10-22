@@ -1,0 +1,22 @@
+::ng-deep .menu-container {
+  background-color: #49494b;
+  height: 36px;
+  margin-bottom: 0.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+
+  .menu-item {
+    cursor: pointer;
+  }
+}
+
+::ng-deep .content-wrapper {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  max-height: calc(100vh - 49px - 36px - 36px - 0.2rem * 2);
+}
+
+::ng-deep .full-height {
+  height: calc(100vh - 49px - 36px - 36px - 0.2rem * 2);
+}

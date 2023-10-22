@@ -1,1 +1,16 @@
-<p>manage works!</p>
+<div class="menu-container">
+  <div
+    *ngFor="let item of menuLevel2"
+    class="border-primary mx-2 border-1 menu-item"
+    [ngClass]="{ 'border-bottom': item.selected }"
+  >
+    <a
+      class="text-white pe-auto text-decoration-none"
+      (click)="onMenuLevel2ItemClick(item)"
+      ><i class="bi" [ngClass]="item.icon"></i> {{ item.title }}</a
+    >
+  </div>
+</div>
+<div>
+  <router-outlet></router-outlet>
+</div>

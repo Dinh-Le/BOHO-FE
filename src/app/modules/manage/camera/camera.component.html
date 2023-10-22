@@ -1,0 +1,640 @@
+<div class="menu-container">
+  <a
+    *ngFor="let item of cameraMenuItems"
+    class="btn btn-primary text-white mx-2 px-2"
+    (click)="item.onclick()"
+  >
+    <i class="bi" [ngClass]="item.icon"></i>
+    {{ item.title }}
+  </a>
+</div>
+<div class="content-wrapper">
+  <table class="table bg-white text-dark m-0">
+    <colgroup>
+      <col width="28px" />
+      <col width="400px" />
+      <col width="auto" />
+      <col span="3" width="150px" />
+    </colgroup>
+    <thead>
+      <th></th>
+      <th>
+        Tên camera<i class="bg-transparent text-dark bi bi-sort-alpha-down"></i>
+      </th>
+      <th>
+        Địa chỉ RTSP<i
+          class="bg-transparent text-dark bi bi-sort-alpha-down"
+        ></i>
+      </th>
+      <th>
+        Loại<i class="bg-transparent text-dark bi bi-sort-alpha-down"></i>
+      </th>
+      <th>Nút<i class="bg-transparent text-dark bi bi-sort-alpha-down"></i></th>
+      <th>
+        Trạng thái<i class="bg-transparent text-dark bi bi-sort-alpha-down"></i>
+      </th>
+    </thead>
+  </table>
+  <table
+    *ngFor="let item of cameraList; trackBy: trackById"
+    class="m-0 mb-1 w-100"
+  >
+    <colgroup>
+      <col width="28px" />
+      <col width="400px" />
+      <col width="auto" />
+      <col span="3" width="150px" />
+    </colgroup>
+    <tbody>
+      <tr (click)="item.isExpanded = !item.isExpanded">
+        <td>
+          <span
+            style="
+              display: inline-block;
+              transform: rotate(0);
+              transition: transform 0.3s;
+            "
+            [ngClass]="{ 'transform-rotate-90': item.isExpanded }"
+            ><i class="bi bi-chevron-right"></i
+          ></span>
+        </td>
+        <td>{{ item.name }}</td>
+        <td>{{ item.rtspUrl }}</td>
+        <td>{{ item.type }}</td>
+        <td>{{ item.node }}</td>
+        <td class="p-2">
+          <div
+            class="px-2 bg-good text-center text-uppercase"
+            *ngIf="item.status === 'Tốt'"
+          >
+            {{ item.status }}
+          </div>
+          <div
+            class="px-2 bg-error text-center text-uppercase"
+            *ngIf="item.status === 'Có lỗi'"
+          >
+            {{ item.status }}
+          </div>
+          <div
+            class="px-2 bg-disconnected text-center text-uppercase"
+            *ngIf="item.status === 'Mất kết nối'"
+          >
+            {{ item.status }}
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="6" class="border-0 p-0">
+          <div
+            class="row"
+            [ngClass]="item.isExpanded ? 'show px-4 py-2' : 'hide'"
+          >
+            <div class="col-8">
+              <div *ngIf="item.isEditMode; else viewMode">
+                <div class="form-group row">
+                  <div class="col-4">
+                    <input
+                      type="text"
+                      [(ngModel)]="item.name"
+                      class="form-control text-center text-white bg-transparent border-0 border-bottom border-primary rounded-0"
+                    />
+                  </div>
+                </div>
+                <div class="form-group row mt-4">
+                  <label for="activation" class="col-2 col-form-label"
+                    >Hoạt động</label
+                  >
+                  <div class="col-10">
+                    <div class="form-check form-switch">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="activation"
+                        [(ngModel)]="item.status"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group row mt-2">
+                  <label for="driverCamera" class="col-2 col-form-label"
+                    >Driver camera</label
+                  >
+                  <div class="col-10">
+                    <select
+                      id="driverCamera"
+                      class="form-select bg-transparent border-white"
+                      [(ngModel)]="item.driverType"
+                    >
+                      <option value="rtsp">RTSP</option>
+                      <option value="onvif">ONVIF</option>
+                      <option value="milestone">Milestone</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group row mt-2">
+                  <label class="col-2 col-form-label">Loại</label>
+                  <div class="col-10">
+                    <div class="form-check form-check-inline">
+                      <input
+                        class="form-check-input"
+                        name="cameraType"
+                        id="cameraTypeBullet"
+                        type="radio"
+                        [(ngModel)]="item.type"
+                        value="Cố định"
+                      />
+                      <label class="form-check-label" for="cameraTypeBullet"
+                        >Cố định</label
+                      >
+                    </div>
+                    <div
+                      class="form-check form-check-inline"
+                      [ngClass]="{ 'pe-none': item.driverType === 'rtsp' }"
+                    >
+                      <input
+                        class="form-check-input"
+                        name="cameraType"
+                        id="cameraTypePTZ"
+                        type="radio"
+                        [(ngModel)]="item.type"
+                        value="PTZ"
+                        [disabled]="item.driverType === 'rtsp'"
+                      />
+                      <label class="form-check-label" for="cameraTypePTZ"
+                        >PTZ</label
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div *ngIf="item.driverType === 'rtsp'">
+                  <div class="form-group row mt-2">
+                    <label for="rtspUrl" class="col-2 form-check-label"
+                      >Địa chỉ RTSP</label
+                    >
+                    <div class="col-10">
+                      <input
+                        type="text"
+                        id="rtspUrl"
+                        [(ngModel)]="item.rtspUrl"
+                        class="form-control bg-transparent border-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label for="rtspUsername" class="col-2 form-check-label"
+                      >ID người dùng</label
+                    >
+                    <div class="col-10">
+                      <input
+                        type="text"
+                        id="rtspUsername"
+                        class="form-control bg-transparent border-white"
+                        [(ngModel)]="item.rtspUsername"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label for="rtspPassword" class="col-2 form-check-label"
+                      >Mật khẩu</label
+                    >
+                    <div class="col-10">
+                      <input
+                        type="password"
+                        id="rtspPassword"
+                        class="form-control border-bottom bg-transparent border-white"
+                        [(ngModel)]="item.rtspPassword"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div *ngIf="item.driverType === 'onvif'">
+                  <div class="form-group row mt-2">
+                    <label for="onvif-ip" class="col-2 form-check-label"
+                      >IP</label
+                    >
+                    <div class="col-10">
+                      <input
+                        type="text"
+                        id="onvif-ip"
+                        [(ngModel)]="item.onvifIp"
+                        class="form-control bg-transparent border-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label for="onvif-ip" class="col-2 form-check-label"
+                      >Cổng</label
+                    >
+                    <div class="col-10">
+                      <input
+                        type="text"
+                        id="onvif-ip"
+                        [(ngModel)]="item.onvifPort"
+                        class="form-control bg-transparent border-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label for="onvifUsername" class="col-2 form-check-label"
+                      >ID người dùng</label
+                    >
+                    <div class="col-10">
+                      <input
+                        type="text"
+                        id="onvifUsername"
+                        class="form-control bg-transparent border-white"
+                        [(ngModel)]="item.onvifUsername"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label for="onvifPassword" class="col-2 form-check-label"
+                      >Mật khẩu</label
+                    >
+                    <div class="col-10">
+                      <input
+                        type="password"
+                        id="onvifPassword"
+                        class="form-control border-bottom bg-transparent border-white"
+                        [(ngModel)]="item.onvifPassword"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-3" *ngIf="item.isEditMode">
+                    <div class="col-10 offset-2">
+                      <button class="btn btn-primary px-4 text-white py-1">
+                        Kết nối
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label for="ovifProfile" class="col-2 form-check-label"
+                      >Profile</label
+                    >
+                    <div class="col-10">
+                      <input
+                        id="ovifProfile"
+                        class="form-control border-bottom bg-transparent border-white"
+                        [(ngModel)]="item.onvifProfile"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label for="onvifRtsp" class="col-2 form-check-label"
+                      >Địa chỉ RTSP</label
+                    >
+                    <div class="col-10">
+                      <input
+                        id="onvifRtsp"
+                        class="form-control border-bottom bg-transparent border-white"
+                        [(ngModel)]="item.onvifRtspUrl"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div *ngIf="item.driverType === 'milestone'">
+                  <div class="form-group row mt-2">
+                    <label for="milestone-ip" class="col-2 form-check-label"
+                      >IP</label
+                    >
+                    <div class="col-10">
+                      <input
+                        type="text"
+                        id="milestone-ip"
+                        [(ngModel)]="item.milestoneIp"
+                        class="form-control bg-transparent border-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label for="milestone" class="col-2 form-check-label"
+                      >Cổng</label
+                    >
+                    <div class="col-10">
+                      <input
+                        type="text"
+                        id="milestone"
+                        [(ngModel)]="item.milestonePort"
+                        class="form-control bg-transparent border-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label for="milestoneAuthType" class="col-2 col-form-label"
+                      >Loại xác thực</label
+                    >
+                    <div class="col-10">
+                      <select
+                        id="milestoneAuthType"
+                        class="form-select bg-transparent border-white"
+                        [(ngModel)]="item.milestoneAuthType"
+                      >
+                        <option value="windows" selected>Windows</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label
+                      for="milestoneUsername"
+                      class="col-2 form-check-label"
+                      >ID người dùng</label
+                    >
+                    <div class="col-10">
+                      <input
+                        type="text"
+                        id="milestoneUsername"
+                        class="form-control bg-transparent border-white"
+                        [(ngModel)]="item.milestoneUsername"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label
+                      for="milestonePassword"
+                      class="col-2 form-check-label"
+                      >Mật khẩu</label
+                    >
+                    <div class="col-10">
+                      <input
+                        type="password"
+                        id="milestonePassword"
+                        class="form-control border-bottom bg-transparent border-white"
+                        [(ngModel)]="item.milestonePassword"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-3">
+                    <div class="col-10 offset-2">
+                      <button class="btn btn-primary px-4 text-white py-1">
+                        Kết nối
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label for="milestoneCamera" class="col-2 form-check-label"
+                      >Camera</label
+                    >
+                    <div class="col-10">
+                      <input
+                        id="milestoneCamera"
+                        class="form-control border-bottom bg-transparent border-white"
+                        [(ngModel)]="item.milestoneCamera"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label for="milestoneRtspUrl" class="col-2 form-check-label"
+                      >Địa chỉ RTSP</label
+                    >
+                    <div class="col-10">
+                      <input
+                        id="milestoneRtspUrl"
+                        class="form-control border-bottom bg-transparent border-white"
+                        [(ngModel)]="item.milestoneRtspUrl"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group d-flex justify-content-end mt-3">
+                  <button
+                    class="text-white btn btn-outline-primary bg-gray px-4 mx-1 py-1"
+                    (click)="reset(item)"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    class="text-white btn btn-primary px-4 mx-1 py-1"
+                    (click)="save(item)"
+                  >
+                    Lưu
+                  </button>
+                </div>
+              </div>
+              <ng-template #viewMode>
+                <div class="form-group row">
+                  <div class="col-4">
+                    {{ item.name }}
+                  </div>
+                </div>
+                <div class="form-group row mt-4">
+                  <label for="activation" class="col-2 col-form-label"
+                    >Hoạt động</label
+                  >
+                  <div class="col-10">
+                    <i
+                      class="bi"
+                      [ngClass]="item.status ? 'bi-check-lg' : 'bi-x'"
+                    ></i>
+                  </div>
+                </div>
+
+                <div class="form-group row mt-2">
+                  <label for="driverCamera" class="col-2 col-form-label"
+                    >Driver camera</label
+                  >
+                  <div class="col-10">
+                    {{ item.driverType }}
+                  </div>
+                </div>
+
+                <div class="form-group row mt-2">
+                  <label class="col-2 col-form-label">Loại</label>
+                  <div class="col-10">
+                    {{ item.type }}
+                  </div>
+                </div>
+
+                <div *ngIf="item.driverType === 'rtsp'">
+                  <div class="form-group row mt-2">
+                    <label for="rtspUrl" class="col-2 form-check-label"
+                      >Địa chỉ RTSP</label
+                    >
+                    <div class="col-10">
+                      {{ item.rtspUrl }}
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label for="rtspUsername" class="col-2 form-check-label"
+                      >ID người dùng</label
+                    >
+                    <div class="col-10">
+                      {{ item.rtspUsername }}
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label for="rtspPassword" class="col-2 form-check-label"
+                      >Mật khẩu</label
+                    >
+                    <div class="col-10">
+                      {{ item.rtspPassword }}
+                    </div>
+                  </div>
+                </div>
+
+                <div *ngIf="item.driverType === 'onvif'">
+                  <div class="form-group row mt-2">
+                    <label for="onvif-ip" class="col-2 form-check-label"
+                      >IP</label
+                    >
+                    <div class="col-10">
+                      {{ item.onvifIp }}
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label for="onvif-ip" class="col-2 form-check-label"
+                      >Cổng</label
+                    >
+                    <div class="col-10">{{ item.onvifPort }}</div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label for="onvifUsername" class="col-2 form-check-label"
+                      >ID người dùng</label
+                    >
+                    <div class="col-10">{{ item.onvifUsername }}</div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label for="onvifPassword" class="col-2 form-check-label"
+                      >Mật khẩu</label
+                    >
+                    <div class="col-10">{{ item.onvifPassword }}</div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label for="ovifProfile" class="col-2 form-check-label"
+                      >Profile</label
+                    >
+                    <div class="col-10">{{ item.onvifProfile }}</div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label for="onvifRtsp" class="col-2 form-check-label"
+                      >Địa chỉ RTSP</label
+                    >
+                    <div class="col-10">
+                      {{ item.onvifRtspUrl }}
+                    </div>
+                  </div>
+                </div>
+
+                <div *ngIf="item.driverType === 'milestone'">
+                  <div class="form-group row mt-2">
+                    <label for="milestone-ip" class="col-2 form-check-label"
+                      >IP</label
+                    >
+                    <div class="col-10">
+                      {{ item.milestoneIp }}
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label for="milestone" class="col-2 form-check-label"
+                      >Cổng</label
+                    >
+                    <div class="col-10">
+                      {{ item.milestonePort }}
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label for="milestoneAuthType" class="col-2 col-form-label"
+                      >Loại xác thực</label
+                    >
+                    <div class="col-10">
+                      {{ item.milestoneAuthType }}
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label
+                      for="milestoneUsername"
+                      class="col-2 form-check-label"
+                      >ID người dùng</label
+                    >
+                    <div class="col-10">
+                      {{ item.milestoneUsername }}
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label
+                      for="milestonePassword"
+                      class="col-2 form-check-label"
+                      >Mật khẩu</label
+                    >
+                    <div class="col-10">********</div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label for="milestoneCamera" class="col-2 form-check-label"
+                      >Camera</label
+                    >
+                    <div class="col-10">
+                      {{ item.milestoneCamera }}
+                    </div>
+                  </div>
+
+                  <div class="form-group row mt-2">
+                    <label for="milestoneRtspUrl" class="col-2 form-check-label"
+                      >Địa chỉ RTSP</label
+                    >
+                    <div class="col-10">
+                      {{ item.milestoneRtspUrl }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group d-flex justify-content-end mt-3">
+                  <button
+                    class="text-white btn btn-outline-primary bg-gray px-4 mx-1 py-1"
+                    (click)="remove(item)"
+                  >
+                    Xóa
+                  </button>
+                  <button
+                    class="text-white btn btn-primary px-4 mx-1 py-1"
+                    (click)="edit(item)"
+                  >
+                    Chỉnh sửa
+                  </button>
+                </div>
+              </ng-template>
+            </div>
+            <div class="col-4 media">
+              <img
+                class="mr-3"
+                src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2264%22%20height%3D%2264%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_18b3e7ffaf0%20text%20%7B%20fill%3Argba(255%2C255%2C255%2C.75)%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A10pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_18b3e7ffaf0%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%2213.8359375%22%20y%3D%2236.5%22%3E64x64%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E"
+                alt="Generic placeholder image"
+              />
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
