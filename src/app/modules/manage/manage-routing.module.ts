@@ -7,6 +7,7 @@ import { CameraDetailComponent } from './camera-detail/camera-detail.component';
 import { PresetSettingsComponent } from './camera-detail/preset-settings/preset-settings.component';
 import { PatrolSettingsComponent } from './camera-detail/patrol-settings/patrol-settings.component';
 import { TourSettingsComponent } from './camera-detail/tour-settings/tour-settings.component';
+import { ScheduleComponent } from './schedule/schedule.component';
 
 @NgModule({
   imports: [
@@ -24,10 +25,11 @@ import { TourSettingsComponent } from './camera-detail/tour-settings/tour-settin
             path: 'camera-detail',
             component: CameraDetailComponent,
             children: [
-              // {
-              //   path: '',
-              //   redirectTo: 'preset-settings',
-              // },
+              {
+                path: '',
+                pathMatch: 'full',
+                redirectTo: 'preset-settings',
+              },
               {
                 path: 'preset-settings',
                 component: PresetSettingsComponent,
@@ -45,6 +47,10 @@ import { TourSettingsComponent } from './camera-detail/tour-settings/tour-settin
           {
             path: 'rule',
             component: RuleComponent,
+          },
+          {
+            path: 'schedule',
+            component: ScheduleComponent,
           },
         ],
       },

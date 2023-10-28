@@ -1,24 +1,32 @@
 import { Component, OnInit } from '@angular/core';
-import { CustomListViewItem } from '@modules/manage/custom-list-view/custom-list-view-item';
+import { SelectItemModel } from '@shared/models/select-item-model';
 
 @Component({
   selector: 'app-preset-settings',
   templateUrl: 'preset-settings.component.html',
 })
 export class PresetSettingsComponent implements OnInit {
-  presetList: CustomListViewItem[] = [];
+  presetList: SelectItemModel[] = [];
 
   ngOnInit(): void {
     this.presetList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((e) => ({
       value: e,
-      text: `Điểm giám sát ${e}`,
+      label: `Điểm giám sát ${e}`,
       selected: false,
     }));
+  }
+
+  trackByValue(_: any, item: SelectItemModel) {
+    return item.value;
   }
 
   load() {}
 
   play() {
     console.log(this.presetList);
+  }
+
+  remove(item: SelectItemModel) {
+    this.presetList = this.presetList.filter((e) => e.value !== item.value);
   }
 }

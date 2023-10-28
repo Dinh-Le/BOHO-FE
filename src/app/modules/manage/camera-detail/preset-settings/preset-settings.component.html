@@ -1,12 +1,30 @@
 <div class="bg-dark full-height">
   <div class="row px-4 pt-5">
+    <div class="col-5 offset-7 text-white">Xem trước</div>
+  </div>
+  <div class="row px-4 mt-1">
     <div class="col-6">
       <div style="background: rgb(41, 40, 42)">
         <div class="text-white px-2 py-1">Điểm giám sát</div>
-        <app-custom-list-view
-          [(ngModel)]="presetList"
-          style="max-height: 200px; overflow-y: scroll; display: block"
-        ></app-custom-list-view>
+        <div style="max-height: 200px; overflow-y: scroll">
+          <div
+            class="d-flex justify-content-between p-1"
+            style="cursor: pointer"
+            *ngFor="let item of presetList; trackBy: trackByValue"
+            [ngStyle]="{
+              background: item.selected ? 'rgb(82,133,182)' : '#515151'
+            }"
+            (click)="item.selected = !item.selected"
+          >
+            <span class="text-white">{{ item.label }}</span>
+            <a
+              (click)="remove(item)"
+              class="text-white"
+              [ngClass]="item.selected ? 'visible' : 'invisible'"
+              ><i class="bi bi-trash-fill"></i
+            ></a>
+          </div>
+        </div>
       </div>
 
       <div class="d-flex mt-3">
@@ -24,8 +42,7 @@
         </button>
       </div>
     </div>
-    <div class="col-6">
-      <div class="text-white">Xem trước</div>
+    <div class="offset-1 col-5">
       <div class="media">
         <img
           class="mr-3"

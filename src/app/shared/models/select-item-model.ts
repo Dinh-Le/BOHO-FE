@@ -1,5 +1,5 @@
 export interface SelectItemModel {
-    label: string;
-    value: any;
-    selected?: boolean;
+  label: string;
+  value: any;
+  selected?: boolean;
 }

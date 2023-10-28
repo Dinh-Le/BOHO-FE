@@ -1,0 +1,35 @@
+$color-dark: rgb(41, 40, 42);
+$color-gray: rgb(74, 73, 75);
+$topbar-height: 49px;
+$menubar-height: 36px;
+$component-margin: 0.2rem;
+$content-height: calc(
+  100vh - $topbar-height - 2 * $menubar-height - 2 * $component-margin
+);
+$content-padding: 3rem;
+
+.table-wrapper {
+  background: $color-gray;
+  height: calc($content-height - 2 * $content-padding);
+  overflow-y: auto;
+  border: 0.1rem solid $color-dark;
+
+  table {
+    background: $color-gray;
+    width: 100%;
+    border-collapse: collapse;
+
+    thead {
+      background: $color-dark;
+
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    tr:hover {
+      background: gray;
+      transition: all 0.5s ease-in-out;
+    }
+  }
+}

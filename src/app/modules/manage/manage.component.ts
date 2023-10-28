@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-manage',
   templateUrl: './manage.component.html',
-  styleUrls: ['./manage.component.css'],
+  styleUrls: ['./manage.component.scss'],
 })
 export class ManageComponent implements OnInit {
   router = inject(Router);
@@ -36,7 +36,7 @@ export class ManageComponent implements OnInit {
     {
       icon: 'bi-clock',
       title: 'Lịch trình',
-      onclick: null,
+      path: '/manage/schedule',
     },
     {
       icon: 'bi-exclamation-triangle',
@@ -61,6 +61,7 @@ export class ManageComponent implements OnInit {
   }
 
   onMenuLevel2ItemClick(item: MenuItem) {
+    console.log(item);
     let selectedItem = this.menuLevel2.find((item) => item.selected);
     if (selectedItem !== undefined) {
       selectedItem.selected = false;

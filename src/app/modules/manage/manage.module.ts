@@ -11,7 +11,8 @@ import { CameraDetailComponent } from './camera-detail/camera-detail.component';
 import { PresetSettingsComponent } from './camera-detail/preset-settings/preset-settings.component';
 import { PatrolSettingsComponent } from './camera-detail/patrol-settings/patrol-settings.component';
 import { TourSettingsComponent } from './camera-detail/tour-settings/tour-settings.component';
-import { CustomListViewComponent } from './custom-list-view/custom-list-view.component';
+import { ScheduleComponent } from './schedule/schedule.component';
+import { TimeSelectComponent } from './time-select/time-select.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { CustomListViewComponent } from './custom-list-view/custom-list-view.com
     PresetSettingsComponent,
     PatrolSettingsComponent,
     TourSettingsComponent,
-    CustomListViewComponent,
+    ScheduleComponent,
+    TimeSelectComponent,
   ],
   imports: [
     CommonModule,

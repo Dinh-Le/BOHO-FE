@@ -1,0 +1,69 @@
+<div class="menu-container">
+  <div
+    *ngFor="let item of menuItems"
+    class="mx-2 menu-item"
+    [ngClass]="
+      item.selected
+        ? 'border-1 border-bottom border-primary pe-none'
+        : 'pe-auto'
+    "
+  >
+    <a
+      class="btn btn-primary text-white text-decoration-none px-2"
+      (click)="item.onclick && item.onclick()"
+    >
+      <i class="bi" [ngClass]="item.icon"></i>
+      {{ item.title }}
+    </a>
+  </div>
+</div>
+<div class="full-height bg-dark p-5">
+  <div class="table-wrapper">
+    <table>
+      <colgroup>
+        <col width="auto" span="4" />
+        <col width="32px" />
+      </colgroup>
+      <thead>
+        <th>Lịch trình</th>
+        <th>Thời gian bắt đầu</th>
+        <th>Thời gian kết thúc</th>
+        <th>Ngày</th>
+        <th></th>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of items; trackBy: trackById">
+          <td class="px-2 py-1">{{ item.name }}</td>
+          <td class="px-2 py-1">
+            <app-time-select [(ngModel)]="item.startTime"></app-time-select>
+          </td>
+          <td class="px-2 py-1">
+            <app-time-select [(ngModel)]="item.endTime"></app-time-select>
+          </td>
+          <td class="px-2 py-1">
+            <div class="d-flex flex-wrap">
+              <button
+                style="width: 42px"
+                *ngFor="let day of daysInWeek; index as i"
+                class="btn border border-primary mx-1 text-center rounded-0"
+                [ngClass]="
+                  item.days.includes(i.toString())
+                    ? 'bg-primary'
+                    : 'bg-transparent'
+                "
+                (click)="toggleDay(item, i)"
+              >
+                {{ day }}
+              </button>
+            </div>
+          </td>
+          <td class="px-2 py-1">
+            <a class="btn" (click)="remove(item)">
+              <i class="bi bi-trash-fill"></i>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
