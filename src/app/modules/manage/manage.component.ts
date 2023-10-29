@@ -61,7 +61,6 @@ export class ManageComponent implements OnInit {
   }
 
   onMenuLevel2ItemClick(item: MenuItem) {
-    console.log(item);
     let selectedItem = this.menuLevel2.find((item) => item.selected);
     if (selectedItem !== undefined) {
       selectedItem.selected = false;

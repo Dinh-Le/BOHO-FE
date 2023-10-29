@@ -1,0 +1,43 @@
+$color-dark: rgb(41, 40, 42);
+$color-gray: rgb(74, 73, 75);
+
+table {
+  width: 100%;
+
+  tr:nth-child(even) {
+    border-bottom: 0.2rem solid $color-dark;
+  }
+
+  tr {
+    background: $color-gray;
+  }
+
+  thead {
+    background: rgb(242, 242, 242);
+    color: rgb(95, 93, 96);
+  }
+
+  .expand-icon {
+    display: inline-block;
+    transform: rotate(0);
+    transition: transform 0.3s;
+  }
+
+  .expand-icon.transform-rotate-90 {
+    transform: rotate(90deg);
+    transition: transform 0.3s;
+  }
+
+  .show {
+    max-height: 1000px;
+    opacity: 1;
+    transition: all 0.3;
+  }
+
+  .hide {
+    max-height: 0px;
+    opacity: 0;
+    overflow-y: hidden;
+    transition: all 0.3;
+  }
+}

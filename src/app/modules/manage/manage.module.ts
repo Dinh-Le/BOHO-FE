@@ -13,6 +13,8 @@ import { PatrolSettingsComponent } from './camera-detail/patrol-settings/patrol-
 import { TourSettingsComponent } from './camera-detail/tour-settings/tour-settings.component';
 import { ScheduleComponent } from './schedule/schedule.component';
 import { TimeSelectComponent } from './time-select/time-select.component';
+import { MenuBarComponent } from './menu-bar/menu-bar.component';
+import { ExpandableTableComponent } from './expandable-table/expandable-table.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +27,8 @@ import { TimeSelectComponent } from './time-select/time-select.component';
     TourSettingsComponent,
     ScheduleComponent,
     TimeSelectComponent,
+    MenuBarComponent,
+    ExpandableTableComponent,
   ],
   imports: [
     CommonModule,

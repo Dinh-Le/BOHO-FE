@@ -1,0 +1,9 @@
+<a
+  *ngFor="let item of items"
+  class="btn btn-primary text-white mx-2 px-2"
+  (click)="item.onclick()"
+>
+  <i class="bi" [ngClass]="item.icon"></i>
+  {{ item.title }}
+</a>
+<div class=""></div>

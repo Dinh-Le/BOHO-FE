@@ -1,0 +1,62 @@
+<table [ngClass]="classNames">
+  <colgroup>
+    <col [width]="28" *ngIf="collapseContentTemplateRef" />
+    <col *ngFor="let column of columns" width="column.width || 'auto" />
+  </colgroup>
+  <thead>
+    <th></th>
+    <th *ngFor="let column of columns">
+      <ng-container
+        *ngIf="column.headerTemplateRef; else defaultHeaderTemplate"
+        [ngTemplateOutlet]="column.headerTemplateRef"
+      ></ng-container>
+      <ng-template #defaultHeaderTemplate>
+        {{ column.label }}
+      </ng-template>
+      <i *ngIf="column.sortable" class="bi bi-sort-alpha-down"></i>
+    </th>
+  </thead>
+  <tbody *ngIf="data && data.length > 0; else noDataTemplate" class="bg-black">
+    <ng-container *ngFor="let row of data; trackBy: trackById">
+      <tr>
+        <td (click)="row.isExpanded = !row.isExpanded">
+          <span
+            class="expand-icon"
+            [ngClass]="{ 'transform-rotate-90': row.isExpanded }"
+            ><i class="bi bi-chevron-right"></i
+          ></span>
+        </td>
+        <td *ngFor="let column of columns">
+          <ng-container
+            *ngIf="column.contentTemplateRef; else defaultContentTemplate"
+            [ngTemplateOutlet]="column.contentTemplateRef"
+            [ngTemplateOutletContext]="{ row }"
+          >
+          </ng-container>
+          <ng-template #defaultContentTemplate>
+            {{ selectByPath(row, column.prop) }}
+          </ng-template>
+        </td>
+      </tr>
+      <tr *ngIf="collapseContentTemplateRef">
+        <td [colSpan]="columns.length + 1">
+          <div [ngClass]="row.isExpanded ? 'show px-4 py-2' : 'hide'">
+            <ng-container
+              [ngTemplateOutlet]="collapseContentTemplateRef"
+              [ngTemplateOutletContext]="{ data: row }"
+            ></ng-container>
+          </div>
+        </td>
+      </tr>
+    </ng-container>
+  </tbody>
+  <ng-template #noDataTemplate>
+    <tbody>
+      <tr>
+        <td [colSpan]="columns.length + 1">
+          <div class="text-center">No data</div>
+        </td>
+      </tr>
+    </tbody>
+  </ng-template>
+</table>

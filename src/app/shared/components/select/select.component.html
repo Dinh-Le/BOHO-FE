@@ -1,19 +1,41 @@
 <ng-template #defaultDropdownMenuItemTemplate let-label="label">
-    {{label}}
+  {{ label }}
 </ng-template>
 <ng-template #defaultDropdownToggleContentTemplate let-label="label">
-    {{label}}
+  {{ label }}
 </ng-template>
-<div ngbDropdown class="d-inline-block" [autoClose]="multiple ? 'outside' : true">
-    <button type="button" class="btn text-white" [ngClass]="titleClasses" ngbDropdownToggle>
-        <ng-container [ngTemplateOutlet]="dropdownToggleContentTemplate || defaultDropdownToggleContentTemplate"
-            [ngTemplateOutletContext]="{label}"></ng-container>
-    </button>
-    <div ngbDropdownMenu>
-        <a href="javascript:" [ngClass]="{'bg-primary': item.selected}"
-            *ngFor="let item of items; trackBy: trackByItems" ngbDropdownItem (click)="selectItem(item)">
-            <ng-container [ngTemplateOutlet]="dropdownItemTemplate || defaultDropdownMenuItemTemplate"
-                [ngTemplateOutletContext]="item"></ng-container>
-        </a>
-    </div>
+<div
+  ngbDropdown
+  class="d-inline-block w-100"
+  [autoClose]="multiple ? 'outside' : true"
+>
+  <a
+    href="javascript:void(0)"
+    class="btn text-white"
+    [ngClass]="titleClasses"
+    ngbDropdownToggle
+  >
+    <ng-container
+      [ngTemplateOutlet]="
+        dropdownToggleContentTemplate || defaultDropdownToggleContentTemplate
+      "
+      [ngTemplateOutletContext]="{label}"
+    ></ng-container>
+  </a>
+  <div ngbDropdownMenu>
+    <a
+      href="javascript:"
+      [ngClass]="{ 'bg-primary': item.selected }"
+      *ngFor="let item of items; trackBy: trackByItems"
+      ngbDropdownItem
+      (click)="selectItem(item)"
+    >
+      <ng-container
+        [ngTemplateOutlet]="
+          dropdownItemTemplate || defaultDropdownMenuItemTemplate
+        "
+        [ngTemplateOutletContext]="item"
+      ></ng-container>
+    </a>
+  </div>
 </div>

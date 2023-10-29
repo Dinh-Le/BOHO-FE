@@ -1,7 +1,11 @@
-import { Component, Input, TemplateRef, ViewChild, forwardRef } from '@angular/core';
+import {
+  Component,
+  Input,
+  TemplateRef,
+  forwardRef,
+} from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { SelectItemModel } from '@shared/models/select-item-model';
-
 
 @Component({
   selector: 'app-select',
@@ -11,9 +15,9 @@ import { SelectItemModel } from '@shared/models/select-item-model';
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => SelectComponent),
-      multi: true
-    }
-  ]
+      multi: true,
+    },
+  ],
 })
 export class SelectComponent implements ControlValueAccessor {
   @Input()
@@ -39,11 +43,13 @@ export class SelectComponent implements ControlValueAccessor {
 
   currentValues: SelectItemModel[] = [];
 
-  onChange = (_: any) => { };
+  onChange = (_: SelectItemModel) => {};
 
-  onTouched = () => { };
+  onTouched = () => {};
 
-  trackByItems(index: number, item: SelectItemModel): any { return item.value; }
+  trackByItems(_: number, item: SelectItemModel): any {
+    return item.value;
+  }
 
   get titleClasses(): string {
     return this.currentValues.length ? this.activeClass : this.deactiveClass;
@@ -53,12 +59,12 @@ export class SelectComponent implements ControlValueAccessor {
     return this.multiple ? this.currentValues : this.currentValues[0];
   }
 
-  set model(newValues: any[]) {
+  set model(newValues: SelectItemModel[]) {
     if (this.currentValues.length === newValues.length) {
       let changed = false;
 
       for (const currentValue of this.currentValues) {
-        if (!newValues.find(e => e.value == currentValue.value)) {
+        if (!newValues.find((e) => e.value == currentValue.value)) {
           changed = true;
           break;
         }
@@ -68,15 +74,13 @@ export class SelectComponent implements ControlValueAccessor {
         return;
       }
     }
-    
-    this.currentValues.forEach(e => e.selected = false);
-    newValues.forEach(e => e.selected = true);
-    this.currentValues = newValues;
 
+    this.items.forEach(e => e.selected = false);
+    this.currentValues = this.items.filter(e => newValues.some(({ value }) => e.value === value));
     this.onChange(this.model);
   }
 
-  writeValue(value: any): void {    
+  writeValue(value: any): void {
     if (!value) {
       this.model = [];
     } else if (!Array.isArray(value)) {
@@ -97,21 +101,23 @@ export class SelectComponent implements ControlValueAccessor {
   selectItem(item: SelectItemModel) {
     if (!this.multiple && item.selected) {
       return;
-    } 
-    
+    }
+
     if (this.multiple) {
       item.selected = !item.selected;
 
       if (item.selected) {
         this.currentValues.push(item);
-      } else {      
-        const index = this.currentValues.findIndex(e => e.value === item.value);
+      } else {
+        const index = this.currentValues.findIndex(
+          (e) => e.value === item.value
+        );
         if (index !== -1) {
           this.currentValues.splice(index, 1);
         }
 
         this.onChange(this.model);
-      }      
+      }
     } else {
       this.model = [item];
     }

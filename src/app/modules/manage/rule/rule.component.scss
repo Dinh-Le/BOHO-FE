@@ -1,0 +1,23 @@
+table {
+  width: 100%;
+
+  thead {
+    background: rgb(242, 242, 242);
+    color: rgb(95, 93, 96);
+  }
+
+  .show {
+    max-height: 1000px;
+    opacity: 1;
+    transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out,
+      padding 0.3 ease-in-out;
+  }
+
+  .hide {
+    max-height: 0px;
+    opacity: 0;
+    overflow-y: hidden;
+    transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out,
+      padding 0.3 ease-in-out;
+  }
+}

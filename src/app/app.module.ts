@@ -16,6 +16,9 @@ import { sidebarReducer } from './state/sidebar.reducer';
 import { TopBarComponent } from './layout/top-bar/top-bar.component';
 import { DataModule } from './data/data.module';
 import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
+import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+
 
 @NgModule({
   imports: [
@@ -27,6 +30,7 @@ import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
 
     // 3rd party module
     NgxLoadingModule.forRoot({}),
+    FontAwesomeModule,
 
     StoreModule.forRoot({ sidebar: sidebarReducer }),
 
@@ -49,4 +53,8 @@ import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
     TopBarComponent,
   ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(faIconLibrary: FaIconLibrary) {
+    faIconLibrary.addIconPacks(fas);
+  }
+}
