@@ -9,16 +9,19 @@
 - [III. Code Return](#iii-code-return)
 - [IV. API USAGE](#iv-api-usage)
     * [1 User Management API](#1-user-management-api)
-    * [2 Node Management API](#2-node-management-api)
-    * [3 Device Management API](#3-device-management-api)
-    * [4 Camera Management API](#4-camera-management-api)
-    * [5 Rule Management API](#5-rule-management-api)
-    * [6 Object Configurate API](#6-object-configurate-management-api)
-    * [7 Alarm Management API](#7-alarm-management-api)
-    * [8. Device Configs Management API (Removed)](#8-device-configs-management-api-(remove)) 
-    * [9. Health Check Monitor API](#9-health-check-monitor-api)
-    * [10. Edge Controller API](#10-edge-controller-api)
-    * [11. Milestone Intergrate](#11-milestone-intergrate)
+    * [2 Group Management API](#2-group-management-api)
+    * [3 Node Operator Management API](#3-node-operator-management-api)
+    * [4 Node Management API](#4-node-management-api)
+    * [5 Device Management API](#5-device-management-api)
+    * [6 Patrol Management API](#6-patrol-management-api)
+    * [7 Tour Management API](#7-tour-management-api)
+    * [8 Rule Management API](#8-rule-management-api)
+    * [9 Object Configurate API](#9-object-configurate-management-api)
+    * [10 Alarm Management API](#10-alarm-management-api)
+    * [11 Device Configs Management API (Removed)](#11-device-configs-management-api-(remove)) 
+    * [12 Health Check Monitor API](#12-health-check-monitor-api)
+    * [13 Edge Controller API](#13-edge-controller-api)
+    * [14 Milestone Intergrate](#14-milestone-intergrate)
 ----
 ## I General API Information
 
@@ -117,6 +120,16 @@
 - Update snapshot support function on PTZ and Static cameras
 - Update database construction
 
+#### ```12. UDATE NODE(27/08/2023)```
+- Update is_activate field for node
+- Check the activate status on Start/Stop service function
+
+#### ```13. UDATE NODE(26/10/2023)```
+- Update CRUD for Node Operator module
+- Update CRUD for device Group module
+- Update CRUD for Touring, Patrol, Preset module
+- Refactor API structure for Device, and Camera module
+- Delete API list support for Camera module
 ---
 ## III. CODE RETURN
 
@@ -274,14 +287,289 @@ Response: {
   "success": "boolean"
 }
 ```
+----
+## **2 Group Management API**
+
+#### ADD GROUP
+
+- Create POST request to create group for camera group
+```
+POST /api/rest/v1/user/<user_id>/group
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request : {
+  "name" : "str",
+  "describle" : "str"
+}
+
+Response: {
+  "message": "str",
+  "success": "boolean"
+}
+```
+
+----
+
+#### GET GROUPS
+- Create GET request to get the list of groups
+```
+GET /api/rest/v1/user/<user_id>/group
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: None
+
+Response:{
+  "data": {
+    "code": 1000,
+    "data": [
+      {
+          "name" : "str",
+          "describle" : "str"
+      }
+    ]
+  },
+  "message": "str",
+  "success": false
+}
+```
 ---
-## **2 Node Management API**
+#### GET GROUP IN DETAIL
+- Create GET request to get the group by id
+```
+GET /api/rest/v1/user/<user_id>/group/<group_id>
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: None
+
+Response:{
+  "data": {
+    "code": 1000,
+    "data": 
+      {
+        "name" : "str",
+        "describle" : "str"
+      }
+  },
+  "message": "str",
+  "success": false
+}
+```
+---
+
+#### UPDATE GROUP INFO
+
+- Create PATCH request to update node group information
+```
+PATCH /api/rest/v1/user/<user_id>/group/<group_id>
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: {
+  "name" : "str",
+  "describle" : "str"
+}
+
+Response: {
+  "message": "str",
+  "success": "boolean"
+}
+```
+---
+#### DELETE GROUP
+
+- Create DELETE request to delete group information
+```
+DELETE /api/rest/v1/user/<user_id>/group/<group_id>
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: None
+
+Response: {
+  "data": {},
+  "message" : "str",
+  "success" : "boolean"
+}
+```
+
+---
+## **3 Node Operator Management API**
+
+#### ADD NODE OPERATOR
+
+- Create POST request to create node operator for edge serivce
+```
+POST /api/rest/v1/user/<user_id>/node_operator
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request : {
+  "name" : "str",
+  "describle" : "str"
+}
+
+Response: {
+  "message": "str",
+  "success": "boolean"
+}
+```
+
+----
+
+#### GET NODE OPERATORS
+- Create GET request to get the list of node group
+```
+GET /api/rest/v1/user/<user_id>/node_operator
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: None
+
+Response:{
+  "data": {
+    "data": [
+      {
+          "name" : "str",
+          "describle" : "str"
+      }
+    ]
+  },
+  "message": "str",
+  "success": false
+}
+```
+---
+#### GET NODE OPERATOR IN DETAIL
+- Create GET request to get the  node operator by id
+```
+GET /api/rest/v1/user/<user_id>/node_operator/<node_operator_id>
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: None
+
+Response:{
+  "data": {
+    "data": 
+      {
+        "name" : "str",
+        "describle" : "str"
+      }
+  },
+  "message": "str",
+  "success": false
+}
+```
+---
+
+#### UPDATE NODE OPERATOR INFO
+
+- Create PATCH request to update node operator information
+```
+PATCH /api/rest/v1/user/<user_id>/node_operator/<node_operator_id>
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: {
+	"node_id" : "str",
+  "name" : "str",
+  "describle" : "str"
+}
+
+Response: {
+  "message": "str",
+  "success": "boolean"
+}
+```
+---
+#### DELETE NODE OPERATOR
+
+- Create DELETE request to delete node operator information
+```
+DELETE /api/rest/v1/user/<user_id>/node_operator/<node_operator_id>
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: None
+
+Response: {
+  "data": {},
+  "message" : "str",
+  "success" : "boolean"
+}
+```
+
+---
+## **4 Node Management API**
 
 #### ADD NODE
 
-- Create POST request to create edge device ( only admin user can create node)
+- Create POST request to create edge device 
 ```
-POST /api/rest/v1/node
+POST /api/rest/v1/user/<user_id>/node
 ```
 
 ```
@@ -297,12 +585,11 @@ Request: {
         "lon": "str",
     },
     "name": "str",
-    "type": "str", /// DeepStream or TensortRT or Milestone
+    "type": "str", /// DeepStream or TensortRT
     "ip": "str",
     "node_metadata": {
-      "user" : "str", /// Not required only for VMS
-      "password" : "str", /// Not required only for VMS
-      "end_point": "str" /// Not required only for VMS
+      "user" : "str", ///  required for ssh connection
+      "password" : "str", /// required for ssh connection
     },
     "connection_metadata": {
         "kafka" : {
@@ -340,9 +627,9 @@ Response: {
 ----
 
 #### GET NODES
-- Create GET request to get the list of nodes
+- Create GET request to get the list of nodes by user id
 ```
-GET /api/rest/v1/nodes
+GET /api/rest/v1/user/<user_id>/nodes
 ```
 
 ```
@@ -359,7 +646,8 @@ Response:{
     "code": 1000,
     "data": [
       {
-          "node_id": "str",
+          "id": "str",
+          "node_operator_id": "str",
           "location" : {
               "lat": "str",
               "lon": "str",
@@ -367,10 +655,10 @@ Response:{
           "name": "str",
           "type": "str", /// DeepStream or TensortRT
           "ip": "str",
+          "is_active" : "boolean", /// The atribute to validate the status process of node service
           "node_metadata": {
-            "user" : "str", /// Not required only for VMS
-            "password" : "str", /// Not required only for VMS
-            "end_point": "str" /// Not required only for VMS
+            "user" : "str", /// required for ssh connection
+            "password" : "str", /// required for ssh connection
           },
           "connection_metadata": {
               "kafka" : {
@@ -406,11 +694,85 @@ Response:{
   "success": false
 }
 ```
+
+----
+
+#### GET NODES BY NODE OPERATOR
+- Create GET request to get the list of nodes by user id
+```
+GET /api/rest/v1/user/<user_id>/nodes
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+```
+End point : /api/rest/v1/user/<user_id>/nodes?npi=<str>
+npi : node operator id
+```
+
+```json
+Response:{
+  "data": {
+    "code": 1000,
+    "data": [
+      {
+          "id": "str",
+          "node_operator_id": "str",
+          "location" : {
+              "lat": "str",
+              "lon": "str",
+          },
+          "name": "str",
+          "type": "str", /// DeepStream or TensortRT
+          "ip": "str",
+          "is_active" : "boolean", /// The atribute to validate the status process of node service
+          "node_metadata": {
+            "user" : "str", /// required for ssh connection
+            "password" : "str", /// required for ssh connection
+          },
+          "connection_metadata": {
+              "kafka" : {
+                  "port": "str",
+                  "topic": "str"
+                  
+              },
+              "mqtt": {
+                  "port": "str",
+                  "topic": "str"
+              },
+              "socket": {
+                  "port": "str"
+              }
+          },
+          "engine_metadata" : {
+            "resolution" : {
+              "width" : "int",
+              "height" : "int"
+            },
+            "frame_rate" : "int", // Maximum value is 30
+            "sensitive": {
+              "detection" : "int", //Range value from 1 to 5
+              "tracking" : "int" //Range value from 1 to 5
+            },
+            "frame_step" : "int"
+          }
+      }
+    ],
+    "message": "str"
+  },
+  "message": "str",
+  "success": false
+}
+```
+
 ---
 #### GET NODE IN DETAIL
 - Create GET request to get the  node information
 ```
-GET /api/rest/v1/nodes/<node_id>
+GET /api/rest/v1/user/<user_id>/nodes/<node_id>
 ```
 
 ```
@@ -428,6 +790,7 @@ Response:{
     "data": 
       {
           "node_id": "str",
+          "node_operator_id" : "str",
           "location" : {
               "lat": "str",
               "lon": "str",
@@ -435,6 +798,7 @@ Response:{
           "name": "str",
           "type": "str", /// DeepStream or TensortRT
           "ip": "str",
+          "is_active" : "boolean", /// The atribute to validate the status process of node service
           "node_metadata": {
             "user" : "str", /// Not required only for VMS
             "password" : "str", /// Not required only for VMS
@@ -500,10 +864,9 @@ Request: {
     "type": "str", /// DeepStream or TensortRT
     "ip": "str",
     "node_metadata": {
-      "stream_port" : "str",
-      "stream_url" : "str",
-      "image_stream_url": "str",
-      "imaeg_stream_port" : "str"
+        "user" : "str", /// Not required only for VMS
+        "password" : "str", /// Not required only for VMS
+        "end_point": "str" /// Not required only for VMS
     },
     "connection_metadata": {
         "kafka" : {
@@ -589,7 +952,7 @@ Response: {
 ```
 
 ---
-### 3. Device Management API
+### 5. Device Management API
 
 #### CREATE DEVICE
 
@@ -607,18 +970,42 @@ Type: application/json
 ```json
 Request: {
 	"device_metadata" : {
-        "ip" : "str",
-        "http_port" : "str",
-        "rtsp_port" : "str",
-        "user" : "str", // In case camera dont have security step let it empty
-        "password": "str" // In case camera dont have security step let it empty
-    },
+        "manufacture" : "str",
+        "describle" : "str"
+    }, // Do not need to have,
     "location" : {
         "lat" : "str",
         "long" : "str"
     },
     "type" : "str", // Device Type : Camera, Radar , ....
-    "region" : "str"
+    "camera" : {
+      "driver" : "str", // camera driver (RTSP, Milestone, Onvif)
+      "type" : "str", // camera type can be Static or PTZ
+      "connection_metadata" : {
+        "onvif" : {
+          "ip" : "str",
+          "http_port" : "str",
+          "rtsp_port" : "str",
+          "profile" : "str", // camera profile can be 0,1,2
+          "user" : "str", // In case camera dont have security step let it empty
+          "password": "str" // In case camera dont have security step let it empty
+        },
+        "rtsp" : {
+          "rtsp_url" : "str",
+          "user" : "str", // In case camera dont have security step let it empty
+          "password": "str" // In case camera dont have security step let it empty
+        },
+        "milestone" : {
+          "ip" : "str",
+          "http_port" : "str",
+          "rtsp_port" : "str",
+          "authen_type" : "str",
+          "profile" : "str", //camepra profile can be 0,1,2
+          "user" : "str", // In case camera dont have security step let it empty
+          "password": "str" // In case camera dont have security step let it empty
+        }
+      } // depend on driver type to declear different connection metadata format
+    }
 }
 
 Response: {
@@ -647,20 +1034,44 @@ Request: None
 
 Response:{
   "data": [{
-  "device_id" : "str",
+  "id" : "str",
 	"device_metadata" : {
-        "ip" : "str",
-        "http_port" : "str",
-        "rtsp_port" : "str",
-        "user" : "str", // In case camera dont have security step let it empty
-        "password": "str" // In case camera dont have security step let it empty
-    },
+        "manufacture" : "str",
+        "describle" : "str"
+    }, // Do not need to have,
     "location" : {
         "lat" : "str",
         "long" : "str"
     },
     "type" : "str", // Device Type : Camera, Radar , ....
-    "region" : "str"
+    "camera" : {
+      "driver" : "str", // camera driver (RTSP, Milestone, Onvif)
+      "type" : "str", // camera type can be Static or PTZ
+      "connection_metadata" : {
+        "onvif" : {
+          "ip" : "str",
+          "http_port" : "str",
+          "rtsp_port" : "str",
+          "profile" : "str", // camera profile can be 0,1,2
+          "user" : "str", // In case camera dont have security step let it empty
+          "password": "str" // In case camera dont have security step let it empty
+        },
+        "rtsp" : {
+          "rtsp_url" : "str",
+          "user" : "str", // In case camera dont have security step let it empty
+          "password": "str" // In case camera dont have security step let it empty
+        },
+        "milestone" : {
+          "ip" : "str",
+          "http_port" : "str",
+          "rtsp_port" : "str",
+          "authen_type" : "str",
+          "profile" : "str", //camepra profile can be 0,1,2
+          "user" : "str", // In case camera dont have security step let it empty
+          "password": "str" // In case camera dont have security step let it empty
+        }
+      } // depend on driver type to declear different connection metadata format
+    }
   }],
     "message" : "str",
     "success" : "boolean"
@@ -685,20 +1096,44 @@ Request: None
 
 Response: {
   "data": {
-  "device_id" : "str",
+  "id" : "str",
 	"device_metadata" : {
-        "ip" : "str",
-        "http_port" : "str",
-        "rtsp_port" : "str",
-        "user" : "str", // In case camera dont have security step let it empty
-        "password": "str" // In case camera dont have security step let it empty
-    },
+        "manufacture" : "str",
+        "describle" : "str"
+    }, // Do not need to have,
     "location" : {
         "lat" : "str",
         "long" : "str"
     },
     "type" : "str", // Device Type : Camera, Radar , ....
-    "region" : "str"
+    "camera" : {
+      "driver" : "str", // camera driver (RTSP, Milestone, Onvif)
+      "type" : "str", // camera type can be Static or PTZ
+      "connection_metadata" : {
+        "onvif" : {
+          "ip" : "str",
+          "http_port" : "str",
+          "rtsp_port" : "str",
+          "profile" : "str", // camera profile can be 0,1,2
+          "user" : "str", // In case camera dont have security step let it empty
+          "password": "str" // In case camera dont have security step let it empty
+        },
+        "rtsp" : {
+          "rtsp_url" : "str",
+          "user" : "str", // In case camera dont have security step let it empty
+          "password": "str" // In case camera dont have security step let it empty
+        },
+        "milestone" : {
+          "ip" : "str",
+          "http_port" : "str",
+          "rtsp_port" : "str",
+          "authen_type" : "str",
+          "profile" : "str", //camepra profile can be 0,1,2
+          "user" : "str", // In case camera dont have security step let it empty
+          "password": "str" // In case camera dont have security step let it empty
+        }
+      } // depend on driver type to declear different connection metadata format
+    }
   },
     "message" : "str",
     "success" : "boolean"
@@ -721,18 +1156,42 @@ Type: application/json
 ```json
 Request: {
 	"device_metadata" : {
-        "ip" : "str",
-        "http_port" : "str",
-        "rtsp_port" : "str",
-        "user" : "str", // In case camera dont have security step let it empty
-        "password": "str" // In case camera dont have security step let it empty
-    },
+        "manufacture" : "str",
+        "describle" : "str"
+    }, // Do not need to have,
     "location" : {
         "lat" : "str",
         "long" : "str"
     },
     "type" : "str", // Device Type : Camera, Radar , ....
-    "region" : "str"
+    "camera" : {
+      "driver" : "str", // camera driver (RTSP, Milestone, Onvif)
+      "type" : "str", // camera type can be Static or PTZ
+      "connection_metadata" : {
+        "onvif" : {
+          "ip" : "str",
+          "http_port" : "str",
+          "rtsp_port" : "str",
+          "profile" : "str", // camera profile can be 0,1,2
+          "user" : "str", // In case camera dont have security step let it empty
+          "password": "str" // In case camera dont have security step let it empty
+        },
+        "rtsp" : {
+          "rtsp_url" : "str",
+          "user" : "str", // In case camera dont have security step let it empty
+          "password": "str" // In case camera dont have security step let it empty
+        },
+        "milestone" : {
+          "ip" : "str",
+          "http_port" : "str",
+          "rtsp_port" : "str",
+          "authen_type" : "str",
+          "profile" : "str", //camepra profile can be 0,1,2
+          "user" : "str", // In case camera dont have security step let it empty
+          "password": "str" // In case camera dont have security step let it empty
+        }
+      } // depend on driver type to declear different connection metadata format
+    }
 }
 
 Response: {
@@ -763,17 +1222,14 @@ Response: {
   "success" : "boolean"
 }
 ```
-
-
-
 ---
-### 4. Camera Management API
+### 6. Patrol Management API
 
-#### CREATE CAMERA
+#### CREATE PATROL
 
-- Create POST request to create new camera( only admin user can add the user)
+- Create POST request to create new patrol
 ```
-POST /api/rest/v1/node/<node_id>/device/<device_id>/camera
+POST /api/rest/v1/user/<user_id>/node/<node_id>/device/<device_id>/patrol
 ```
 
 ```
@@ -784,14 +1240,7 @@ Type: application/json
 
 ```json
 Request: {
-	"stream_metadata" : {
-        "milestone_id" : "str",
-        "milestone_url" : "str",
-        "is_onvif" : "bool"
-    }, // Not need to define this field when create request
-    "manufacture" : "str", //Camera name (Flexwatch, Hanwha, Sony,...)
-    "source_pos" : "int", // The position of camera on grid
-    "type" : "str" // Camera type (PTZ,Static)
+	"name" : "str" // name of patrol
 }
 
 Response: {
@@ -803,10 +1252,10 @@ Response: {
 
 ```
 ----
-#### GET CAMERAS LIST
-- Create GET request to get the list of cameras
+#### GET PATROL LIST
+- Create GET request to get the list of patrols
 ```
-GET /api/rest/v1/node/<node_id>/device/<device_id>/cameras
+GET /api/rest/v1/user/<user_id>/node/<node_id>/device/<device_id>/patrol
 ```
 
 ```
@@ -820,26 +1269,19 @@ Request: None
 
 Response:{
   "data": [{
-  "camera_id" : "str",
-	"stream_metadata" : {
-        "milestone_id" : "str",
-        "milestone_url" : "str",
-        "is_onvif" : "bool"
-    },
-    "manufacture" : "str", //Camera name (Flexwatch, Hanwha, Sony,...)
-    "source_pos" : "int", // The position of camera on grid
-    "type" : "str" // Camera type (PTZ,Static)
+  "id" : "str",
+  "name" : "str"
   }],
     "message" : "str",
     "success" : "boolean"
 }
 ```
 ----
-#### GET CAMERA
+#### GET PATROL
 
-- Create GET request to get current camera information
+- Create GET request to get current patrols information
 ```
-GET /api/rest/v1/node/<node_id>/device/<device_id>/camera/<camera_id>
+GET /api/rest/v1/user/<user_id>/node/<node_id>/device/<device_id>/patrol/<patrol_id>
 ```
 
 ```
@@ -853,26 +1295,19 @@ Request: None
 
 Response: {
   "data": {
-  "camera_id" : "str",
-	"stream_metadata" : {
-        "milestone_id" : "str",
-        "milestone_url" : "str",
-        "is_onvif" : "bool"
-    }, 
-    "manufacture" : "str", //Camera name (Flexwatch, Hanwha, Sony,...)
-    "source_pos" : "int", // The position of camera on grid
-    "type" : "str" // Camera type (PTZ,Static)
+  "id" : "str",
+  "name": "str"
   },
     "message" : "str",
     "success" : "boolean"
 }
 ```
 ----
-#### EDIT CAMERA
+#### EDIT PATROL
 
-- Create PATCH request to edit the current camera
+- Create PATCH request to edit the current patrol
 ```
-PATCH /api/rest/v1/node/<node_id>/device/<device_id>/camera/<camera_id>
+PATCH /api/rest/v1/user/<user_id>/node/<node_id>/device/<device_id>/patrol/<patrol_id>
 ```
 
 ```
@@ -883,14 +1318,7 @@ Type: application/json
 
 ```json
 Request: {
-	"stream_metadata" : {
-        "milestone_id" : "str",
-        "milestone_url" : "str",
-        "is_onvif" : "bool"
-    } , 
-    "manufacture" : "str", //Camera name (Flexwatch, Hanwha, Sony,...)
-    "source_pos" : "int", // The position of camera on grid
-    "type" : "str" // Camera type (PTZ,Static)
+	"name" : "str"
 }
 
 Response: {
@@ -899,11 +1327,395 @@ Response: {
 }
 ```
 ---
-#### DELETE CAMERA
+#### DELETE PATROL
 
-- Create DELETE request to delete device information
+- Create DELETE request to delete patrol information
 ```
-DELETE /api/rest/v1/node/<node_id>/device/<device_id>/camera/<camera_id>
+DELETE /api/rest/v1/user/<user_id>/node/<node_id>/device/<device_id>/patrol/<patrol_id>
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: None
+
+Response: {
+  "data": {},
+  "message" : "str",
+  "success" : "boolean"
+}
+```
+---
+#### CREATE PATROL MANAGEMENT
+
+- Create POST request to linkage between preset and patrol together
+```
+POST /api/rest/v1/user/<user_id>/node/<node_id>/device/<device_id>/patrol/<patrol_id>/patrol_management
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: {
+	"preset_ids" : "list" // list of preset ids
+}
+Response:{
+  "data": {
+  "id" : "str"
+  },
+    "message" : "str",
+    "success" : "boolean"
+}
+```
+----
+#### GET PATROL MANAGEMENT LIST
+- Create GET request to get the list of patrol managements
+```
+GET /api/rest/v1/user/<user_id>/node/<node_id>/device/<device_id>/patrol/<patrol_id>/patrol_management
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: None
+
+Response:{
+  "data": [{
+  "id" : "str",
+  "patrol_id" : "str",
+  "preset_id" : "str"
+  }],
+    "message" : "str",
+    "success" : "boolean"
+}
+```
+----
+#### GET PATROL MANAGEMENT
+
+- Create GET request to get current patrol management information
+```
+GET /api/rest/v1/user/<user_id>/node/<node_id>/device/<device_id>/patrol/<patrol_id>/patrol_management/<patrol_management_id>
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: None
+
+Response: {
+  "data": {
+  "id" : "str",
+  "patrol_id" : "str",
+  "preset_id" : "str"
+  },
+    "message" : "str",
+    "success" : "boolean"
+}
+```
+
+---
+#### DELETE PATROL MANAGEMENT
+
+- Create DELETE request to delete patrol management information
+```
+DELETE /api/rest/v1/user/<user_id>/node/<node_id>/device/<device_id>/patrol/<patrol_id>/patrol_management/<patrol_management_id>
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: None
+
+Response: {
+  "data": {},
+  "message" : "str",
+  "success" : "boolean"
+}
+```
+---
+#### CREATE PATROL SCHEDULE
+
+- Create POST request to create a schedule for patrol
+```
+POST /api/rest/v1/user/<user_id>/node/<node_id>/device/<device_id>/patrol/<patrol_id>/patrol_schedule
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: {
+	"touring_id" : "str",
+  "color": "str", //should store in hexa or any color format value
+  "schedule": {
+    "start_time": "str", // time format hh:mm
+    "end_time": "str", // time format hh:mm
+    "day": "str" // the integer value preset for day start Monday = 0 and Sunday = 6
+  }
+}
+Response:{
+  "data": {
+  "id" : "str"
+  },
+    "message" : "str",
+    "success" : "boolean"
+}
+```
+----
+#### GET PATROL SCHEDULE LIST
+- Create GET request to get the list of patrol schedules
+```
+GET /api/rest/v1/user/<user_id>/node/<node_id>/device/<device_id>/patrol/<patrol_id>/patrol_schedule
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: None
+
+Response:{
+  "data": [{
+  "id" : "str",
+	"touring_id" : "str",
+  "color": "str", //should store in hexa or any color format value
+  "schedule": {
+    "start_time": "str", // time format hh:mm
+    "end_time": "str", // time format hh:mm
+    "day": "str" // the integer value preset for day start Monday = 0 and Sunday = 6
+  }
+  }],
+    "message" : "str",
+    "success" : "boolean"
+}
+```
+----
+#### GET PATROL SCHEDULE
+
+- Create GET request to get current patrol schedule information
+```
+GET /api/rest/v1/user/<user_id>/node/<node_id>/device/<device_id>/patrol/<patrol_id>/patrol_schedule/<patrol_schedule_id>
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: None
+
+Response: {
+  "data": {
+  "id" : "str",
+	"touring_id" : "str",
+  "color": "str", //should store in hexa or any color format value
+  "schedule": {
+    "start_time": "str", // time format hh:mm
+    "end_time": "str", // time format hh:mm
+    "day": "str" // the integer value preset for day start Monday = 0 and Sunday = 6
+  }
+  },
+    "message" : "str",
+    "success" : "boolean"
+}
+```
+----
+#### EDIT PATROL SCHEDULE
+
+- Create PATCH request to edit the current patrol
+```
+PATCH /api/rest/v1/user/<user_id>/node/<node_id>/device/<device_id>/patrol/<patrol_id>/patrol_schedule/<patrol_schedule_id>
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: {
+	"touring_id" : "str",
+  "color": "str", //should store in hexa or any color format value
+  "schedule": {
+    "start_time": "str", // time format hh:mm
+    "end_time": "str", // time format hh:mm
+    "day": "str" // the integer value preset for day start Monday = 0 and Sunday = 6
+  }
+}
+
+Response: {
+  "message": "str",
+  "success": "boolean"
+}
+```
+---
+#### DELETE PATROL SCHEDULE
+
+- Create DELETE request to delete patrol management information
+```
+DELETE /api/rest/v1/user/<user_id>/node/<node_id>/device/<device_id>/patrol/<patrol_id>/patrol_schedule/<patrol_schedule_id>
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: None
+
+Response: {
+  "data": {},
+  "message" : "str",
+  "success" : "boolean"
+}
+```
+---
+### 7. Tour Management API
+
+#### CREATE TOURING
+
+- Create POST request to create new touring
+```
+POST /api/rest/v1/user/<user_id>/node/<node_id>/device/<device_id>/touring
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: {
+	"type" : "str", // The touring type can be patrol or preset type
+  "active" : "boolean"
+}
+
+Response: {
+  "data": {
+    "id" : "str"
+  },
+  "message": "str",
+  "success": "boolean"
+}
+
+
+```
+----
+#### GET TOURING LIST
+- Create GET request to get the list of touring
+```
+GET /api/rest/v1/user/<user_id>/node/<node_id>/device/<device_id>/touring
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: None
+
+Response:{
+  "data": [{
+  "id" : "str",
+  "type" : "str",
+  "active" : "boolean"
+  }],
+    "message" : "str",
+    "success" : "boolean"
+}
+```
+----
+#### GET TOURING
+
+- Create GET request to get current touring information
+```
+GET /api/rest/v1/user/<user_id>/node/<node_id>/device/<device_id>/touring/<touring_id>
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: None
+
+Response: {
+  "data": {
+  "id" : "str",
+  "type" : "str",
+  "active" : "str"
+  },
+    "message" : "str",
+    "success" : "boolean"
+}
+```
+----
+#### EDIT TOURING
+
+- Create PATCH request to edit the current touring
+```
+PATCH /api/rest/v1/user/<user_id>/node/<node_id>/device/<device_id>/touring/<touring_id>
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: {
+  "type" : "str",
+  "active" : "str"
+}
+
+Response: {
+  "message": "str",
+  "success": "boolean"
+}
+```
+---
+#### DELETE TOURING
+
+- Create DELETE request to delete touring information
+```
+DELETE /api/rest/v1/user/<user_id>/node/<node_id>/device/<device_id>/touring/<touring_id>
 ```
 
 ```
@@ -923,45 +1735,8 @@ Response: {
 ```
 
 ---
-#### SNAPSHOT
 
-
-- Create GET request to download the image information
-```
-GET /api/rest/v1/node/<node_id>/device/<device_id>/cameras/<camera_id>/snapshot
-```
-
-```
-Request Header
-Authorization: Bearer
-Type: application/json
-```
-- Request Parameters:
-    - ***rule_id*** : define the rule id to get the current snapshot from database (optional)
-    - ***preset_id*** : define the preset_id to get the snapshot from current time (optional) - (In case of Static camera, set preset_id  = 1)
-```json
-
-Response: {
-  "message": "str",
-  "success": "boolean",
-  "data": {
-    "size": "list", /// [width,height]
-    "format" : "str",
-    "img" : "str" // image data
-  }
-}
-```
-- Example Usage
-```python
-import base64
-imgdata = base64.b64decode(res['data']['img'])
-filename = 'some_image.jpg' 
-with open(filename, 'wb') as f:
-    f.write(imgdata)
-```
-
----
-### 5. Rule Management API
+### 8. Rule Management API
 
 #### CREATE RULE
 
@@ -1207,7 +1982,7 @@ Response: img_data (str base64 format)
 ```
 
 ---
-### 6 .Object Configurate API
+### 8. Object Configurate API
 
 #### CREATE OBJECT CONFIGURE
 
@@ -1362,7 +2137,7 @@ Response: {
 ```
 
 ---
-### 7. Alarm Management API
+### 9. Alarm Management API
 
 #### CREATE ALARM MANAGEMENT
 
@@ -1524,7 +2299,7 @@ Response: {
 ```
 
 ---
-### 8. Device Configs Management API (Removed)
+### 10. Device Configs Management API (Removed)
 
 #### ADD DEVICE CONFIG
 
@@ -1678,7 +2453,7 @@ Response: {
         - Loitering Alarm: This is for loitering event. Cannot use in when preset in background zone
         - No Alarm: This case is used when no event happend
 ---
-### 9. Health Check Monitor API
+### 11. Health Check Monitor API
 
 
 #### GET DEVICE INFORMATION
@@ -1774,6 +2549,8 @@ Response: {
   "success": "boolean"
 }
 ```
+
+```Note: The service return error if the is_activate already TRUE```
 ------------
 #### Stop Edge System
 
@@ -1797,9 +2574,9 @@ Response: {
   "success": "boolean"
 }
 ```
-
+```Note: The service return error if the is_activate already FALSE```
 ---
-### 11. Milestone Intergrate
+### 12. Milestone Intergrate
 
 
 #### Camera Control Command
