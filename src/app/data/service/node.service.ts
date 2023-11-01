@@ -1,5 +1,4 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BOHOEndpoints } from '../schema/boho-v2/endpoints';
 import {
@@ -10,8 +9,9 @@ import {
 } from '../schema/boho-v2/node';
 import { ResponseBase } from '../schema/boho-v2/response-base';
 import { formatString } from '@app/helpers/function';
+import { RestfullApiService } from './restful-api.service';
 
-export abstract class NodeData {
+export abstract class NodeManagementService extends RestfullApiService {
   abstract findAll(): Observable<GetNodesResponse>;
   abstract find(id: string): Observable<NodeDetailedResponse>;
   abstract create(request: CreateNodeRequest): Observable<ResponseBase>;
@@ -24,9 +24,7 @@ export abstract class NodeData {
 }
 
 @Injectable({ providedIn: 'root' })
-export class NodeService extends NodeData {
-  private httpClient = inject(HttpClient);
-
+export class NodeManagementServiceImpl extends NodeManagementService {
   findAll(): Observable<GetNodesResponse> {
     return this.httpClient.get<GetNodesResponse>(BOHOEndpoints.nodes);
   }

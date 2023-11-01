@@ -14,7 +14,7 @@ import {
   GetDeviceResponse,
   CreateOrUpdateDeviceRequest,
 } from '../schema/boho-v2/device';
-import { NodeData } from './node.service';
+import { NodeManagementService } from './node.service';
 import {
   GetNodesResponse,
   NodeDetailedResponse,
@@ -98,7 +98,7 @@ export class MockDeviceService extends DeviceData {
 }
 
 @Injectable()
-export class MockNodeService extends NodeData {
+export class MockNodeService extends NodeManagementService {
   override findAll(): Observable<GetNodesResponse> {
     const response: GetNodesResponse = {
       success: true,

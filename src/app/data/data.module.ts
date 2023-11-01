@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { DeviceData } from './service/device.service';
 import { CameraData } from './service/camera.service';
-import { NodeData } from './service/node.service';
+import { NodeManagementService } from './service/node.service';
 import {
   MockCameraService,
   MockDeviceService,
@@ -13,7 +13,7 @@ import {
 const providers = [
   { provide: DeviceData, useClass: MockDeviceService },
   { provide: CameraData, useClass: MockCameraService },
-  { provide: NodeData, useClass: MockNodeService },
+  { provide: NodeManagementService, useClass: MockNodeService },
 ];
 
 @NgModule({

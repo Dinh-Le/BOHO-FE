@@ -33,3 +33,8 @@ Password: dckr_pat_L6B99ubtix1Y10vJoLrU-E1kFVM
 ## Build docker image
 
 docker buildx build --platform linux/amd64 -t blackrookie/boho:v1.0 --push .
+
+## Anydesk
+
+ID: 241985098
+Password: goback@2020

@@ -1,27 +1,53 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
 import { JWTTokenService } from '../../core/services/jwt-token.service';
-import { BOHOEndpoints } from '../schema/boho-v2/endpoints';
-import {
-  LoginResponse,
-  UpdatePasswordRequest,
-  UserCredentials,
-} from '../schema/boho-v2/user';
+import { User } from '../schema/boho-v2/user';
 import { ResponseBase } from '../schema/boho-v2/response-base';
+import { RestfullApiService } from './restful-api.service';
+import { environment } from '@env';
+
+export abstract class UserService extends RestfullApiService {
+  public abstract create(user: Omit<User, 'id'>): Observable<ResponseBase>;
+
+  public abstract findAll(): Observable<ResponseBase & { data: User[] }>;
+
+  public abstract login(
+    user: Required<Pick<User, 'name' | 'password'>>
+  ): Observable<ResponseBase & { data: string }>;
+
+  public abstract updatePassword(
+    userId: string,
+    password: string
+  ): Observable<ResponseBase>;
+
+  public abstract updateRole(
+    userId: string,
+    role: string
+  ): Observable<ResponseBase>;
+}
 
 @Injectable({ providedIn: 'root' })
-export class UserService {
-  constructor(
-    private httpClient: HttpClient,
-    private tokenService: JWTTokenService
-  ) {}
+export class UserServiceImpl extends UserService {
+  tokenService = inject(JWTTokenService);
 
-  login(userCredentials: UserCredentials): Observable<LoginResponse> {
+  public override create(user: Omit<User, 'id'>): Observable<ResponseBase> {
+    const url = `${environment.baseUrl}/api/rest/v1/user/add_user`;
+    return this.httpClient.post<ResponseBase>(url, user);
+  }
+
+  public override findAll(): Observable<ResponseBase & { data: User[] }> {
+    const url = `${environment.baseUrl}/api/rest/v1/user/get_users`;
+    return this.httpClient.get<ResponseBase & { data: User[] }>(url);
+  }
+
+  public override login(
+    user: Required<Pick<User, 'name' | 'password'>>
+  ): Observable<ResponseBase & { data: string }> {
+    const url = `${environment.baseUrl}/api/rest/v1/login`;
     return this.httpClient
-      .post<LoginResponse>(BOHOEndpoints.login, userCredentials)
+      .post<ResponseBase & { data: string }>(url, user)
       .pipe(
-        map((loginResponse: LoginResponse) => {
+        map((loginResponse: ResponseBase & { data: string }) => {
           if (loginResponse.success) {
             this.tokenService.token = loginResponse.data;
           }
@@ -31,12 +57,22 @@ export class UserService {
       );
   }
 
-  changePassword(
-    updatePasswordRequest: UpdatePasswordRequest
+  public override updatePassword(
+    userId: string,
+    password: string
   ): Observable<ResponseBase> {
-    return this.httpClient.post<ResponseBase>(
-      BOHOEndpoints.changePassword,
-      updatePasswordRequest
-    );
+    const url = `${environment.baseUrl}/user/update_password`;
+    return this.httpClient.post<ResponseBase>(url, {
+      user_id: userId,
+      password,
+    });
+  }
+
+  public override updateRole(
+    userId: string,
+    role: string
+  ): Observable<ResponseBase> {
+    const url = `${environment.baseUrl}/user/update_role`;
+    return this.httpClient.post<ResponseBase>(url, { user_id: userId, role });
   }
 }

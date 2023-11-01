@@ -1,5 +1,5 @@
 export interface PatrolManagement {
   id: string;
-  patrolId: string;
-  presetId: string;
+  patrol_id: string;
+  preset_id: string;
 }

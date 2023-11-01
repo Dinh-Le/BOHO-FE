@@ -17,6 +17,7 @@ export abstract class PatrolManagementService {
       data: Pick<PatrolManagement, 'id'>;
     }
   >;
+
   abstract findAll(
     userId: string,
     nodeId: string,
@@ -27,6 +28,7 @@ export abstract class PatrolManagementService {
       data: PatrolManagement[];
     }
   >;
+
   abstract find(
     userId: string,
     nodeId: string,
@@ -38,6 +40,7 @@ export abstract class PatrolManagementService {
       data: PatrolManagement;
     }
   >;
+
   abstract delete(
     userId: string,
     nodeId: string,
@@ -63,6 +66,7 @@ export class PatrolManagementServiceImpl extends PatrolManagementService {
       ResponseBase & { data: Pick<PatrolManagement, 'id'> }
     >(url, { preset_ids: presetIds });
   }
+
   override findAll(
     userId: string,
     nodeId: string,
@@ -74,6 +78,7 @@ export class PatrolManagementServiceImpl extends PatrolManagementService {
       url
     );
   }
+
   override find(
     userId: string,
     nodeId: string,
@@ -84,6 +89,7 @@ export class PatrolManagementServiceImpl extends PatrolManagementService {
     const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device/${deviceId}/patrol/${patrolId}/patrol_management/${patrolManagementId}`;
     return this.httpClient.get<ResponseBase & { data: PatrolManagement }>(url);
   }
+
   override delete(
     userId: string,
     nodeId: string,

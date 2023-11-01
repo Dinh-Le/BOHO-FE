@@ -1,8 +1,5 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CreatePatrolResponse } from '../schema/boho-v2/create-patrol.response';
-import { FindAllPatrolsReponse } from '../schema/boho-v2/find-all-patrol.reponse';
-import { FindPatrolResponse } from '../schema/boho-v2/find-patrol.response';
 import { Patrol } from '../schema/boho-v2/patrol';
 import { ResponseBase } from '../schema/boho-v2/response-base';
 import { HttpClient } from '@angular/common/http';
@@ -13,19 +10,31 @@ export abstract class PatrolService {
     userId: string,
     nodeId: string,
     deviceId: string,
-    patrol: Patrol
-  ): Observable<CreatePatrolResponse>;
+    patrol: Omit<Patrol, 'id'>
+  ): Observable<
+    ResponseBase & {
+      data: string;
+    }
+  >;
   abstract findAll(
     userId: string,
     nodeId: string,
     deviceId: string
-  ): Observable<FindAllPatrolsReponse>;
+  ): Observable<
+    ResponseBase & {
+      data: Patrol[];
+    }
+  >;
   abstract find(
     userId: string,
     nodeId: string,
     deviceId: string,
     patrolId: string
-  ): Observable<FindPatrolResponse>;
+  ): Observable<
+    ResponseBase & {
+      data: Patrol;
+    }
+  >;
   abstract update(
     userId: string,
     nodeId: string,
@@ -48,20 +57,37 @@ export class PatrolServiceImpl extends PatrolService {
     userId: string,
     nodeId: string,
     deviceId: string,
-    patrol: Patrol
-  ): Observable<CreatePatrolResponse> {
+    patrol: Omit<Patrol, 'id'>
+  ): Observable<
+    ResponseBase & {
+      data: string;
+    }
+  > {
     const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device/${deviceId}/patrol`;
-    return this.httpClient.post<CreatePatrolResponse>(url, {
+    return this.httpClient.post<
+      ResponseBase & {
+        data: string;
+      }
+    >(url, {
       name: patrol.name,
     });
   }
+
   override findAll(
     userId: string,
     nodeId: string,
     deviceId: string
-  ): Observable<FindAllPatrolsReponse> {
+  ): Observable<
+    ResponseBase & {
+      data: Patrol[];
+    }
+  > {
     const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device/${deviceId}/patrol`;
-    return this.httpClient.get<FindAllPatrolsReponse>(url);
+    return this.httpClient.get<
+      ResponseBase & {
+        data: Patrol[];
+      }
+    >(url);
   }
 
   override find(
@@ -69,9 +95,17 @@ export class PatrolServiceImpl extends PatrolService {
     nodeId: string,
     deviceId: string,
     patrolId: string
-  ): Observable<FindPatrolResponse> {
+  ): Observable<
+    ResponseBase & {
+      data: Patrol;
+    }
+  > {
     const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device/${deviceId}/patrol/${patrolId}`;
-    return this.httpClient.get<FindPatrolResponse>(url);
+    return this.httpClient.get<
+      ResponseBase & {
+        data: Patrol;
+      }
+    >(url);
   }
 
   override update(
