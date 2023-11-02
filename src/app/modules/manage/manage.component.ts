@@ -17,8 +17,13 @@ export class ManageComponent implements OnInit {
       onclick: null,
     },
     {
-      icon: 'bi-gpu-card',
-      title: 'Thiết bị',
+      icon: 'bi-diagram-3',
+      title: 'Hệ thống',
+      path: '/manage/system',
+    },
+    {
+      icon: 'bi-pc-horizontal',
+      title: 'Node',
       onclick: null,
     },
     {
@@ -34,18 +39,13 @@ export class ManageComponent implements OnInit {
       onclick: null,
     },
     {
-      icon: 'bi-clock',
-      title: 'Lịch trình',
+      icon: 'bi-car-front-fill',
+      title: 'Biển số xe',
       path: '/manage/schedule',
     },
     {
-      icon: 'bi-exclamation-triangle',
-      title: 'Cảnh báo',
-      onclick: null,
-    },
-    {
-      icon: 'bi-gear',
-      title: 'Cài đặt',
+      icon: 'bi-plugin',
+      title: 'Tích hợp',
       onclick: null,
     },
   ];

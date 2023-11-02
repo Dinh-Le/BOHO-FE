@@ -1,0 +1,43 @@
+.menu-container {
+  display: flex;
+  justify-items: center;
+  justify-content: space-between;
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      display: inline;
+      padding: 0;
+      margin: 0;
+      margin-inline-start: 1rem;
+      cursor: pointer;
+    }
+
+    li.active {
+      border-bottom-style: solid;
+      border-bottom-width: 1px;
+      border-bottom-color: var(--bs-primary);
+      pointer-events: none;
+    }
+  }
+}
+
+.status {
+  display: block;
+  padding: 0;
+  margin: 2px;
+  width: 100%;
+  color: white;
+  text-align: center;
+}
+
+.status.success {
+  background: lightgreen;
+}
+
+.status.failure {
+  background: orange;
+}

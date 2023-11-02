@@ -9,6 +9,10 @@ export interface ColumnConfig {
   contentTemplateRef?: TemplateRef<any>;
 }
 
+export interface ExpandableTableRowData {
+  isExpanded?: boolean;
+}
+
 @Component({
   selector: 'app-expandable-table',
   templateUrl: 'expandable-table.component.html',
@@ -37,8 +41,7 @@ export class ExpandableTableComponent {
   selectByPath(o: any, path: string) {
     try {
       return path.split('.').reduce((o, key) => o[key], o);
-    }
-    catch {
+    } catch {
       return '';
     }
   }

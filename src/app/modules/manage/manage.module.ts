@@ -15,6 +15,7 @@ import { ScheduleComponent } from './schedule/schedule.component';
 import { TimeSelectComponent } from './time-select/time-select.component';
 import { MenuBarComponent } from './menu-bar/menu-bar.component';
 import { ExpandableTableComponent } from './expandable-table/expandable-table.component';
+import { SystemComponent } from './system/system.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import { ExpandableTableComponent } from './expandable-table/expandable-table.co
     TimeSelectComponent,
     MenuBarComponent,
     ExpandableTableComponent,
+    SystemComponent,
   ],
   imports: [
     CommonModule,

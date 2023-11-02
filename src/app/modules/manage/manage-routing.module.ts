@@ -8,6 +8,7 @@ import { PresetSettingsComponent } from './camera-detail/preset-settings/preset-
 import { PatrolSettingsComponent } from './camera-detail/patrol-settings/patrol-settings.component';
 import { TourSettingsComponent } from './camera-detail/tour-settings/tour-settings.component';
 import { ScheduleComponent } from './schedule/schedule.component';
+import { SystemComponent } from './system/system.component';
 
 @NgModule({
   imports: [
@@ -43,6 +44,10 @@ import { ScheduleComponent } from './schedule/schedule.component';
                 component: TourSettingsComponent,
               },
             ],
+          },
+          {
+            path: 'system',
+            component: SystemComponent,
           },
           {
             path: 'rule',

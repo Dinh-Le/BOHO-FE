@@ -1,0 +1,174 @@
+<div class="menu-container">
+  <ul>
+    <li
+      *ngFor="let item of systems"
+      [ngClass]="{ active: item.selected }"
+      (click)="selectSystem(item)"
+    >
+      {{ item.label }}
+    </li>
+  </ul>
+  <button class="btn btn-primary text-white me-2 px-2" (click)="add()">
+    <i class="bi bi-plus"></i>Thêm
+  </button>
+</div>
+
+<div class="content-wrapper full-height">
+  <app-expandable-table
+    class="w-100"
+    classNames="bg-black"
+    [data]="data"
+    [columns]="columns"
+    rowKey="id"
+    [collapseContentTemplateRef]="contentTemplate"
+  ></app-expandable-table>
+  <ng-template #contentTemplate let-data="data">
+    <ng-container *ngIf="!data.formData.editable; else editFormTemplate">
+      <div class="row">
+        <span class="fs-18">{{ data.formData.name }}</span>
+      </div>
+      <div class="mt-4 row">
+        <div class="col-3">Host/Cổng:</div>
+        <div class="col-9">
+          {{ data.formData.host }}/{{ data.formData.port }}
+        </div>
+      </div>
+      <div class="mt-1 row">
+        <div class="col-3">Loại xác thực:</div>
+        <div class="col-9">
+          {{ data.formData.authType }}
+        </div>
+      </div>
+      <div class="mt-1 row">
+        <div class="col-3">ID người dùng:</div>
+        <div class="col-9">
+          {{ data.formData.userId }}
+        </div>
+      </div>
+      <div class="mt-1 row">
+        <div class="col-3">Mật khẩu:</div>
+        <div class="col-9">
+          {{ data.formData.password }}
+        </div>
+      </div>
+      <div class="mt-1 row">
+        <div class="col-3">Cổng sự kiên:</div>
+        <div class="col-9">
+          {{ data.formData.eventPort }}
+        </div>
+      </div>
+      <div class="mt-3 row">
+        <div class="offset-6">
+          <button class="btn btn-danger px-2 text-white mx-1">Xóa</button>
+          <button
+            class="btn btn-primary px-2 text-white mx-1"
+            (click)="data.formData.editable = true"
+          >
+            Chỉnh sửa
+          </button>
+        </div>
+      </div>
+    </ng-container>
+    <ng-template #editFormTemplate>
+      <div class="row">
+        <div class="col-8">
+          <div class="form-group row">
+            <div class="col-9">
+              <input
+                class="form-control form-control-sm text-white bg-transparent border-0 border-bottom border-primary rounded-0 fs-16"
+                [(ngModel)]="data.formData.name"
+              />
+            </div>
+          </div>
+          <div class="form-group mt-4 row">
+            <div class="col-3">Host/Cổng:</div>
+            <div class="col-6">
+              <input
+                class="form-control form-control-sm text-white bg-transparent border-light"
+                [(ngModel)]="data.formData.host"
+              />
+            </div>
+            <div class="col-3">
+              <input
+                class="form-control form-control-sm text-white bg-transparent border-light"
+                [(ngModel)]="data.formData.port"
+              />
+            </div>
+          </div>
+          <div class="form-group mt-1 row">
+            <div class="col-3">Loại xác thực:</div>
+            <div class="col-6">
+              <input
+                class="form-control form-control-sm text-white bg-transparent border-light"
+                [(ngModel)]="data.formData.authType"
+              />
+            </div>
+          </div>
+          <div class="form-group mt-1 row">
+            <div class="col-3">ID người dùng:</div>
+            <div class="col-6">
+              <input
+                class="form-control form-control-sm text-white bg-transparent border-light"
+                [(ngModel)]="data.formData.userId"
+              />
+            </div>
+          </div>
+          <div class="form-group mt-1 row">
+            <div class="col-3">Mật khẩu:</div>
+            <div class="col-6">
+              <input
+                class="form-control form-control-sm text-white bg-transparent border-light"
+                [(ngModel)]="data.formData.password"
+                type="password"
+              />
+            </div>
+            <div class="col-3">
+              <button
+                class="btn btn-primary text-white form-control form-control-sm"
+              >
+                Test kết nối
+              </button>
+            </div>
+          </div>
+          <div class="mt-1 row">
+            <div class="col-3">Cổng sự kiên:</div>
+            <div class="col-6">
+              <input
+                class="form-control form-control-sm text-white bg-transparent border-light"
+                [(ngModel)]="data.formData.eventPort"
+              />
+            </div>
+            <div class="col-3">
+              <button
+                class="form-control form-control-sm btn btn-primary text-white"
+              >
+                Test gửi
+              </button>
+            </div>
+          </div>
+          <div class="mt-3 row">
+            <div class="offset-6">
+              <button
+                class="btn btn-secondary px-2 text-white mx-1"
+                (click)="data.formData.editable = false"
+              >
+                Hủy
+              </button>
+              <button
+                class="btn btn-primary px-2 text-white mx-1"
+                (click)="data.formData.editable = false"
+              >
+                Lưu
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ng-template>
+  <ng-template #statusCellTemplateRef let-row="row">
+    <div class="status" [ngClass]="row.status ? 'success' : 'failure'">
+      {{ row.status ? "THÀNH CÔNG" : "THẤT BẠI" }}
+    </div>
+  </ng-template>
+</div>
