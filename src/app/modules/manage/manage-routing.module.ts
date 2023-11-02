@@ -10,6 +10,7 @@ import { TourSettingsComponent } from './camera-detail/tour-settings/tour-settin
 import { ScheduleComponent } from './schedule/schedule.component';
 import { SystemComponent } from './system/system.component';
 import { GroupNodeComponent } from './group-node/group-node.component';
+import { NodeComponent } from './node/node.component';
 
 @NgModule({
   imports: [
@@ -53,6 +54,10 @@ import { GroupNodeComponent } from './group-node/group-node.component';
           {
             path: 'group-node',
             component: GroupNodeComponent,
+          },
+          {
+            path: 'node',
+            component: NodeComponent
           },
           {
             path: 'rule',

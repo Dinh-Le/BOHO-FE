@@ -20,6 +20,7 @@ import { MenuBarComponent } from './menu-bar/menu-bar.component';
 import { ExpandableTableComponent } from './expandable-table/expandable-table.component';
 import { SystemComponent } from './system/system.component';
 import { GroupNodeComponent } from './group-node/group-node.component';
+import { NodeComponent } from './node/node.component';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { GroupNodeComponent } from './group-node/group-node.component';
     ExpandableTableComponent,
     SystemComponent,
     GroupNodeComponent,
+    NodeComponent
   ],
   imports: [
     CommonModule,
