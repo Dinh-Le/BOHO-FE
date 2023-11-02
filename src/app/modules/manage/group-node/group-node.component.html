@@ -1,0 +1,70 @@
+<div class="menu-container d-flex justify-content-between">
+  <span class="ms-2">Nhóm node</span>
+  <div class="me-2">
+    <button class="btn btn-primary text-white px-2" (click)="add()">
+      <i class="bi bi-plus"></i>Thêm
+    </button>
+  </div>
+</div>
+<div class="content-wrapper">
+  <table class="w-100">
+    <colgroup>
+      <col width="30" />
+      <col span="2" width="auto" />
+      <col width="300" />
+    </colgroup>
+    <thead>
+      <th></th>
+      <th>Tên nhóm nút<i class="bi bi-sort-alpha-down"></i></th>
+      <th>Số lượng nút<i class="bi bi-sort-alpha-down"></i></th>
+      <th></th>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of data; trackBy: trackById">
+        <td></td>
+        <td>
+          <ng-container *ngIf="!item.editable; else editableForm">
+            {{ item.name }}
+          </ng-container>
+          <ng-template #editableForm>
+            <div class="d-flex align-items-center px-1">
+              <input
+                class="w-100 border-0 border-light border-bottom"
+                [(ngModel)]="item.name"
+              />
+              <button
+                class="btn btn-secondary px-2"
+                (click)="item.editable = false"
+              >
+                Hủy
+              </button>
+              <button class="btn btn-primary px-2" (click)="update(item)">
+                Lưu
+              </button>
+            </div>
+          </ng-template>
+        </td>
+        <td>{{ item.nodeCount }}</td>
+        <td>
+          <div
+            ngbDropdown
+            container="body"
+            class="d-flex align-items-center justify-content-end pe-2"
+          >
+            <a class="cursor-pointer hide-caret" ngbDropdownToggle
+              ><i class="bi bi-three-dots"></i
+            ></a>
+            <ul class="table-row-popup-menu" ngbDropdownMenu>
+              <li (click)="item.editable = true">
+                <i class="bi bi-pencil-square"></i> Đặt lại tên
+              </li>
+              <li (click)="remove(item)">
+                <i class="bi bi-trash"></i> Xóa nhóm
+              </li>
+            </ul>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -9,6 +9,7 @@ import { PatrolSettingsComponent } from './camera-detail/patrol-settings/patrol-
 import { TourSettingsComponent } from './camera-detail/tour-settings/tour-settings.component';
 import { ScheduleComponent } from './schedule/schedule.component';
 import { SystemComponent } from './system/system.component';
+import { GroupNodeComponent } from './group-node/group-node.component';
 
 @NgModule({
   imports: [
@@ -48,6 +49,10 @@ import { SystemComponent } from './system/system.component';
           {
             path: 'system',
             component: SystemComponent,
+          },
+          {
+            path: 'group-node',
+            component: GroupNodeComponent,
           },
           {
             path: 'rule',

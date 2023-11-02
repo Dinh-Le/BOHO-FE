@@ -5,7 +5,10 @@ import { ManageComponent } from './manage.component';
 import { CameraComponent } from './camera/camera.component';
 import { RuleComponent } from './rule/rule.component';
 import { SharedModule } from '@shared/shared.module';
-import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbCollapseModule,
+  NgbDropdownModule,
+} from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CameraDetailComponent } from './camera-detail/camera-detail.component';
 import { PresetSettingsComponent } from './camera-detail/preset-settings/preset-settings.component';
@@ -16,6 +19,7 @@ import { TimeSelectComponent } from './time-select/time-select.component';
 import { MenuBarComponent } from './menu-bar/menu-bar.component';
 import { ExpandableTableComponent } from './expandable-table/expandable-table.component';
 import { SystemComponent } from './system/system.component';
+import { GroupNodeComponent } from './group-node/group-node.component';
 
 @NgModule({
   declarations: [
@@ -31,6 +35,7 @@ import { SystemComponent } from './system/system.component';
     MenuBarComponent,
     ExpandableTableComponent,
     SystemComponent,
+    GroupNodeComponent,
   ],
   imports: [
     CommonModule,
@@ -39,6 +44,7 @@ import { SystemComponent } from './system/system.component';
     ManageRoutingModule,
     SharedModule,
     NgbCollapseModule,
+    NgbDropdownModule,
   ],
 })
 export class ManageModule {}

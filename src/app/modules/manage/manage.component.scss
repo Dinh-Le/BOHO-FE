@@ -12,8 +12,7 @@
 }
 
 ::ng-deep .content-wrapper {
-  overflow-y: scroll;
-  overflow-x: hidden;
+  overflow: auto;
   max-height: calc(100vh - 49px - 36px - 36px - 0.2rem * 2);
 }
 
