@@ -15,3 +15,16 @@
     transition: background 0.5s;
   }
 }
+
+table, th, td {
+  border: 1px solid var(--bs-gray-700);
+  border-collapse: collapse;
+  padding: 2px 5px;
+}
+
+table {
+  th {
+    color: var(--bs-gray-800);
+    background: var(--bs-white);
+  }
+}

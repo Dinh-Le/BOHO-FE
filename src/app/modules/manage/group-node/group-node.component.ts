@@ -21,7 +21,7 @@ export class GroupNodeComponent {
       id: v4(),
       name: '',
       nodeCount: 0,
-      editable: false,
+      editable: true,
     });
   }
 

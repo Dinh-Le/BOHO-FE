@@ -7,7 +7,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { CoreModule } from '@app/core.module';
 import { SharedModule } from '@shared/shared.module';
 import { SidebarComponent } from './layout/sidebar/sidebar.component';
-import { NgxLoadingModule } from 'ngx-loading';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -29,7 +28,6 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
     ReactiveFormsModule,
 
     // 3rd party module
-    NgxLoadingModule.forRoot({}),
     FontAwesomeModule,
 
     StoreModule.forRoot({ sidebar: sidebarReducer }),

@@ -10,8 +10,9 @@
   <table class="w-100">
     <colgroup>
       <col width="30" />
-      <col span="2" width="auto" />
-      <col width="300" />
+      <col width="400"/>
+      <col width="150" />
+      <col width="auto"/>
     </colgroup>
     <thead>
       <th></th>
@@ -33,12 +34,12 @@
                 [(ngModel)]="item.name"
               />
               <button
-                class="btn btn-secondary px-2"
+                class="btn btn-secondary px-2 mx-1 text-white"
                 (click)="item.editable = false"
               >
                 Hủy
               </button>
-              <button class="btn btn-primary px-2" (click)="update(item)">
+              <button class="btn btn-primary px-2 text-white" (click)="update(item)">
                 Lưu
               </button>
             </div>
@@ -68,3 +69,17 @@
     </tbody>
   </table>
 </div>
+<ng-template #addRowModel let-modal>
+  <div class="modal-header">
+		<h4 class="modal-title" id="modal-basic-title">Thêm nhóm nút</h4>
+		<button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+	</div>
+	<div class="modal-body">
+    <div class="form-group">
+      <input class="form-input"/>
+    </div>
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Save</button>
+	</div>
+</ng-template>

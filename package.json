@@ -35,7 +35,6 @@
     "leaflet": "^1.9.4",
     "material-icons": "^1.13.11",
     "moment": "^2.29.4",
-    "ngx-loading": "^15.0.0",
     "ngx.leaflet.offline": "^1.1.2",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",

@@ -25,10 +25,6 @@ export class ContentLayoutComponent implements OnInit {
     return this.loadingService.loading;
   }
 
-  get loadingConfig() {
-    return this.loadingService.config;
-  }
-
   ngOnInit(): void {
     this.sidebar$.subscribe(
       (newState) => (this.sidebarVisible = newState.state)
