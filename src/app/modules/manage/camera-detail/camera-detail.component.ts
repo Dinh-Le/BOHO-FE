@@ -9,6 +9,11 @@ import { Router } from '@angular/router';
 export class CameraDetailComponent implements OnInit {
   menuItems: MenuItem[] = [
     {
+      icon: 'bi-info-circle',
+      title: 'Thông tin',
+      path: '/manage/camera-detail/info',
+    },
+    {
       icon: 'bi-arrows-move',
       title: 'Điểm giám sát',
       path: '/manage/camera-detail/preset-settings',

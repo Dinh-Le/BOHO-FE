@@ -1,0 +1,68 @@
+<div class="full-height bg-dark p-5">
+  <div class="row mt-1">
+    <div class="col-2">
+      <label for="name">Tên:</label>
+    </div>
+    <div class="col-6">
+      <input
+        id="name"
+        class="form-control form-control-sm bg-light text-dark"
+        [(ngModel)]="data.name"
+      />
+    </div>
+  </div>
+  <div class="row mt-1">
+    <div class="col-2">
+      <label for="address">Địa điểm:</label>
+    </div>
+    <div class="col-6">
+      <input
+        id="address"
+        class="form-control form-control-sm bg-light text-dark"
+        [(ngModel)]="data.address"
+      />
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-primary px-4 text-white" (click)="changeAddress()">Đổi</button>
+    </div>
+  </div>
+  <div class="row mt-1">
+    <div class="col-2">
+      <label for="driver-name">Driver camera:</label>
+    </div>
+    <div class="col-6">
+      <input
+        id="driver-name"
+        class="form-control form-control-sm bg-transparent border-light"
+        [value]="data.driverName"
+        readonly
+      />
+    </div>
+  </div>
+  <div class="row mt-1">
+    <div class="col-2">
+      <label for="type-name">Loại:</label>
+    </div>
+    <div class="col-6">
+      <input
+        id="type-name"
+        class="form-control form-control-sm bg-transparent border-light"
+        [value]="data.typeName"
+        readonly
+      />
+    </div>
+  </div>
+  <div class="row mt-1">
+    <div class="col-2">
+      <label for="rtspUrl">URL RTSP:</label>
+    </div>
+    <div class="col-6">
+      <input
+        id="rtspUrl"
+        class="form-control form-control-sm bg-transparent border-light"
+        [value]="data.rtspUrl"
+        readonly
+      />
+    </div>
+  </div>
+</div>

@@ -70,8 +70,8 @@ export class MapViewComponent implements OnInit, OnDestroy {
     this.devicesSubscription?.unsubscribe();
   }
 
-  onMapReady($event: Leaflet.Map) {
-    this.map = $event;
+  onMapReady(map: Leaflet.Map) {
+    this.map = map;
   }
 
   mapClicked($event: any) {}

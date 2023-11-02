@@ -21,6 +21,9 @@ import { ExpandableTableComponent } from './expandable-table/expandable-table.co
 import { SystemComponent } from './system/system.component';
 import { GroupNodeComponent } from './group-node/group-node.component';
 import { NodeComponent } from './node/node.component';
+import { CameraInfoComponent } from './camera-detail/camera-info/camera-info.component';
+import { LeafletModule } from '@asymmetrik/ngx-leaflet';
+import { LocationPickerComponent } from './camera-detail/location-picker/location-picker.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +40,8 @@ import { NodeComponent } from './node/node.component';
     ExpandableTableComponent,
     SystemComponent,
     GroupNodeComponent,
-    NodeComponent
+    NodeComponent,
+    CameraInfoComponent,
   ],
   imports: [
     CommonModule,
@@ -47,6 +51,7 @@ import { NodeComponent } from './node/node.component';
     SharedModule,
     NgbCollapseModule,
     NgbDropdownModule,
+    LeafletModule,
   ],
 })
 export class ManageModule {}

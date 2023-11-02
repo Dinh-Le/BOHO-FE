@@ -11,6 +11,7 @@ import { ScheduleComponent } from './schedule/schedule.component';
 import { SystemComponent } from './system/system.component';
 import { GroupNodeComponent } from './group-node/group-node.component';
 import { NodeComponent } from './node/node.component';
+import { CameraInfoComponent } from './camera-detail/camera-info/camera-info.component';
 
 @NgModule({
   imports: [
@@ -31,7 +32,11 @@ import { NodeComponent } from './node/node.component';
               {
                 path: '',
                 pathMatch: 'full',
-                redirectTo: 'preset-settings',
+                redirectTo: 'info',
+              },
+              {
+                path: 'info',
+                component: CameraInfoComponent
               },
               {
                 path: 'preset-settings',

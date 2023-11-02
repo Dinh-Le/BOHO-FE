@@ -1,0 +1,34 @@
+<div class="modal-header">
+  <h4 class="modal-title">Thay đổi địa điểm</h4>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="activeModal.dismiss('Cross click')"
+  ></button>
+</div>
+<div class="modal-body">
+  <div
+    class="map"
+    leaflet
+    [leafletOptions]="options"
+    (leafletMapReady)="onMapReady($event)"
+    (leafletClick)="mapClicked($event)"
+  ></div>
+</div>
+<div class="modal-footer d-flex justify-content-center">
+  <button
+    type="button"
+    class="btn btn-secondary border-light"
+    (click)="activeModal.close('Close click')"
+  >
+    Hủy
+  </button>
+  <button
+    type="button"
+    class="btn btn-primary border-light"
+    (click)="activeModal.close('Close click')"
+  >
+    Lưu
+  </button>
+</div>
