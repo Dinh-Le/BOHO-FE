@@ -114,6 +114,7 @@ export class Select2Component implements ControlValueAccessor {
       this.onChange(this.model);
     } else {
       this.model = [item];
+      this.menuVisible = false;
     }
   }
 

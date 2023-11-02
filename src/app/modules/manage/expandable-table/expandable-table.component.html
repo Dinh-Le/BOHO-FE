@@ -1,7 +1,7 @@
 <table [ngClass]="classNames">
   <colgroup>
     <col [width]="28" *ngIf="collapseContentTemplateRef" />
-    <col *ngFor="let column of columns" width="column.width || 'auto" />
+    <col *ngFor="let column of columns" width="column.width || 'auto'" />
   </colgroup>
   <thead>
     <th></th>

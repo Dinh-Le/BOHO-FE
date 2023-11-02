@@ -75,3 +75,15 @@
     font-size: #{$size}px;
   }
 }
+
+.inline-input {
+  border: 0;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: var(--bs-primary);
+  outline: none;
+}
+
+.inline-input:focus {
+  outline: none;
+}
