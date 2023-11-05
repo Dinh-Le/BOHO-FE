@@ -23,7 +23,7 @@ import { GroupNodeComponent } from './group-node/group-node.component';
 import { NodeComponent } from './node/node.component';
 import { CameraInfoComponent } from './camera-detail/camera-info/camera-info.component';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
-import { LocationPickerComponent } from './camera-detail/location-picker/location-picker.component';
+import { GroupCameraComponent } from './group-camera/group-camera.component';
 
 @NgModule({
   declarations: [
@@ -42,6 +42,7 @@ import { LocationPickerComponent } from './camera-detail/location-picker/locatio
     GroupNodeComponent,
     NodeComponent,
     CameraInfoComponent,
+    GroupCameraComponent,
   ],
   imports: [
     CommonModule,

@@ -1,5 +1,5 @@
 <div class="menu-container d-flex justify-content-between">
-  <span class="ms-2">Nhóm node</span>
+  <span class="ms-2">Nhóm camera</span>
   <div class="me-2">
     <button class="btn btn-primary text-white px-2" (click)="add()">
       <i class="bi bi-plus"></i>Thêm
@@ -16,8 +16,8 @@
     </colgroup>
     <thead>
       <th></th>
-      <th>Tên nhóm nút<i class="bi bi-sort-alpha-down"></i></th>
-      <th>Số lượng nút<i class="bi bi-sort-alpha-down"></i></th>
+      <th>Tên nhóm camera<i class="bi bi-sort-alpha-down"></i></th>
+      <th>Số lượng camera<i class="bi bi-sort-alpha-down"></i></th>
       <th></th>
     </thead>
     <tbody>
@@ -48,7 +48,7 @@
             </div>
           </ng-template>
         </td>
-        <td>{{ item.nodeCount }}</td>
+        <td>{{ item.cameraCount }}</td>
         <td>
           <div
             ngbDropdown
@@ -61,6 +61,9 @@
             <ul class="table-row-popup-menu" ngbDropdownMenu>
               <li (click)="item.editable = true">
                 <i class="bi bi-pencil-square"></i> Đặt lại tên
+              </li>
+              <li (click)="showManageCameraDialog(item)">
+                <i class="bi bi-camera-video"></i> Quản lý camera
               </li>
               <li (click)="remove(item)">
                 <i class="bi bi-trash"></i> Xóa nhóm

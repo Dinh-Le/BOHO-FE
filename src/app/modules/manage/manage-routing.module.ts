@@ -12,6 +12,7 @@ import { SystemComponent } from './system/system.component';
 import { GroupNodeComponent } from './group-node/group-node.component';
 import { NodeComponent } from './node/node.component';
 import { CameraInfoComponent } from './camera-detail/camera-info/camera-info.component';
+import { GroupCameraComponent } from './group-camera/group-camera.component';
 
 @NgModule({
   imports: [
@@ -36,7 +37,7 @@ import { CameraInfoComponent } from './camera-detail/camera-info/camera-info.com
               },
               {
                 path: 'info',
-                component: CameraInfoComponent
+                component: CameraInfoComponent,
               },
               {
                 path: 'preset-settings',
@@ -61,8 +62,12 @@ import { CameraInfoComponent } from './camera-detail/camera-info/camera-info.com
             component: GroupNodeComponent,
           },
           {
+            path: 'group-camera',
+            component: GroupCameraComponent,
+          },
+          {
             path: 'node',
-            component: NodeComponent
+            component: NodeComponent,
           },
           {
             path: 'rule',

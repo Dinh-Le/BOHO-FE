@@ -2,6 +2,7 @@
   <div
     *ngFor="let item of menuLevel2"
     class="border-primary mx-2 border-1 menu-item"
+    style="overflow-x: auto"
     [ngClass]="{ 'border-bottom': item.selected }"
   >
     <a
