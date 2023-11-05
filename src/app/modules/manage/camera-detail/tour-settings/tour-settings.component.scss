@@ -15,3 +15,20 @@ button.btn {
   background: var(--bs-primary);
   color: white;
 }
+.label {
+  width: 100px;
+}
+.tour {
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+
+.tour.active {
+  border-width: 2px;
+  border-style: solid;
+  border-color: rgb(156, 231, 152);
+  pointer-events: none;
+  cursor: none;
+}

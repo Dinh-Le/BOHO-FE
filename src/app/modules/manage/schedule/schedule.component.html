@@ -1,69 +1,87 @@
-<div class="menu-container">
-  <div
-    *ngFor="let item of menuItems"
-    class="mx-2 menu-item"
-    [ngClass]="
-      item.selected
-        ? 'border-1 border-bottom border-primary pe-none'
-        : 'pe-auto'
-    "
+<div
+  class="menu-container d-flex justify-content-between aligns-item-center px-2"
+>
+  <ul>
+    <li><i class="bi bi-list-check"></i>Quy tắc</li>
+    <li class="active"><i class="bi bi-clock"></i>Lịch trình</li>
+  </ul>
+  <a class="btn btn-primary px-2 text-white" (click)="add()">
+    <i class="bi bi-plus"></i> Thêm</a
   >
-    <a
-      class="btn btn-primary text-white text-decoration-none px-2"
-      (click)="item.onclick && item.onclick()"
-    >
-      <i class="bi" [ngClass]="item.icon"></i>
-      {{ item.title }}
-    </a>
-  </div>
 </div>
-<div class="full-height bg-dark p-5">
-  <div class="table-wrapper">
-    <table>
-      <colgroup>
-        <col width="auto" span="4" />
-        <col width="32px" />
-      </colgroup>
-      <thead>
-        <th>Lịch trình</th>
-        <th>Thời gian bắt đầu</th>
-        <th>Thời gian kết thúc</th>
-        <th>Ngày</th>
-        <th></th>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of items; trackBy: trackById">
-          <td class="px-2 py-1">{{ item.name }}</td>
-          <td class="px-2 py-1">
-            <app-time-select [(ngModel)]="item.startTime"></app-time-select>
-          </td>
-          <td class="px-2 py-1">
-            <app-time-select [(ngModel)]="item.endTime"></app-time-select>
-          </td>
-          <td class="px-2 py-1">
-            <div class="d-flex flex-wrap">
-              <button
-                style="width: 42px"
-                *ngFor="let day of daysInWeek; index as i"
-                class="btn border border-primary mx-1 text-center rounded-0"
-                [ngClass]="
-                  item.days.includes(i.toString())
-                    ? 'bg-primary'
-                    : 'bg-transparent'
-                "
-                (click)="toggleDay(item, i)"
-              >
-                {{ day }}
-              </button>
-            </div>
-          </td>
-          <td class="px-2 py-1">
-            <a class="btn" (click)="remove(item)">
-              <i class="bi bi-trash-fill"></i>
-            </a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+<div class="full-height">
+  <app-expandable-table
+    rowKey="id"
+    [data]="data"
+    [columns]="columns"
+    [collapseContentTemplateRef]="rowContentTemplate"
+  ></app-expandable-table>
+  <ng-template #rowContentTemplate let-data="data">
+    <div class="px-4 py-2">
+      <div class="row">
+        <div class="col-6">
+          <input
+            class="inline-input fs-16 w-100 text-white bg-transparent"
+            [(ngModel)]="data.formData.name"
+            [disabled]="data.formData.editable"
+          />
+        </div>
+      </div>
+      <div
+        class="mt-5 row"
+        style="
+          display: grid;
+          grid-template-columns: 20px repeat(24, 1fr);
+          height: 20px;
+        "
+      >
+        <span></span>
+        <span *ngFor="let item of [].constructor(24); let i = index">
+          {{ i }}
+        </span>
+      </div>
+      <div
+        *ngFor="let day of data.formData.scheduleData; let i = index"
+        style="
+          display: grid;
+          grid-template-columns: 20px repeat(24, 1fr);
+          height: 20px;
+        "
+      >
+        <span>{{ daysInWeek[i] }}</span>
+        <span
+          (click)="day[j] = !day[j]"
+          [ngStyle]="{
+            'pointer-events': data.formData.editable ? 'auto' : 'none'
+          }"
+          class="border border-1 border-dark cursor-pointer"
+          *ngFor="let hour of day; let j = index"
+          [ngClass]="hour ? 'bg-primary' : 'bg-secondary'"
+        >
+        </span>
+      </div>
+      <div class="mt-4 d-flex justify-content-center">
+        <ng-container *ngIf="data.formData.editable; else viewButtonsTemplate">
+          <button
+            class="my-button cancel me-2"
+            (click)="data.formData.editable = false"
+          >
+            Hủy
+          </button>
+          <button class="my-button submit" (click)="save(data)">Lưu</button>
+        </ng-container>
+        <ng-template #viewButtonsTemplate>
+          <button class="my-button remove me-2" (click)="remove(data)">
+            Xóa
+          </button>
+          <button
+            class="my-button submit"
+            (click)="data.formData.editable = true"
+          >
+            Chỉnh sửa
+          </button>
+        </ng-template>
+      </div>
+    </div>
+  </ng-template>
 </div>

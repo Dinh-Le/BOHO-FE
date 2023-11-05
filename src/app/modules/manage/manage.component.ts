@@ -14,7 +14,6 @@ export class ManageComponent implements OnInit {
     {
       icon: 'bi-laptop',
       title: 'Bảng thông tin',
-      onclick: null,
     },
     {
       icon: 'bi-diagram-3',
@@ -24,29 +23,26 @@ export class ManageComponent implements OnInit {
     {
       icon: 'bi-pc-horizontal',
       title: 'Node',
-      onclick: null,
+      path: '/manage/group-node',
     },
     {
       icon: 'bi-camera-video',
       title: 'Camera',
-      path: '/manage/camera',
-      onclick: null,
+      path: '/manage/group-camera',
     },
     {
       icon: 'bi-list-check',
       title: 'Quy tắc',
       path: '/manage/rule',
-      onclick: null,
     },
     {
       icon: 'bi-car-front-fill',
       title: 'Biển số xe',
-      path: '/manage/schedule',
+      path: '/manage/vehicle-list',
     },
     {
       icon: 'bi-plugin',
       title: 'Tích hợp',
-      onclick: null,
     },
   ];
 

@@ -1,4 +1,4 @@
-<div class="bg-dark p-5">
+<div class="bg-dark p-5 full-height">
   <div class="d-flex">
     <div class="day-label"></div>
     <div class="hour-container">
@@ -7,32 +7,119 @@
   </div>
   <div
     class="d-flex align-items-center"
-    *ngFor="let toursInDay of toursInWeek; index as i"
+    *ngFor="let dayData of data; index as i"
   >
     <div class="day-label">{{ daysInWeek[i].label }}</div>
-    <div class="hour-container border border-light border-1">
-      <span
-        *ngFor="let item of toursInDay"
+    <div
+      class="w-100 border border-light border-1 bg-transparent"
+      style="position: relative; height: 30px"
+    >
+      <div
+        class="tour"
+        (click)="selectTour(tour)"
+        [ngClass]="{ active: tour.selected }"
+        *ngFor="let tour of dayData; index as j"
         [ngStyle]="{
-          background: item || 'transparent'
+          left: tour.left,
+          width: tour.width,
+          background: tour.color.value
         }"
-      ></span>
+      ></div>
     </div>
   </div>
   <div class="d-flex mt-4 justify-content-center">
-    <button class="btn mx-2 py-1">Xóa chọn</button>
-    <button class="btn">Xóa tất cả</button>
+    <button class="btn mx-2 py-1" (click)="deleteSelectedTour()">
+      Xóa chọn
+    </button>
+    <button class="btn" (click)="deleteAll()">Xóa tất cả</button>
   </div>
-  <div class="d-flex mt-4 justify-content-center">
-    <span>Thời gian</span>
-    <input class="border-light border-1" value="00" />
-    <span>:</span>
-    <input class="border-light border-1" value="00" />
-    <span>~</span>
-    <input class="border-light border-1" value="00" />
-    <span>:</span>
-    <input class="border-light border-1" value="00" />
-    <span>Ngày</span>
-    <app-select-2 [items]="daysInWeek"></app-select-2>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="row mt-4">
+      <div class="col-4">
+        <div class="d-flex align-items-center">
+          <span class="label">Thời gian:</span>
+          <app-time-input
+            formControlName="startTime"
+            name="start-time"
+            id="start-time"
+          ></app-time-input>
+          <span class="mx-2">~</span>
+          <app-time-input
+            formControlName="endTime"
+            name="end-time"
+            id="end-time"
+          ></app-time-input>
+        </div>
+      </div>
+      <div class="col-4 d-flex align-items-center">
+        <label for="day" class="label">Ngày:</label>
+        <app-select-2
+          class="w-100"
+          [items]="daysInWeek"
+          name="day"
+          formControlName="day"
+          id="day"
+        ></app-select-2>
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="d-flex align-items-center">
+        <span class="label">Loại hành trình:</span>
+        <div class="me-2 w-40">
+          <input
+            type="radio"
+            name="type"
+            id="type-patrol"
+            value="patrol"
+            formControlName="type"
+          />
+          <label class="ms-1" for="type-patrol">Tuần tra</label>
+        </div>
+        <div class="w-40">
+          <input
+            type="radio"
+            name="type"
+            id="type-preset"
+            value="preset"
+            formControlName="type"
+          />
+          <label class="ms-1" for="type-preset">Điểm giám sát</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-4 d-flex align-items-center">
+        <label for="patrol" class="label">Hành trình: </label>
+        <app-select-2
+          class="w-100"
+          id="patrol"
+          name="patrol"
+          [items]="patrols"
+          formControlName="patrol"
+        ></app-select-2>
+      </div>
+      <div class="col-4 d-flex align-items-center">
+        <span for="color" class="label">Màu sắc:</span>
+        <app-select-2
+          class="w-100"
+          id="color"
+          name="color"
+          [items]="colors"
+          formControlName="color"
+        ></app-select-2>
+      </div>
+      <div class="col-4">
+        <button class="my-button submit" [disabled]="!canSubmit()">
+          Thêm lịch trình
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <div class="d-flex justify-content-center align-items-center mt-4">
+    <button type="button" class="my-button cancel mx-1">Hủy</button>
+    <button type="submit" class="my-button submit mx-1">Lưu</button>
   </div>
 </div>

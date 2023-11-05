@@ -17,10 +17,13 @@
 
 .my-button {
   color: white;
-  width: 100px;
+  width: 120px;
   border-width: 1px;
   border-radius: 4px;
   border-style: solid;
+  border-color: var(--bs-blue);
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
 }
 
 .my-button.submit {
@@ -35,4 +38,8 @@
 
 .my-button.cancel {
   background: var(--bs-secondary);
+}
+
+.my-button.remove {
+  background: var(--bs-danger);
 }

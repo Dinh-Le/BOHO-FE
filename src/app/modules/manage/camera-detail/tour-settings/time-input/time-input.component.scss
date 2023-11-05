@@ -1,0 +1,13 @@
+input[type="number"] {
+  width: calc(3ch + 4px);
+  border: 1px solid white;
+  padding: 2px;
+  color: var(--bs-white);
+  background: var(--bs-dark);
+  text-align: center;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

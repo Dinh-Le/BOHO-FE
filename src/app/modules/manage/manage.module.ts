@@ -26,6 +26,7 @@ import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { GroupCameraComponent } from './group-camera/group-camera.component';
 import { VehicleListComponent } from './vehical-list/vehicle-list.component';
 import { VehicleListDetailComponent } from './vehicle-list-detail/vehicle-list-detail.component';
+import { TimeInputComponent } from './camera-detail/tour-settings/time-input/time-input.component';
 
 @NgModule({
   declarations: [
@@ -47,6 +48,7 @@ import { VehicleListDetailComponent } from './vehicle-list-detail/vehicle-list-d
     GroupCameraComponent,
     VehicleListComponent,
     VehicleListDetailComponent,
+    TimeInputComponent,
   ],
   imports: [
     CommonModule,
