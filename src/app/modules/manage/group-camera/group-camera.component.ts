@@ -11,7 +11,7 @@ interface RowData {
 @Component({
   selector: 'app-group-camera',
   templateUrl: 'group-camera.component.html',
-  styleUrls: ['group-camera.component.scss'],
+  styleUrls: ['../shared/table.scss'],
 })
 export class GroupCameraComponent {
   data: RowData[] = [];

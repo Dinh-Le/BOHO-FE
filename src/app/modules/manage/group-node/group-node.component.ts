@@ -11,7 +11,7 @@ interface RowData {
 @Component({
   selector: 'app-group-node',
   templateUrl: 'group-node.component.html',
-  styleUrls: ['group-node.component.scss'],
+  styleUrls: ['group-node.component.scss', '../shared/table.scss'],
 })
 export class GroupNodeComponent {
   data: RowData[] = [];
