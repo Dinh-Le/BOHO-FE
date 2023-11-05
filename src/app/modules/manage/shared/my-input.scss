@@ -1,0 +1,38 @@
+.my-input {
+  padding: 2px;
+  width: 100%;
+  border: none;
+  background: white;
+  color: black;
+  border-radius: 4px;
+}
+
+.my-input:focus {
+  outline: none;
+}
+
+.my-input:invalid {
+  border: 1px solid red;
+}
+
+.my-button {
+  color: white;
+  width: 100px;
+  border-width: 1px;
+  border-radius: 4px;
+  border-style: solid;
+}
+
+.my-button.submit {
+  background: var(--bs-primary);
+}
+
+.my-button.submit[disabled] {
+  background: var(--bs-secondary);
+  pointer-events: none;
+  color: gray;
+}
+
+.my-button.cancel {
+  background: var(--bs-secondary);
+}

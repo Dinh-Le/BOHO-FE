@@ -1,3 +1,21 @@
+ul.table-row-popup-menu {
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+
+  li {
+    background: var(--bs-gray-800);
+    cursor: pointer;
+    color: white;
+    padding: 0 5px;
+  }
+
+  li:hover {
+    background: var(--bs-gray-500);
+    transition: background 0.5s;
+  }
+}
+
 table,
 th,
 td {

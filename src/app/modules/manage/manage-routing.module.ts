@@ -13,6 +13,8 @@ import { GroupNodeComponent } from './group-node/group-node.component';
 import { NodeComponent } from './node/node.component';
 import { CameraInfoComponent } from './camera-detail/camera-info/camera-info.component';
 import { GroupCameraComponent } from './group-camera/group-camera.component';
+import { VehicleListComponent } from './vehical-list/vehicle-list.component';
+import { VehicleListDetailComponent } from './vehicle-list-detail/vehicle-list-detail.component';
 
 @NgModule({
   imports: [
@@ -64,6 +66,14 @@ import { GroupCameraComponent } from './group-camera/group-camera.component';
           {
             path: 'group-camera',
             component: GroupCameraComponent,
+          },
+          {
+            path: 'vehicle-list',
+            component: VehicleListComponent,
+          },
+          {
+            path: 'vehicle-list-detail',
+            component: VehicleListDetailComponent,
           },
           {
             path: 'node',

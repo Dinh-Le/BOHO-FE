@@ -1,0 +1,77 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="p-2">
+  <div class="modal-header">
+    <h4 class="modal-title">{{ title }}</h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="close()"
+    ></button>
+  </div>
+  <div class="modal-body mt-4">
+    <div class="row">
+      <div class="col-3">
+        <label for="name">Tên danh sách:</label>
+      </div>
+      <div class="col-6">
+        <input
+          class="my-input"
+          id="name"
+          name="name"
+          formControlName="name"
+          required
+        />
+      </div>
+    </div>
+    <div class="row mt-1">
+      <div class="col-3">
+        <label for="name">Loại:</label>
+      </div>
+      <div class="col-6">
+        <div class="form-check form-check-inline">
+          <input
+            class="form-check-input"
+            name="type"
+            id="type"
+            type="radio"
+            formControlName="type"
+            value="black-list"
+          />
+          <label class="form-check-label" for="type">Danh sách đen</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input
+            class="form-check-input"
+            name="type"
+            id="type"
+            type="radio"
+            formControlName="type"
+            value="white-list"
+          />
+          <label class="form-check-label" for="type">Danh sách trắng</label>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-1">
+      <div class="col-3">
+        <label for="imported-file">Nạp danh sách</label>
+      </div>
+      <div class="col-6">
+        <input class="my-input" id="imported-file" name="imported-file" />
+      </div>
+      <div class="col-3">
+        <button class="btn btn-primary text-white w-100" type="button">
+          Duyệt file
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer mt-2 mb-2 d-flex justify-content-center">
+    <button type="button" class="my-button cancel" (click)="close()">
+      {{ cancelButtonTitle }}
+    </button>
+    <button type="submit" class="my-button submit" [disabled]="!canSubmit()">
+      {{ submitButtonTitle }}
+    </button>
+  </div>
+</form>

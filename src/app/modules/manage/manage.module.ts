@@ -24,6 +24,8 @@ import { NodeComponent } from './node/node.component';
 import { CameraInfoComponent } from './camera-detail/camera-info/camera-info.component';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { GroupCameraComponent } from './group-camera/group-camera.component';
+import { VehicleListComponent } from './vehical-list/vehicle-list.component';
+import { VehicleListDetailComponent } from './vehicle-list-detail/vehicle-list-detail.component';
 
 @NgModule({
   declarations: [
@@ -43,6 +45,8 @@ import { GroupCameraComponent } from './group-camera/group-camera.component';
     NodeComponent,
     CameraInfoComponent,
     GroupCameraComponent,
+    VehicleListComponent,
+    VehicleListDetailComponent,
   ],
   imports: [
     CommonModule,
