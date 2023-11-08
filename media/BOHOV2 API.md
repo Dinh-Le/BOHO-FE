@@ -130,6 +130,13 @@
 - Update CRUD for Touring, Patrol, Preset module
 - Refactor API structure for Device, and Camera module
 - Delete API list support for Camera module
+
+#### ```13. UDATE NODE(06/11/2023)```
+- Update Group Management API
+- Update Node Operator API
+- Update Node Management API
+- Update Device Management API
+- Add
 ---
 ## III. CODE RETURN
 
@@ -334,9 +341,9 @@ Request: None
 
 Response:{
   "data": {
-    "code": 1000,
     "data": [
       {
+          "id" : "str",
           "name" : "str",
           "describle" : "str"
       }
@@ -364,9 +371,9 @@ Request: None
 
 Response:{
   "data": {
-    "code": 1000,
     "data": 
       {
+        "id" : "str",
         "name" : "str",
         "describle" : "str"
       }
@@ -407,6 +414,117 @@ Response: {
 - Create DELETE request to delete group information
 ```
 DELETE /api/rest/v1/user/<user_id>/group/<group_id>
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: None
+
+Response: {
+  "data": {},
+  "message" : "str",
+  "success" : "boolean"
+}
+```
+------
+
+#### ADD GROUP MANAGEMENT
+
+- Create POST request to create group for camera group management
+```
+POST /api/rest/v1/user/<user_id>/group_management
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request : {
+  "group_id" : "str",
+  "device_id" : "str"
+}
+
+Response: {
+  "message": "str",
+  "success": "boolean"
+}
+```
+
+#### GET GROUPS MANAGEMENT
+- Create GET request to get the list of groups management
+```
+GET /api/rest/v1/user/<user_id>/group_management?<group_id>='str'
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+```
+Note: - not add group_id the query will return group management of that user in list 
+      - add group_id the query will return  group management of that group in list
+```
+
+```json
+Request: None
+
+Response:{
+  "data": {
+    "data": [
+      {
+          "id" : "str",
+          "device_id" : "str",
+          "group_id" : "str"
+      }
+    ]
+  },
+  "message": "str",
+  "success": false
+}
+```
+
+---
+
+#### UPDATE GROUP MANAGEMENT INFO
+
+- Create PATCH request to update node group information
+```
+PATCH /api/rest/v1/user/<user_id>/group_management/<group_management_id>
+```
+
+```
+Request Header
+Authorization: Bearer
+Type: application/json
+```
+
+```json
+Request: {
+  "device_id" : "str",
+  "group_id" : "str"
+}
+
+Response: {
+  "message": "str",
+  "success": "boolean"
+}
+```
+
+---
+#### DELETE GROUP MANAGEMENT
+
+- Create DELETE request to delete group information
+```
+DELETE /api/rest/v1/user/<user_id>/group_management/<group_management_id>
 ```
 
 ```
@@ -474,6 +592,7 @@ Response:{
   "data": {
     "data": [
       {
+          "id" : "str",
           "name" : "str",
           "describle" : "str"
       }
@@ -503,6 +622,7 @@ Response:{
   "data": {
     "data": 
       {
+        "id" : "str",
         "name" : "str",
         "describle" : "str"
       }
@@ -629,7 +749,7 @@ Response: {
 #### GET NODES
 - Create GET request to get the list of nodes by user id
 ```
-GET /api/rest/v1/user/<user_id>/nodes
+GET /api/rest/v1/user/<user_id>/node
 ```
 
 ```
@@ -643,7 +763,6 @@ Request: None
 
 Response:{
   "data": {
-    "code": 1000,
     "data": [
       {
           "id": "str",
@@ -709,14 +828,13 @@ Authorization: Bearer
 Type: application/json
 ```
 ```
-End point : /api/rest/v1/user/<user_id>/nodes?npi=<str>
+End point : /api/rest/v1/user/<user_id>/node?npi=<str>
 npi : node operator id
 ```
 
 ```json
 Response:{
   "data": {
-    "code": 1000,
     "data": [
       {
           "id": "str",
@@ -772,7 +890,7 @@ Response:{
 #### GET NODE IN DETAIL
 - Create GET request to get the  node information
 ```
-GET /api/rest/v1/user/<user_id>/nodes/<node_id>
+GET /api/rest/v1/user/<user_id>/node/<node_id>
 ```
 
 ```
@@ -786,7 +904,6 @@ Request: None
 
 Response:{
   "data": {
-    "code": 1000,
     "data": 
       {
           "node_id": "str",
@@ -844,7 +961,7 @@ Response:{
 
 - Create PATCH request to update node information
 ```
-PATCH /api/rest/v1/node/<node_id>
+PATCH /api/rest/v1/user/<user_id>/node/<node_id>
 ```
 
 ```
@@ -906,7 +1023,7 @@ Response: {
 
 - Create DELETE request to delete node information
 ```
-DELETE /api/rest/v1/node/<node_id>
+DELETE /api/rest/v1/user/<user_id>/node/<node_id>
 ```
 
 ```
@@ -958,7 +1075,7 @@ Response: {
 
 - Create POST request to create new device( only admin user can add the user)
 ```
-POST /api/rest/v1/node/<node_id>/device
+POST /api/rest/v1/user/<user_id>/node/<node_id>/device
 ```
 
 ```
@@ -1020,7 +1137,7 @@ Response: {
 #### GET DEVICES LIST
 - Create GET request to get the list of devices
 ```
-GET /api/rest/v1/node/<node_id>/devices
+GET /api/rest/v1/user/<user_id>/node/<node_id>/devices
 ```
 
 ```
@@ -1082,7 +1199,7 @@ Response:{
 
 - Create GET request to get current device information
 ```
-GET /api/rest/v1/node/<node_id>/device/<device_id>
+GET /api/rest/v1/user/<user_id>/node/<node_id>/device/<device_id>
 ```
 
 ```
@@ -1144,7 +1261,7 @@ Response: {
 
 - Create PATCH request to edit the current device( only admin user can add the device)
 ```
-PATCH /api/rest/v1/node/<node_id>/device/<device_id>
+PATCH /api/rest/v1/user/<user_id>/node/<node_id>/device/<device_id>
 ```
 
 ```
@@ -1204,7 +1321,7 @@ Response: {
 
 - Create DELETE request to delete device information
 ```
-DELETE /api/rest/v1/node/<node_id>/device/<device_id>
+DELETE /api/rest/v1/user/<user_id>/node/<node_id>/device/<device_id>
 ```
 
 ```

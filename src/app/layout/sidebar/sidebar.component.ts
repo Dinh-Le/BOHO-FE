@@ -11,7 +11,7 @@ import { catchError, finalize } from 'rxjs';
 import { Device } from 'src/app/data/schema/boho-v2/device';
 import { CameraData } from 'src/app/data/service/camera.service';
 import { DeviceData } from 'src/app/data/service/device.service';
-import { NodeManagementService } from 'src/app/data/service/node.service';
+import { NodeService } from 'src/app/data/service/node.service';
 import { SidebarActions } from 'src/app/state/sidebar.action';
 import { SidebarState } from 'src/app/state/sidebar.state';
 
@@ -55,7 +55,7 @@ interface Server {
   styleUrls: ['./sidebar.component.scss'],
 })
 export class SidebarComponent implements OnInit {
-  private nodeService = inject(NodeManagementService);
+  private nodeService = inject(NodeService);
   private deviceService = inject(DeviceData);
   private cameraService = inject(CameraData);
   private eRef = inject(ElementRef);

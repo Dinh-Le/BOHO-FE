@@ -1,71 +1,56 @@
-import { ResponseBase } from './response-base';
+import { LatLng } from "./latlng";
 
 export interface NodeMetadata {
   user: string;
   password: string;
-  end_point: string;
+}
+
+export interface KafkaConnectionMetadata {
+  port: string;
+  topic: string;
+}
+
+export interface MQTTConnectionMetadata {
+  port: string;
+  topic: string;
+}
+
+export interface SocketConnectionMetadata {
+  port: string;
 }
 
 export interface ConnectionMetadata {
-  kafka: {
-    port: string;
-    topic: string;
-  };
-  mqtt: {
-    port: string;
-    topic: string;
-  };
-  socket: {
-    port: string;
-  };
+  kafka: KafkaConnectionMetadata;
+  mqtt: MQTTConnectionMetadata;
+  socket: SocketConnectionMetadata;
+}
+
+export interface Resolution {
+  width: number;
+  height: number;
+}
+
+export interface Sensitive {
+  detection: number;
+  tracking: number;
 }
 
 export interface EngineMetadata {
-  resolution: {
-    width: number;
-    height: number;
-  };
+  resolution: Resolution;
   frame_rate: number;
-  sensitive: {
-    detection: number;
-    tracking: number;
-  };
+  sensitive: Sensitive;
   frame_step: number;
 }
 
 export interface Node {
   id: string;
+  node_operator_id: string;
+  location: LatLng;
   name: string;
-  type?: string;
-  ip?: string;
-  location?: {
-    lat: string;
-    lon: string;
-  };
-  node_metadata?: NodeMetadata;
-  connection_metadata?: ConnectionMetadata;
-  engine_metadata?: EngineMetadata;
-}
-
-export interface CreateNodeRequest extends Omit<Node, 'id'> {}
-
-export interface UpdateNodeRequest extends Omit<Node, 'node_metadata'> {
-  node_metadata: {
-    stream_port: string;
-    stream_url: string;
-    image_stream_url: string;
-    imaeg_stream_port: string;
-  };
-}
-
-export interface GetNodesResponse extends ResponseBase {
-  data: Node[];
-}
-
-export interface NodeDetailedResponse extends ResponseBase {
-  data: {
-    code: number;
-    message: string;
-    data: Node;
-  };
+  type: string;
+  ip: string;
+  is_active: boolean;
+  node_metadata: NodeMetadata;
+  connection_metadata: ConnectionMetadata;
+  engine_metadata: EngineMetadata;
 }

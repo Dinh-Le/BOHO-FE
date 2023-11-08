@@ -1,61 +1,78 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BOHOEndpoints } from '../schema/boho-v2/endpoints';
-import {
-  CreateNodeRequest,
-  GetNodesResponse,
-  NodeDetailedResponse,
-  UpdateNodeRequest,
-} from '../schema/boho-v2/node';
+import { Node } from '../schema/boho-v2/node';
 import { ResponseBase } from '../schema/boho-v2/response-base';
 import { formatString } from '@app/helpers/function';
 import { RestfullApiService } from './restful-api.service';
+import { HttpParams } from '@angular/common/http';
 
-export abstract class NodeManagementService extends RestfullApiService {
-  abstract findAll(): Observable<GetNodesResponse>;
-  abstract find(id: string): Observable<NodeDetailedResponse>;
-  abstract create(request: CreateNodeRequest): Observable<ResponseBase>;
-  abstract update(
-    id: string,
-    updateNodeRequest: UpdateNodeRequest
+export abstract class NodeService extends RestfullApiService {
+  abstract findAll(
+    userId: string,
+    nodeOperatorId?: string
+  ): Observable<ResponseBase & { data: Node[] }>;
+  abstract find(
+    userId: string,
+    nodeId: string
+  ): Observable<ResponseBase & { data: Node }>;
+  abstract create(
+    userId: string,
+    data: Omit<Node, 'id' | 'node_operator_id' | 'is_active'>
   ): Observable<ResponseBase>;
-  abstract delete(id: string): Observable<ResponseBase>;
-  abstract sync(id: string): Observable<ResponseBase>;
+  abstract update(
+    userId: string,
+    data: Omit<Node, 'node_operator_id' | 'is_active'>
+  ): Observable<ResponseBase>;
+  abstract delete(userId: string, nodeId: string): Observable<ResponseBase>;
+  abstract sync(nodeId: string): Observable<ResponseBase>;
 }
 
 @Injectable({ providedIn: 'root' })
-export class NodeManagementServiceImpl extends NodeManagementService {
-  findAll(): Observable<GetNodesResponse> {
-    return this.httpClient.get<GetNodesResponse>(BOHOEndpoints.nodes);
-  }
+export class NodeServiceImpl extends NodeService {
+  override findAll(
+    userId: string,
+    nodeOperatorId?: string | undefined
+  ): Observable<ResponseBase & { data: Node[] }> {
+    const url = `/api/rest/v1/user/${userId}/node`;
 
-  find(id: string): Observable<NodeDetailedResponse> {
-    const url = formatString(BOHOEndpoints.node, [id]);
-    return this.httpClient.get<NodeDetailedResponse>(url);
-  }
+    if (nodeOperatorId) {
+      const params = new HttpParams();
+      params.set('npi', nodeOperatorId);
 
-  create(request: CreateNodeRequest): Observable<ResponseBase> {
-    return this.httpClient.post<ResponseBase>(
-      BOHOEndpoints.createNode,
-      request
-    );
-  }
+      return this.httpClient.get<ResponseBase & { data: Node[] }>(url, {
+        params,
+      });
+    }
 
-  update(
-    id: string,
-    updateNodeRequest: UpdateNodeRequest
+    return this.httpClient.get<ResponseBase & { data: Node[] }>(url);
+  }
+  override find(
+    userId: string,
+    nodeId: string
+  ): Observable<ResponseBase & { data: Node }> {
+    const url = `/api/rest/v1/user/${userId}/node/${nodeId}`;
+    return this.httpClient.get<ResponseBase & { data: Node }>(url);
+  }
+  override create(
+    userId: string,
+    data: Omit<Node, 'id' | 'node_operator_id' | 'is_active'>
   ): Observable<ResponseBase> {
-    const url = formatString(BOHOEndpoints.node, [id]);
-    return this.httpClient.patch<ResponseBase>(url, updateNodeRequest);
+    const url = `/api/rest/v1/user/${userId}/node`;
+    return this.httpClient.post<ResponseBase>(url, data);
   }
-
-  delete(id: string): Observable<ResponseBase> {
-    const url = formatString(BOHOEndpoints.node, [id]);
+  override update(
+    userId: string,
+    data: Omit<Node, 'node_operator_id' | 'is_active'>
+  ): Observable<ResponseBase> {
+    const url = `/api/rest/v1/user/${userId}/node/${data.id}`;
+    return this.httpClient.patch<ResponseBase>(url, data);
+  }
+  override delete(userId: string, nodeId: string): Observable<ResponseBase> {
+    const url = `/api/rest/v1/user/${userId}/node/${nodeId}`;
     return this.httpClient.delete<ResponseBase>(url);
   }
-
-  sync(id: string): Observable<ResponseBase> {
-    const url = `${formatString(BOHOEndpoints.node, [id])}/sync`;
-    return this.httpClient.post<ResponseBase>(url, { id });
+  override sync(nodeId: string): Observable<ResponseBase> {
+    throw new Error('Method not implemented.');
   }
 }
