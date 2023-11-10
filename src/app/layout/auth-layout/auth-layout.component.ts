@@ -12,8 +12,8 @@ import { UserService } from 'src/app/data/service/user.service';
 })
 export class AuthLayoutComponent implements OnInit {
   loginForm: FormGroup = new FormGroup({
-    username: new FormControl('', [Validators.required]),
-    password: new FormControl('', [Validators.required]),
+    username: new FormControl('root', [Validators.required]),
+    password: new FormControl('Goback@2021', [Validators.required]),
   });
 
   constructor(
@@ -25,8 +25,6 @@ export class AuthLayoutComponent implements OnInit {
   ngOnInit(): void {}
 
   submit() {
-    console.log('submit');
-
     this.userService
       .login({
         name: this.loginForm.get('username')?.value,

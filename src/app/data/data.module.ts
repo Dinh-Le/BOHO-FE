@@ -1,19 +1,32 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
-import { DeviceData } from './service/device.service';
-import { CameraData } from './service/camera.service';
-import { NodeService } from './service/node.service';
-import {
-  MockCameraService,
-  MockDeviceService,
-  MockNodeService,
-} from './service/mock.service';
+import { NodeService, NodeServiceImpl } from './service/node.service';
+import { DeviceService, DeviceServiceImpl } from './service/device.service';
+import { UserService, UserServiceImpl } from './service/user.service';
+import { GroupService, GroupServiceImpl } from './service/group.service';
+import { GroupManagementService, GroupManagementServiceImpl } from './service/group-management.service';
+import { NodeOperatorService, NodeOperatorServiceImpl } from './service/node-operator.service';
+import { ObjectService, ObjectServiceImpl } from './service/object.service';
+import { PatrolManagementService, PatrolManagementServiceImpl } from './service/patrol-management.service';
+import { PatrolScheduleService, PatrolScheduleServiceImpl } from './service/patrol-schedule.service';
+import { PatrolService, PatrolServiceImpl } from './service/patrol.service';
+import { RuleService, RuleServiceImpl } from './service/rule.service';
+import { TouringService, TouringServiceImpl } from './service/touring.service';
 
 const providers = [
-  { provide: DeviceData, useClass: MockDeviceService },
-  { provide: CameraData, useClass: MockCameraService },
-  { provide: NodeService, useClass: MockNodeService },
+  { provide: UserService, useClass: UserServiceImpl },
+  { provide: DeviceService, useClass: DeviceServiceImpl },
+  { provide: GroupService, useClass: GroupServiceImpl },
+  { provide: GroupManagementService, useClass: GroupManagementServiceImpl },
+  { provide: NodeOperatorService, useClass: NodeOperatorServiceImpl },
+  { provide: NodeService, useClass: NodeServiceImpl },
+  { provide: ObjectService, useClass: ObjectServiceImpl },
+  { provide: PatrolManagementService, useClass: PatrolManagementServiceImpl },
+  { provide: PatrolScheduleService, useClass: PatrolScheduleServiceImpl },
+  { provide: PatrolService, useClass: PatrolServiceImpl },
+  { provide: RuleService, useClass: RuleServiceImpl },
+  { provide: TouringService, useClass: TouringServiceImpl },
 ];
 
 @NgModule({

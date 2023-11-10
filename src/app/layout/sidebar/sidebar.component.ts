@@ -9,9 +9,9 @@ import { ToastService } from '@app/services/toast.service';
 import { Store } from '@ngrx/store';
 import { catchError, finalize } from 'rxjs';
 import { Device } from 'src/app/data/schema/boho-v2/device';
-import { CameraData } from 'src/app/data/service/camera.service';
-import { DeviceData } from 'src/app/data/service/device.service';
+import { DeviceService } from 'src/app/data/service/device.service';
 import { NodeService } from 'src/app/data/service/node.service';
+import { UserService } from 'src/app/data/service/user.service';
 import { SidebarActions } from 'src/app/state/sidebar.action';
 import { SidebarState } from 'src/app/state/sidebar.state';
 
@@ -56,26 +56,26 @@ interface Server {
 })
 export class SidebarComponent implements OnInit {
   private nodeService = inject(NodeService);
-  private deviceService = inject(DeviceData);
-  private cameraService = inject(CameraData);
+  private deviceService = inject(DeviceService);
   private eRef = inject(ElementRef);
   private store = inject(Store<{ sidebar: SidebarState }>);
   private toastService = inject(ToastService);
+  userService = inject(UserService);
 
   mode: string = 'by-node';
   servers: Server[] = [];
   autoHideEnabled: boolean = false;
 
   ngOnInit(): void {
-    this.nodeService.findAll().subscribe((response) => {
-      this.servers = response.data.map((node) => ({
-        id: node.id,
-        name: node.name,
-        cameras: [],
-        isExpandable: true,
-        isSelectable: false,
-      }));
-    });
+    // this.nodeService.findAll().subscribe((response) => {
+    //   this.servers = response.data.map((node) => ({
+    //     id: node.id,
+    //     name: node.name,
+    //     cameras: [],
+    //     isExpandable: true,
+    //     isSelectable: false,
+    //   }));
+    // });
   }
 
   trackById(_: number, item: any) {
@@ -136,32 +136,32 @@ export class SidebarComponent implements OnInit {
     server.isLoading = true;
     server.isExpandable = false;
     server.isSelectable = false;
-    this.deviceService
-      .findAll(server.id)
-      .pipe(
-        catchError((_, response) => response),
-        finalize(() => {
-          server.isLoading = false;
-          server.isLoaded = true;
-        })
-      )
-      .subscribe((response) => {
-        if (response.success) {
-          server.cameras = response.data.map((device) => ({
-            id: device.id,
-            name: device.region,
-            channels: [],
-            device: device,
-            serverId: server.id,
-            isExpandable: true,
-            isSelectable: false,
-          }));
-          server.isExpandable = true;
-          server.isSelectable = true;
-        } else {
-          this.toastService.showError(response.message);
-        }
-      });
+    // this.deviceService
+    //   .findAll(server.id)
+    //   .pipe(
+    //     catchError((_, response) => response),
+    //     finalize(() => {
+    //       server.isLoading = false;
+    //       server.isLoaded = true;
+    //     })
+    //   )
+    //   .subscribe((response) => {
+    //     if (response.success) {
+    //       server.cameras = response.data.map((device) => ({
+    //         id: device.id,
+    //         name: device.region,
+    //         channels: [],
+    //         device: device,
+    //         serverId: server.id,
+    //         isExpandable: true,
+    //         isSelectable: false,
+    //       }));
+    //       server.isExpandable = true;
+    //       server.isSelectable = true;
+    //     } else {
+    //       this.toastService.showError(response.message);
+    //     }
+    //   });
   }
 
   private loadCamera(camera: Camera): void {
@@ -169,30 +169,30 @@ export class SidebarComponent implements OnInit {
     camera.isExpandable = false;
     camera.isSelectable = false;
 
-    this.cameraService
-      .findAll(camera.serverId, camera.id)
-      .pipe(
-        catchError((_, response) => response),
-        finalize(() => {
-          camera.isLoading = false;
-          camera.isLoaded = true;
-        })
-      )
-      .subscribe((response) => {
-        if (response.success) {
-          camera.channels = [
-            {
-              id: response.data.id,
-              name: response.data.manufacture,
-              cameraId: camera.id,
-              serverId: camera.serverId,
-            },
-          ];
-          camera.isExpandable = true;
-          camera.isSelectable = true;
-        } else {
-          this.toastService.showError(response.message);
-        }
-      });
+    // this.cameraService
+    //   .findAll(camera.serverId, camera.id)
+    //   .pipe(
+    //     catchError((_, response) => response),
+    //     finalize(() => {
+    //       camera.isLoading = false;
+    //       camera.isLoaded = true;
+    //     })
+    //   )
+    //   .subscribe((response) => {
+    //     if (response.success) {
+    //       camera.channels = [
+    //         {
+    //           id: response.data.id,
+    //           name: response.data.manufacture,
+    //           cameraId: camera.id,
+    //           serverId: camera.serverId,
+    //         },
+    //       ];
+    //       camera.isExpandable = true;
+    //       camera.isSelectable = true;
+    //     } else {
+    //       this.toastService.showError(response.message);
+    //     }
+    //   });
   }
 }

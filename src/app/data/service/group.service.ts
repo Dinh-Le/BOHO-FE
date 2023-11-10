@@ -2,6 +2,7 @@ import { Observable } from 'rxjs';
 import { ResponseBase } from '../schema/boho-v2/response-base';
 import { Group } from '../schema/boho-v2/group';
 import { RestfullApiService } from './restful-api.service';
+import { environment } from '@env';
 
 export abstract class GroupService extends RestfullApiService {
   public abstract findAll(
@@ -27,29 +28,29 @@ export abstract class GroupService extends RestfullApiService {
 
 export class GroupServiceImpl extends GroupService {
   public findAll(userId: string): Observable<ResponseBase & { data: Group[] }> {
-    const url = `/api/rest/v1/user/${userId}/group`;
+    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/group`;
     return this.httpClient.get<ResponseBase & { data: Group[] }>(url);
   }
   public find(
     userId: string,
     groupId: string
   ): Observable<ResponseBase & { data: Group }> {
-    const url = `/api/rest/v1/user/${userId}/group/${groupId}`;
+    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/group/${groupId}`;
     return this.httpClient.get<ResponseBase & { data: Group }>(url);
   }
   public create(
     userId: string,
     data: Omit<Group, 'id'>
   ): Observable<ResponseBase> {
-    const url = `/api/rest/v1/user/${userId}/group`;
+    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/group`;
     return this.httpClient.post<ResponseBase>(url, data);
   }
   public update(userId: string, group: Group): Observable<ResponseBase> {
-    const url = `/api/rest/v1/user/${userId}/group/${group.id}`;
+    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/group/${group.id}`;
     return this.httpClient.patch<ResponseBase>(url, group);
   }
   public delete(userId: string, groupId: string): Observable<ResponseBase> {
-    const url = `/api/rest/v1/user/${userId}/group/${groupId}`;
+    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/group/${groupId}`;
     return this.httpClient.delete<ResponseBase>(url);
   }
 }

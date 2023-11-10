@@ -1,8 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Observable, timer } from 'rxjs';
 import { CameraItem, cameraListMockData } from './camera-item';
 import { MenuItem } from '../menu-item';
 import { v4 as uuid } from 'uuid';
+import { DeviceService } from 'src/app/data/service/device.service';
+import { NodeService } from 'src/app/data/service/node.service';
+import { NodeOperatorService } from 'src/app/data/service/node-operator.service';
 
 @Component({
   selector: 'app-camera',
@@ -10,6 +13,10 @@ import { v4 as uuid } from 'uuid';
   styleUrls: ['./camera.component.scss'],
 })
 export class CameraComponent implements OnInit {
+  deviceService = inject(DeviceService);
+  nodeService = inject(NodeService);
+  nodeOperatorService = inject(NodeOperatorService);
+
   cameraMenuItems: MenuItem[] = [
     {
       icon: 'bi-plus',
@@ -24,6 +31,11 @@ export class CameraComponent implements OnInit {
     timer(1000).subscribe(() => {
       this.cameraList = cameraListMockData.map((e) => ({ ...e }));
     });
+    this.nodeOperatorService
+      .findAll('b430f545-97c1-44e6-9269-1dd3c7b7315b')
+      .subscribe(response => {
+        console.log(response);
+      })
   }
 
   trackById(_: number, item: any) {

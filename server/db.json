@@ -1,0 +1,44 @@
+{
+  "user": [
+    {
+      "id": "0",
+      "name": "root",
+      "password": "Goback@2021",
+      "email": "admin@gmail.com"
+    }
+  ],
+  "group": [
+    {
+      "id": "a4d8651e-96e5-41f3-9769-77f268747053",
+      "name": "Group camera 1",
+      "describle": ""
+    },
+    {
+      "id": "7d28a2f6-3373-458f-aece-567147b819eb",
+      "name": "Group camera 2",
+      "describle": ""
+    }
+  ],
+  "group_management": [],
+  "node": [],
+  "node_operator": [
+    {
+      "id": "107b787a-06af-473c-ad61-a02ffac99631",
+      "name": "Group node 1",
+      "describle": "",
+      "node_id": ""
+    },
+    {
+      "id": "3e6d9e78-5bf4-4d27-8f49-c9df7fe4ac94",
+      "name": "Group node 2",
+      "describle": "",
+      "node_id": ""
+    },
+    {
+      "id": "59036518-7b5f-4458-ae3e-cfdc759edea3",
+      "name": "Group node 3",
+      "describle": "",
+      "node_id": ""
+    }
+  ]
+}

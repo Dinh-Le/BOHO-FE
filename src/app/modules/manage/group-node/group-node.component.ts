@@ -1,4 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { ToastService } from '@app/services/toast.service';
+import { NodeOperator } from 'src/app/data/schema/boho-v2/node-operator';
+import { NodeOperatorService } from 'src/app/data/service/node-operator.service';
 import { v4 } from 'uuid';
 
 interface RowData {
@@ -13,16 +16,47 @@ interface RowData {
   templateUrl: 'group-node.component.html',
   styleUrls: ['group-node.component.scss', '../shared/table.scss'],
 })
-export class GroupNodeComponent {
+export class GroupNodeComponent implements OnInit {
+  nodeOperatorService = inject(NodeOperatorService);
+  toastService = inject(ToastService);
   data: RowData[] = [];
 
+  ngOnInit(): void {
+    this.nodeOperatorService.findAll('0').subscribe((response) => {
+      if (!response.success) {
+        this.toastService.showError('Fetch node operator failed');
+        return;
+      }
+
+      this.data = response.data.map((e) => ({
+        id: e.id,
+        name: e.name,
+        nodeCount: 0,
+      }));
+    });
+  }
+
   add() {
-    this.data.push({
+    const newNodeOperator: NodeOperator = {
       id: v4(),
       name: '',
-      nodeCount: 0,
-      editable: true,
-    });
+      describle: '',
+    };
+    this.nodeOperatorService
+      .create('0', newNodeOperator)
+      .subscribe((response) => {
+        if (!response.success) {
+          this.toastService.showError('Create new node operator failed');
+          return;
+        }
+
+        this.data.push({
+          id: newNodeOperator.id,
+          name: newNodeOperator.name,
+          nodeCount: 0,
+          editable: true,
+        });
+      });
   }
 
   trackById(_: any, item: RowData) {
@@ -30,10 +64,31 @@ export class GroupNodeComponent {
   }
 
   remove(item: RowData) {
-    this.data = this.data.filter((e) => e.id !== item.id);
+    this.nodeOperatorService.delete('0', item.id).subscribe((response) => {
+      if (!response.success) {
+        this.toastService.showError('Delete node operator failed');
+        return;
+      }
+
+      this.data = this.data.filter((e) => e.id !== item.id);
+    });
   }
 
   update(item: RowData) {
-    item.editable = false;
+    this.nodeOperatorService
+      .update('0', {
+        id: item.id,
+        name: item.name,
+        describle: '',
+        node_id: '',
+      })
+      .subscribe((response) => {
+        if (!response.success) {
+          this.toastService.showError('Update node operator failed');
+          return;
+        }
+
+        item.editable = false;
+      });
   }
 }

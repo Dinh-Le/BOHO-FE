@@ -1,4 +1,4 @@
-import { LatLng } from 'leaflet';
+import { LatLng } from "./latlng";
 
 export interface DeviceMetadata {
   manufacture: string;
