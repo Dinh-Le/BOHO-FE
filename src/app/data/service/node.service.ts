@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { BOHOEndpoints } from '../schema/boho-v2/endpoints';
 import { Node } from '../schema/boho-v2/node';
 import { ResponseBase } from '../schema/boho-v2/response-base';
-import { formatString } from '@app/helpers/function';
 import { RestfullApiService } from './restful-api.service';
 import { HttpParams } from '@angular/common/http';
+import { environment } from '@env';
 
 export abstract class NodeService extends RestfullApiService {
   abstract findAll(
@@ -34,7 +33,7 @@ export class NodeServiceImpl extends NodeService {
     userId: string,
     nodeOperatorId?: string | undefined
   ): Observable<ResponseBase & { data: Node[] }> {
-    const url = `/api/rest/v1/user/${userId}/node`;
+    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node`;
 
     if (nodeOperatorId) {
       const params = new HttpParams();
@@ -51,25 +50,25 @@ export class NodeServiceImpl extends NodeService {
     userId: string,
     nodeId: string
   ): Observable<ResponseBase & { data: Node }> {
-    const url = `/api/rest/v1/user/${userId}/node/${nodeId}`;
+    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}`;
     return this.httpClient.get<ResponseBase & { data: Node }>(url);
   }
   override create(
     userId: string,
     data: Omit<Node, 'id' | 'node_operator_id' | 'is_active'>
   ): Observable<ResponseBase> {
-    const url = `/api/rest/v1/user/${userId}/node`;
+    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node`;
     return this.httpClient.post<ResponseBase>(url, data);
   }
   override update(
     userId: string,
     data: Omit<Node, 'node_operator_id' | 'is_active'>
   ): Observable<ResponseBase> {
-    const url = `/api/rest/v1/user/${userId}/node/${data.id}`;
+    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${data.id}`;
     return this.httpClient.patch<ResponseBase>(url, data);
   }
   override delete(userId: string, nodeId: string): Observable<ResponseBase> {
-    const url = `/api/rest/v1/user/${userId}/node/${nodeId}`;
+    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}`;
     return this.httpClient.delete<ResponseBase>(url);
   }
   override sync(nodeId: string): Observable<ResponseBase> {
