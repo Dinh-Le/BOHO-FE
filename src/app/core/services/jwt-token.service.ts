@@ -6,9 +6,19 @@ export class JWTTokenService {
   private _expiresIn = Number.MIN_SAFE_INTEGER;
   private _token = '';
   private _tokenKey = 'AUTH_TOKEN';
+  private _userId = '';
+  private _role = '';
 
   constructor() {
     this.token = localStorage.getItem(this._tokenKey) || '';
+  }
+
+  get userId() {
+    return this._userId;
+  }
+
+  get role() {
+    return this._role;
   }
 
   get token(): string {
@@ -23,6 +33,8 @@ export class JWTTokenService {
     this._token = value;
     const encodededPayload = this.token.split('.')[1];
     const payload = JSON.parse(atob(encodededPayload));
+    this._userId = payload.user_id;
+    this._role = payload.role;
     this._expiresIn = payload.exp;
 
     localStorage.setItem(this._tokenKey, value);
