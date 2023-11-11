@@ -1,0 +1,27 @@
+<div class="modal-header">
+  <h4 class="modal-title">{{ title }}</h4>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="cancel.emit()"
+  ></button>
+</div>
+<div class="modal-body">
+  <div class="container">
+    <ng-content></ng-content>
+  </div>
+</div>
+<div class="modal-footer d-flex justify-content-center">
+  <button type="button" class="my-button cancel" (click)="cancel.emit()">
+    {{ cancelTitle }}
+  </button>
+  <button
+    type="submit"
+    class="my-button submit"
+    [disabled]="!canSubmit"
+    (click)="submit.emit()"
+  >
+    {{ submitTitle }}
+  </button>
+</div>
