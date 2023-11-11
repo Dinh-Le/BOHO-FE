@@ -1,4 +1,4 @@
-import { LatLng } from "./latlng";
+import { LatLng } from './latlng';
 
 export interface NodeMetadata {
   user: string;
@@ -51,6 +51,6 @@ export interface Node {
   ip: string;
   is_active: boolean;
   node_metadata: NodeMetadata;
-  connection_metadata: ConnectionMetadata;
-  engine_metadata: EngineMetadata;
+  connection_metadata?: ConnectionMetadata;
+  engine_metadata?: EngineMetadata;
 }

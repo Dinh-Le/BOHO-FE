@@ -16,93 +16,110 @@
   <ng-template #collapseContentTemplate let-data="data">
     <div class="row">
       <div class="col-8">
-        <ng-container *ngIf="data.formData.editable; else readonlyForm">
-          <div class="row">
-            <div class="col-9">
-              <input
-                class="fs-16 inline-input w-100 text-white bg-transparent"
-                [(ngModel)]="data.formData.name"
-              />
+        <ng-container *ngIf="data.editable; else readonlyForm">
+          <form [formGroup]="data.form" (ngSubmit)="save(data)">
+            <div class="row">
+              <div class="col-9">
+                <input
+                  class="fs-16 inline-input w-100 text-white bg-transparent"
+                  name="name"
+                  formControlName="name"
+                  required
+                />
+              </div>
             </div>
-          </div>
-          <div class="row mt-4">
-            <div class="col-3">Loại:</div>
-            <div class="col-6">
-              <app-select-2
-                [items]="types"
-                [(ngModel)]="data.formData.type"
-              ></app-select-2>
+            <div class="row mt-4">
+              <div class="col-3">Loại:</div>
+              <div class="col-6">
+                <app-select-2
+                  [items]="types"
+                  formControlName="type"
+                  required
+                ></app-select-2>
+              </div>
             </div>
-          </div>
-          <div class="row mt-1">
-            <div class="col-3">Host/Cổng:</div>
-            <div class="col-6">
-              <input
-                class="form-control form-control-sm border border-light bg-transparent text-white"
-                [(ngModel)]="data.formData.host"
-              />
+            <div class="row mt-1">
+              <div class="col-3">Host/Cổng:</div>
+              <div class="col-6">
+                <input
+                  class="form-control form-control-sm border border-light bg-transparent text-white"
+                  name="host"
+                  formControlName="host"
+                  required
+                />
+              </div>
+              <div class="col-3">
+                <input
+                  type="number"
+                  min="1"
+                  max="65535"
+                  class="form-control form-control-sm border border-light bg-transparent text-white"
+                  name="port"
+                  formControlName="port"
+                  required
+                />
+              </div>
             </div>
-            <div class="col-3">
-              <input
-                type="number"
-                min="1"
-                max="65535"
-                class="form-control form-control-sm border border-light bg-transparent text-white"
-                [(ngModel)]="data.formData.port"
-              />
+            <div class="row mt-1">
+              <div class="col-3">ID người dùng:</div>
+              <div class="col-6">
+                <input
+                  class="form-control form-control-sm border border-light bg-transparent text-white"
+                  name="userId"
+                  formControlName="userId"
+                  required
+                />
+              </div>
             </div>
-          </div>
-          <div class="row mt-1">
-            <div class="col-3">ID người dùng:</div>
-            <div class="col-6">
-              <input
-                class="form-control form-control-sm border border-light bg-transparent text-white"
-                [(ngModel)]="data.formData.userId"
-              />
+            <div class="row mt-1">
+              <div class="col-3">Mật khẩu</div>
+              <div class="col-6">
+                <input
+                  name="password"
+                  class="form-control form-control-sm border border-light bg-transparent text-white"
+                  formControlName="password"
+                  required
+                />
+              </div>
             </div>
-          </div>
-          <div class="row mt-1">
-            <div class="col-3">Mật khẩu</div>
-            <div class="col-6">
-              <input
-                type="password"
-                class="form-control form-control-sm border border-light bg-transparent text-white"
-                [(ngModel)]="data.formData.password"
-              />
+            <div class="row mt-4">
+              <div class="offset-8 col-auto">
+                <button
+                  class="btn btn-danger px-2 mx-1"
+                  (click)="data.editable = false"
+                >
+                  Huỷ
+                </button>
+                <button
+                  class="btn btn-primary px-2 mx-1"
+                  [disabled]="data.form.invalid"
+                >
+                  Lưu
+                </button>
+              </div>
             </div>
-          </div>
-          <div class="row mt-4">
-            <div class="offset-8 col-auto">
-              <button
-                class="btn btn-danger px-2 mx-1"
-                (click)="data.formData.editable = false"
-              >
-                Huỷ
-              </button>
-              <button class="btn btn-primary px-2 mx-1" (click)="save(data)">
-                Lưu
-              </button>
-            </div>
-          </div></ng-container
-        >
+          </form>
+        </ng-container>
         <ng-template #readonlyForm>
           <div class="row">
-            <span class="fs-16">{{ data.formData.name }}</span>
+            <span class="fs-16">{{ data.form.get("name")?.value }}</span>
           </div>
           <div class="row mt-4">
             <div class="col-3">Loại:</div>
-            <div class="col-6">{{ data.formData.type?.label }}</div>
+            <div class="col-6">{{ data.form.get("type")?.value?.label }}</div>
           </div>
           <div class="row mt-1">
             <div class="col-3">Host/Cổng:</div>
             <div class="col-6">
-              {{ data.formData.host }}/{{ data.formData.port }}
+              {{ data.form.get("host")?.value }}/{{
+                data.form.get("port")?.value
+              }}
             </div>
             <div class="col-3"></div>
           </div>
           <div class="row mt-1">
             <div class="col-3">ID người dùng:</div>
-            <div class="col-6">{{ data.formData.userId }}</div>
+            <div class="col-6">{{ data.form.get("userId")?.value }}</div>
           </div>
           <div class="row mt-1">
             <div class="col-3">Mật khẩu</div>
@@ -118,7 +135,7 @@
               </button>
               <button
                 class="btn btn-primary px-2 mx-1 text-white"
-                (click)="data.formData.editable = true"
+                (click)="data.editable = true"
               >
                 Chỉnh sửa
               </button>

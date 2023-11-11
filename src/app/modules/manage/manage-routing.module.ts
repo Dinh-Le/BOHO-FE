@@ -64,6 +64,10 @@ import { VehicleListDetailComponent } from './vehicle-list-detail/vehicle-list-d
             component: GroupNodeComponent,
           },
           {
+            path: 'group-node/:nodeOperatorId/node',
+            component: NodeComponent,
+          },
+          {
             path: 'group-camera',
             component: GroupCameraComponent,
           },
@@ -74,10 +78,6 @@ import { VehicleListDetailComponent } from './vehicle-list-detail/vehicle-list-d
           {
             path: 'vehicle-list-detail',
             component: VehicleListDetailComponent,
-          },
-          {
-            path: 'node',
-            component: NodeComponent,
           },
           {
             path: 'rule',

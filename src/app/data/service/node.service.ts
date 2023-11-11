@@ -36,8 +36,7 @@ export class NodeServiceImpl extends NodeService {
     const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node`;
 
     if (nodeOperatorId) {
-      const params = new HttpParams();
-      params.set('npi', nodeOperatorId);
+      const params = new HttpParams().set('npi', nodeOperatorId);
 
       return this.httpClient.get<ResponseBase & { data: Node[] }>(url, {
         params,
