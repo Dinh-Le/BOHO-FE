@@ -86,5 +86,30 @@
       "node_id": ""
     }
   ],
-  "device": []
+  "device": [
+    {
+      "id": "1e744fe7-06f4-4a3e-9e9d-327a0c3b402b",
+      "name": "Cổng chính",
+      "device_metadata": {
+        "manufacture": "",
+        "describle": ""
+      },
+      "location": {
+        "lat": "",
+        "long": ""
+      },
+      "type": "Cố định",
+      "camera": {
+        "driver": "rtsp",
+        "type": "Cố định",
+        "connection_metadata": {
+          "rtsp": {
+            "rtsp_url": "rtsp://192.168.1.100:554/cam0_1",
+            "user": "admin",
+            "password": "admin"
+          }
+        }
+      }
+    }
+  ]
 }

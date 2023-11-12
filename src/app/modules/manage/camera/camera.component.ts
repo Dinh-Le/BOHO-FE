@@ -21,6 +21,7 @@ import { SelectItemModel } from '@shared/models/select-item-model';
 interface RowData extends ExpandableTableRowData {
   id: string;
   name: string;
+  rtspUrl: string;
   type: string;
   node: string;
   status: string;
@@ -216,13 +217,14 @@ export class CameraComponent implements OnInit, AfterViewInit {
     const newCamera: RowData = {
       id: uuid(),
       name: '',
-      type: 'Cố định',
+      rtspUrl: '',
+      type: '',
       node: '',
       status: '',
       form: new FormGroup({
         name: new FormControl(null, [Validators.required]),
         activation: new FormControl(false, [Validators.required]),
-        driver: new FormControl(null, [Validators.required]),
+        driver: new FormControl(this.cameraDrivers[0], [Validators.required]),
         type: new FormControl(null, [Validators.required]),
       }),
       isExpanded: true,
@@ -303,6 +305,7 @@ export class CameraComponent implements OnInit, AfterViewInit {
 
       item.name = device.name;
       item.type = device.type;
+      item.rtspUrl = connectionMetadata.rtsp?.rtsp_url || '';
       item.isEditMode = false;
       item.isNew = false;
     });
