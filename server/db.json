@@ -46,11 +46,11 @@
       },
       "name": "Node 1",
       "type": "TensorRT",
-      "ip": "122.168.1.1:1234",
+      "ip": "122.168.1.1:1235",
       "is_active": false,
       "node_metadata": {
         "user": "admin",
-        "password": "admin"
+        "password": "gfhg"
       }
     }
   ],
@@ -74,14 +74,8 @@
       "node_id": ""
     },
     {
-      "id": "0701da4d-a883-4968-913a-6be5b813bd1d",
-      "name": "Group node 4",
-      "describle": "",
-      "node_id": ""
-    },
-    {
-      "id": "281e5062-9fd6-43b3-8b58-6677bd3785ff",
-      "name": "Group node 5",
+      "id": "a32fccf6-176d-415f-a05e-dbbe7dd63730",
+      "name": "Group node 45",
       "describle": "",
       "node_id": ""
     }
@@ -107,6 +101,30 @@
             "rtsp_url": "rtsp://192.168.1.100:554/cam0_1",
             "user": "admin",
             "password": "admin"
+          }
+        }
+      }
+    },
+    {
+      "id": "93c28ba2-bb3f-4a03-bd47-f671ae6ee9a7",
+      "name": "Camera 1",
+      "device_metadata": {
+        "manufacture": "",
+        "describle": ""
+      },
+      "location": {
+        "lat": "",
+        "long": ""
+      },
+      "type": "Cố định",
+      "camera": {
+        "driver": "rtsp",
+        "type": "Cố định",
+        "connection_metadata": {
+          "rtsp": {
+            "rtsp_url": "1",
+            "user": "11",
+            "password": "1"
           }
         }
       }

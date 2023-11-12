@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { MenuItem } from '../menu-item';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-camera-detail',
@@ -11,25 +11,32 @@ export class CameraDetailComponent implements OnInit {
     {
       icon: 'bi-info-circle',
       title: 'Thông tin',
-      path: '/manage/camera-detail/info',
+      path: '/manage/camera/{id}/info',
     },
     {
       icon: 'bi-arrows-move',
       title: 'Điểm giám sát',
-      path: '/manage/camera-detail/preset-settings',
+      path: '/manage/camera/{id}/preset-settings',
     },
     {
       icon: 'bi-arrow-repeat',
       title: 'Tuần tra',
-      path: '/manage/camera-detail/patrol-settings',
+      path: '/manage/camera/{id}/patrol-settings',
     },
     {
       icon: 'bi-calendar3',
       title: 'Lịch trình PTZ',
-      path: '/manage/camera-detail/tour-settings',
+      path: '/manage/camera/{id}/tour-settings',
     },
   ];
   router = inject(Router);
+
+  constructor(activatedRoute: ActivatedRoute) {
+    const id = activatedRoute.snapshot.params['cameraId'];
+    this.menuItems = this.menuItems.map(e => Object.assign(e, {
+      path: e.path?.replace('{id}', id)
+    }))
+  }
 
   ngOnInit(): void {
     const currentUrl = this.router.url;
