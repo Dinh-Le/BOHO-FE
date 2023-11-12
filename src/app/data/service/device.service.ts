@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { ResponseBase } from '../schema/boho-v2/response-base';
 import { Device } from '../schema/boho-v2/device';
 import { RestfullApiService } from './restful-api.service';
+import { environment } from '@env';
 
 export abstract class DeviceService extends RestfullApiService {
   public abstract create(
@@ -38,14 +39,14 @@ export class DeviceServiceImpl extends DeviceService {
     nodeId: string,
     device: Omit<Device, 'id'>
   ): Observable<ResponseBase> {
-    const url = `/api/rest/v1/user/${userId}/node/${nodeId}/device`;
+    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device`;
     return this.httpClient.post<ResponseBase>(url, device);
   }
   public override findAll(
     userId: string,
     nodeId: string
   ): Observable<ResponseBase & { data: Device[] }> {
-    const url = `/api/rest/v1/user/${userId}/node/${nodeId}/device`;
+    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device`;
     return this.httpClient.get<ResponseBase & { data: Device[] }>(url);
   }
   public override find(
@@ -53,7 +54,7 @@ export class DeviceServiceImpl extends DeviceService {
     nodeId: string,
     deviceId: string
   ): Observable<ResponseBase & { data: Device }> {
-    const url = `/api/rest/v1/user/${userId}/node/${nodeId}/device/${deviceId}`;
+    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device/${deviceId}`;
     return this.httpClient.get<ResponseBase & { data: Device }>(url);
   }
   public override update(
@@ -61,7 +62,7 @@ export class DeviceServiceImpl extends DeviceService {
     nodeId: string,
     device: Device
   ): Observable<ResponseBase> {
-    const url = `/api/rest/v1/user/${userId}/node/${nodeId}/device/${device.id}`;
+    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device/${device.id}`;
     return this.httpClient.patch<ResponseBase>(url, device);
   }
   public override delete(
@@ -69,7 +70,7 @@ export class DeviceServiceImpl extends DeviceService {
     nodeId: string,
     deviceId: string
   ): Observable<ResponseBase> {
-    const url = `/api/rest/v1/user/${userId}/node/${nodeId}/device/${deviceId}`;
+    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device/${deviceId}`;
     return this.httpClient.delete<ResponseBase>(url);
   }
 }
