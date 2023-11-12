@@ -23,6 +23,7 @@ export interface CameraItem {
   milestoneRtspUrl?: string;
   isExpanded?: boolean;
   isEditMode?: boolean;
+  isNew?: boolean;
 }
 
 export const cameraListMockData: CameraItem[] = [

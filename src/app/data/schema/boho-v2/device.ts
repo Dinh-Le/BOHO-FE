@@ -1,4 +1,4 @@
-import { LatLng } from "./latlng";
+import { LatLng } from './latlng';
 
 export interface DeviceMetadata {
   manufacture: string;
@@ -31,9 +31,9 @@ export interface MilestoneConnectionMetadata {
 }
 
 export interface ConnectionMetadata {
-  onvif: OnvifConnectionMetadata;
-  rtsp: RtspConnectionMetadata;
-  milestone: MilestoneConnectionMetadata;
+  onvif?: OnvifConnectionMetadata;
+  rtsp?: RtspConnectionMetadata;
+  milestone?: MilestoneConnectionMetadata;
 }
 
 export interface Camera {
@@ -44,6 +44,7 @@ export interface Camera {
 
 export interface Device {
   id: string;
+  name: string;
   device_metadata: DeviceMetadata;
   location: LatLng;
   type: string;

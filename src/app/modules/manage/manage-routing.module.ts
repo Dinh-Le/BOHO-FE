@@ -24,12 +24,27 @@ import { VehicleListDetailComponent } from './vehicle-list-detail/vehicle-list-d
         component: ManageComponent,
         children: [
           {
-            path: 'camera',
-            pathMatch: 'full',
+            path: 'group-camera',
+            component: GroupCameraComponent,
+          },
+          {
+            path: 'system',
+            component: SystemComponent,
+          },
+          {
+            path: 'group-node',
+            component: GroupNodeComponent,
+          },
+          {
+            path: 'group-node/:nodeOperatorId/node',
+            component: NodeComponent,
+          },
+          {
+            path: 'node/:nodeId/camera',
             component: CameraComponent,
           },
           {
-            path: 'camera-detail',
+            path: 'camera/:cameraId',
             component: CameraDetailComponent,
             children: [
               {
@@ -54,22 +69,6 @@ import { VehicleListDetailComponent } from './vehicle-list-detail/vehicle-list-d
                 component: TourSettingsComponent,
               },
             ],
-          },
-          {
-            path: 'system',
-            component: SystemComponent,
-          },
-          {
-            path: 'group-node',
-            component: GroupNodeComponent,
-          },
-          {
-            path: 'group-node/:nodeOperatorId/node',
-            component: NodeComponent,
-          },
-          {
-            path: 'group-camera',
-            component: GroupCameraComponent,
           },
           {
             path: 'vehicle-list',

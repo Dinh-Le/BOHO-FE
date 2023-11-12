@@ -19,9 +19,10 @@ server.use(jsonServer.rewriter({
     '/api/rest/v1/user/:user_id/group_management': '/group_management',
     '/api/rest/v1/user/:user_id/group_management/:group_management_id': '/group_management/:group_management_id',
     '/api/rest/v1/user/:user_id/node': '/node',
-    '/api/rest/v1/user/:user_id/node/:node_id': '/node/:node_id',
+    '/api/rest/v1/user/:user_id/node/:node_id': '/node/:node_id',    
     '/api/rest/v1/user/:user_id/node_operator': '/node_operator',
     '/api/rest/v1/user/:user_id/node_operator/:node_operator_id': '/node_operator/:node_operator_id',
+
   }));
 server.use(router);
 server.listen(3000, () => {
