@@ -1,0 +1,11 @@
+<div class="menu-item-label">
+  <a
+    ><i class="px-1" [ngClass]="item.icon" *ngIf="item.icon"></i
+    >{{ item.label }}</a
+  >
+</div>
+
+<app-menu
+  [menuItems]="item.children"
+  *ngIf="item.children && item.children.length > 0"
+></app-menu>

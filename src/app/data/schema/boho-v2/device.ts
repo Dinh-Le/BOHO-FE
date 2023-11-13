@@ -45,6 +45,7 @@ export interface Camera {
 export interface Device {
   id: string;
   name: string;
+  node_id?: string;
   device_metadata: DeviceMetadata;
   location: LatLng;
   type: string;

@@ -15,9 +15,13 @@ import { sidebarReducer } from './state/sidebar.reducer';
 import { TopBarComponent } from './layout/top-bar/top-bar.component';
 import { DataModule } from './data/data.module';
 import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
-import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import {
+  FaIconLibrary,
+  FontAwesomeModule,
+} from '@fortawesome/angular-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
-
+import { MenuComponent } from './layout/menu/menu.component';
+import { MenuItemComponent } from './layout/menu/menu-item.component';
 
 @NgModule({
   imports: [
@@ -49,6 +53,8 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
     AuthLayoutComponent,
     SidebarComponent,
     TopBarComponent,
+    MenuComponent,
+    MenuItemComponent,
   ],
 })
 export class AppModule {

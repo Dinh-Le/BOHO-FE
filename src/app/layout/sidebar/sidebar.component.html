@@ -30,7 +30,7 @@
   </div>
   <div class="bg-dark text-light mt-2 camera-menu-container">
     <div class="p-1">
-      <div *ngFor="let server of servers">
+      <!-- <div *ngFor="let server of servers">
         <div
           class="d-flex node-container align-items-center"
           [ngStyle]="{ disabled: server.isLoading }"
@@ -117,7 +117,8 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
+      <app-menu [menuItems]="menuItems"></app-menu>
     </div>
   </div>
 </div>

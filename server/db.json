@@ -83,6 +83,7 @@
   "device": [
     {
       "id": "1e744fe7-06f4-4a3e-9e9d-327a0c3b402b",
+      "node_id": "31da1e8b-0502-4007-abf2-b2b37da5124f",
       "name": "Cổng chính",
       "device_metadata": {
         "manufacture": "",
@@ -107,6 +108,7 @@
     },
     {
       "id": "93c28ba2-bb3f-4a03-bd47-f671ae6ee9a7",
+      "node_id": "31da1e8b-0502-4007-abf2-b2b37da5124f",
       "name": "Camera 1",
       "device_metadata": {
         "manufacture": "",
