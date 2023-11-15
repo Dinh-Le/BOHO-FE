@@ -1,11 +1,18 @@
 <div class="menu-item-label">
-  <a
-    ><i class="px-1" [ngClass]="item.icon" *ngIf="item.icon"></i
+  <a (click)="item.onclick(item)">
+    <i
+      class="bi cursor-pointer"
+      [ngClass]="isExpanded ? 'bi-chevron-down' : 'bi-chevron-right'"
+      *ngIf="hasChild"
+      (click)="$event.stopPropagation(); isExpanded = !isExpanded"
+    ></i>
+    <i class="px-1" [ngClass]="item.icon" *ngIf="item.icon"></i
     >{{ item.label }}</a
   >
 </div>
 
 <app-menu
-  [menuItems]="item.children"
-  *ngIf="item.children && item.children.length > 0"
+  [ngClass]="{ 'd-none': !isExpanded }"
+  [menuItems]="item.children!"
+  *ngIf="hasChild"
 ></app-menu>

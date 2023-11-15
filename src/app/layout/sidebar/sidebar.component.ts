@@ -124,7 +124,7 @@ export class SidebarComponent implements OnInit {
             const nodeOperatorMenuItem: MenuItem = {
               id: nodeOperator.id,
               label: nodeOperator.name,
-              link: '#',
+              onclick: this.onMenuItemClick.bind(this),
               icon: 'bi bi-folder-fill',
               children: [],
             };
@@ -137,14 +137,14 @@ export class SidebarComponent implements OnInit {
               const nodeMenuItem: MenuItem = {
                 id: node.id,
                 label: node.name,
-                link: '#',
+                onclick: this.onMenuItemClick.bind(this),
                 icon: 'bi bi-projector-fill',
                 children: this.devices
                   .filter((device) => device.node_id === node.id)
                   .map((device) => ({
                     id: device.id,
                     label: device.name,
-                    link: '#',
+                    onclick: this.onMenuItemClick.bind(this),
                     icon: 'bi bi-camera-video-fill',
                   })),
               };
@@ -164,51 +164,6 @@ export class SidebarComponent implements OnInit {
       });
   }
 
-  trackById(_: number, item: any) {
-    return item.id;
-  }
-
-  toggleServer(server: Server) {
-    if (!server.isLoaded) {
-      this.loadServer(server);
-    }
-
-    server.expanded = !server.expanded;
-  }
-
-  toggleCamera(camera: Camera) {
-    if (!camera.isLoaded) {
-      this.loadCamera(camera);
-    }
-
-    camera.expanded = !camera.expanded;
-  }
-
-  onServerSelectionChanged(server: Server): void {
-    server.cameras.forEach((camera) => {
-      if (camera.selected != server.selected) {
-        camera.selected = server.selected;
-        this.onCameraSelectionChanged(camera);
-      }
-    });
-  }
-
-  onCameraSelectionChanged(camera: Camera, server?: Server): void {
-    camera.channels.forEach((channel) => (channel.selected = camera.selected));
-
-    if (!camera.selected && server) {
-      server.selected = false;
-    }
-
-    if (camera.selected) {
-      this.store.dispatch(SidebarActions.addDevice({ device: camera.device }));
-    } else {
-      this.store.dispatch(
-        SidebarActions.removeDevice({ device: camera.device })
-      );
-    }
-  }
-
   @HostListener('document:click', ['$event'])
   clickout(event: Event) {
     if (!this.eRef.nativeElement.contains(event.target)) {
@@ -218,67 +173,8 @@ export class SidebarComponent implements OnInit {
     }
   }
 
-  private loadServer(server: Server): void {
-    server.isLoading = true;
-    server.isExpandable = false;
-    server.isSelectable = false;
-    // this.deviceService
-    //   .findAll(server.id)
-    //   .pipe(
-    //     catchError((_, response) => response),
-    //     finalize(() => {
-    //       server.isLoading = false;
-    //       server.isLoaded = true;
-    //     })
-    //   )
-    //   .subscribe((response) => {
-    //     if (response.success) {
-    //       server.cameras = response.data.map((device) => ({
-    //         id: device.id,
-    //         name: device.region,
-    //         channels: [],
-    //         device: device,
-    //         serverId: server.id,
-    //         isExpandable: true,
-    //         isSelectable: false,
-    //       }));
-    //       server.isExpandable = true;
-    //       server.isSelectable = true;
-    //     } else {
-    //       this.toastService.showError(response.message);
-    //     }
-    //   });
-  }
-
-  private loadCamera(camera: Camera): void {
-    camera.isLoading = true;
-    camera.isExpandable = false;
-    camera.isSelectable = false;
-
-    // this.cameraService
-    //   .findAll(camera.serverId, camera.id)
-    //   .pipe(
-    //     catchError((_, response) => response),
-    //     finalize(() => {
-    //       camera.isLoading = false;
-    //       camera.isLoaded = true;
-    //     })
-    //   )
-    //   .subscribe((response) => {
-    //     if (response.success) {
-    //       camera.channels = [
-    //         {
-    //           id: response.data.id,
-    //           name: response.data.manufacture,
-    //           cameraId: camera.id,
-    //           serverId: camera.serverId,
-    //         },
-    //       ];
-    //       camera.isExpandable = true;
-    //       camera.isSelectable = true;
-    //     } else {
-    //       this.toastService.showError(response.message);
-    //     }
-    //   });
+  onMenuItemClick(item: MenuItem) {
+    console.log('Select: ', item.label);
+    this.store.dispatch(SidebarActions.selectMenuItem({ item }));
   }
 }

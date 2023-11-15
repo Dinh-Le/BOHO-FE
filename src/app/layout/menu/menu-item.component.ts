@@ -9,4 +9,10 @@ import { MenuItem } from './menu-item';
 export class MenuItemComponent {
   @Input()
   item!: MenuItem;
+
+  isExpanded: boolean = false;
+
+  get hasChild() {
+    return this.item.children && this.item.children.length > 0;
+  }
 }

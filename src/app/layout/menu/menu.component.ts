@@ -9,11 +9,4 @@ import { MenuItem } from './menu-item';
 export class MenuComponent {
   @Input()
   menuItems!: MenuItem[];
-
-  @Input()
-  loading: boolean = false;
-
-  isSelected = false;
-  isExpanded = false;
-  isDisabled = false;
 }

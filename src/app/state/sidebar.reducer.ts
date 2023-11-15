@@ -6,6 +6,7 @@ export const initialState: SidebarState = {
   state: true,
   autoHideEnabled: false,
   devices: [],
+  selectedMenuItem: undefined
 };
 
 export const sidebarReducer = createReducer(
@@ -38,5 +39,9 @@ export const sidebarReducer = createReducer(
       ..._state,
       devices: _state.devices.filter((e) => !deviceIds.has(e.id)),
     };
-  })
+  }),
+  on(SidebarActions.selectMenuItem, (_state, {item}) => ({
+    ..._state,
+    selectedMenuItem: item
+  }))
 );

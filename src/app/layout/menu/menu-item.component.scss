@@ -1,9 +1,14 @@
 .menu-item-label {
   width: 100%;
   cursor: pointer;
+
+  a {
+    display: block;
+    user-select: none;
+  }
 }
 
-.menu-item-label:hover {
-  background: lightgray;
-  color: black;
-}
+// .menu-item-label:hover {
+//   background: lightgray;
+//   color: black;
+// }

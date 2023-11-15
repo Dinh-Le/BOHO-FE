@@ -1,6 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { MenuItem } from './menu-item';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Store, select } from '@ngrx/store';
+import { SidebarState } from 'src/app/state/sidebar.state';
 
 @Component({
   selector: 'app-manage',
@@ -9,6 +11,8 @@ import { Router } from '@angular/router';
 })
 export class ManageComponent implements OnInit {
   router = inject(Router);
+  store = inject(Store<{ sidebar: SidebarState }>);
+  activatedRoute = inject(ActivatedRoute);
 
   menuLevel2: MenuItem[] = [
     {
@@ -54,6 +58,13 @@ export class ManageComponent implements OnInit {
     if (menuItem) {
       menuItem.selected = true;
     }
+
+    this.store.pipe(
+      select('sidebar'),
+      select('selectedMenuItem')
+    ).subscribe((item) => {
+      
+    })
   }
 
   onMenuLevel2ItemClick(item: MenuItem) {
