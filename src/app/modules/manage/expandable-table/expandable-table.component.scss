@@ -4,12 +4,9 @@ $color-gray: rgb(74, 73, 75);
 table {
   width: 100%;
 
-  tr:nth-child(even) {
-    border-bottom: 0.2rem solid $color-dark;
-  }
-
   tr {
     background: $color-gray;
+    border-bottom: 0.2rem solid $color-dark;
   }
 
   thead {
@@ -35,9 +32,10 @@ table {
   }
 
   .hide {
-    max-height: 0px;
-    opacity: 0;
-    overflow-y: hidden;
+    // max-height: 0px;
+    // opacity: 0;
+    // overflow-y: hidden;
     transition: all 0.3;
+    display: none;
   }
 }

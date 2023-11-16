@@ -12,20 +12,14 @@ import {
 } from '../expandable-table/expandable-table.component';
 import { v4 } from 'uuid';
 
-interface ExternalSystemRowData extends ExpandableTableRowData {
+interface RowData extends ExpandableTableRowData {
   id: string;
-  name: string;
-  type: string;
-  host: string;
-  port: number;
-  status: boolean;
-  formData: ExternalSystemFormData;
-}
-
-interface ExternalSystemFormData {
   name?: string;
+  type?: string;
   host?: string;
   port?: number;
+  status?: boolean;
+  authType?: string;
   userId?: string;
   password?: string;
   eventPort?: number;
@@ -80,7 +74,7 @@ export class SystemComponent implements AfterViewInit, OnInit {
       sortable: true,
     },
   ];
-  data: ExternalSystemRowData[] = [];
+  data: RowData[] = [];
 
   ngOnInit(): void {}
 
@@ -126,12 +120,13 @@ export class SystemComponent implements AfterViewInit, OnInit {
   add() {
     this.data.push({
       id: v4(),
-      name: '',
-      type: '',
-      host: '',
-      port: 0,
       status: false,
-      formData: {},
+      editable: true,
+      isExpanded: true,
     });
+  }
+
+  remove(item: RowData) {
+    this.data = this.data.filter(({id}) => item.id !== id);
   }
 }
