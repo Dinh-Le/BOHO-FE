@@ -93,6 +93,7 @@ export class SidebarComponent implements OnInit {
     {
       id: this.userId,
       label: 'Admin',
+      level: 'user',
       onclick: this.onMenuItemClick.bind(this),
       icon: 'bi bi-user',
       children: [],
@@ -139,6 +140,7 @@ export class SidebarComponent implements OnInit {
             const nodeOperatorMenuItem: MenuItem = {
               id: nodeOperator.id,
               label: nodeOperator.name,
+              level: 'node_operator',
               onclick: this.onMenuItemClick.bind(this),
               icon: 'bi bi-folder-fill',
               children: [],
@@ -152,6 +154,7 @@ export class SidebarComponent implements OnInit {
               const nodeMenuItem: MenuItem = {
                 id: node.id,
                 label: node.name,
+                level: 'node',
                 onclick: this.onMenuItemClick.bind(this),
                 icon: 'bi bi-projector-fill',
                 children: this.devices
@@ -159,6 +162,7 @@ export class SidebarComponent implements OnInit {
                   .map((device) => ({
                     id: device.id,
                     label: device.name,
+                    level: 'device',
                     onclick: this.onMenuItemClick.bind(this),
                     icon: 'bi bi-camera-video-fill',
                   })),

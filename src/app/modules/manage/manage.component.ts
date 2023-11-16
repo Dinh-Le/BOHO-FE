@@ -59,17 +59,16 @@ export class ManageComponent implements OnInit {
       menuItem.selected = true;
     }
 
-    this.store.pipe(
-      select('sidebar'),
-      select('selectedMenuItem')
-    ).subscribe((item) => {
-      
-    })
+    this.store
+      .pipe(select('sidebar'), select('selectedMenuItem'))
+      .subscribe((item) => {
+        
+      });
   }
 
   onMenuLevel2ItemClick(item: MenuItem) {
     let selectedItem = this.menuLevel2.find((item) => item.selected);
-    if (selectedItem !== undefined) {
+    if (selectedItem) {
       selectedItem.selected = false;
     }
 

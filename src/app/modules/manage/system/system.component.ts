@@ -82,24 +82,7 @@ export class SystemComponent implements AfterViewInit, OnInit {
   ];
   data: ExternalSystemRowData[] = [];
 
-  ngOnInit(): void {
-    this.data = [
-      {
-        id: '1',
-        name: 'Milestone VMS server 1',
-        type: 'Milestone Xprotect',
-        host: '14.161.12.2',
-        port: 4333,
-        status: true,
-        formData: {
-          name: 'Milestone VMS server 1',
-          host: '14.161.12.2',
-          port: 4333,
-          eventPort: 4444,
-        },
-      },
-    ];
-  }
+  ngOnInit(): void {}
 
   ngAfterViewInit(): void {
     this.columns = [
@@ -127,6 +110,7 @@ export class SystemComponent implements AfterViewInit, OnInit {
         label: 'Trạng thái',
         prop: 'status',
         sortable: true,
+        width: '200',
         contentTemplateRef: this.statusCellTemplateRef,
       },
     ];
