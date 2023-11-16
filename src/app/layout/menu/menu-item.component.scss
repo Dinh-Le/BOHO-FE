@@ -8,7 +8,7 @@
   }
 }
 
-// .menu-item-label:hover {
-//   background: lightgray;
-//   color: black;
-// }
+.menu-item-label.active {
+  background: lightgray;
+  color: black;
+}

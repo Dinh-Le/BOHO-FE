@@ -5,4 +5,5 @@ export interface MenuItem {
   icon?: string;
   data?: any;
   children?: MenuItem[];
+  isSelected?: boolean;
 }

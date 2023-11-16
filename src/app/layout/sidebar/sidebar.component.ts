@@ -3,10 +3,11 @@ import {
   ElementRef,
   HostListener,
   OnInit,
+  ViewChild,
   inject,
 } from '@angular/core';
 import { ToastService } from '@app/services/toast.service';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import {
   catchError,
   finalize,
@@ -14,6 +15,7 @@ import {
   mergeMap,
   of,
   switchMap,
+  take,
   zip,
 } from 'rxjs';
 import { Device, DeviceMetadata } from 'src/app/data/schema/boho-v2/device';
@@ -26,6 +28,7 @@ import { UserService } from 'src/app/data/service/user.service';
 import { SidebarActions } from 'src/app/state/sidebar.action';
 import { SidebarState } from 'src/app/state/sidebar.state';
 import { MenuItem } from '../menu/menu-item';
+import { MenuComponent } from '../menu/menu.component';
 
 interface CameraChannel {
   id: string;
@@ -71,9 +74,13 @@ export class SidebarComponent implements OnInit {
   private nodeService = inject(NodeService);
   private deviceService = inject(DeviceService);
   private eRef = inject(ElementRef);
-  private store = inject(Store<{ sidebar: SidebarState }>);
+  private store: Store<{ sidebar: SidebarState }> = inject(
+    Store<{ sidebar: SidebarState }>
+  );
   private toastService = inject(ToastService);
   userService = inject(UserService);
+
+  @ViewChild('menu') menu!: ElementRef;
 
   mode: string = 'by-node';
   servers: Server[] = [];
@@ -82,7 +89,15 @@ export class SidebarComponent implements OnInit {
   nodes: Node[] = [];
   devices: Device[] = [];
   nodeOperators: NodeOperator[] = [];
-  menuItems: MenuItem[] = [];
+  menuItems: MenuItem[] = [
+    {
+      id: this.userId,
+      label: 'Admin',
+      onclick: this.onMenuItemClick.bind(this),
+      icon: 'bi bi-user',
+      children: [],
+    }
+  ];
 
   ngOnInit(): void {
     this.nodeOperatorService
@@ -148,10 +163,11 @@ export class SidebarComponent implements OnInit {
                     icon: 'bi bi-camera-video-fill',
                   })),
               };
+
               nodeOperatorMenuItem.children?.push(nodeMenuItem);
             }
 
-            this.menuItems.push(nodeOperatorMenuItem);
+            this.menuItems[0].children?.push(nodeOperatorMenuItem);
           }
         })
       )
@@ -175,6 +191,6 @@ export class SidebarComponent implements OnInit {
 
   onMenuItemClick(item: MenuItem) {
     console.log('Select: ', item.label);
-    this.store.dispatch(SidebarActions.selectMenuItem({ item }));
+    this.store.dispatch(SidebarActions.selectMenuItem({ item: item }));
   }
 }
