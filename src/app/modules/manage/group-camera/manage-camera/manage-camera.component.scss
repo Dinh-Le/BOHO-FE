@@ -1,0 +1,18 @@
+input {
+    border: 2px solid black;
+    background: white;
+    color: black;
+    padding: 0.5rem;
+    width: 100%;
+    outline: none;
+}
+
+input:focus {    
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+input::placeholder {
+    color: black;
+    font-style: italic;
+}

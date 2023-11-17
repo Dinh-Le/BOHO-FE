@@ -5,6 +5,7 @@ import { Group } from 'src/app/data/schema/boho-v2/group';
 import { GroupService } from 'src/app/data/service/group.service';
 import { v4 } from 'uuid';
 import { AddGroupCameraComponent } from './add-group-camera/add-group-camera.component';
+import { ManageCameraComponent } from './manage-camera/manage-camera.component';
 
 interface RowData {
   id: string;
@@ -100,5 +101,11 @@ export class GroupCameraComponent implements OnInit {
     });
   }
 
-  showManageCameraDialog(item: RowData) {}
+  showManageCameraDialog(item: RowData) {
+    const modal = this.modalService.open(ManageCameraComponent, {
+      size: 'xl'
+    });
+    modal.componentInstance.id = item.id;
+    modal.componentInstance.name = item.name;
+  }
 }
