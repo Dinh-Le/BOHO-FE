@@ -1,0 +1,13 @@
+<app-form-dialog
+  title="Thay đổi địa điểm"
+  (cancel)="cancel()"
+  (submit)="submit()"
+>
+  <div
+    class="map"
+    leaflet
+    [leafletOptions]="options"
+    (leafletMapReady)="onMapReady($event)"
+    (leafletClick)="mapClicked($event)"
+  ></div
+></app-form-dialog>

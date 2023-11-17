@@ -17,7 +17,7 @@ export class FormDialogComponent {
   cancelTitle = 'Hủy';
 
   @Input()
-  canSubmit = false;
+  canSubmit = true;
 
   @Output()
   cancel = new EventEmitter();
