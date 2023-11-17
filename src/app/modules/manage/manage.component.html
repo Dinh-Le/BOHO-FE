@@ -3,12 +3,12 @@
     *ngFor="let item of menuLevel2"
     class="border-primary mx-2 border-1 menu-item"
     style="overflow-x: auto"
-    [ngClass]="{ 'border-bottom': item.selected }"
+    [ngClass]="{ 'border-bottom': item.isSelected }"
   >
     <a
       class="text-white pe-auto text-decoration-none"
       (click)="onMenuLevel2ItemClick(item)"
-      ><i class="bi" [ngClass]="item.icon"></i> {{ item.title }}</a
+      ><i class="bi" [ngClass]="item.icon"></i> {{ item.label }}</a
     >
   </div>
 </div>

@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { MenuItem } from './menu-item';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
+import { MenuItem } from 'src/app/layout/menu/menu-item';
 import { SidebarState } from 'src/app/state/sidebar.state';
 
 @Component({
@@ -17,36 +17,36 @@ export class ManageComponent implements OnInit {
   menuLevel2: MenuItem[] = [
     {
       icon: 'bi-laptop',
-      title: 'Bảng thông tin',
+      label: 'Bảng thông tin',
     },
     {
       icon: 'bi-diagram-3',
-      title: 'Hệ thống',
+      label: 'Hệ thống',
       path: '/manage/system',
     },
     {
       icon: 'bi-pc-horizontal',
-      title: 'Node',
+      label: 'Node',
       path: '/manage/group-node',
     },
     {
       icon: 'bi-camera-video',
-      title: 'Camera',
+      label: 'Camera',
       path: '/manage/group-camera',
     },
     {
       icon: 'bi-list-check',
-      title: 'Quy tắc',
+      label: 'Quy tắc',
       path: '/manage/rule',
     },
     {
       icon: 'bi-car-front-fill',
-      title: 'Biển số xe',
+      label: 'Biển số xe',
       path: '/manage/vehicle-list',
     },
     {
       icon: 'bi-plugin',
-      title: 'Tích hợp',
+      label: 'Tích hợp',
     },
   ];
 
@@ -56,26 +56,51 @@ export class ManageComponent implements OnInit {
       (e) => e.path && currentUrl.startsWith(e.path)
     );
     if (menuItem) {
-      menuItem.selected = true;
+      menuItem.isSelected = true;
     }
 
     this.store
       .pipe(select('sidebar'), select('selectedMenuItem'))
-      .subscribe((item) => {
-        
+      .subscribe((selectedSideMenuItem: MenuItem) => {
+        const selectedMenuLevel2Item = this.menuLevel2.find(
+          (item) => item.isSelected
+        );
+
+        if (selectedMenuLevel2Item?.label === 'Node') {
+          switch (selectedSideMenuItem?.level) {
+            case 'node_operator':
+              this.router.navigateByUrl(
+                `/manage/group-node/${selectedSideMenuItem.id}/node`
+              );
+              break;
+            case 'node':
+              this.router.navigateByUrl(
+                `manage/node/${selectedSideMenuItem.id}/camera`
+              );
+              break;
+            case 'device':
+              this.router.navigateByUrl(
+                `manage/camera/${selectedSideMenuItem.id}/info`
+              );
+              break;
+            default:
+              this.router.navigateByUrl('/manage/group-node');
+              break;
+          }
+        } else if (selectedMenuLevel2Item?.label === 'Camera') {
+          //TODO: Change the side menu mode to 'LOGIC'
+          this.router.navigateByUrl('/manage/group-camera');
+        }
       });
   }
 
   onMenuLevel2ItemClick(item: MenuItem) {
-    let selectedItem = this.menuLevel2.find((item) => item.selected);
+    const selectedItem = this.menuLevel2.find((item) => item.isSelected);
     if (selectedItem) {
-      selectedItem.selected = false;
+      selectedItem.isSelected = false;
     }
 
-    item.selected = true;
-    if (item.onclick) {
-      item.onclick();
-    }
+    item.isSelected = true;
 
     if (item.path) {
       this.router.navigateByUrl(item.path);

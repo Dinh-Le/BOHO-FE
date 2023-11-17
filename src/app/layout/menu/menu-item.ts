@@ -1,8 +1,9 @@
 export interface MenuItem {
-  id: string;
+  id?: string;
   label: string;
-  level: string;
-  onclick: (item: MenuItem) => void;
+  level?: string;
+  onclick?: (item: MenuItem) => void;
+  path?: string;
   icon?: string;
   data?: any;
   children?: MenuItem[];

@@ -1,5 +1,5 @@
 <div class="menu-item-label" [ngClass]="{'active': item.isSelected, 'pe-none': item.isSelected}">
-  <a (click)="item.onclick(item)">
+  <a (click)="item.onclick && item.onclick(item)">
     <i
       class="bi cursor-pointer"
       [ngClass]="isExpanded ? 'bi-chevron-down' : 'bi-chevron-right'"
