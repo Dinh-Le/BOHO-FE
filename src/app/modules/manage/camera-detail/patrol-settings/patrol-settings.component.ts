@@ -1,19 +1,20 @@
 import { Component } from '@angular/core';
 import { SelectItemModel } from '@shared/models/select-item-model';
+import { ListViewItem } from '../list-view/list-view-item';
 
 @Component({
   selector: 'app-patrol-settings',
   templateUrl: 'patrol-settings.component.html',
+  styleUrls: ['../../shared/my-input.scss']
 })
 export class PatrolSettingsComponent {
-  patrolList: SelectItemModel[] = [];
+  patrols: ListViewItem[] = [];
   presetList: SelectItemModel[] = [];
 
   ngOnInit(): void {
-    this.patrolList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((e) => ({
-      value: e,
+    this.patrols = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((e) => ({
+      id: e.toString(),
       label: `Patrol ${e}`,
-      selected: false,
     }));
     this.presetList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((e) => ({
       value: e,
@@ -30,8 +31,8 @@ export class PatrolSettingsComponent {
 
   play() {}
 
-  remove(item: SelectItemModel) {
-    this.patrolList = this.patrolList.filter((e) => e.value !== item.value);
+  remove(item: ListViewItem) {
+    this.patrols = this.patrols.filter((e) => e.id !== item.id);
   }
 
   removePreset(item: SelectItemModel) {

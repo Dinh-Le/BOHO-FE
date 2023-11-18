@@ -1,0 +1,35 @@
+<div class="listview-header px-2 fs-16">{{ title }}</div>
+<ul class="listview-body">
+  <li
+    *ngFor="let item of items; trackBy: trackById"
+    (click)="onItemClick(item)"
+    [ngClass]="{ active: item.isSelected }"
+    class="listview-item"
+  >
+    <input
+      [(ngModel)]="item.label"
+      class="inline-input ms-2"
+      *ngIf="item.isEditable; else span"
+    />
+    <ng-template #span>
+      <span class="ps-2">{{ item.label }}</span>
+    </ng-template>
+    <div class="d-flex align-items-center">
+      <i
+        class="bi bi-save px-3"
+        *ngIf="item.isSelected && item.isEditable"
+        (click)="onSaveClick(item)"
+      ></i>
+      <i
+        class="bi bi-pencil-square px-3"
+        *ngIf="item.isSelected && !item.isEditable"
+        (click)="$event.stopPropagation(); item.isEditable = true"
+      ></i>
+      <i
+        class="bi bi-trash-fill pe-2"
+        *ngIf="item.isSelected"
+        (click)="onRemoveClick(item)"
+      ></i>
+    </div>
+  </li>
+</ul>

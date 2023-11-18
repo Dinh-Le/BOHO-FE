@@ -27,6 +27,7 @@ import { GroupCameraComponent } from './group-camera/group-camera.component';
 import { VehicleListComponent } from './vehical-list/vehicle-list.component';
 import { VehicleListDetailComponent } from './vehicle-list-detail/vehicle-list-detail.component';
 import { TimeInputComponent } from './camera-detail/tour-settings/time-input/time-input.component';
+import { ListViewComponent } from './camera-detail/list-view/list-view.component';
 
 @NgModule({
   declarations: [
@@ -49,6 +50,7 @@ import { TimeInputComponent } from './camera-detail/tour-settings/time-input/tim
     VehicleListComponent,
     VehicleListDetailComponent,
     TimeInputComponent,
+    ListViewComponent,
   ],
   imports: [
     CommonModule,
