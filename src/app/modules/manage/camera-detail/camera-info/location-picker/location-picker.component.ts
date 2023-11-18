@@ -21,10 +21,10 @@ export class LocationPickerComponent {
     draggable: true
   });
 
-  set latLng({ lat, lng }: { lat: number; lng: number }) {
+  set latLng({ lat, lng }: { lat: number; lng: number }) {    
     this.marker.setLatLng({ lat, lng });
     if (this.map) {
-      this.map.setView({ lat, lng });
+      this.map.panTo(this.marker.getLatLng());
     }
   }
 
@@ -47,7 +47,8 @@ export class LocationPickerComponent {
 
   onMapReady($event: any) {
     this.map = $event as Leaflet.Map;
-    this.marker.addTo(this.map);
+    this.marker.addTo(this.map);    
+    this.map.panTo(this.marker.getLatLng());    
   }
 
   mapClicked($event: any) {

@@ -18,7 +18,7 @@ interface CameraInfo {
 @Component({
   selector: 'app-camera-info',
   templateUrl: 'camera-info.component.html',
-  styleUrls: ['camera-info.component.scss'],
+  styleUrls: ['camera-info.component.scss', '../../shared/my-input.scss'],
 })
 export class CameraInfoComponent implements OnInit {
   modalService = inject(NgbModal);
@@ -60,7 +60,8 @@ export class CameraInfoComponent implements OnInit {
 
   async changeAddress() {
     const modal = this.modalService.open(LocationPickerComponent, {
-      size: 'lg',
+      size: 'xl',
+      centered: true,
     });
     modal.componentInstance.latLng = {
       lat: this.device!.location.lat,
@@ -73,6 +74,7 @@ export class CameraInfoComponent implements OnInit {
         lat,
         long: lng,
       };
+      this.data.address = this.geodecode(this.device?.location);
       this.deviceService
         .update('0', this.device!.node_id!, this.device!)
         .subscribe((response) => {

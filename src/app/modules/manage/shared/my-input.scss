@@ -16,18 +16,18 @@
 }
 
 .my-button {
-  color: white;
-  width: 120px;
+  color: #FFFFFF;
+  width: 80px;
   border-width: 1px;
   border-radius: 4px;
   border-style: solid;
-  border-color: var(--bs-blue);
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
+  border-color: #31538F;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
 .my-button.submit {
-  background: var(--bs-primary);
+  background: #5285B6;
 }
 
 .my-button.submit[disabled] {
