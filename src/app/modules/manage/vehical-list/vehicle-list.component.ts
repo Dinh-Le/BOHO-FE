@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { NgbModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { AddVehicleListComponent } from './add-vehicle-list/add-vehicle-list.component';
 import { v4 } from 'uuid';
+import { Router } from '@angular/router';
 
 interface RowItemModel {
   id: string;
@@ -17,6 +18,7 @@ interface RowItemModel {
 })
 export class VehicleListComponent {
   modelService: NgbModal = inject(NgbModal);
+  _router = inject(Router);
 
   title: string = 'Danh sách biển số xe';
   data: RowItemModel[] = [];
@@ -29,6 +31,7 @@ export class VehicleListComponent {
     this.modelService
       .open(AddVehicleListComponent, {
         size: 'lg',
+        centered: true
       })
       .closed.subscribe(({ data }) => {
         this.data.push(
@@ -37,6 +40,11 @@ export class VehicleListComponent {
           })
         );
       });
+  }
+
+  view(item: RowItemModel) {
+    console.log('View detail: ', item);
+    this._router.navigateByUrl('/manage/vehicle-list-detail');
   }
 
   remove(item: RowItemModel) {

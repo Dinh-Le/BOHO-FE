@@ -12,12 +12,14 @@
       <col width="30" />
       <col width="400" />
       <col width="150" />
+      <col width="150" />
       <col width="auto" />
     </colgroup>
     <thead>
       <th></th>
-      <th>Tên nhóm camera<i class="bi bi-sort-alpha-down"></i></th>
-      <th>Số lượng camera<i class="bi bi-sort-alpha-down"></i></th>
+      <th>Các danh sách<i class="bi bi-sort-alpha-down"></i></th>
+      <th>Loại<i class="bi bi-sort-alpha-down"></i></th>
+      <th>Số lượng biển<i class="bi bi-sort-alpha-down"></i></th>
       <th></th>
     </thead>
     <tbody>
@@ -26,6 +28,7 @@
         <td>
           {{ item.name }}
         </td>
+        <td>{{ item.type }}</td>
         <td>{{ item.vehicleCount }}</td>
         <td>
           <div
@@ -37,7 +40,7 @@
               ><i class="bi bi-three-dots"></i
             ></a>
             <ul class="table-row-popup-menu" ngbDropdownMenu>
-              <li><i class="bi bi-pencil-square"></i> Xem danh sách</li>
+              <li (click)="view(item)"><i class="bi bi-pencil-square"></i> Xem danh sách</li>
               <li><i class="bi bi-camera-video"></i> Nạp lại danh sách</li>
               <li (click)="remove(item)">
                 <i class="bi bi-trash"></i> Xóa nhóm
@@ -49,28 +52,3 @@
     </tbody>
   </table>
 </div>
-<ng-template #addRowModel let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">Thêm nhóm nút</h4>
-    <button
-      type="button"
-      class="btn-close"
-      aria-label="Close"
-      (click)="modal.dismiss('Cross click')"
-    ></button>
-  </div>
-  <div class="modal-body">
-    <div class="form-group">
-      <input class="form-input" />
-    </div>
-  </div>
-  <div class="modal-footer">
-    <button
-      type="button"
-      class="btn btn-outline-dark"
-      (click)="modal.close('Save click')"
-    >
-      Save
-    </button>
-  </div>
-</ng-template>

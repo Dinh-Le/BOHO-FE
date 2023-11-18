@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 
 interface RowItemModel {
   name: string;
@@ -12,6 +13,8 @@ interface RowItemModel {
   styleUrls: ['../shared/table.scss'],
 })
 export class VehicleListDetailComponent {
+  _router = inject(Router);
+
   title: string = 'Xe mất cắp';
   data: RowItemModel[] = [
     {
@@ -30,4 +33,8 @@ export class VehicleListDetailComponent {
       expiresDate: new Date(),
     },
   ];
+
+  back() {
+    this._router.navigateByUrl('/manage/vehicle-list');
+  }
 }

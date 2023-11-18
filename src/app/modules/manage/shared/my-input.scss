@@ -5,10 +5,13 @@
   background: white;
   color: black;
   border-radius: 4px;
+  padding: 0.25rem;
+  outline: none;
 }
 
 .my-input:focus {
-  outline: none;
+  box-shadow: none;
+  -webkit-box-shadow: none;
 }
 
 .my-input:invalid {
