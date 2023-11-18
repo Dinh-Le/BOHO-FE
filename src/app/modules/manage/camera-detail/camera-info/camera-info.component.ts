@@ -6,6 +6,7 @@ import { ToastService } from '@app/services/toast.service';
 import { LocationPickerComponent } from './location-picker/location-picker.component';
 import { Device } from 'src/app/data/schema/boho-v2/device';
 import { LatLng } from 'src/app/data/schema/boho-v2/latlng';
+import { Observable, of, switchMap } from 'rxjs';
 
 interface CameraInfo {
   name: string;
@@ -22,7 +23,7 @@ interface CameraInfo {
 })
 export class CameraInfoComponent implements OnInit {
   modalService = inject(NgbModal);
-  id: string;
+  id$: Observable<any> | undefined;
   device: Device | undefined;
   data: CameraInfo = {
     name: '',
@@ -37,25 +38,28 @@ export class CameraInfoComponent implements OnInit {
     private deviceService: DeviceService,
     private toastService: ToastService
   ) {
-    this.id = activatedRoute.parent?.snapshot.params['cameraId'];
+    this.id$ = activatedRoute.parent?.params.pipe(switchMap(({cameraId}) => of(cameraId)));
   }
 
   ngOnInit(): void {
-    this.deviceService.find('0', '0', this.id).subscribe((response) => {
-      if (!response.success) {
-        this.toastService.showError('Fetch camera data failed.');
-        return;
-      }
-
-      this.device = response.data;
-      this.data = {
-        name: response.data.name,
-        address: this.geodecode(response.data.location),
-        driverName: response.data.camera.driver,
-        typeName: response.data.camera.type,
-        rtspUrl: response.data.camera.connection_metadata.rtsp?.rtsp_url || '',
-      };
-    });
+    this.id$?.subscribe((id) => {
+      this.deviceService.find('0', '0', id).subscribe((response) => {
+        if (!response.success) {
+          this.toastService.showError('Fetch camera data failed.');
+          return;
+        }
+  
+        this.device = response.data;
+        this.data = {
+          name: response.data.name,
+          address: this.geodecode(response.data.location),
+          driverName: response.data.camera.driver,
+          typeName: response.data.camera.type,
+          rtspUrl: response.data.camera.connection_metadata.rtsp?.rtsp_url || '',
+        };
+      });
+    })
+    
   }
 
   async changeAddress() {

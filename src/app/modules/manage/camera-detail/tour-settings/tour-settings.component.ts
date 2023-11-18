@@ -34,12 +34,20 @@ export class TourSettingsComponent implements OnInit {
       label: 'Xanh lá',
     },
     {
-      value: 'red',
-      label: 'Đỏ',
+      value: 'magenta',
+      label: 'Cánh xen',
     },
     {
       value: 'cyan',
       label: 'Xanh lơ',
+    },
+    {
+      value: 'purple',
+      label: 'Tím',
+    },
+    {
+      value: 'orange',
+      label: 'Cam',
     },
   ];
   daysInWeek: SelectItemModel[] = [
