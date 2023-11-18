@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {
   ColumnConfig,
   ExpandableTableRowData,
 } from '../expandable-table/expandable-table.component';
 import { v4 } from 'uuid';
-import { faL } from '@fortawesome/free-solid-svg-icons';
+import { ActivatedRoute } from '@angular/router';
 
 interface RowItemModel extends ExpandableTableRowData {
   id: string;
@@ -19,9 +19,11 @@ interface RowItemModel extends ExpandableTableRowData {
 @Component({
   selector: 'app-schedule',
   templateUrl: 'schedule.component.html',
-  styleUrls: ['schedule.component.scss', '../shared/my-input.scss'],
+  styleUrls: ['../shared/my-input.scss'],
 })
 export class ScheduleComponent implements OnInit {
+  _activatedRoute = inject(ActivatedRoute);
+  _cameraId: string | undefined;
   daysInWeek: string[] = ['H', 'B', 'T', 'N', 'S', 'B', 'C'];
   data: RowItemModel[] = [];
   columns: ColumnConfig[] = [
@@ -31,7 +33,11 @@ export class ScheduleComponent implements OnInit {
     },
   ];
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this._activatedRoute.parent?.params.subscribe(({cameraId}) => {
+      this._cameraId = cameraId;
+    });
+  }
 
   add() {
     this.data.push({
@@ -53,5 +59,9 @@ export class ScheduleComponent implements OnInit {
 
   remove(item: RowItemModel) {
     this.data = this.data.filter((e) => e.id !== item.id);
+  }
+
+  get ruleUrl() {
+    return `/manage/device-rule/${this._cameraId}/rule`;
   }
 }

@@ -1,17 +1,55 @@
-import { AfterViewInit, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  OnInit,
+  TemplateRef,
+  ViewChild,
+  inject,
+} from '@angular/core';
 import { MenuItem } from '../menu-item';
-import { RuleItem, mockRules } from './rule-item';
 import { ColumnConfig } from '../expandable-table/expandable-table.component';
 import { SelectItemModel } from '@shared/models/select-item-model';
+import { ActivatedRoute, Router } from '@angular/router';
+import { v4 } from 'uuid';
+
+export interface RowData {
+  id: string;
+  name: string;
+  status?: boolean;
+  type?: SelectItemModel;
+  objects?: SelectItemModel[];
+  tour?: {
+    id: string;
+    name: string;
+  };
+  tenTichHop?: string;
+  diemGiamSat?: {
+    id: string;
+    name: string;
+  };
+  thoiGianVuot?: number;
+  severity?: {
+    id: string;
+    name: string;
+  };
+  schedule?: {
+    id: string;
+    name: string;
+  };
+  isExpanded?: boolean;
+  isEditable?: boolean;
+}
 
 @Component({
   selector: 'app-rule',
   templateUrl: './rule.component.html',
-  styleUrls: ['./rule.component.scss'],
+  styleUrls: ['./rule.component.scss', '../shared/my-input.scss'],
 })
 export class RuleComponent implements OnInit, AfterViewInit {
   @ViewChild('objectColumnTemplate', { static: true })
   objectColumnTemplate!: TemplateRef<any>;
+  _activatedRoute = inject(ActivatedRoute);
+  _cameraId: string|undefined;
 
   menuItems: MenuItem[] = [
     {
@@ -20,7 +58,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
       onclick: this.add.bind(this),
     },
   ];
-  rules: RuleItem[] = [];
+  data: RowData[] = [];
   presets: SelectItemModel[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((e) => ({
     value: e,
     label: `Điểm giám sát ${e}`,
@@ -86,7 +124,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
   severities: SelectItemModel[] = [
     {
       value: 1,
-      label: 'Thấp'
+      label: 'Thấp',
     },
     {
       value: 2,
@@ -94,13 +132,13 @@ export class RuleComponent implements OnInit, AfterViewInit {
     },
     {
       value: 3,
-      label: 'Cao'
-    }
+      label: 'Cao',
+    },
   ];
-  schedules: SelectItemModel[] = [1, 2, 3, 4].map(e => ({
+  schedules: SelectItemModel[] = [1, 2, 3, 4].map((e) => ({
     value: e,
-    label: 'Lịch trình ' + e
-  }))
+    label: 'Lịch trình ' + e,
+  }));
   columns: ColumnConfig[] = [
     {
       label: 'Tên quy tắc',
@@ -130,9 +168,9 @@ export class RuleComponent implements OnInit, AfterViewInit {
   ];
 
   ngOnInit(): void {
-    this.rules = mockRules.map((e) => ({ ...e }));
-    this.rules[0].isExpanded = true;
-    this.rules[0].isEditable = true;
+    this._activatedRoute.parent?.params.subscribe(({cameraId}) => {
+      this._cameraId = cameraId;
+    });
   }
 
   ngAfterViewInit(): void {
@@ -156,7 +194,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
         label: 'Loại đối tượng',
         prop: 'objects',
         sortable: true,
-        contentTemplateRef: this.objectColumnTemplate
+        contentTemplateRef: this.objectColumnTemplate,
       },
       {
         label: 'Lịch trình',
@@ -166,5 +204,22 @@ export class RuleComponent implements OnInit, AfterViewInit {
     ];
   }
 
-  add() {}
+  add() {
+    const newRule: RowData = {
+      id: v4(),
+      name:  '',
+      status: true,
+      isEditable: true,
+      isExpanded: true
+    }
+    this.data.push(newRule);
+  }
+
+  remove(item: RowData) {
+    this.data = this.data.filter(e => e.id !== item.id);
+  }
+
+  get scheduleUrl() {
+    return `/manage/device-rule/${this._cameraId}/schedule`;
+  }
 }

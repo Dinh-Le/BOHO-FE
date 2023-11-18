@@ -71,16 +71,30 @@ import { VehicleListDetailComponent } from './vehicle-list-detail/vehicle-list-d
             ],
           },
           {
+            path: 'device-rule/:cameraId',
+            children: [
+              {
+                path: '',
+                pathMatch: 'full',
+                redirectTo: 'rule'
+              },
+              {
+                path: 'rule',
+                component: RuleComponent,
+              },
+              {
+                path: 'schedule',
+                component: ScheduleComponent,
+              }
+            ]
+          },
+          {
             path: 'vehicle-list',
             component: VehicleListComponent,
           },
           {
             path: 'vehicle-list-detail',
             component: VehicleListDetailComponent,
-          },
-          {
-            path: 'rule',
-            component: RuleComponent,
           },
           {
             path: 'schedule',

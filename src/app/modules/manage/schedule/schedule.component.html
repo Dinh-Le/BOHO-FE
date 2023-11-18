@@ -1,9 +1,7 @@
-<div
-  class="menu-container d-flex justify-content-between aligns-item-center px-2"
->
+<div class="menu-container d-flex justify-content-between align-items-center px-2">
   <ul>
-    <li><i class="bi bi-list-check"></i>Quy tắc</li>
-    <li class="active"><i class="bi bi-clock"></i>Lịch trình</li>
+    <li class="mx-2"><a class="text-decoration-none" [routerLink]="ruleUrl"><i class="bi bi-list-check"></i>Quy tắc</a></li>
+    <li class="mx-2 active"><i class="bi bi-clock"></i>Lịch trình</li>
   </ul>
   <a class="btn btn-primary px-2 text-white" (click)="add()">
     <i class="bi bi-plus"></i> Thêm</a

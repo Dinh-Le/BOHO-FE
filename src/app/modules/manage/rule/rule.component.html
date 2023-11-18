@@ -1,9 +1,23 @@
-<app-menu-bar [items]="menuItems"></app-menu-bar>
+<div
+  class="menu-container d-flex justify-content-between align-items-center px-2"
+>
+  <ul>
+    <li class="mx-2 active"><i class="bi bi-list-check"></i>Quy tắc</li>
+    <li class="mx-2">
+      <a class="text-decoration-none" [routerLink]="scheduleUrl"
+        ><i class="bi bi-clock"></i>Lịch trình</a
+      >
+    </li>
+  </ul>
+  <a class="btn btn-primary px-2 text-white" (click)="add()">
+    <i class="bi bi-plus"></i> Thêm</a
+  >
+</div>
 <div class="content-wrapper full-height">
   <app-expandable-table
     class="w-100"
     classNames="bg-black"
-    [data]="rules"
+    [data]="data"
     [columns]="columns"
     [collapseContentTemplateRef]="contentTemplate"
   ></app-expandable-table>
@@ -62,14 +76,11 @@
             >
           </div>
           <div class="col-8">
-            <select
+            <app-select-2
               [id]="data.id + '__diem-giam-sat'"
-              class="form-select bg-transparent border-light form-select-sm"
-            >
-              <option *ngFor="let item of presets" [ngValue]="item">
-                {{ item.label }}
-              </option>
-            </select>
+              [items]="presets"
+              [(ngModel)]="data.diemGiamSat"
+            ></app-select-2>
           </div>
         </div>
         <div class="form-group row mt-2">
@@ -143,7 +154,9 @@
             >
           </div>
           <div class="col-8">
-            <div class="input-group input-group-sm border-light">
+            <div
+              class="input-group input-group-sm border rounded-1 border-light"
+            >
               <input
                 type="number"
                 [id]="data.id + '__thoi-gian-vuot'"
@@ -163,15 +176,11 @@
             >
           </div>
           <div class="col-8">
-            <select
+            <app-select-2
               [id]="data.id + '__severity'"
-              class="form-select form-select-sm bg-transparent border-light text-white"
+              [items]="severities"
               [(ngModel)]="data.severity"
-            >
-              <option *ngFor="let item of severities" [ngValue]="item">
-                {{ item.label }}
-              </option>
-            </select>
+            ></app-select-2>
           </div>
         </div>
         <div class="form-group row mt-2">
@@ -181,15 +190,11 @@
             >
           </div>
           <div class="col-8">
-            <select
+            <app-select-2
               [id]="data.id + '__lich-trinh'"
-              class="form-select form-select-sm bg-transparent border-light text-white"
+              [items]="schedules"
               [(ngModel)]="data.schedule"
-            >
-              <option *ngFor="let item of schedules" [ngValue]="item">
-                {{ item.label }}
-              </option>
-            </select>
+            ></app-select-2>
           </div>
         </div>
         <div class="form-group row mt-2">
@@ -207,15 +212,13 @@
         </div>
         <div class="form-group d-flex justify-content-end mt-2">
           <button
-            class="btn btn-secondary mx-1 text-white"
-            style="width: 60px"
+            class="my-button cancel mx-1"
             (click)="data.isEditable = false"
           >
             Hủy
           </button>
           <button
-            class="btn btn-primary mx-1 text-white"
-            style="width: 60px"
+            class="my-button submit mx-1"
             (click)="data.isEditable = false"
           >
             Lưu
@@ -241,14 +244,16 @@
           <div class="col-4">
             <span class="fs-14">Tên tích hợp:</span>
           </div>
-          <div class="col-8"></div>
+          <div class="col-8">
+            <span class="fs-14">{{ data.tenTichHop }}</span>
+          </div>
         </div>
         <div class="form-group row mt-2">
           <div class="col-4">
             <span class="fs-14">Điểm giám sát:</span>
           </div>
           <div class="col-8">
-            <span class="fs-14">{{ data.diemGiamSat.name }}</span>
+            <span class="fs-14">{{ data.diemGiamSat?.label }}</span>
           </div>
         </div>
         <div class="form-group row mt-2">
@@ -256,15 +261,24 @@
             <span class="fs-14">Loại quy tắc:</span>
           </div>
           <div class="col-8">
-            <span class="fs-14">{{ data.type?.name }}</span>
+            <span class="fs-14">{{ data.type?.label }}</span>
           </div>
         </div>
         <div class="form-group row mt-2">
           <div class="col-4">
             <span class="fs-14">Loại đối tượng:</span>
           </div>
-          <div class="col-8 d-flex">
-            <i *ngFor="let object of data.objects" [ngClass]="object.icon"></i>
+          <div class="col-8">
+            <ng-container *ngFor="let item of data.objects || []">
+              <i
+                *ngIf="item.icon.startsWith('bi'); else faIconTemplate"
+                class="mx-1"
+                [ngClass]="item.icon"
+              ></i>
+              <ng-template #faIconTemplate>
+                <fa-icon [icon]="item.icon.split(',')" class="mx-1"></fa-icon>
+              </ng-template>
+            </ng-container>
           </div>
         </div>
         <div class="form-group row mt-2">
@@ -280,7 +294,7 @@
             <span class="fs-14">Mức độ nghiêm trọng:</span>
           </div>
           <div class="col-8">
-            <span class="fs-14">{{ data.severity.name }}</span>
+            <span class="fs-14">{{ data.severity?.label }}</span>
           </div>
         </div>
         <div class="form-group row mt-2">
@@ -288,22 +302,23 @@
             <span class="fs-14">Lịch trình:</span>
           </div>
           <div class="col-8">
-            <span class="fs-14">{{ data.schedule.name }}</span>
+            <span class="fs-14">{{ data.schedule?.label }}</span>
           </div>
         </div>
         <div class="form-group row mt-2">
           <div class="col-4">
             <span class="fs-14">Tác động PTZ:</span>
           </div>
-          <div class="col-8"></div>
+          <div class="col-8">
+            <span class="fs-14">{{ data.tacDongPtz }}</span>
+          </div>
         </div>
         <div class="form-group d-flex justify-content-end">
-          <button class="btn btn-primary mx-1 text-white" style="width: 60px">
+          <button class="my-button cancel mx-1" (click)="remove(data)">
             Xóa
           </button>
           <button
-            class="btn btn-primary mx-1 text-white"
-            style="width: 60px"
+            class="my-button submit mx-1"
             (click)="data.isEditable = true"
           >
             Chỉnh
@@ -328,7 +343,7 @@
       [ngClass]="item.icon"
     ></i>
     <ng-template #faIconTemplate>
-      <fa-icon [icon]="item.icon.split(',')"></fa-icon>
+      <fa-icon [icon]="item.icon.split(',')" class="mx-1"></fa-icon>
     </ng-template>
   </ng-container>
 </ng-template>

@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
 import { MenuItem } from 'src/app/layout/menu/menu-item';
 import { SidebarState } from 'src/app/state/sidebar.state';
@@ -37,7 +37,6 @@ export class ManageComponent implements OnInit {
     {
       icon: 'bi-list-check',
       label: 'Quy tắc',
-      path: '/manage/rule',
     },
     {
       icon: 'bi-car-front-fill',
@@ -50,18 +49,25 @@ export class ManageComponent implements OnInit {
     },
   ];
 
+  _selectedSideMenuItem: MenuItem | undefined;
+
   ngOnInit(): void {
-    const currentUrl = this.router.url;
-    const menuItem = this.menuLevel2.find(
-      (e) => e.path && currentUrl.startsWith(e.path)
-    );
-    if (menuItem) {
-      menuItem.isSelected = true;
-    }
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        const menuItem = this.menuLevel2.find(
+          (e) => e.path && this.router.url.startsWith(e.path)
+        );
+        if (menuItem) {
+          menuItem.isSelected = true;
+        }
+      }
+    });
 
     this.store
       .pipe(select('sidebar'), select('selectedMenuItem'))
       .subscribe((selectedSideMenuItem: MenuItem) => {
+        this._selectedSideMenuItem = selectedSideMenuItem;
+
         const selectedMenuLevel2Item = this.menuLevel2.find(
           (item) => item.isSelected
         );
@@ -90,6 +96,12 @@ export class ManageComponent implements OnInit {
         } else if (selectedMenuLevel2Item?.label === 'Camera') {
           //TODO: Change the side menu mode to 'LOGIC'
           this.router.navigateByUrl('/manage/group-camera');
+        } else if (selectedMenuLevel2Item?.label === 'Quy tắc') {
+          if (selectedSideMenuItem.level === 'device') {
+            this.router.navigateByUrl(
+              `manage/camera/${selectedSideMenuItem.id}/rule`
+            );
+          }
         }
       });
   }
@@ -104,6 +116,15 @@ export class ManageComponent implements OnInit {
 
     if (item.path) {
       this.router.navigateByUrl(item.path);
+    }
+
+    if (
+      item.label === 'Quy tắc' &&
+      this._selectedSideMenuItem?.level === 'device'
+    ) {
+      this.router.navigateByUrl(
+        `manage/device-rule/${this._selectedSideMenuItem.id}/rule`
+      );
     }
   }
 }

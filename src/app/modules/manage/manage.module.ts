@@ -16,7 +16,6 @@ import { PatrolSettingsComponent } from './camera-detail/patrol-settings/patrol-
 import { TourSettingsComponent } from './camera-detail/tour-settings/tour-settings.component';
 import { ScheduleComponent } from './schedule/schedule.component';
 import { TimeSelectComponent } from './time-select/time-select.component';
-import { MenuBarComponent } from './menu-bar/menu-bar.component';
 import { ExpandableTableComponent } from './expandable-table/expandable-table.component';
 import { SystemComponent } from './system/system.component';
 import { GroupNodeComponent } from './group-node/group-node.component';
@@ -40,7 +39,6 @@ import { ListViewComponent } from './camera-detail/list-view/list-view.component
     TourSettingsComponent,
     ScheduleComponent,
     TimeSelectComponent,
-    MenuBarComponent,
     ExpandableTableComponent,
     SystemComponent,
     GroupNodeComponent,
