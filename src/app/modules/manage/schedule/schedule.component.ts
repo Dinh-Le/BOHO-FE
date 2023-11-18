@@ -5,15 +5,13 @@ import {
 } from '../expandable-table/expandable-table.component';
 import { v4 } from 'uuid';
 import { ActivatedRoute } from '@angular/router';
+import { RowData } from '../rule/rule.component';
 
 interface RowItemModel extends ExpandableTableRowData {
   id: string;
   name: string;
-  formData: {
-    editable: boolean;
-    name: string;
-    scheduleData: boolean[][];
-  };
+  scheduleData: boolean[][];
+  isEditable?: boolean;
 }
 
 @Component({
@@ -44,17 +42,21 @@ export class ScheduleComponent implements OnInit {
       id: v4(),
       name: '',
       isExpanded: true,
-      formData: {
-        editable: true,
-        name: '',
-        scheduleData: this.daysInWeek.map((e) => Array(24).fill(false)),
-      },
+      isEditable: true,
+      scheduleData: this.daysInWeek.map((e) => Array(48).fill(true)),
     });
   }
 
+  toggle(item: RowItemModel, i: number, j: number) {
+    if (!item.isEditable) {
+      return;
+    }
+
+    item.scheduleData[i][j] = !item.scheduleData[i][j];
+  }
+
   save(item: RowItemModel) {
-    item.formData.editable = false;
-    item.name = item.formData.name;
+    item.isEditable = false;
   }
 
   remove(item: RowItemModel) {

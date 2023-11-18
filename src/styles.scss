@@ -87,3 +87,7 @@
 .inline-input:focus {
   outline: none;
 }
+
+.inline-input:disabled {
+  border: none;
+}
