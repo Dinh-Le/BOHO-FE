@@ -97,8 +97,9 @@ export class SidebarComponent implements OnInit {
       onclick: this.onMenuItemClick.bind(this),
       icon: 'bi bi-user',
       children: [],
-    }
+    },
   ];
+  selectedMenuItem: MenuItem | undefined;
 
   ngOnInit(): void {
     this.nodeOperatorService
@@ -195,6 +196,7 @@ export class SidebarComponent implements OnInit {
 
   onMenuItemClick(item: MenuItem) {
     console.log('Select: ', item.label);
+    this.selectedMenuItem = item;
     this.store.dispatch(SidebarActions.selectMenuItem({ item: item }));
   }
 }

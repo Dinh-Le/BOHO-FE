@@ -1,4 +1,4 @@
-<div class="menu-item-label" [ngClass]="{'active': item.isSelected, 'pe-none': item.isSelected}">
+<div class="menu-item-label" [ngClass]="{'active': isSelected, 'pe-none': isSelected}">
   <a (click)="item.onclick && item.onclick(item)">
     <i
       class="bi cursor-pointer"
@@ -14,5 +14,6 @@
 <app-menu
   [ngClass]="{ 'd-none': !isExpanded }"
   [menuItems]="item.children!"
+  [value]="value"
   *ngIf="hasChild"
 ></app-menu>

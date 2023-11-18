@@ -48,7 +48,7 @@ import { ListViewComponent } from './camera-detail/list-view/list-view.component
     VehicleListComponent,
     VehicleListDetailComponent,
     TimeInputComponent,
-    ListViewComponent,
+    ListViewComponent
   ],
   imports: [
     CommonModule,

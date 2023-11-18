@@ -37,6 +37,7 @@ export class ManageComponent implements OnInit {
     {
       icon: 'bi-list-check',
       label: 'Quy tắc',
+      path: '/manage/device-rule',
     },
     {
       icon: 'bi-car-front-fill',
@@ -99,7 +100,7 @@ export class ManageComponent implements OnInit {
         } else if (selectedMenuLevel2Item?.label === 'Quy tắc') {
           if (selectedSideMenuItem.level === 'device') {
             this.router.navigateByUrl(
-              `manage/camera/${selectedSideMenuItem.id}/rule`
+              `manage/device-rule/${selectedSideMenuItem.id}/rule`
             );
           }
         }
@@ -118,13 +119,14 @@ export class ManageComponent implements OnInit {
       this.router.navigateByUrl(item.path);
     }
 
-    if (
-      item.label === 'Quy tắc' &&
-      this._selectedSideMenuItem?.level === 'device'
-    ) {
-      this.router.navigateByUrl(
-        `manage/device-rule/${this._selectedSideMenuItem.id}/rule`
-      );
+    if (item.label === 'Quy tắc') {
+      if (this._selectedSideMenuItem?.level === 'device') {
+        this.router.navigateByUrl(
+          `manage/device-rule/${this._selectedSideMenuItem.id}/rule`
+        );
+      } else {
+        this.router.navigateByUrl(`manage/device-rule`);
+      }
     }
   }
 }

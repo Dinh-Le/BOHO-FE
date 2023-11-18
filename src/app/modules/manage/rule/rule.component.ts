@@ -168,7 +168,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
   ];
 
   ngOnInit(): void {
-    this._activatedRoute.parent?.params.subscribe(({cameraId}) => {
+    this._activatedRoute.params.subscribe(({cameraId}) => {
       this._cameraId = cameraId;
     });
   }

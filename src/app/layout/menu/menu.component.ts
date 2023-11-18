@@ -9,4 +9,7 @@ import { MenuItem } from './menu-item';
 export class MenuComponent {
   @Input()
   menuItems!: MenuItem[];
+
+  @Input()
+  value: MenuItem | undefined;
 }

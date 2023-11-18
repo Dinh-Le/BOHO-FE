@@ -32,7 +32,7 @@ export class ScheduleComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this._activatedRoute.parent?.params.subscribe(({cameraId}) => {
+    this._activatedRoute.params.subscribe(({cameraId}) => {
       this._cameraId = cameraId;
     });
   }
