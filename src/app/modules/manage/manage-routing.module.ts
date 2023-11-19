@@ -15,6 +15,7 @@ import { CameraInfoComponent } from './camera-detail/camera-info/camera-info.com
 import { GroupCameraComponent } from './group-camera/group-camera.component';
 import { VehicleListComponent } from './vehical-list/vehicle-list.component';
 import { VehicleListDetailComponent } from './vehicle-list-detail/vehicle-list-detail.component';
+import { IntegrationComponent } from './integration/integration.component';
 
 @NgModule({
   imports: [
@@ -23,6 +24,10 @@ import { VehicleListDetailComponent } from './vehicle-list-detail/vehicle-list-d
         path: '',
         component: ManageComponent,
         children: [
+          {
+            path: 'integration',
+            component: IntegrationComponent
+          },
           {
             path: 'group-camera',
             component: GroupCameraComponent,

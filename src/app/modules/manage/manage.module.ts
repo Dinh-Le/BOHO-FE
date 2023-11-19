@@ -27,6 +27,7 @@ import { VehicleListComponent } from './vehical-list/vehicle-list.component';
 import { VehicleListDetailComponent } from './vehicle-list-detail/vehicle-list-detail.component';
 import { TimeInputComponent } from './camera-detail/tour-settings/time-input/time-input.component';
 import { ListViewComponent } from './camera-detail/list-view/list-view.component';
+import { IntegrationComponent } from './integration/integration.component';
 
 @NgModule({
   declarations: [
@@ -48,7 +49,8 @@ import { ListViewComponent } from './camera-detail/list-view/list-view.component
     VehicleListComponent,
     VehicleListDetailComponent,
     TimeInputComponent,
-    ListViewComponent
+    ListViewComponent,
+    IntegrationComponent
   ],
   imports: [
     CommonModule,

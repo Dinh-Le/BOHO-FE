@@ -48,3 +48,32 @@
 .my-button.remove {
   background: var(--bs-danger);
 }
+
+.my-input[type=checkbox] {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.my-input[type=checkbox]:checked::after {
+  content: '';
+  position: absolute;
+  display: inline-block;
+  border: solid black;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+  width: 8px;
+  height: 16px;
+}
+
+.my-input[type=checkbox]::before {
+  content: '';
+  position: absolute;
+  display:  inline-block;
+  width: 24px;
+  height: 24px;
+  background: white;
+  border-radius: 0.25rem;
+}

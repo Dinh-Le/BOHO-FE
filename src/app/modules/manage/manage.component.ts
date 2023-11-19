@@ -47,6 +47,7 @@ export class ManageComponent implements OnInit {
     {
       icon: 'bi-plugin',
       label: 'Tích hợp',
+      path: '/manage/integration'
     },
   ];
 

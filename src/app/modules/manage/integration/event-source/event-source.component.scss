@@ -1,0 +1,21 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+  
+  thead {
+    background-color: white;
+    
+    th {
+      color: black;
+    }
+  }
+
+  tr {
+    border-bottom: 2px solid black;
+
+    td {
+      color: white;
+      padding: 5px;
+    }
+  }
+}
