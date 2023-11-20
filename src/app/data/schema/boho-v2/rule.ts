@@ -1,10 +1,17 @@
-import { Preset } from './preset';
-
 export interface Rule {
-  rule_id: string;
-  snapshot: string;
-  tour_level?: number;
-  tour_group?: number;
-  preset?: Preset;
-  camera_id: string;
+  id: string;
+  name: string;
+  combine_name: string;
+  active: boolean;
+  post_action: any;
+  alarm_type: string;
+  points: number[][];
+  level: string;
+  alarm_metadata: {
+    loitering: {
+      time_stand: string;
+    };
+    sobatage: any;
+  };
+  objects: number[];
 }
