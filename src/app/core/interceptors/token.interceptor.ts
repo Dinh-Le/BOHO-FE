@@ -40,7 +40,7 @@ export class TokenInterceptor implements HttpInterceptor {
       // Bug: The get users API returns sucessfully, but the `success` field is false
       // Workaround: set the `success` field to true if the message field is `Successfully`
       map((event) => {
-        if (event instanceof HttpResponse && typeof event.body === 'object' && event.body.message === 'Successful') {
+        if (event instanceof HttpResponse && typeof event.body === 'object' && event.body.message.includes('uccessful')) {
           return event.clone({
             body: Object.assign({}, event.body, {
               success: true,

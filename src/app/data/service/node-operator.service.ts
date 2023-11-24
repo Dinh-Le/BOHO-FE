@@ -7,68 +7,55 @@ import { environment } from '@env';
 
 export abstract class NodeOperatorService extends RestfullApiService {
   public abstract create(
-    userId: string,
-    data: Omit<NodeOperator, 'id'>
-  ): Observable<ResponseBase>;
+    data: Pick<NodeOperator, 'name'>
+  ): Observable<ResponseBase & { data: string }>;
 
-  public abstract findAll(
-    userId: string
-  ): Observable<ResponseBase & { data: NodeOperator[] }>;
+  public abstract findAll(): Observable<
+    ResponseBase & { data: NodeOperator[] }
+  >;
 
   public abstract find(
-    userId: string,
-    nodeOperatorId: string
+    id: string
   ): Observable<ResponseBase & { data: NodeOperator }>;
 
-  public abstract update(
-    userId: string,
-    nodeOperator: NodeOperator & { node_id: string }
-  ): Observable<ResponseBase>;
+  public abstract update(data: NodeOperator): Observable<ResponseBase>;
 
-  public abstract delete(
-    userId: string,
-    nodeOperatorId: string
-  ): Observable<ResponseBase>;
+  public abstract delete(id: string): Observable<ResponseBase>;
 }
 
 @Injectable({ providedIn: 'root' })
 export class NodeOperatorServiceImpl extends NodeOperatorService {
-  public override create(
-    userId: string,
-    data: Omit<NodeOperator, 'id'>
-  ): Observable<ResponseBase> {
-    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node_operator`;
-    return this.httpClient.post<ResponseBase>(url, data);
+  public override create({
+    name,
+  }: Pick<NodeOperator, 'name'>): Observable<ResponseBase & { data: string }> {
+    const url = `${environment.baseUrl}/api/rest/v1/node_operator`;
+    return this.httpClient.post<ResponseBase & { data: string }>(url, {
+      name,
+      describle: '',
+    });
   }
 
-  public override findAll(
-    userId: string
-  ): Observable<ResponseBase & { data: NodeOperator[] }> {
-    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node_operator`;
+  public override findAll(): Observable<
+    ResponseBase & { data: NodeOperator[] }
+  > {
+    const url = `${environment.baseUrl}/api/rest/v1/node_operator`;
     return this.httpClient.get<ResponseBase & { data: NodeOperator[] }>(url);
   }
 
   public override find(
-    userId: string,
-    nodeOperatorId: string
+    id: string
   ): Observable<ResponseBase & { data: NodeOperator }> {
-    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node_operator/${nodeOperatorId}`;
+    const url = `${environment.baseUrl}/api/rest/v1/node_operator/${id}`;
     return this.httpClient.get<ResponseBase & { data: NodeOperator }>(url);
   }
 
-  public override update(
-    userId: string,
-    nodeOperator: NodeOperator & { node_id: string }
-  ): Observable<ResponseBase> {
-    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node_operator/${nodeOperator.id}`;
-    return this.httpClient.patch<ResponseBase>(url, nodeOperator);
+  public override update({ id, name }: NodeOperator): Observable<ResponseBase> {
+    const url = `${environment.baseUrl}/api/rest/v1/node_operator/${id}`;
+    return this.httpClient.patch<ResponseBase>(url, { name, describle: '' });
   }
 
-  public override delete(
-    userId: string,
-    nodeOperatorId: string
-  ): Observable<ResponseBase> {
-    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node_operator/${nodeOperatorId}`;
+  public override delete(id: string): Observable<ResponseBase> {
+    const url = `${environment.baseUrl}/api/rest/v1/node_operator/${id}`;
     return this.httpClient.delete<ResponseBase>(url);
   }
 }

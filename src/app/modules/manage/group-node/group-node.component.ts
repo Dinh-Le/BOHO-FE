@@ -25,7 +25,7 @@ export class GroupNodeComponent implements OnInit {
   data: RowData[] = [];
 
   ngOnInit(): void {
-    this.nodeOperatorService.findAll('0').subscribe((response) => {
+    this.nodeOperatorService.findAll().subscribe((response) => {
       if (!response.success) {
         this.toastService.showError('Fetch node operator failed');
         return;
@@ -47,23 +47,20 @@ export class GroupNodeComponent implements OnInit {
       const newNodeOperator: NodeOperator = {
         id: v4(),
         name,
-        describle: '',
       };
-      this.nodeOperatorService
-        .create('0', newNodeOperator)
-        .subscribe((response) => {
-          if (!response.success) {
-            this.toastService.showError('Create new node operator failed');
-            return;
-          }
+      this.nodeOperatorService.create(newNodeOperator).subscribe((response) => {
+        if (!response.success) {
+          this.toastService.showError('Create new node operator failed');
+          return;
+        }
 
-          this.data.push({
-            id: newNodeOperator.id,
-            name: newNodeOperator.name,
-            nodeCount: 0,
-            editable: false,
-          });
+        this.data.push({
+          id: response.data,
+          name: newNodeOperator.name,
+          nodeCount: 0,
+          editable: false,
         });
+      });
     } catch {
       // Do nothing
     }
@@ -74,7 +71,7 @@ export class GroupNodeComponent implements OnInit {
   }
 
   remove(item: RowData) {
-    this.nodeOperatorService.delete('0', item.id).subscribe((response) => {
+    this.nodeOperatorService.delete(item.id).subscribe((response) => {
       if (!response.success) {
         this.toastService.showError('Delete node operator failed');
         return;
@@ -86,11 +83,9 @@ export class GroupNodeComponent implements OnInit {
 
   update(item: RowData) {
     this.nodeOperatorService
-      .update('0', {
+      .update({
         id: item.id,
         name: item.name,
-        describle: '',
-        node_id: '',
       })
       .subscribe((response) => {
         if (!response.success) {
