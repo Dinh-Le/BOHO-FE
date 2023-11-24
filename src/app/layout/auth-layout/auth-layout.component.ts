@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LoadingService } from '@app/services/loading.service';
-import { finalize, tap } from 'rxjs';
+import { ToastService } from '@app/services/toast.service';
+import { catchError, of, switchMap } from 'rxjs';
 import { UserService } from 'src/app/data/service/user.service';
 
 @Component({
@@ -11,32 +11,44 @@ import { UserService } from 'src/app/data/service/user.service';
   styleUrls: ['./auth-layout.component.scss'],
 })
 export class AuthLayoutComponent implements OnInit {
+  private _router = inject(Router);
+  private _userService = inject(UserService);
+  private _toastService = inject(ToastService);
+
   loginForm: FormGroup = new FormGroup({
     username: new FormControl('root', [Validators.required]),
     password: new FormControl('Goback@2021', [Validators.required]),
   });
 
-  constructor(
-    private router: Router,
-    private userService: UserService,
-    private loadingService: LoadingService
-  ) {}
-
   ngOnInit(): void {}
 
   submit() {
-    this.userService
+    this._userService
       .login({
         name: this.loginForm.get('username')?.value,
         password: this.loginForm.get('password')?.value,
       })
-      .subscribe(
-        () => {
-          this.router.navigateByUrl('/search');
-        },
-        (errors) => {
-          alert(errors?.error.message);
+      .pipe(
+        switchMap((response) => {
+          if (!response.success) {
+            throw Error(response.message);
+          }
+
+          return this._userService.findAll();
+        }),
+        catchError((error) => {
+          this._toastService.showError(error);
+          return of(null);
+        })
+      )
+      .subscribe((response) => {
+        // Bug: The get users API returns sucessfully, but the `success` field is false
+        // Workaround: Check the data is not null
+        if (response?.data) {
+          this._userService.currentUser = response.data;
+          console.log(this._userService.currentUser);
+          this._router.navigateByUrl('/search');
         }
-      );
+      });
   }
 }

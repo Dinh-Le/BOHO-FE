@@ -27,14 +27,14 @@ export class TokenInterceptor implements HttpInterceptor {
       return next.handle(req);
     }
 
-    // if (this.tokenService.isExpired) {
-    //   this.router.navigateByUrl('/login');
-    // }
+    if (this.tokenService.isExpired) {
+      this.router.navigateByUrl('/login');
+    }
 
-    // const authReq = req.clone({
-    //   setHeaders: { Authorization: `Bearer ${this.tokenService.token}` },
-    // });
+    const authReq = req.clone({
+      setHeaders: { Authorization: `Bearer ${this.tokenService.token}` },
+    });
 
-    return next.handle(req);
+    return next.handle(authReq);
   }
 }

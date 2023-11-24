@@ -7,9 +7,11 @@ import { RestfullApiService } from './restful-api.service';
 import { environment } from '@env';
 
 export abstract class UserService extends RestfullApiService {
+  public currentUser: User | undefined;
+
   public abstract create(user: Omit<User, 'id'>): Observable<ResponseBase>;
 
-  public abstract findAll(): Observable<ResponseBase & { data: User[] }>;
+  public abstract findAll(): Observable<ResponseBase & { data: User }>;
 
   public abstract login(
     user: Required<Pick<User, 'name' | 'password'>>
@@ -35,9 +37,9 @@ export class UserServiceImpl extends UserService {
     return this.httpClient.post<ResponseBase>(url, user);
   }
 
-  public override findAll(): Observable<ResponseBase & { data: User[] }> {
+  public override findAll(): Observable<ResponseBase & { data: User }> {
     const url = `${environment.baseUrl}/api/rest/v1/user/get_users`;
-    return this.httpClient.get<ResponseBase & { data: User[] }>(url);
+    return this.httpClient.get<ResponseBase & { data: User }>(url);
   }
 
   public override login(

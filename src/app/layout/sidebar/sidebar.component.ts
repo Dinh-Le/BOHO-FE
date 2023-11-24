@@ -29,6 +29,7 @@ import { SidebarActions } from 'src/app/state/sidebar.action';
 import { SidebarState } from 'src/app/state/sidebar.state';
 import { MenuItem } from '../menu/menu-item';
 import { MenuComponent } from '../menu/menu.component';
+import { JWTTokenService } from '@app/services/jwt-token.service';
 
 interface CameraChannel {
   id: string;
@@ -72,6 +73,7 @@ interface Server {
 export class SidebarComponent implements OnInit {
   private nodeOperatorService = inject(NodeOperatorService);
   private nodeService = inject(NodeService);
+  private _tokenService = inject(JWTTokenService);
   private deviceService = inject(DeviceService);
   private eRef = inject(ElementRef);
   private store: Store<{ sidebar: SidebarState }> = inject(
@@ -102,6 +104,12 @@ export class SidebarComponent implements OnInit {
   selectedMenuItem: MenuItem | undefined;
 
   ngOnInit(): void {
+    this.userService.findAll().subscribe(response => {
+      if (response.success) {
+        console.log(response.data);
+      }
+    });
+    this.userId = this._tokenService.userId;
     this.nodeOperatorService
       .findAll(this.userId)
       .pipe(
