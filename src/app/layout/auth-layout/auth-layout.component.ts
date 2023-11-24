@@ -42,9 +42,7 @@ export class AuthLayoutComponent implements OnInit {
         })
       )
       .subscribe((response) => {
-        // Bug: The get users API returns sucessfully, but the `success` field is false
-        // Workaround: Check the data is not null
-        if (response?.data) {
+        if (response?.success) {
           this._userService.currentUser = response.data;
           console.log(this._userService.currentUser);
           this._router.navigateByUrl('/search');

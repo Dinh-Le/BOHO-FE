@@ -73,14 +73,12 @@ interface Server {
 export class SidebarComponent implements OnInit {
   private nodeOperatorService = inject(NodeOperatorService);
   private nodeService = inject(NodeService);
-  private _tokenService = inject(JWTTokenService);
   private deviceService = inject(DeviceService);
   private eRef = inject(ElementRef);
   private store: Store<{ sidebar: SidebarState }> = inject(
     Store<{ sidebar: SidebarState }>
   );
   private toastService = inject(ToastService);
-  userService = inject(UserService);
 
   @ViewChild('menu') menu!: ElementRef;
 
@@ -104,14 +102,8 @@ export class SidebarComponent implements OnInit {
   selectedMenuItem: MenuItem | undefined;
 
   ngOnInit(): void {
-    this.userService.findAll().subscribe(response => {
-      if (response.success) {
-        console.log(response.data);
-      }
-    });
-    this.userId = this._tokenService.userId;
     this.nodeOperatorService
-      .findAll(this.userId)
+      .findAll()
       .pipe(
         switchMap((response) => {
           if (!response.success) {

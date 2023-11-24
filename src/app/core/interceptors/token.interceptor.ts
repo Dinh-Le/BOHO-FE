@@ -3,10 +3,11 @@ import {
   HttpHandler,
   HttpInterceptor,
   HttpRequest,
+  HttpResponse,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@env';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { JWTTokenService } from '../services/jwt-token.service';
 import { Router } from '@angular/router';
 
@@ -35,6 +36,20 @@ export class TokenInterceptor implements HttpInterceptor {
       setHeaders: { Authorization: `Bearer ${this.tokenService.token}` },
     });
 
-    return next.handle(authReq);
+    return next.handle(authReq).pipe(
+      // Bug: The get users API returns sucessfully, but the `success` field is false
+      // Workaround: set the `success` field to true if the message field is `Successfully`
+      map((event) => {
+        if (event instanceof HttpResponse && typeof event.body === 'object' && event.body.message === 'Successful') {
+          return event.clone({
+            body: Object.assign({}, event.body, {
+              success: true,
+            }),
+          });
+        } else {
+          return event;
+        }
+      })
+    );
   }
 }
