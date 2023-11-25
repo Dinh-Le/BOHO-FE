@@ -44,13 +44,14 @@ export interface EngineMetadata {
 
 export interface Node {
   id: string;
-  node_operator_id: string;
-  location: LatLng;
+  location?: LatLng;
   name: string;
   type: string;
   ip: string;
+  port: number;
   is_active: boolean;
   node_metadata: NodeMetadata;
   connection_metadata?: ConnectionMetadata;
   engine_metadata?: EngineMetadata;
+  node_operator_id: string;
 }
