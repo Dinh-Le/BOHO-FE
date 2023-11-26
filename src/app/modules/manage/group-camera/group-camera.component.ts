@@ -6,12 +6,14 @@ import { GroupService } from 'src/app/data/service/group.service';
 import { v4 } from 'uuid';
 import { AddGroupCameraComponent } from './add-group-camera/add-group-camera.component';
 import { ManageCameraComponent } from './manage-camera/manage-camera.component';
+import { catchError, of } from 'rxjs';
+import { InvalidId } from 'src/app/data/constants';
 
 interface RowData {
   id: string;
   name: string;
   cameraCount: number;
-  editable?: boolean;
+  isEditable?: boolean;
 }
 
 @Component({
@@ -20,49 +22,73 @@ interface RowData {
   styleUrls: ['../shared/table.scss'],
 })
 export class GroupCameraComponent implements OnInit {
-  groupService = inject(GroupService);
-  toastService = inject(ToastService);
-  modalService = inject(NgbModal);
+  private _groupService = inject(GroupService);
+  private _toastService = inject(ToastService);
+  private _modalService = inject(NgbModal);
+
   data: RowData[] = [];
 
   ngOnInit(): void {
-    this.groupService.findAll('0').subscribe((response) => {
-      if (!response.success) {
-        this.toastService.showError('Fetch group device failed');
-        return;
-      }
-      this.data = response.data.map((e) => ({
-        id: e.id,
-        name: e.name,
-        cameraCount: 0,
-      }));
-    });
+    this._groupService
+      .findAll()
+      .pipe(
+        catchError(({ message }) =>
+          of({
+            message,
+            success: false,
+            data: [],
+          })
+        )
+      )
+      .subscribe((response) => {
+        if (!response.success) {
+          this._toastService.showError(
+            'Fetch group device failed. Reason: ' + response.message
+          );
+          return;
+        }
+        this.data = response.data.map(({ id, name }) => ({
+          id,
+          name,
+          cameraCount: 0,
+        }));
+      });
   }
 
+  trackById(_: any, item: RowData) {
+    return item.id;
+  }
+
+  //#region  Event handlers
   async add() {
     try {
-      const { name } = await this.modalService.open(AddGroupCameraComponent)
+      const { name } = await this._modalService.open(AddGroupCameraComponent)
         .result;
 
-      const newGroup: Group = {
-        id: v4(),
-        name: name,
-        describle: '',
-      };
-
-      this.groupService
-        .create('0', newGroup)
+      this._groupService
+        .create({ name, describle: '' })
+        .pipe(
+          catchError(({ message }) =>
+            of({
+              message,
+              success: false,
+              data: InvalidId,
+            })
+          )
+        )
         .subscribe((response) => {
           if (!response.success) {
-            this.toastService.showError('Create group failed');
+            this._toastService.showError(
+              'Create group failed. Reason: ' + response.message
+            );
             return;
           }
 
           this.data.push({
-            id: newGroup.id,
-            name: newGroup.name,
+            id: response.data,
+            name,
             cameraCount: 0,
-            editable: false,
+            isEditable: false,
           });
         });
     } catch {
@@ -70,14 +96,10 @@ export class GroupCameraComponent implements OnInit {
     }
   }
 
-  trackById(_: any, item: RowData) {
-    return item.id;
-  }
-
   remove(item: RowData) {
-    this.groupService.delete('0', item.id).subscribe((response) => {
+    this._groupService.delete(item.id).subscribe((response) => {
       if (!response.success) {
-        this.toastService.showError('Delete group failed');
+        this._toastService.showError('Delete group failed');
         return;
       }
 
@@ -86,26 +108,39 @@ export class GroupCameraComponent implements OnInit {
   }
 
   update(item: RowData) {
-    const group: Group = {
-      id: item.id,
-      name: item.name,
-      describle: '',
-    };
-    this.groupService.update('0', group).subscribe((response) => {
-      if (!response.success) {
-        this.toastService.showError('Update group failed');
-        return;
-      }
+    this._groupService
+      .update(item.id, {
+        name: item.name,
+        describle: '',
+      })
+      .pipe(
+        catchError(({ message }) =>
+          of({
+            message,
+            success: false,
+            data: InvalidId,
+          })
+        )
+      )
+      .subscribe((response) => {
+        if (!response.success) {
+          this._toastService.showError(
+            'Update group failed. Reason: ' + response.message
+          );
+          return;
+        }
 
-      item.editable = false;
-    });
+        item.isEditable = false;
+      });
   }
 
   showManageCameraDialog(item: RowData) {
-    const modal = this.modalService.open(ManageCameraComponent, {
-      size: 'xl'
+    const modal = this._modalService.open(ManageCameraComponent, {
+      size: 'xl',
     });
     modal.componentInstance.id = item.id;
     modal.componentInstance.name = item.name;
   }
+
+  //#endregion
 }

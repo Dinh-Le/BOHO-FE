@@ -5,4 +5,4 @@ export * from './camera-types.constant';
 export * from './locations.constanst';
 export * from './device-types.constant';
 
-export const InvalidId = -1;
+export const InvalidId = '-1';

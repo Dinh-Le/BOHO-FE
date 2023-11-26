@@ -24,7 +24,7 @@
       <tr *ngFor="let item of data; trackBy: trackById">
         <td></td>
         <td>
-          <ng-container *ngIf="!item.editable; else editableForm">
+          <ng-container *ngIf="!item.isEditable; else editableForm">
             {{ item.name }}
           </ng-container>
           <ng-template #editableForm>
@@ -35,7 +35,7 @@
               />
               <button
                 class="btn btn-secondary px-2 mx-1 text-white"
-                (click)="item.editable = false"
+                (click)="item.isEditable= false"
               >
                 Hủy
               </button>
@@ -59,7 +59,7 @@
               ><i class="bi bi-three-dots"></i
             ></a>
             <ul class="table-row-popup-menu" ngbDropdownMenu>
-              <li (click)="item.editable = true">
+              <li (click)="item.isEditable= true">
                 <i class="bi bi-pencil-square"></i> Đặt lại tên
               </li>
               <li (click)="showManageCameraDialog(item)">
