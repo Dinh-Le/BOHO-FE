@@ -15,7 +15,7 @@ export abstract class NodeService extends RestfullApiService {
   abstract findAll(
     nodeOperatorId?: string
   ): Observable<ResponseBase & { data: Node[] }>;
-  abstract find(nodeId: string): Observable<ResponseBase & { data: Node }>;
+  abstract find(id: string): Observable<ResponseBase & { data: Node }>;
   abstract create(
     data: CreateOrUpdateNodeDto
   ): Observable<ResponseBase & { data: string }>;
@@ -23,7 +23,7 @@ export abstract class NodeService extends RestfullApiService {
     id: string,
     data: CreateOrUpdateNodeDto
   ): Observable<ResponseBase>;
-  abstract delete(nodeId: string): Observable<ResponseBase>;
+  abstract delete(id: string): Observable<ResponseBase>;
   abstract sync(nodeId: string): Observable<ResponseBase>;
 }
 
@@ -46,7 +46,7 @@ export class NodeServiceImpl extends NodeService {
   }
 
   override find(id: string): Observable<ResponseBase & { data: Node }> {
-    const url = `${environment.baseUrl}/api/rest/v1/${id}`;
+    const url = `${environment.baseUrl}/api/rest/v1/node/${id}`;
     return this.httpClient.get<ResponseBase & { data: Node }>(url);
   }
 

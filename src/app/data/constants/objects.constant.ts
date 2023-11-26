@@ -1,4 +1,4 @@
-export const objects: string[] = [
+export const Objects: string[] = [
   'Xe đạp',
   'Xe ô-tô',
   'Xe buýt',

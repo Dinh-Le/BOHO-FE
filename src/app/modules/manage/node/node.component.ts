@@ -11,15 +11,10 @@ import {
   NodeService,
 } from 'src/app/data/service/node.service';
 import { ToastService } from '@app/services/toast.service';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Node } from 'src/app/data/schema/boho-v2/node';
 import { NodeOperatorService } from 'src/app/data/service/node-operator.service';
 import { NodeOperator } from 'src/app/data/schema/boho-v2/node-operator';
-import { catchError, map, of, switchMap } from 'rxjs';
-import { faL } from '@fortawesome/free-solid-svg-icons';
-import { nodeTypes } from 'src/app/data/constants';
-import { HttpErrorResponse } from '@angular/common/http';
-import { ResponseBase } from 'src/app/data/schema/boho-v2/response-base';
+import { catchError, of, switchMap } from 'rxjs';
+import { NodeTypes } from 'src/app/data/constants';
 
 interface RowItemModel extends ExpandableTableRowData {
   id: string;
@@ -75,7 +70,7 @@ export class NodeComponent implements OnInit {
       sortable: true,
     },
   ];
-  types: SelectItemModel[] = nodeTypes.map((e) => ({
+  types: SelectItemModel[] = NodeTypes.map((e) => ({
     value: e,
     label: e,
   }));

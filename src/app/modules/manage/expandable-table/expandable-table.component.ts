@@ -13,6 +13,13 @@ export interface ExpandableTableRowData {
   isExpanded?: boolean;
 }
 
+export class ExpandableTableRowItemModelBase implements ExpandableTableRowData {
+  // indicate that the row is newly created
+  isNew?: boolean;
+  isEditable?: boolean;
+  isExpanded?: boolean;
+}
+
 @Component({
   selector: 'app-expandable-table',
   templateUrl: 'expandable-table.component.html',

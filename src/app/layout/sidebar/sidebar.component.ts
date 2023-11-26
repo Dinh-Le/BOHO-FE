@@ -123,7 +123,7 @@ export class SidebarComponent implements OnInit {
           this.nodes = response.data;
           return zip(
             this.nodes.map((node) =>
-              this.deviceService.findAll(this.userId, node.id)
+              this.deviceService.findAll(node.id)
             )
           );
         }),

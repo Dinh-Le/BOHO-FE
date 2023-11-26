@@ -18,7 +18,7 @@
   <ng-template #collapseContentTemplate let-data="data">
     <div class="row">
       <div class="col-8">
-        <ng-container *ngIf="data.isEditMode; else readonlyForm">
+        <ng-container *ngIf="data.isEditable; else readonlyForm">
           <form [formGroup]="data.form" (ngSubmit)="save(data)">
             <div class="row">
               <input
@@ -28,15 +28,15 @@
             </div>
             <div class="row mt-4">
               <div class="col-4">
-                <label [htmlFor]="data.id + '-activation'">Hoạt động:</label>
+                <label [htmlFor]="data.id + '-is-active'">Hoạt động:</label>
               </div>
               <div class="col-8">
                 <div class="form-check form-switch">
                   <input
                     class="form-check-input"
                     type="checkbox"
-                    [id]="data.id + '-activation'"
-                    formControlName="activation"
+                    [id]="data.id + '-is-active'"
+                    formControlName="is_active"
                   />
                 </div>
               </div>
@@ -50,7 +50,7 @@
                   [id]="data.id + '-driver'"
                   formControlName="driver"
                   [items]="cameraDrivers"
-                  (ngModelChange)="setSubForm(data)"
+                  (ngModelChange)="data.updateCameraForm()"
                 ></app-select-2>
               </div>
             </div>
@@ -63,7 +63,7 @@
                     [id]="data.id + '-camera-type-bullet'"
                     type="radio"
                     formControlName="type"
-                    value="Cố định"
+                    value="Static"
                   />
                   <label
                     class="form-check-label"
@@ -74,7 +74,7 @@
                 <div
                   class="form-check form-check-inline"
                   [ngClass]="{
-                    'pe-none': data.form.get('driver').value?.value === 'rtsp'
+                    'pe-none': data.isRtsp
                   }"
                 >
                   <input
@@ -83,7 +83,7 @@
                     type="radio"
                     formControlName="type"
                     value="PTZ"
-                    [disabled]="data.form.get('driver').value?.value === 'rtsp'"
+                    [disabled]="data.isRtsp"
                   />
                   <label
                     class="form-check-label"
@@ -93,10 +93,8 @@
                 </div>
               </div>
             </div>
-            <ng-container
-              *ngIf="data.form.get('driver').value?.value === 'rtsp'"
-            >
-              <form [formGroup]="data.form.get('subForm')">
+            <ng-container *ngIf="data.isRtsp">
+              <form [formGroup]="data.form.get('camera')">
                 <div class="row mt-2">
                   <div class="col-4">
                     <label [htmlFor]="data.id + '-rtsp-url'"
@@ -106,7 +104,7 @@
                   <div class="col-8">
                     <input
                       [id]="data.id + '-rtsp-url'"
-                      formControlName="url"
+                      formControlName="rtspUrl"
                       class="form-control bg-transparent border-light form-control-sm"
                       required
                     />
@@ -123,7 +121,6 @@
                       [id]="data.id + '-rtsp-user-id'"
                       formControlName="userId"
                       class="form-control bg-transparent border-light form-control-sm"
-                      required
                     />
                   </div>
                 </div>
@@ -138,16 +135,13 @@
                       [id]="data.id + '-rtsp-user-password'"
                       formControlName="password"
                       class="form-control bg-transparent border-light form-control-sm"
-                      required
                     />
                   </div>
                 </div>
               </form>
             </ng-container>
-            <ng-container
-              *ngIf="data.form.get('driver').value?.value === 'onvif'"
-            >
-              <form [formGroup]="data.form.get('subForm')">
+            <ng-container *ngIf="data.isOnvif">
+              <form [formGroup]="data.form.get('camera')">
                 <div class="row mt-2">
                   <div class="col-4">
                     <label [htmlFor]="data.id + '-onvif-ip'">IP:</label>
@@ -246,10 +240,8 @@
                 </div>
               </form>
             </ng-container>
-            <ng-container
-              *ngIf="data.form.get('driver').value?.value === 'milestone'"
-            >
-              <form [formGroup]="data.form.get('subForm')">
+            <ng-container *ngIf="data.isMilestone">
+              <form [formGroup]="data.form.get('camera')">
                 <div class="row mt-2">
                   <div class="col-4">
                     <label [htmlFor]="data.id + '-milestone-server'"
@@ -298,14 +290,14 @@
             <div class="row mt-4">
               <div class="d-flex justify-content-end">
                 <button
-                  class="btn btn-secondary px-4 mx-1 text-white"
-                  (click)="data.isEditMode = false"
+                  class="my-button cancel mx-1"
+                  (click)="data.isEditable= false"
                 >
                   Hủy
                 </button>
                 <button
-                  class="btn btn-primary px-4 mx-1 text-white"
-                  [disabled]="data.form.invalid"
+                  class="my-button submit mx-1"
+                  [disabled]="!data.canSubmit"
                 >
                   Lưu
                 </button>
@@ -315,54 +307,50 @@
         </ng-container>
         <ng-template #readonlyForm>
           <div class="row">
-            <span class="fs-16 text-white col-auto">{{
-              data.form.get("name").value
-            }}</span>
+            <span class="fs-16 text-white col-auto">{{ data.name }}</span>
           </div>
           <div class="row mt-4">
             <div class="col-4">Hoạt động:</div>
             <div class="col-8">
               <i
                 class="bi"
-                [ngClass]="
-                  data.form.get('activation').value ? 'bi-check-lg' : 'bi-x'
-                "
+                [ngClass]="data.isActive ? 'bi-check-lg' : 'bi-x'"
               ></i>
             </div>
           </div>
           <div class="row mt-2">
             <div class="col-4">Driver:</div>
             <div class="col-8">
-              {{ data.form.get('driver').value.label }}
+              {{ data.driver }}
             </div>
           </div>
           <div class="row mt-2">
             <div class="col-4">Loại:</div>
             <div class="col-8">
-              {{ data.form.get("type").value }}
+              {{ data.type }}
             </div>
           </div>
-          <ng-container *ngIf="data.form.get('driver')?.value?.value === 'rtsp'">
+          <ng-container *ngIf="data.isRtsp">
             <div class="row mt-2">
               <div class="col-4">Địa chỉ RTSP:</div>
               <div class="col-8">
-                {{ data.form.get("subForm.url").value }}
+                {{ data.rtspUrl }}
               </div>
             </div>
             <div class="row mt-2">
               <div class="col-4">ID người dùng:</div>
               <div class="col-8">
-                {{ data.form.get("subForm.userId").value }}
+                {{ data.userId }}
               </div>
             </div>
             <div class="row mt-2">
               <div class="col-4">Mật khẩu:</div>
               <div class="col-8">
-                {{ data.form.get("subForm.password").value }}
+                {{ data.password }}
               </div>
             </div>
           </ng-container>
-          <ng-container *ngIf="data.form.get('driver')?.value?.value === 'onvif'">
+          <ng-container *ngIf="data.isOnvif">
             <div class="row mt-2">
               <div class="col-4">IP:</div>
               <div class="col-8">
@@ -400,9 +388,7 @@
               </div>
             </div>
           </ng-container>
-          <ng-container
-            *ngIf="data.form.get('driver').value.value === 'milestone'"
-          >
+          <ng-container *ngIf="data.isMilestone">
             <div class="row mt-2">
               <div class="col-4">Máy chủ:</div>
               <div class="col-8">
@@ -432,7 +418,7 @@
               </button>
               <button
                 class="btn btn-primary px-4 mx-1 text-white"
-                (click)="data.isEditMode = true"
+                (click)="data.isEditable= true"
               >
                 Chỉnh sửa
               </button>

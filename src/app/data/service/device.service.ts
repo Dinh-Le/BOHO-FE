@@ -4,29 +4,37 @@ import { ResponseBase } from '../schema/boho-v2/response-base';
 import { Device } from '../schema/boho-v2/device';
 import { RestfullApiService } from './restful-api.service';
 import { environment } from '@env';
+import { HoChiMinhCoord } from '../constants';
+
+export type CreateOrUpdateDeviceRequestDto = Pick<
+  Device,
+  'name' | 'is_active' | 'type' | 'camera'
+>;
+
+export type CreateDeviceResponeDto = ResponseBase & { data: number };
 
 export abstract class DeviceService extends RestfullApiService {
   public abstract create(
-    userId: string,
     nodeId: string,
-    device: Omit<Device, 'id'>
-  ): Observable<ResponseBase>;
+    data: CreateOrUpdateDeviceRequestDto
+  ): Observable<CreateDeviceResponeDto>;
+
   public abstract findAll(
-    userId: string,
     nodeId: string
   ): Observable<ResponseBase & { data: Device[] }>;
+
   public abstract find(
-    userId: string,
     nodeId: string,
     deviceId: string
   ): Observable<ResponseBase & { data: Device }>;
+
   public abstract update(
-    userId: string,
     nodeId: string,
-    device: Device
+    deviceId: string,
+    data: CreateOrUpdateDeviceRequestDto
   ): Observable<ResponseBase>;
+
   public abstract delete(
-    userId: string,
     nodeId: string,
     deviceId: string
   ): Observable<ResponseBase>;
@@ -35,42 +43,60 @@ export abstract class DeviceService extends RestfullApiService {
 @Injectable({ providedIn: 'root' })
 export class DeviceServiceImpl extends DeviceService {
   public override create(
-    userId: string,
     nodeId: string,
-    device: Omit<Device, 'id'>
-  ): Observable<ResponseBase> {
-    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device`;
-    return this.httpClient.post<ResponseBase>(url, device);
+    { name, is_active, type, camera }: CreateOrUpdateDeviceRequestDto
+  ): Observable<CreateDeviceResponeDto> {
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device`;
+    return this.httpClient.post<CreateDeviceResponeDto>(
+      url,
+      Object.assign(
+        {},
+        { name, is_active, type, camera },
+        {
+          location: HoChiMinhCoord,
+        }
+      )
+    );
   }
+
   public override findAll(
-    userId: string,
     nodeId: string
   ): Observable<ResponseBase & { data: Device[] }> {
-    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device`;
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device`;
     return this.httpClient.get<ResponseBase & { data: Device[] }>(url);
   }
+
   public override find(
-    userId: string,
     nodeId: string,
     deviceId: string
   ): Observable<ResponseBase & { data: Device }> {
-    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device/${deviceId}`;
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}`;
     return this.httpClient.get<ResponseBase & { data: Device }>(url);
   }
+
   public override update(
-    userId: string,
     nodeId: string,
-    device: Device
+    deviceId: string,
+    { name, is_active, type, camera }: CreateOrUpdateDeviceRequestDto
   ): Observable<ResponseBase> {
-    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device/${device.id}`;
-    return this.httpClient.patch<ResponseBase>(url, device);
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}`;
+    return this.httpClient.patch<ResponseBase>(
+      url,
+      Object.assign(
+        {},
+        { name, is_active, type, camera },
+        {
+          location: HoChiMinhCoord,
+        }
+      )
+    );
   }
+
   public override delete(
-    userId: string,
     nodeId: string,
     deviceId: string
   ): Observable<ResponseBase> {
-    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device/${deviceId}`;
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}`;
     return this.httpClient.delete<ResponseBase>(url);
   }
 }

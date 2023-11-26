@@ -19,7 +19,7 @@ export interface SocketConnectionMetadata {
   port: string;
 }
 
-export interface ConnectionMetadata {
+export interface NodeConnectionMetadata {
   kafka: KafkaConnectionMetadata;
   mqtt: MQTTConnectionMetadata;
   socket: SocketConnectionMetadata;
@@ -51,7 +51,7 @@ export interface Node {
   port: number;
   is_active: boolean;
   node_metadata: NodeMetadata;
-  connection_metadata?: ConnectionMetadata;
+  connection_metadata?: NodeConnectionMetadata;
   engine_metadata?: EngineMetadata;
   node_operator_id: string;
 }

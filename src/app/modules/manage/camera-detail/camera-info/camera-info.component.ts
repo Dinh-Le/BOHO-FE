@@ -43,7 +43,7 @@ export class CameraInfoComponent implements OnInit {
 
   ngOnInit(): void {
     this.id$?.subscribe((id) => {
-      this.deviceService.find('0', '0', id).subscribe((response) => {
+      this.deviceService.find('0', id).subscribe((response) => {
         if (!response.success) {
           this.toastService.showError('Fetch camera data failed.');
           return;
@@ -80,7 +80,7 @@ export class CameraInfoComponent implements OnInit {
       };
       this.data.address = this.geodecode(this.device?.location);
       this.deviceService
-        .update('0', this.device!.node_id!, this.device!)
+        .update(this.device!.node_id!, this.device!.id, this.device!)
         .subscribe((response) => {
           if (!response.success) {
             this.toastService.showError('Change address failed.');
