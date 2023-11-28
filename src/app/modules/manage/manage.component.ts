@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
-import { MenuItem } from 'src/app/layout/menu/menu-item';
+import { MenuItem } from '@shared/components/menu/menu-item';
 import { SidebarState } from 'src/app/state/sidebar.state';
 
 @Component({

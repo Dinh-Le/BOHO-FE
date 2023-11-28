@@ -23,6 +23,7 @@ import {
   HoChiMinhCoord,
   InvalidId,
   DeviceType_Camera,
+  DeviceStatus_Good,
 } from 'src/app/data/constants';
 import { catchError, switchMap } from 'rxjs/operators';
 import { NodeService } from 'src/app/data/service/node.service';
@@ -73,6 +74,7 @@ export class CameraComponent implements OnInit, AfterViewInit {
     {
       label: 'Trạng thái',
       prop: 'status',
+      width: '200',
     },
   ];
   milestoneServers: SelectItemModel[] = ['1', '2', '3'].map((e) => ({
@@ -108,6 +110,7 @@ export class CameraComponent implements OnInit, AfterViewInit {
       {
         label: 'Trạng thái',
         prop: 'status',
+        width: '200',
         contentTemplateRef: this.statusColumnTemplate,
       },
     ];
@@ -141,9 +144,11 @@ export class CameraComponent implements OnInit, AfterViewInit {
           return;
         }
 
-        this.data = response.data.map(
-          (device) => new RowItemModel(device, this.node!)
-        );
+        this.data = response.data.map((device) => {
+          const row = new RowItemModel(device, this.node!);
+          row.status = DeviceStatus_Good;
+          return row;
+        });
       });
   }
 

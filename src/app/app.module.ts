@@ -20,8 +20,6 @@ import {
   FontAwesomeModule,
 } from '@fortawesome/angular-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
-import { MenuComponent } from './layout/menu/menu.component';
-import { MenuItemComponent } from './layout/menu/menu-item.component';
 
 @NgModule({
   imports: [
@@ -52,9 +50,7 @@ import { MenuItemComponent } from './layout/menu/menu-item.component';
     ContentLayoutComponent,
     AuthLayoutComponent,
     SidebarComponent,
-    TopBarComponent,
-    MenuComponent,
-    MenuItemComponent,
+    TopBarComponent
   ],
 })
 export class AppModule {

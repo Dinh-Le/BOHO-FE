@@ -291,7 +291,7 @@
               <div class="d-flex justify-content-end">
                 <button
                   class="my-button cancel mx-1"
-                  (click)="data.isEditable= false"
+                  (click)="data.isEditable = false"
                 >
                   Hủy
                 </button>
@@ -418,7 +418,7 @@
               </button>
               <button
                 class="btn btn-primary px-4 mx-1 text-white"
-                (click)="data.isEditable= true"
+                (click)="data.isEditable = true"
               >
                 Chỉnh sửa
               </button>
@@ -436,23 +436,20 @@
     </div>
   </ng-template>
   <ng-template #statusColumnTemplate let-row="row">
-    <div
-      class="px-2 bg-good text-center text-uppercase"
-      *ngIf="row.status === 'Tốt'"
+    <span class="px-2 device-status bg-good" *ngIf="row.isGood">
+      {{ row.status }}
+    </span>
+    <span
+      class="px-2 device-status bg-error"
+      *ngIf="row.isFailure"
     >
       {{ row.status }}
-    </div>
-    <div
-      class="px-2 bg-error text-center text-uppercase"
-      *ngIf="row.status === 'Có lỗi'"
+    </span>
+    <span
+      class="px-2 device-status bg-disconnected"
+      *ngIf="row.isDiconnected"
     >
       {{ row.status }}
-    </div>
-    <div
-      class="px-2 bg-disconnected text-center text-uppercase"
-      *ngIf="row.status === 'Mất kết nối'"
-    >
-      {{ row.status }}
-    </div>
+    </span>
   </ng-template>
 </div>

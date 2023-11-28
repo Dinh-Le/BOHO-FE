@@ -3,42 +3,37 @@ import { ResponseBase } from '../schema/boho-v2/response-base';
 import { GroupManagement } from '../schema/boho-v2/group-management';
 import { RestfullApiService } from './restful-api.service';
 import { HttpParams } from '@angular/common/http';
+import { environment } from '@env';
 
 export abstract class GroupManagementService extends RestfullApiService {
   public abstract create(
-    userId: string,
     data: Omit<GroupManagement, 'id'>
   ): Observable<ResponseBase>;
+
   public abstract findAll(
-    userId: string,
     groupId?: string
   ): Observable<ResponseBase & { data: GroupManagement[] }>;
+
   public abstract update(
-    userId: string,
     groupManagement: GroupManagement
   ): Observable<ResponseBase>;
-  public abstract delete(
-    userId: string,
-    groupManagementId: string
-  ): Observable<ResponseBase>;
+
+  public abstract delete(groupManagementId: string): Observable<ResponseBase>;
 }
 
 export class GroupManagementServiceImpl extends GroupManagementService {
-  public create(
-    userId: string,
-    data: Omit<GroupManagement, 'id'>
-  ): Observable<ResponseBase> {
-    const url = `/api/rest/v1/user/${userId}/group_management`;
+  public create(data: Omit<GroupManagement, 'id'>): Observable<ResponseBase> {
+    const url = `${environment.baseUrl}/api/rest/v1/group_management`;
     return this.httpClient.post<ResponseBase>(url, data);
   }
+
   public findAll(
-    userId: string,
     groupId?: string
   ): Observable<ResponseBase & { data: GroupManagement[] }> {
-    const url = `/api/rest/v1/user/${userId}/group_management`;
+    const url = `${environment.baseUrl}/api/rest/v1/group_management`;
+    
     if (groupId) {
-      const params = new HttpParams();
-      params.set('group_id', groupId);
+      const params = new HttpParams().set('group_id', groupId);
       return this.httpClient.get<ResponseBase & { data: GroupManagement[] }>(
         url,
         { params }
@@ -49,18 +44,14 @@ export class GroupManagementServiceImpl extends GroupManagementService {
       );
     }
   }
-  public update(
-    userId: string,
-    groupManagement: GroupManagement
-  ): Observable<ResponseBase> {
-    const url = `/api/rest/v1/user/${userId}/group_management/${groupManagement.id}`;
+
+  public update(groupManagement: GroupManagement): Observable<ResponseBase> {
+    const url = `${environment.baseUrl}/api/rest/v1/group_management/${groupManagement.id}`;
     return this.httpClient.patch<ResponseBase>(url, groupManagement);
   }
-  public delete(
-    userId: string,
-    groupManagementId: string
-  ): Observable<ResponseBase> {
-    const url = `/api/rest/v1/user/${userId}/group_management/${groupManagementId}`;
+
+  public delete(groupManagementId: string): Observable<ResponseBase> {
+    const url = `${environment.baseUrl}/api/rest/v1/group_management/${groupManagementId}`;
     return this.httpClient.delete<ResponseBase>(url);
   }
 }

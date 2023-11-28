@@ -1,0 +1,17 @@
+<ul class="list-view">
+  <li
+    class="list-view-item"
+    [ngClass]="item.isActive ? activeClass : ''"
+    *ngFor="let item of items; trackBy: trackById"
+    (click)="onItemClick(item)"
+  >
+    <ng-container
+      *ngIf="itemTemplate; else defaultTemplate"
+      [ngTemplateOutlet]="itemTemplate"
+      [ngTemplateOutletContext]="{item}"
+    ></ng-container>
+    <ng-template #defaultTemplate>
+      {{ item.text }}
+    </ng-template>
+  </li>
+</ul>

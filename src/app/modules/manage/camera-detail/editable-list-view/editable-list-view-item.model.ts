@@ -1,4 +1,4 @@
-export interface ListViewItem {
+export interface EditableListViewItemModel {
   id: string;
   label: string;
   isSelected?: boolean;

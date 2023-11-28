@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SelectItemModel } from '@shared/models/select-item-model';
-import { ListViewItem } from '../list-view/list-view-item';
+import { EditableListViewItemModel } from '../editable-list-view/editable-list-view-item.model';
 
 @Component({
   selector: 'app-preset-settings',
@@ -8,8 +7,8 @@ import { ListViewItem } from '../list-view/list-view-item';
   styleUrls: ['../../shared/my-input.scss'],
 })
 export class PresetSettingsComponent implements OnInit {
-  presetList: ListViewItem[] = [];
-  selectedItem: ListViewItem|undefined;
+  presetList: EditableListViewItemModel[] = [];
+  selectedItem: EditableListViewItemModel|undefined;
 
   ngOnInit(): void {
     this.presetList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((e) => ({
@@ -26,9 +25,9 @@ export class PresetSettingsComponent implements OnInit {
     console.log(this.presetList);
   }
 
-  remove(item: ListViewItem) {
+  remove(item: EditableListViewItemModel) {
     this.presetList = this.presetList.filter((e) => e.id !== item.id);
   }
 
-  save(item: ListViewItem) {}
+  save(item: EditableListViewItemModel) {}
 }

@@ -8,6 +8,7 @@ import { AddGroupCameraComponent } from './add-group-camera/add-group-camera.com
 import { ManageCameraComponent } from './manage-camera/manage-camera.component';
 import { catchError, of } from 'rxjs';
 import { InvalidId } from 'src/app/data/constants';
+import { ViewMode } from '@shared/components/tree-view/view-mode.enum';
 
 interface RowData {
   id: string;
@@ -27,6 +28,7 @@ export class GroupCameraComponent implements OnInit {
   private _modalService = inject(NgbModal);
 
   data: RowData[] = [];
+  viewMode = ViewMode.Geolocation;
 
   ngOnInit(): void {
     this._groupService

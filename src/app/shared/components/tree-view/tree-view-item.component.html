@@ -1,0 +1,30 @@
+<div
+  class="tree-view-item"
+  [ngClass]="{ active: isSelected }"
+  *ngIf="item?.isVisible"
+>
+  <a class="label" (click)="$event.stopPropagation(); click.emit(item)">
+    <i
+      class="bi cursor-pointer"
+      [ngClass]="item?.isExpanded ? 'bi-chevron-down' : 'bi-chevron-right'"
+      *ngIf="item?.hasChild"
+      (click)="toggleExpand($event)"
+    ></i>
+    <i
+      style="color: rgb(223, 176, 158)"
+      class="px-1"
+      [ngClass]="item?.icon"
+      *ngIf="item?.icon"
+    ></i
+    >{{ item?.label }}</a
+  >
+</div>
+
+<app-tree-view-item-dropdown
+  [selectedItems]="selectedItems"
+  [ngClass]="{ 'd-none': !item.isExpanded }"
+  [items]="item.children"
+  *ngIf="item && item?.hasChild && item?.isVisible"
+  (itemClick)="click.emit($event)"
+>
+</app-tree-view-item-dropdown>

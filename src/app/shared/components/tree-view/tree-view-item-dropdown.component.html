@@ -1,0 +1,9 @@
+<ul>
+  <li *ngFor="let item of items">
+    <app-tree-view-item
+      [item]="item"
+      (click)="itemClick.emit($event)"
+      [selectedItems]="selectedItems"
+    ></app-tree-view-item>
+  </li>
+</ul>

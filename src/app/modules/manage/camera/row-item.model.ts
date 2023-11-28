@@ -6,6 +6,9 @@ import {
   CameraDriver_RTSP,
   CameraDriver_Onvif,
   CameraDriver_Milestone,
+  DeviceStatus_Good,
+  DeviceStatus_Disconnected,
+  DeviceStatus_Failure,
 } from 'src/app/data/constants';
 
 export class RowItemModel extends ExpandableTableRowItemModelBase {
@@ -65,11 +68,11 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
   }
   
   get userId() {
-    return this.form.get('userId')?.value;
+    return this.form.get('camera')?.get('userId')?.value;
   }
 
   get password() {
-    return this.form.get('password')?.value;
+    return this.form.get('camera')?.get('password')?.value;
   }
 
   get isRtsp() {
@@ -82,6 +85,18 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
 
   get isMilestone() {
     return this.driver === CameraDriver_Milestone;
+  }
+
+  get isGood() {
+    return this.status === DeviceStatus_Good;
+  }
+
+  get isDisconnected() {
+    return this.status === DeviceStatus_Disconnected;
+  }
+
+  get isFailure() {
+    return this.status === DeviceStatus_Failure;
   }
 
   updateCameraForm(device?: Device): void {

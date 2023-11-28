@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { SelectItemModel } from '@shared/models/select-item-model';
-import { ListViewItem } from '../list-view/list-view-item';
+import { EditableListViewItemModel } from '../editable-list-view/editable-list-view-item.model';
 
 @Component({
   selector: 'app-patrol-settings',
@@ -8,7 +8,7 @@ import { ListViewItem } from '../list-view/list-view-item';
   styleUrls: ['../../shared/my-input.scss']
 })
 export class PatrolSettingsComponent {
-  patrols: ListViewItem[] = [];
+  patrols: EditableListViewItemModel[] = [];
   presetList: SelectItemModel[] = [];
 
   ngOnInit(): void {
@@ -31,7 +31,7 @@ export class PatrolSettingsComponent {
 
   play() {}
 
-  remove(item: ListViewItem) {
+  remove(item: EditableListViewItemModel) {
     this.patrols = this.patrols.filter((e) => e.id !== item.id);
   }
 

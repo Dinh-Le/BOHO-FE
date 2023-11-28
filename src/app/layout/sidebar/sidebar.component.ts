@@ -27,8 +27,8 @@ import { NodeService } from 'src/app/data/service/node.service';
 import { UserService } from 'src/app/data/service/user.service';
 import { SidebarActions } from 'src/app/state/sidebar.action';
 import { SidebarState } from 'src/app/state/sidebar.state';
-import { MenuItem } from '../menu/menu-item';
-import { MenuComponent } from '../menu/menu.component';
+import { MenuItem } from '../../shared/components/menu/menu-item';
+import { MenuComponent } from '../../shared/components/menu/menu.component';
 import { JWTTokenService } from '@app/services/jwt-token.service';
 
 interface CameraChannel {
