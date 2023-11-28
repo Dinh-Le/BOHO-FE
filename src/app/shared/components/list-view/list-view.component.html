@@ -1,7 +1,7 @@
 <ul class="list-view">
   <li
     class="list-view-item"
-    [ngClass]="item.isActive ? activeClass : ''"
+    [ngStyle]="getListItemStyles(item)"
     *ngFor="let item of items; trackBy: trackById"
     (click)="onItemClick(item)"
   >

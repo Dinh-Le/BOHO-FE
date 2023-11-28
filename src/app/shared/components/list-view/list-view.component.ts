@@ -25,7 +25,10 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms';
 export class ListViewComponent extends ControlValueAccessorImpl<ListViewItemModel> {
   @Input() items: ListViewItemModel[] = [];
   @Input() itemTemplate?: TemplateRef<any>;
-  @Input() activeClass: string = 'active';
+  @Input() backgroundColor: string = 'white';
+  @Input() textColor: string = 'black';
+  @Input() activeBackgroundColor: string = 'skyblue';
+  @Input() activeTextColor: string = 'black';
   @Output() itemClick = new EventEmitter<ListViewItemModel>();
 
   trackById(_: any, item: ListViewItemModel) {
@@ -42,6 +45,18 @@ export class ListViewComponent extends ControlValueAccessorImpl<ListViewItemMode
     }
 
     this.itemClick.emit(item);
+  }
+
+  getListItemStyles(item: ListViewItemModel) {
+    return item.isActive
+      ? {
+          background: this.activeBackgroundColor,
+          color: this.activeTextColor,
+        }
+      : {
+          background: this.backgroundColor,
+          color: this.textColor,
+        };
   }
 
   override areEqual(x: ListViewItemModel, y: ListViewItemModel): boolean {

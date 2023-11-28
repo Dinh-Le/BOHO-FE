@@ -1,4 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  ɵclearResolutionOfComponentResourcesQueue,
+} from '@angular/core';
 import { ToastService } from '@app/services/toast.service';
 import { FormDialogComponent } from '@modules/manage/form-dialog/form-dialog.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -7,9 +12,13 @@ import { ViewMode } from '@shared/components/tree-view/view-mode.enum';
 import { SharedModule } from '@shared/shared.module';
 import {
   Subject,
+  catchError,
   debounceTime,
   distinctUntilChanged,
+  from,
   mergeAll,
+  mergeMap,
+  map,
   of,
   switchMap,
   zip,
@@ -28,6 +37,8 @@ import { DeviceTreeBuilder } from './device-tree-builder';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ListViewItemModel } from '@shared/components/list-view/list-view-item.model';
+import { InvalidId } from 'src/app/data/constants';
+import { text } from '@fortawesome/fontawesome-svg-core';
 
 @Component({
   selector: 'app-manage-camera',
@@ -130,19 +141,23 @@ export class ManageCameraComponent implements OnInit {
             .setDevices(devices)
             .build();
 
-          this.deviceListItems = devices
-            .filter((e) => groupManagements.some((x) => x.device_id === e.id))
-            .map((e) => ({
+          this.deviceListItems = groupManagements.map((e) => {
+            const device = devices.find(
+              (x) => x.id.toString() == e.device_id.toString()
+            );
+            return {
               id: e.id,
-              text: e.name,
-              data: e,
-            }));
+              text: device!.name,
+              data: device,
+            };
+          });
 
           // Hide devices that added to the group
           this.treeViewData.traverse((item) => {
             if (
               this.deviceListItems.some(
-                (e) => `${DeviceTreeBuilder.DeviceIDPrefix}${e.id}` === item.id
+                (e) =>
+                  `${DeviceTreeBuilder.DeviceIDPrefix}${e.data.id}` === item.id
               )
             ) {
               item.isVisible = false;
@@ -161,42 +176,128 @@ export class ManageCameraComponent implements OnInit {
   }
 
   add() {
-    // Hide devices that added to the group
-    this.treeViewData.traverse((item) => {
-      if (this.devicesToAdd.some((e) => e.id === item.id)) {
-        item.isVisible = false;
+    if (this.devicesToAdd.length === 0) {
+      return;
+    }
+
+    zip(
+      from(this.devicesToAdd).pipe(
+        map((item) =>
+          this._groupManagementService
+            .create({
+              group_id: this.id,
+              device_id: (item.data as Device).id,
+            })
+            .pipe(
+              switchMap((response) => of({ response, item })),
+              catchError(({ message }) =>
+                of({
+                  response: {
+                    success: false,
+                    message,
+                    data: InvalidId,
+                  },
+                  item,
+                })
+              )
+            )
+        ),
+        mergeAll()
+      )
+    ).subscribe((results) => {
+      results
+        .filter((e) => !e.response.success)
+        .forEach((e) =>
+          this._toastService.showError(
+            `Add device ${e.item.data.name} to group failed with error: ${e.response.message}`
+          )
+        );
+
+      const deviceIds = new Set<string>(
+        results.filter((e) => e.response.success).map((e) => e.item.data.id.toString())
+      );
+      if (deviceIds.size === 0) {
+        return;
       }
+
+      this.deviceListItems.push(
+        ...results
+          .filter((e) => e.response.success)
+          .map((e) => ({
+            id: e.response.data,
+            text: e.item.data.name,
+            data: e.item.data,
+          }))
+      );
+
+      // Hide devices that added to the group
+      this.treeViewData.traverse((item) => {
+        const id = item.id.split('-').slice(-1)[0];
+        if (deviceIds.has(id)) {
+          item.isVisible = false;
+        }
+      });
+
+      this.devicesToAdd = [];
     });
-    this.deviceListItems.push(
-      ...this.devicesToAdd
-        .map((e) => e.data as Device)
-        .map((e) => ({
-          id: e.id,
-          text: e.name,
-          data: e,
-        }))
-    );
-    this.devicesToAdd = [];
   }
 
   remove() {
-    const deviceIdsToRemove = new Set<string>(
-      this.devicesToRemove.map((e) => e.id.toString())
-    );
+    if (this.devicesToRemove.length == 0) {
+      return;
+    }
 
-    // Show devices that being removed from the group
-    this.treeViewData.traverse((item) => {
-      if (item.isLeaf) {
-        const id = item.id.split('-').slice(-1)[0];
-        if (deviceIdsToRemove.has(id)) {
-          item.isVisible = true;
-        }
+    zip(
+      from(this.devicesToRemove).pipe(
+        map((item) =>
+          this._groupManagementService.delete(item.id).pipe(
+            switchMap((response) => of({ response, item })),
+            catchError(({ message }) =>
+              of({
+                response: {
+                  success: false,
+                  message,
+                },
+                item,
+              })
+            )
+          )
+        ),
+        mergeAll()
+      )
+    ).subscribe((results) => {
+      console.log(results);
+      results
+        .filter((e) => !e.response.success)
+        .forEach((e) =>
+          this._toastService.showError(
+            `Delete camera ${e.item.text} failed with error: ${e.response.message}`
+          )
+        );
+
+      // Show devices that being removed from the group
+      const deviceIds = new Set<string>(
+        results.filter((e) => e.response.success).map((e) => e.item.data.id.toString())
+      );
+      if (deviceIds.size == 0) {
+        return;
       }
+
+      this.treeViewData.traverse((item) => {
+        if (item.isLeaf) {
+          const id = item.id.split('-').slice(-1)[0];
+          if (deviceIds.has(id)) {
+            item.isVisible = true;
+          }
+        }
+      });
+
+      this.deviceListItems = this.deviceListItems.filter(
+        (e) => !deviceIds.has(e.data.id.toString())
+      );
+
+      this.devicesToRemove = [];
     });
-    this.deviceListItems = this.deviceListItems.filter(
-      (e) => !deviceIdsToRemove.has(e.id.toString())
-    );
-    this.devicesToRemove = [];
   }
 
   cancel() {

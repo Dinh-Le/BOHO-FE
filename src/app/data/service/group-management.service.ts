@@ -5,10 +5,12 @@ import { RestfullApiService } from './restful-api.service';
 import { HttpParams } from '@angular/common/http';
 import { environment } from '@env';
 
+export type CreateGroupManageResponse = ResponseBase & { data: string };
+
 export abstract class GroupManagementService extends RestfullApiService {
   public abstract create(
     data: Omit<GroupManagement, 'id'>
-  ): Observable<ResponseBase>;
+  ): Observable<CreateGroupManageResponse>;
 
   public abstract findAll(
     groupId?: string
@@ -22,16 +24,18 @@ export abstract class GroupManagementService extends RestfullApiService {
 }
 
 export class GroupManagementServiceImpl extends GroupManagementService {
-  public create(data: Omit<GroupManagement, 'id'>): Observable<ResponseBase> {
+  public create(
+    data: Omit<GroupManagement, 'id'>
+  ): Observable<CreateGroupManageResponse> {
     const url = `${environment.baseUrl}/api/rest/v1/group_management`;
-    return this.httpClient.post<ResponseBase>(url, data);
+    return this.httpClient.post<CreateGroupManageResponse>(url, data);
   }
 
   public findAll(
     groupId?: string
   ): Observable<ResponseBase & { data: GroupManagement[] }> {
     const url = `${environment.baseUrl}/api/rest/v1/group_management`;
-    
+
     if (groupId) {
       const params = new HttpParams().set('group_id', groupId);
       return this.httpClient.get<ResponseBase & { data: GroupManagement[] }>(

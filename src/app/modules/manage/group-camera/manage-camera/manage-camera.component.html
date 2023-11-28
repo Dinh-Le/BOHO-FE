@@ -14,7 +14,7 @@
   </div>
   <div class="row mt-2">
     <div class="col-6">
-      <div style="height: 250px; overflow-y: auto; background: white">
+      <div style="height: 400px; overflow-y: auto; background: white; padding: 1rem">
         <app-tree-view
           [data]="treeViewData"
           [(ngModel)]="devicesToAdd"
@@ -32,16 +32,17 @@
     </div>
     <div class="col-5">
       <div
-        style="height: 250px; overflow-y: auto; background: white; color: black"
+        style="height: 400px; overflow-y: auto; background: white; color: black; padding: 1rem"
       >
         <app-list-view
           [itemTemplate]="deviceListItemTemplate"
           [items]="deviceListItems"
+          activeBackgroundColor="#c2e1ed9e"
           [(ngModel)]="devicesToRemove"
         ></app-list-view>
         <ng-template #deviceListItemTemplate let-item="item">
-          <i class="bi bi-camera-video-fill mx-2 pe-none"></i
-          ><span class="pe-none">{{ item.text }}</span>
+          <i class="bi bi-camera-video-fill mx-2 user-select-none" style="color: rgb(223, 176, 158);"></i
+          ><span class="user-select-none">{{ item.text }}</span>
         </ng-template>
       </div>
     </div>
