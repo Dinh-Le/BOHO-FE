@@ -46,7 +46,7 @@ export class TopBarComponent {
       .subscribe((event) => {
         const currentPath = (event as NavigationEnd).url;
         for (const item of this.navItems) {
-          item.active = item.path === currentPath;
+          item.active = currentPath.startsWith(item.path);
         }
       });
   }

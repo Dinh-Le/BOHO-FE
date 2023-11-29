@@ -54,14 +54,10 @@ export class ManageComponent implements OnInit {
   _selectedSideMenuItem: MenuItem | undefined;
 
   ngOnInit(): void {
+    this.updateMenuLevel2();
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        const menuItem = this.menuLevel2.find(
-          (e) => e.path && this.router.url.startsWith(e.path)
-        );
-        if (menuItem) {
-          menuItem.isSelected = true;
-        }
+        this.updateMenuLevel2();
       }
     });
 
@@ -106,6 +102,12 @@ export class ManageComponent implements OnInit {
           }
         }
       });
+  }
+
+  updateMenuLevel2() {
+    this.menuLevel2 = this.menuLevel2.map(e => Object.assign(e, {
+      isSelected: e.path && this.router.url.startsWith(e.path)
+    }));
   }
 
   onMenuLevel2ItemClick(item: MenuItem) {
