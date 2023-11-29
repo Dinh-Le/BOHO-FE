@@ -1,5 +1,12 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  TemplateRef,
+} from '@angular/core';
 import { TreeViewItemModel } from './tree-view-item.model';
+import { TreeViewConfig } from './tree-view-config';
 
 @Component({
   selector: 'app-tree-view-item-dropdown',
@@ -12,6 +19,10 @@ export class TreeViewItemDropDownComponent {
 
   @Input()
   selectedItems: TreeViewItemModel[] = [];
+
+  @Input() config!: TreeViewConfig;
+
+  @Input() itemTemplate?: TemplateRef<any>;
 
   @Output()
   itemClick = new EventEmitter<TreeViewItemModel>();

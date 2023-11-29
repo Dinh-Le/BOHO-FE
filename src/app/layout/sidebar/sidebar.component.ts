@@ -7,63 +7,23 @@ import {
   inject,
 } from '@angular/core';
 import { ToastService } from '@app/services/toast.service';
-import { Store, select } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import {
-  catchError,
-  finalize,
-  mergeAll,
-  mergeMap,
   of,
   switchMap,
-  take,
   zip,
 } from 'rxjs';
-import { Device, DeviceMetadata } from 'src/app/data/schema/boho-v2/device';
-import { Node } from 'src/app/data/schema/boho-v2/node';
-import { NodeOperator } from 'src/app/data/schema/boho-v2/node-operator';
+import { Device } from 'src/app/data/schema/boho-v2/device';
 import { DeviceService } from 'src/app/data/service/device.service';
 import { NodeOperatorService } from 'src/app/data/service/node-operator.service';
 import { NodeService } from 'src/app/data/service/node.service';
-import { UserService } from 'src/app/data/service/user.service';
 import { SidebarActions } from 'src/app/state/sidebar.action';
 import { SidebarState } from 'src/app/state/sidebar.state';
-import { MenuItem } from '../../shared/components/menu/menu-item';
-import { MenuComponent } from '../../shared/components/menu/menu.component';
-import { JWTTokenService } from '@app/services/jwt-token.service';
-
-interface CameraChannel {
-  id: string;
-  name: string;
-  selected?: boolean;
-  cameraId: string;
-  serverId: string;
-}
-
-interface Camera {
-  id: string;
-  serverId: string;
-  name: string;
-  device: Device;
-  expanded?: boolean;
-  channels: CameraChannel[];
-  selected?: boolean;
-  isLoaded?: boolean;
-  isLoading?: boolean;
-  isSelectable?: boolean;
-  isExpandable?: boolean;
-}
-
-interface Server {
-  id: string;
-  name: string;
-  expanded?: boolean;
-  cameras: Camera[];
-  selected?: boolean;
-  isLoaded?: boolean;
-  isLoading?: boolean;
-  isSelectable?: boolean;
-  isExpandable?: boolean;
-}
+import { GroupService } from 'src/app/data/service/group.service';
+import { GroupManagementService } from 'src/app/data/service/group-management.service';
+import { DeviceTreeBuilder } from '@shared/helpers/device-tree-builder';
+import { ViewMode } from '@shared/components/tree-view/view-mode.enum';
+import { TreeViewItemModel } from '@shared/components/tree-view/tree-view-item.model';
 
 @Component({
   selector: 'app-sidebar',
@@ -71,118 +31,27 @@ interface Server {
   styleUrls: ['./sidebar.component.scss'],
 })
 export class SidebarComponent implements OnInit {
-  private nodeOperatorService = inject(NodeOperatorService);
-  private nodeService = inject(NodeService);
-  private deviceService = inject(DeviceService);
+  private _nodeOperatorService = inject(NodeOperatorService);
+  private _nodeService = inject(NodeService);
+  private _deviceService = inject(DeviceService);
+  private _groupService = inject(GroupService);
+  private _groupManagementService = inject(GroupManagementService);
+  private _toastService = inject(ToastService);
+
   private eRef = inject(ElementRef);
   private store: Store<{ sidebar: SidebarState }> = inject(
     Store<{ sidebar: SidebarState }>
   );
-  private toastService = inject(ToastService);
 
   @ViewChild('menu') menu!: ElementRef;
 
-  mode: string = 'by-node';
-  servers: Server[] = [];
+  mode: string = '';
   autoHideEnabled: boolean = false;
-  userId = '0';
-  nodes: Node[] = [];
-  devices: Device[] = [];
-  nodeOperators: NodeOperator[] = [];
-  menuItems: MenuItem[] = [
-    {
-      id: this.userId,
-      label: 'Admin',
-      level: 'user',
-      onclick: this.onMenuItemClick.bind(this),
-      icon: 'bi bi-user',
-      children: [],
-    },
-  ];
-  selectedMenuItem: MenuItem | undefined;
+  root?: TreeViewItemModel;
+  isLoading: boolean = true;
 
   ngOnInit(): void {
-    this.nodeOperatorService
-      .findAll()
-      .pipe(
-        switchMap((response) => {
-          if (!response.success) {
-            throw Error('Fetch node operator data failed');
-          }
-
-          this.nodeOperators = response.data;
-          return this.nodeService.findAll(this.userId);
-        })
-      )
-      .pipe(
-        mergeMap((response) => {
-          if (!response.success) {
-            throw Error('Fetch node data failed');
-          }
-
-          this.nodes = response.data;
-          return zip(
-            this.nodes.map((node) =>
-              this.deviceService.findAll(node.id)
-            )
-          );
-        }),
-        mergeAll(),
-        catchError((error) => {
-          console.error('Error: ', error);
-          this.toastService.showError(error);
-          return of(null);
-        }),
-        finalize(() => {
-          console.log('Node operator:', this.nodeOperators);
-          console.log('Node', this.nodes);
-          console.log('Device', this.devices);
-          for (const nodeOperator of this.nodeOperators) {
-            const nodeOperatorMenuItem: MenuItem = {
-              id: nodeOperator.id,
-              label: nodeOperator.name,
-              level: 'node_operator',
-              onclick: this.onMenuItemClick.bind(this),
-              icon: 'bi bi-folder-fill',
-              children: [],
-            };
-
-            for (const node of this.nodes) {
-              if (node.node_operator_id !== nodeOperator.id) {
-                continue;
-              }
-
-              const nodeMenuItem: MenuItem = {
-                id: node.id,
-                label: node.name,
-                level: 'node',
-                onclick: this.onMenuItemClick.bind(this),
-                icon: 'bi bi-projector-fill',
-                children: this.devices
-                  .filter((device) => device.node_id === node.id)
-                  .map((device) => ({
-                    id: device.id,
-                    label: device.name,
-                    level: 'device',
-                    onclick: this.onMenuItemClick.bind(this),
-                    icon: 'bi bi-camera-video-fill',
-                  })),
-              };
-
-              nodeOperatorMenuItem.children?.push(nodeMenuItem);
-            }
-
-            this.menuItems[0].children?.push(nodeOperatorMenuItem);
-          }
-        })
-      )
-      .subscribe((response) => {
-        if (!response?.success) {
-          return;
-        }
-
-        this.devices.push(...response.data);
-      });
+    this.setViewMode('by-node');
   }
 
   @HostListener('document:click', ['$event'])
@@ -194,9 +63,139 @@ export class SidebarComponent implements OnInit {
     }
   }
 
-  onMenuItemClick(item: MenuItem) {
-    console.log('Select: ', item.label);
-    this.selectedMenuItem = item;
-    this.store.dispatch(SidebarActions.selectMenuItem({ item: item }));
+  // onMenuItemClick(item: MenuItem) {
+  //   this.store.dispatch(SidebarActions.selectMenuItem({ item: item }));
+  // }
+
+  setViewMode(value: string) {
+    if (this.mode === value) {
+      return;
+    }
+
+    this.mode = value;
+
+    if (this.mode === 'by-node') {
+      this.loadLogical();
+    } else if (this.mode === 'by-group') {
+      this.loadGeolocation();
+    }
+  }
+
+  private loadGeolocation(): void {
+    const builder = new DeviceTreeBuilder();
+    builder.setViewMode(ViewMode.Geolocation);
+
+    this.isLoading = true;
+
+    zip(
+      this._groupService.findAll(),
+      this._groupManagementService.findAll(),
+      this._nodeService.findAll()
+    )
+      .pipe(
+        switchMap((responses) => {
+          const [
+            findAllGroupResponse,
+            findAllGroupManagementResponse,
+            findAllNodeResponse,
+          ] = responses;
+
+          if (!findAllGroupResponse.success) {
+            throw Error(
+              'Fetch group data failed with error: ' +
+                findAllGroupResponse.message
+            );
+          }
+
+          if (!findAllGroupManagementResponse.success) {
+            throw Error(
+              'Fetch group management data failed with error: ' +
+                findAllGroupManagementResponse.message
+            );
+          }
+
+          if (!findAllNodeResponse.success) {
+            throw Error(
+              'Fetch node data failed with error: ' +
+                findAllNodeResponse.message
+            );
+          }
+
+          builder.setGroups(findAllGroupResponse.data);
+          builder.setGroupManagements(findAllGroupManagementResponse.data);
+          builder.setNodes(findAllNodeResponse.data);
+
+          return zip(
+            findAllNodeResponse.data.map((node) =>
+              this._deviceService.findAll(node.id)
+            )
+          );
+        }),
+        switchMap((responses) => {
+          const devices = responses
+            .filter((e) => e.success)
+            .reduce<Device[]>((acc, e) => [...acc, ...e.data], []);
+          builder.setDevices(devices);
+          return of(builder.build());
+        })
+      )
+      .subscribe({
+        next: (root) => {
+          this.root = root;
+        },
+        error: ({ message }) => this._toastService.showError(message),
+        complete: () => (this.isLoading = false),
+      });
+  }
+
+  private loadLogical(): void {
+    const builder = new DeviceTreeBuilder();
+    builder.setViewMode(ViewMode.Logical);
+
+    this.isLoading = true;
+
+    zip(this._nodeOperatorService.findAll(), this._nodeService.findAll())
+      .pipe(
+        switchMap((responses) => {
+          const [findAllNodeOperatorResponse, findAllNodeResponse] = responses;
+
+          if (!findAllNodeOperatorResponse.success) {
+            throw Error(
+              'Fetch node operator data failed with error: ' +
+                findAllNodeOperatorResponse.message
+            );
+          }
+
+          if (!findAllNodeResponse.success) {
+            throw Error(
+              'Fetch node data failed with error: ' +
+                findAllNodeResponse.message
+            );
+          }
+
+          builder.setNodeOperators(findAllNodeOperatorResponse.data);
+          builder.setNodes(findAllNodeResponse.data);
+
+          return zip(
+            findAllNodeResponse.data.map((node) =>
+              this._deviceService.findAll(node.id)
+            )
+          );
+        }),
+        switchMap((responses) => {
+          const devices = responses
+            .filter((e) => e.success)
+            .reduce<Device[]>((acc, e) => [...acc, ...e.data], []);
+          builder.setDevices(devices);
+          return of(builder.build());
+        })
+      )
+      .subscribe({
+        next: (root) => {
+          this.root = root;
+        },
+        error: ({ message }) => this._toastService.showError(message),
+        complete: () => (this.isLoading = false),
+      });
   }
 }

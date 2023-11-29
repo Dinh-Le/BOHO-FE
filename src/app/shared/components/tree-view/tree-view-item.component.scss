@@ -1,21 +1,10 @@
-:host {
-  background: inherit;
-}
-
 .tree-view-item {
   width: 100%;
   cursor: pointer;
-  background: inherit;
 
   .label {
     display: block;
     user-select: none;
     text-decoration: none;
-    color: inherit;
   }
-}
-
-.tree-view-item.active {
-  background: lightgray;
-  color: black;
 }

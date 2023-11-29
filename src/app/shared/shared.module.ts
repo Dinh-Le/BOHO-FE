@@ -6,24 +6,24 @@ import { FormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { Select2Component } from './components/select-2/select-2.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { MenuComponent } from './components/menu/menu.component';
-import { MenuItemComponent } from './components/menu/menu-item.component';
 import { TreeViewComponent } from './components/tree-view/tree-view.component';
 import { TreeViewItemComponent } from './components/tree-view/tree-view-item.component';
 import { TreeViewItemDropDownComponent } from './components/tree-view/tree-view-item-dropdown.component';
 import { ListViewComponent } from './components/list-view/list-view.component';
+import { LoadingDirective } from './directives/loading.directive';
+import { LoadingComponent } from './components/loading/loading.component';
 
 @NgModule({
   declarations: [
     SearchInputComponent,
     SelectComponent,
     Select2Component,
-    MenuComponent,
-    MenuItemComponent,
     TreeViewComponent,
     TreeViewItemDropDownComponent,
     TreeViewItemComponent,
     ListViewComponent,
+    LoadingComponent,
+    LoadingDirective
   ],
   imports: [CommonModule, FormsModule, NgbModule, FontAwesomeModule],
   exports: [
@@ -31,10 +31,9 @@ import { ListViewComponent } from './components/list-view/list-view.component';
     SelectComponent,
     Select2Component,
     FontAwesomeModule,
-    MenuComponent,
-    MenuItemComponent,
     TreeViewComponent,
     ListViewComponent,
+    LoadingDirective
   ],
 })
 export class SharedModule {}

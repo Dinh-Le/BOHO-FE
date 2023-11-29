@@ -14,21 +14,35 @@
   </div>
   <div class="border-bottom d-flex justify-content-around pb-1 mt-4">
     <a
-      href="javascript:0"
-      class="border-primary border-2"
-      [ngClass]="{ 'border-bottom': mode === 'by-group' }"
-      (click)="mode = 'by-group'"
+      class="view-mode"
+      [ngClass]="{ active: mode === 'by-group' }"
+      (click)="setViewMode('by-group')"
       >Xem nhóm</a
     >
     <a
-      href="javascript:0"
-      class="border-primary border-2"
-      [ngClass]="{ 'border-bottom': mode === 'by-node' }"
-      (click)="mode = 'by-node'"
+      class="view-mode"
+      [ngClass]="{ active: mode === 'by-node' }"
+      (click)="setViewMode('by-node')"
       >Xem node</a
     >
   </div>
-  <div class="bg-dark text-light mt-2 camera-menu-container">
-    <app-menu #menu class="p-1" [menuItems]="menuItems" [value]="selectedMenuItem"></app-menu>
+  <div
+    class="bg-dark text-light mt-2 camera-menu-container"
+    *isLoading="isLoading"
+  >
+    <app-tree-view
+      *ngIf="root"
+      [data]="root"
+      [itemTemplate]="menuItemTemplate"
+      [config]="{
+        backgroundColor: '#494949',
+        activeBackgroundColor: '#a1a1a1',
+        multiple: false
+      }"
+    ></app-tree-view>
+    <ng-template #menuItemTemplate let-item="item" let-active="active">
+      <i class="mx-1" [ngClass]="item.icon + (item.level >= 2  ? ' device-good':'')"></i
+      ><span class="mx-1">{{ item.label }}</span>
+    </ng-template>
   </div>
 </div>

@@ -5,9 +5,8 @@ ul {
   margin: 0;
   padding: 0;
   padding-left: 1rem;
-  background: inherit;
-}
 
-:host {
-  background: inherit;
+  li {
+    padding: 2px 4px;
+  }
 }

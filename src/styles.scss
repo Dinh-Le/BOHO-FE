@@ -92,3 +92,23 @@
   border: none;
   color: white;
 }
+
+.node-good {
+  color: #94d82d
+}
+
+.node-disconnected {
+  color: #fa5252;
+}
+
+.device-good {
+  color: #94d82d;
+}
+
+.device-disconnected {
+  color: #fa5252;
+}
+
+.device-failure {
+  color: #fcc419;
+}

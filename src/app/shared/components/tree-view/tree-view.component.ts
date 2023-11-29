@@ -3,10 +3,12 @@ import {
   Input,
   OnChanges,
   SimpleChanges,
+  TemplateRef,
   forwardRef,
 } from '@angular/core';
 import { TreeViewItemModel } from './tree-view-item.model';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { TreeViewConfig } from './tree-view-config';
 
 @Component({
   selector: 'app-tree-view',
@@ -18,27 +20,46 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
       useExisting: forwardRef(() => TreeViewComponent),
       multi: true,
     },
-  ]
+  ],
 })
 export class TreeViewComponent implements OnChanges, ControlValueAccessor {
   @Input()
-  data: TreeViewItemModel = new TreeViewItemModel('','');
+  data: TreeViewItemModel = new TreeViewItemModel('', '');
 
   @Input()
   filter: string = '';
 
   @Input()
-  muliple: boolean = true;
+  itemTemplate?: TemplateRef<any>;
+
+  @Input({
+    transform: (value: TreeViewConfig): TreeViewConfig =>
+      Object.assign(
+        {
+          multiple: true,
+          backgroundColor: 'white',
+          activeBackgroundColor: 'lighgray',
+          textColor: 'black',
+          activeTextColor: 'black',
+        },
+        value
+      ),
+  })
+  config: TreeViewConfig = {
+    multiple: true,
+    backgroundColor: 'white',
+    activeBackgroundColor: 'lighgray',
+    textColor: 'black',
+    activeTextColor: 'black',
+  };
 
   ngOnChanges(changes: SimpleChanges): void {
     const { filter } = changes;
-    if (!filter) {
-      return;
+    if (filter) {
+      if (this.data) {
+        this.setFilter(filter.currentValue);
+      }
     }
-
-    if (this.data) {
-      this.setFilter(filter.currentValue);
-    }    
   }
 
   setFilter(text: string) {
@@ -63,11 +84,11 @@ export class TreeViewComponent implements OnChanges, ControlValueAccessor {
 
   //#region Event handlers
   onTreeItemClick(item: TreeViewItemModel) {
-    if (!item.isLeaf) {
-      return;
-    }
+    // if (!item.isLeaf) {
+    //   return;
+    // }
 
-    if (this.muliple) {
+    if (this.config.multiple) {
       if (this.model.some((e) => e.id === item.id)) {
         this.model = this.model.filter((e) => e != item);
       } else {

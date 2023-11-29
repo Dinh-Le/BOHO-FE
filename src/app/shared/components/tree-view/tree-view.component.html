@@ -2,4 +2,7 @@
   [item]="data"
   (click)="onTreeItemClick($event)"
   [selectedItems]="model"
+  [config]="config"
+  [itemTemplate]="itemTemplate"
+  [ngStyle]="{background: config.backgroundColor}"
 ></app-tree-view-item>

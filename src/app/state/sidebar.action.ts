@@ -1,6 +1,5 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
 import { Device } from '../data/schema/boho-v2/device';
-import { MenuItem } from '../shared/components/menu/menu-item';
 
 export const SidebarActions = createActionGroup({
   source: 'Sidebar',
@@ -13,6 +12,6 @@ export const SidebarActions = createActionGroup({
     'Remove device': props<{ device: Device }>(),
     'Add devices': props<{ devices: Device[] }>(),
     'Remove devices': props<{ devices: Device[] }>(),
-    'Select menu item': props<{item: MenuItem}>(),
+    'Select menu item': props<{item: any}>(),
   },
 });

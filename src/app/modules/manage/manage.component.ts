@@ -1,7 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
-import { MenuItem } from '@shared/components/menu/menu-item';
 import { SidebarState } from 'src/app/state/sidebar.state';
 
 @Component({
@@ -14,7 +13,7 @@ export class ManageComponent implements OnInit {
   store = inject(Store<{ sidebar: SidebarState }>);
   activatedRoute = inject(ActivatedRoute);
 
-  menuLevel2: MenuItem[] = [
+  menuLevel2: any[] = [
     {
       icon: 'bi-laptop',
       label: 'Bảng thông tin',
@@ -51,7 +50,7 @@ export class ManageComponent implements OnInit {
     },
   ];
 
-  _selectedSideMenuItem: MenuItem | undefined;
+  // _selectedSideMenuItem: MenuItem | undefined;
 
   ngOnInit(): void {
     this.updateMenuLevel2();
@@ -61,47 +60,47 @@ export class ManageComponent implements OnInit {
       }
     });
 
-    this.store
-      .pipe(select('sidebar'), select('selectedMenuItem'))
-      .subscribe((selectedSideMenuItem: MenuItem) => {
-        this._selectedSideMenuItem = selectedSideMenuItem;
+    // this.store
+    //   .pipe(select('sidebar'), select('selectedMenuItem'))
+    //   .subscribe((selectedSideMenuItem: MenuItem) => {
+    //     this._selectedSideMenuItem = selectedSideMenuItem;
 
-        const selectedMenuLevel2Item = this.menuLevel2.find(
-          (item) => item.isSelected
-        );
+    //     const selectedMenuLevel2Item = this.menuLevel2.find(
+    //       (item) => item.isSelected
+    //     );
 
-        if (selectedMenuLevel2Item?.label === 'Node') {
-          switch (selectedSideMenuItem?.level) {
-            case 'node_operator':
-              this.router.navigateByUrl(
-                `/manage/group-node/${selectedSideMenuItem.id}/node`
-              );
-              break;
-            case 'node':
-              this.router.navigateByUrl(
-                `manage/node/${selectedSideMenuItem.id}/camera`
-              );
-              break;
-            case 'device':
-              this.router.navigateByUrl(
-                `manage/camera/${selectedSideMenuItem.id}/info`
-              );
-              break;
-            default:
-              this.router.navigateByUrl('/manage/group-node');
-              break;
-          }
-        } else if (selectedMenuLevel2Item?.label === 'Camera') {
-          //TODO: Change the side menu mode to 'LOGIC'
-          this.router.navigateByUrl('/manage/group-camera');
-        } else if (selectedMenuLevel2Item?.label === 'Quy tắc') {
-          if (selectedSideMenuItem.level === 'device') {
-            this.router.navigateByUrl(
-              `manage/device-rule/${selectedSideMenuItem.id}/rule`
-            );
-          }
-        }
-      });
+    //     if (selectedMenuLevel2Item?.label === 'Node') {
+    //       switch (selectedSideMenuItem?.level) {
+    //         case 'node_operator':
+    //           this.router.navigateByUrl(
+    //             `/manage/group-node/${selectedSideMenuItem.id}/node`
+    //           );
+    //           break;
+    //         case 'node':
+    //           this.router.navigateByUrl(
+    //             `manage/node/${selectedSideMenuItem.id}/camera`
+    //           );
+    //           break;
+    //         case 'device':
+    //           this.router.navigateByUrl(
+    //             `manage/camera/${selectedSideMenuItem.id}/info`
+    //           );
+    //           break;
+    //         default:
+    //           this.router.navigateByUrl('/manage/group-node');
+    //           break;
+    //       }
+    //     } else if (selectedMenuLevel2Item?.label === 'Camera') {
+    //       //TODO: Change the side menu mode to 'LOGIC'
+    //       this.router.navigateByUrl('/manage/group-camera');
+    //     } else if (selectedMenuLevel2Item?.label === 'Quy tắc') {
+    //       if (selectedSideMenuItem.level === 'device') {
+    //         this.router.navigateByUrl(
+    //           `manage/device-rule/${selectedSideMenuItem.id}/rule`
+    //         );
+    //       }
+    //     }
+    //   });
   }
 
   updateMenuLevel2() {
@@ -110,7 +109,7 @@ export class ManageComponent implements OnInit {
     }));
   }
 
-  onMenuLevel2ItemClick(item: MenuItem) {
+  onMenuLevel2ItemClick(item: any) {
     const selectedItem = this.menuLevel2.find((item) => item.isSelected);
     if (selectedItem) {
       selectedItem.isSelected = false;
@@ -122,14 +121,14 @@ export class ManageComponent implements OnInit {
       this.router.navigateByUrl(item.path);
     }
 
-    if (item.label === 'Quy tắc') {
-      if (this._selectedSideMenuItem?.level === 'device') {
-        this.router.navigateByUrl(
-          `manage/device-rule/${this._selectedSideMenuItem.id}/rule`
-        );
-      } else {
-        this.router.navigateByUrl(`manage/device-rule`);
-      }
-    }
+    // if (item.label === 'Quy tắc') {
+    //   if (this._selectedSideMenuItem?.level === 'device') {
+    //     this.router.navigateByUrl(
+    //       `manage/device-rule/${this._selectedSideMenuItem.id}/rule`
+    //     );
+    //   } else {
+    //     this.router.navigateByUrl(`manage/device-rule`);
+    //   }
+    // }
   }
 }

@@ -1,6 +1,8 @@
-<ul>
+<ul [ngStyle]="{background: config.backgroundColor}">
   <li *ngFor="let item of items">
     <app-tree-view-item
+      [itemTemplate]="itemTemplate"
+      [config]="config"
       [item]="item"
       (click)="itemClick.emit($event)"
       [selectedItems]="selectedItems"

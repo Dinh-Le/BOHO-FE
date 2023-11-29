@@ -1,30 +1,16 @@
-.nodes-container {
-  padding-left: 20px;
-}
-
-// .node-container:hover {
-//   background-color: lightgray;
-// }
-
-.node-title {
-  padding-left: 5px;
-}
-
-@import "../../../../node_modules/bootstrap/scss/bootstrap.scss";
-
-div,
-span {
-  @extend .text-white;
-}
-
-a {
-  @extend .text-white;
-  @extend .text-decoration-none;
-}
-
 .camera-menu-container {
   overflow-y: scroll;
   height: calc(
     100vh - 49px - 0.2rem - 0.5rem * 2 - 22.75px - 1.5rem - 27.5px - 0.5rem
   );
+}
+
+.view-mode {
+  text-decoration: none;
+  cursor: pointer;
+  border-bottom: none;
+}
+
+.view-mode.active {
+  border-bottom: 2px solid #517da8;
 }

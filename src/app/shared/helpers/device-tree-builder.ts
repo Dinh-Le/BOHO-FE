@@ -1,5 +1,5 @@
-import { ViewMode } from '../../../../shared/components/tree-view/view-mode.enum';
-import { TreeViewItemModel } from '../../../../shared/components/tree-view/tree-view-item.model';
+import { ViewMode } from '../components/tree-view/view-mode.enum';
+import { TreeViewItemModel } from '../components/tree-view/tree-view-item.model';
 import {
   Device,
   Group,

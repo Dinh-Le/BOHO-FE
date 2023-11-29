@@ -2,7 +2,6 @@ import {
   Component,
   OnInit,
   inject,
-  ɵclearResolutionOfComponentResourcesQueue,
 } from '@angular/core';
 import { ToastService } from '@app/services/toast.service';
 import { FormDialogComponent } from '@modules/manage/form-dialog/form-dialog.component';
@@ -17,7 +16,6 @@ import {
   distinctUntilChanged,
   from,
   mergeAll,
-  mergeMap,
   map,
   of,
   switchMap,
@@ -33,12 +31,11 @@ import { DeviceService } from 'src/app/data/service/device.service';
 import { GroupManagementService } from 'src/app/data/service/group-management.service';
 import { NodeOperatorService } from 'src/app/data/service/node-operator.service';
 import { NodeService } from 'src/app/data/service/node.service';
-import { DeviceTreeBuilder } from './device-tree-builder';
+import { DeviceTreeBuilder } from '../../../../shared/helpers/device-tree-builder';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ListViewItemModel } from '@shared/components/list-view/list-view-item.model';
 import { InvalidId } from 'src/app/data/constants';
-import { text } from '@fortawesome/fontawesome-svg-core';
 
 @Component({
   selector: 'app-manage-camera',
