@@ -7,7 +7,6 @@ import { environment } from '@env';
 
 export abstract class PatrolService {
   abstract create(
-    userId: string,
     nodeId: string,
     deviceId: string,
     patrol: Omit<Patrol, 'id'>
@@ -17,7 +16,6 @@ export abstract class PatrolService {
     }
   >;
   abstract findAll(
-    userId: string,
     nodeId: string,
     deviceId: string
   ): Observable<
@@ -26,7 +24,6 @@ export abstract class PatrolService {
     }
   >;
   abstract find(
-    userId: string,
     nodeId: string,
     deviceId: string,
     patrolId: string
@@ -36,13 +33,11 @@ export abstract class PatrolService {
     }
   >;
   abstract update(
-    userId: string,
     nodeId: string,
     deviceId: string,
     patrol: Patrol
   ): Observable<ResponseBase>;
   abstract delete(
-    userId: string,
     nodeId: string,
     deviceId: string,
     patrolId: string
@@ -54,7 +49,6 @@ export class PatrolServiceImpl extends PatrolService {
   httpClient = inject(HttpClient);
 
   override create(
-    userId: string,
     nodeId: string,
     deviceId: string,
     patrol: Omit<Patrol, 'id'>
@@ -63,7 +57,7 @@ export class PatrolServiceImpl extends PatrolService {
       data: string;
     }
   > {
-    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device/${deviceId}/patrol`;
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/patrol`;
     return this.httpClient.post<
       ResponseBase & {
         data: string;
@@ -74,7 +68,6 @@ export class PatrolServiceImpl extends PatrolService {
   }
 
   override findAll(
-    userId: string,
     nodeId: string,
     deviceId: string
   ): Observable<
@@ -82,7 +75,7 @@ export class PatrolServiceImpl extends PatrolService {
       data: Patrol[];
     }
   > {
-    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device/${deviceId}/patrol`;
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/patrol`;
     return this.httpClient.get<
       ResponseBase & {
         data: Patrol[];
@@ -91,7 +84,6 @@ export class PatrolServiceImpl extends PatrolService {
   }
 
   override find(
-    userId: string,
     nodeId: string,
     deviceId: string,
     patrolId: string
@@ -100,7 +92,7 @@ export class PatrolServiceImpl extends PatrolService {
       data: Patrol;
     }
   > {
-    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device/${deviceId}/patrol/${patrolId}`;
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/patrol/${patrolId}`;
     return this.httpClient.get<
       ResponseBase & {
         data: Patrol;
@@ -109,22 +101,20 @@ export class PatrolServiceImpl extends PatrolService {
   }
 
   override update(
-    userId: string,
     nodeId: string,
     deviceId: string,
     patrol: Patrol
   ): Observable<ResponseBase> {
-    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device/${deviceId}/patrol/${patrol.id}`;
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/patrol/${patrol.id}`;
     return this.httpClient.patch<ResponseBase>(url, { name: patrol.name });
   }
 
   override delete(
-    userId: string,
     nodeId: string,
     deviceId: string,
     patrolId: string
   ): Observable<ResponseBase> {
-    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device/${deviceId}/patrol/${patrolId}`;
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/patrol/${patrolId}`;
     return this.httpClient.delete<ResponseBase>(url);
   }
 }

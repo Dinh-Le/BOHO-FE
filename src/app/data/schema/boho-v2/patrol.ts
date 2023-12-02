@@ -1,4 +1,4 @@
 export interface Patrol {
-  id: string;
+  id: number;
   name: string;
 }
