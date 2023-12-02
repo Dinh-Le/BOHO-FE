@@ -12,6 +12,8 @@ import { TreeViewItemDropDownComponent } from './components/tree-view/tree-view-
 import { ListViewComponent } from './components/list-view/list-view.component';
 import { LoadingDirective } from './directives/loading.directive';
 import { LoadingComponent } from './components/loading/loading.component';
+import { ObjectEntries } from './pipes/object-entries.pipe';
+import { SvgIconComponent } from './components/svg-icon/svg-icon.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +25,9 @@ import { LoadingComponent } from './components/loading/loading.component';
     TreeViewItemComponent,
     ListViewComponent,
     LoadingComponent,
-    LoadingDirective
+    LoadingDirective,
+    ObjectEntries,
+    SvgIconComponent,
   ],
   imports: [CommonModule, FormsModule, NgbModule, FontAwesomeModule],
   exports: [
@@ -33,7 +37,9 @@ import { LoadingComponent } from './components/loading/loading.component';
     FontAwesomeModule,
     TreeViewComponent,
     ListViewComponent,
-    LoadingDirective
+    LoadingDirective,
+    ObjectEntries,
+    SvgIconComponent,
   ],
 })
 export class SharedModule {}
