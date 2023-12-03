@@ -9,14 +9,15 @@ import {
 } from 'src/app/data/schema/boho-v2';
 
 export class DeviceTreeBuilder {
-  private readonly NodeOperatorIcon = 'bi bi-folder-fill';
-  private readonly NodeIcon = 'bi bi-projector-fill';
-  private readonly DeviceIcon = 'bi bi-camera-video-fill';
+  private readonly NodeOperatorIcon = 'folder';
+  private readonly NodeIcon = 'node';
+  private readonly DeviceIcon = 'video-camera-2';
   private _viewMode = ViewMode.None;
 
   static readonly NodeOperatorIDPrefix = 'node-operator-';
   static readonly NodeIDPrefix = 'node-';
   static readonly DeviceIDPrefix = 'device-';
+  static readonly GroupIDPrefix = 'group-';
 
   private _nodeOperators: NodeOperator[] = [];
   private _nodes: Node[] = [];
@@ -108,7 +109,7 @@ export class DeviceTreeBuilder {
     } else {
       for (const group of this._groups) {
         const item = new TreeViewItemModel(
-          group.id,
+          DeviceTreeBuilder.GroupIDPrefix + group.id,
           group.name,
           this.NodeOperatorIcon
         );
@@ -124,13 +125,13 @@ export class DeviceTreeBuilder {
           continue;
         }
 
-        const groupItem = root.find(groupId);
+        const groupItem = root.find(DeviceTreeBuilder.GroupIDPrefix + groupId);
         if (!groupItem) {
           continue;
         }
 
         const item = new TreeViewItemModel(
-          device.id,
+          DeviceTreeBuilder.DeviceIDPrefix + device.id,
           device.name,
           this.DeviceIcon
         );

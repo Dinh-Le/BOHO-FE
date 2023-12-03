@@ -84,10 +84,6 @@ export class TreeViewComponent implements OnChanges, ControlValueAccessor {
 
   //#region Event handlers
   onTreeItemClick(item: TreeViewItemModel) {
-    // if (!item.isLeaf) {
-    //   return;
-    // }
-
     if (this.config.multiple) {
       if (this.model.some((e) => e.id === item.id)) {
         this.model = this.model.filter((e) => e != item);
@@ -116,7 +112,7 @@ export class TreeViewComponent implements OnChanges, ControlValueAccessor {
       return;
     }
 
-    this._model = [...value];
+    this._model = value;
     this._onChange(this.model);
   }
 

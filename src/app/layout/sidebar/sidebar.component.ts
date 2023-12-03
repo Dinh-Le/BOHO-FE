@@ -7,12 +7,8 @@ import {
   inject,
 } from '@angular/core';
 import { ToastService } from '@app/services/toast.service';
-import { Store } from '@ngrx/store';
-import {
-  of,
-  switchMap,
-  zip,
-} from 'rxjs';
+import { Store, select } from '@ngrx/store';
+import { catchError, of, switchMap, zip } from 'rxjs';
 import { Device } from 'src/app/data/schema/boho-v2/device';
 import { DeviceService } from 'src/app/data/service/device.service';
 import { NodeOperatorService } from 'src/app/data/service/node-operator.service';
@@ -24,6 +20,10 @@ import { GroupManagementService } from 'src/app/data/service/group-management.se
 import { DeviceTreeBuilder } from '@shared/helpers/device-tree-builder';
 import { ViewMode } from '@shared/components/tree-view/view-mode.enum';
 import { TreeViewItemModel } from '@shared/components/tree-view/tree-view-item.model';
+import {
+  NavigationService,
+  SideMenuItemType,
+} from 'src/app/data/service/navigation.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -37,6 +37,7 @@ export class SidebarComponent implements OnInit {
   private _groupService = inject(GroupService);
   private _groupManagementService = inject(GroupManagementService);
   private _toastService = inject(ToastService);
+  private _navigationService = inject(NavigationService);
 
   private eRef = inject(ElementRef);
   private store: Store<{ sidebar: SidebarState }> = inject(
@@ -49,9 +50,20 @@ export class SidebarComponent implements OnInit {
   autoHideEnabled: boolean = false;
   root?: TreeViewItemModel;
   isLoading: boolean = true;
+  selectedItems: TreeViewItemModel[] = [];
 
   ngOnInit(): void {
     this.setViewMode('by-node');
+
+    this.store
+      .pipe(select('sidebar'), select('viewMode'))
+      .subscribe((viewMode) => {
+        if (viewMode === ViewMode.Logical) {
+          this.setViewMode('by-node');
+        } else {
+          this.setViewMode('by-group');
+        }
+      });
   }
 
   @HostListener('document:click', ['$event'])
@@ -63,9 +75,30 @@ export class SidebarComponent implements OnInit {
     }
   }
 
-  // onMenuItemClick(item: MenuItem) {
-  //   this.store.dispatch(SidebarActions.selectMenuItem({ item: item }));
-  // }
+  onMenuItemClick(event: TreeViewItemModel[]) {
+    this.selectedItems = event as TreeViewItemModel[];
+
+    const item = this.selectedItems[0];
+    console.log(item);
+
+    let type = SideMenuItemType.USER;
+    if (item.id.startsWith(DeviceTreeBuilder.NodeOperatorIDPrefix)) {
+      type = SideMenuItemType.NODE_OPERATOR;
+    } else if (item.id.startsWith(DeviceTreeBuilder.NodeIDPrefix)) {
+      type = SideMenuItemType.NODE;
+    } else if (item.id.startsWith(DeviceTreeBuilder.DeviceIDPrefix)) {
+      type = SideMenuItemType.DEVICE;
+    } else if (item.id.startsWith(DeviceTreeBuilder.GroupIDPrefix)) {
+      type = SideMenuItemType.GROUP;
+    }
+
+    this._navigationService.sideMenu = {
+      id: item.data?.id,
+      type,
+      data: item.data,
+    };
+    this._navigationService.navigate();
+  }
 
   setViewMode(value: string) {
     if (this.mode === value) {
@@ -178,7 +211,15 @@ export class SidebarComponent implements OnInit {
 
           return zip(
             findAllNodeResponse.data.map((node) =>
-              this._deviceService.findAll(node.id)
+              this._deviceService.findAll(node.id).pipe(
+                catchError(({ message }) =>
+                  of({
+                    success: false,
+                    message,
+                    data: [],
+                  })
+                )
+              )
             )
           );
         }),

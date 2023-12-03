@@ -5,7 +5,10 @@ import {
 } from '../expandable-table/expandable-table.component';
 import { v4 } from 'uuid';
 import { ActivatedRoute } from '@angular/router';
-import { RowData } from '../rule/rule.component';
+import {
+  Level3Menu,
+  NavigationService,
+} from 'src/app/data/service/navigation.service';
 
 interface RowItemModel extends ExpandableTableRowData {
   id: string;
@@ -21,6 +24,7 @@ interface RowItemModel extends ExpandableTableRowData {
 })
 export class ScheduleComponent implements OnInit {
   _activatedRoute = inject(ActivatedRoute);
+  _navigationService = inject(NavigationService);
   _cameraId: string | undefined;
   daysInWeek: string[] = ['H', 'B', 'T', 'N', 'S', 'B', 'C'];
   data: RowItemModel[] = [];
@@ -32,7 +36,8 @@ export class ScheduleComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this._activatedRoute.params.subscribe(({cameraId}) => {
+    this._navigationService.level3 = Level3Menu.SCHEDULE;
+    this._activatedRoute.params.subscribe(({ cameraId }) => {
       this._cameraId = cameraId;
     });
   }

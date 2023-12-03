@@ -1,8 +1,4 @@
-import {
-  Component,
-  OnInit,
-  inject,
-} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ToastService } from '@app/services/toast.service';
 import { FormDialogComponent } from '@modules/manage/form-dialog/form-dialog.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -211,7 +207,9 @@ export class ManageCameraComponent implements OnInit {
         );
 
       const deviceIds = new Set<string>(
-        results.filter((e) => e.response.success).map((e) => e.item.data.id.toString())
+        results
+          .filter((e) => e.response.success)
+          .map((e) => e.item.data.id.toString())
       );
       if (deviceIds.size === 0) {
         return;
@@ -274,7 +272,9 @@ export class ManageCameraComponent implements OnInit {
 
       // Show devices that being removed from the group
       const deviceIds = new Set<string>(
-        results.filter((e) => e.response.success).map((e) => e.item.data.id.toString())
+        results
+          .filter((e) => e.response.success)
+          .map((e) => e.item.data.id.toString())
       );
       if (deviceIds.size == 0) {
         return;

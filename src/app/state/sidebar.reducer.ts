@@ -39,4 +39,12 @@ export const sidebarReducer = createReducer(
       devices: _state.devices.filter((e) => !deviceIds.has(e.id)),
     };
   }),
+  on(SidebarActions.updateSelectedMenuItem, (_state, { item }) => ({
+    ..._state,
+    selectedMenuItem: item,
+  })),
+  on(SidebarActions.setViewMode, (_state, { viewMode }) => ({
+    ..._state,
+    viewMode,
+  }))
 );

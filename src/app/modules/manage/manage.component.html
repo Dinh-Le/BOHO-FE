@@ -1,17 +1,13 @@
 <div class="menu-container">
-  <div
-    *ngFor="let item of menuLevel2"
-    class="border-primary mx-2 border-1 menu-item"
-    style="overflow-x: auto"
-    [ngClass]="{ 'border-bottom': item.isSelected }"
-  >
-    <a
-      class="text-white pe-auto text-decoration-none"
-      (click)="onMenuLevel2ItemClick(item)"
-      ><i class="bi" [ngClass]="item.icon"></i> {{ item.label }}</a
+  <ul>
+    <li
+      *ngFor="let item of menuLevel2 | objectEntries"
+      [ngClass]="{ active: item[1].isActive }"
+      (click)="onMenuItemClick(item[0])"
     >
-  </div>
+      <app-svg-icon [icon]="item[1].icon" color="white"></app-svg-icon>
+      {{ item[1].text }}
+    </li>
+  </ul>
 </div>
-<div>
-  <router-outlet></router-outlet>
-</div>
+<router-outlet></router-outlet>

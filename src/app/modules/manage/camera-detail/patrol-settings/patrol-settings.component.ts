@@ -6,6 +6,10 @@ import { PatrolService } from 'src/app/data/service/patrol.service';
 import { switchMap } from 'rxjs';
 import { ToastService } from '@app/services/toast.service';
 import { v4 } from 'uuid';
+import {
+  Level3Menu,
+  NavigationService,
+} from 'src/app/data/service/navigation.service';
 
 @Component({
   selector: 'app-patrol-settings',
@@ -16,6 +20,7 @@ export class PatrolSettingsComponent {
   private _activatedRoute = inject(ActivatedRoute);
   private _toastService = inject(ToastService);
   private _patrolService = inject(PatrolService);
+  private _navigationService = inject(NavigationService);
   private _nodeId: string = '';
   private _cameraId: string = '';
 
@@ -23,6 +28,7 @@ export class PatrolSettingsComponent {
   presetList: SelectItemModel[] = [];
 
   ngOnInit(): void {
+    this._navigationService.level3 = Level3Menu.PATROL_SETTINGS;
     this._activatedRoute.parent?.params
       .pipe(
         switchMap(({ nodeId, cameraId }) => {

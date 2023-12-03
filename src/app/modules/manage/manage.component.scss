@@ -9,7 +9,7 @@
   .menu-item {
     cursor: pointer;
   }
-  
+
   ul {
     list-style: none;
     margin: 0;
@@ -18,33 +18,27 @@
     li {
       display: inline-block;
       margin-right: 0.5rem;
+      margin-left: 0.5rem;
 
       i {
-        margin-right: 0.5em;
+        margin-right: 0.25em;
       }
 
       user-select: none;
 
-      a, i {
+      a,
+      i {
         color: white;
       }
     }
 
     li:hover {
       cursor: pointer;
-      font-weight: bold;
-    }
-
-    li:hover.active {
-      pointer-events: none;
-      font-weight: unset;
-      cursor: none;
     }
 
     li.active {
-      border-bottom: 2px;
-      border-bottom-color: var(--bs-primary);
-      border-bottom-style: solid;
+      border-bottom: 2px solid #517da8;
+      pointer-events: none;
     }
   }
 }

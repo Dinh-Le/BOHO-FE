@@ -6,9 +6,10 @@ import { SidebarActions } from 'src/app/state/sidebar.action';
 import { SidebarState } from 'src/app/state/sidebar.state';
 
 interface NavItem {
-  active: boolean;
+  isActive?: boolean;
   title: string;
   path: string;
+  icon: string;
 }
 
 @Component({
@@ -19,24 +20,24 @@ interface NavItem {
 export class TopBarComponent {
   navItems: NavItem[] = [
     {
-      active: false,
       title: 'Tìm kiếm',
       path: '/search',
+      icon: 'search',
     },
     {
-      active: false,
       title: 'Cảnh báo',
       path: '/alert',
+      icon: 'alert',
     },
     {
-      active: false,
       title: 'Báo cáo',
       path: '/reports',
+      icon: 'report',
     },
     {
-      active: false,
       title: 'Quản trị',
       path: '/manage',
+      icon: 'setting',
     },
   ];
 
@@ -46,7 +47,7 @@ export class TopBarComponent {
       .subscribe((event) => {
         const currentPath = (event as NavigationEnd).url;
         for (const item of this.navItems) {
-          item.active = currentPath.startsWith(item.path);
+          item.isActive = currentPath.startsWith(item.path);
         }
       });
   }

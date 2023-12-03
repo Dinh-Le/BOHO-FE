@@ -1,6 +1,12 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { Store, select } from '@ngrx/store';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { ViewMode } from '@shared/components/tree-view/view-mode.enum';
+import {
+  Level2Menu,
+  NavigationService,
+} from 'src/app/data/service/navigation.service';
+import { SidebarActions } from 'src/app/state/sidebar.action';
 import { SidebarState } from 'src/app/state/sidebar.state';
 
 @Component({
@@ -12,123 +18,76 @@ export class ManageComponent implements OnInit {
   router = inject(Router);
   store = inject(Store<{ sidebar: SidebarState }>);
   activatedRoute = inject(ActivatedRoute);
+  private _navigationService = inject(NavigationService);
 
-  menuLevel2: any[] = [
-    {
-      icon: 'bi-laptop',
-      label: 'Bảng thông tin',
+  menuLevel2: {
+    [key in Level2Menu]: {
+      icon: string;
+      text: string;
+      path?: string;
+      isActive?: boolean;
+    };
+  } = {
+    [Level2Menu.DASHBOARD]: {
+      icon: 'dashboard',
+      text: 'Bảng thông tin',
     },
-    {
-      icon: 'bi-diagram-3',
-      label: 'Hệ thống',
+    [Level2Menu.SYSTEM]: {
+      icon: 'system',
+      text: 'Hệ thống',
       path: '/manage/system',
     },
-    {
-      icon: 'bi-pc-horizontal',
-      label: 'Node',
+    [Level2Menu.NODE]: {
+      icon: 'node',
+      text: 'Node',
       path: '/manage/group-node',
     },
-    {
-      icon: 'bi-camera-video',
-      label: 'Camera',
+    [Level2Menu.CAMERA]: {
+      icon: 'video-camera-1',
+      text: 'Camera',
       path: '/manage/group-camera',
     },
-    {
-      icon: 'bi-list-check',
-      label: 'Quy tắc',
+    [Level2Menu.RULE]: {
+      icon: 'rule',
+      text: 'Quy tắc',
       path: '/manage/device-rule',
     },
-    {
-      icon: 'bi-car-front-fill',
-      label: 'Biển số xe',
+    [Level2Menu.VEHICLE]: {
+      icon: 'licence-plate',
+      text: 'Biển số xe',
       path: '/manage/vehicle-list',
     },
-    {
-      icon: 'bi-plugin',
-      label: 'Tích hợp',
-      path: '/manage/integration'
+    [Level2Menu.INTEGRATION]: {
+      icon: 'integration',
+      text: 'Tích hợp',
+      path: '/manage/integration',
     },
-  ];
-
-  // _selectedSideMenuItem: MenuItem | undefined;
+  };
 
   ngOnInit(): void {
-    this.updateMenuLevel2();
-    this.router.events.subscribe((event) => {
-      if (event instanceof NavigationEnd) {
-        this.updateMenuLevel2();
-      }
-    });
-
-    // this.store
-    //   .pipe(select('sidebar'), select('selectedMenuItem'))
-    //   .subscribe((selectedSideMenuItem: MenuItem) => {
-    //     this._selectedSideMenuItem = selectedSideMenuItem;
-
-    //     const selectedMenuLevel2Item = this.menuLevel2.find(
-    //       (item) => item.isSelected
-    //     );
-
-    //     if (selectedMenuLevel2Item?.label === 'Node') {
-    //       switch (selectedSideMenuItem?.level) {
-    //         case 'node_operator':
-    //           this.router.navigateByUrl(
-    //             `/manage/group-node/${selectedSideMenuItem.id}/node`
-    //           );
-    //           break;
-    //         case 'node':
-    //           this.router.navigateByUrl(
-    //             `manage/node/${selectedSideMenuItem.id}/camera`
-    //           );
-    //           break;
-    //         case 'device':
-    //           this.router.navigateByUrl(
-    //             `manage/camera/${selectedSideMenuItem.id}/info`
-    //           );
-    //           break;
-    //         default:
-    //           this.router.navigateByUrl('/manage/group-node');
-    //           break;
-    //       }
-    //     } else if (selectedMenuLevel2Item?.label === 'Camera') {
-    //       //TODO: Change the side menu mode to 'LOGIC'
-    //       this.router.navigateByUrl('/manage/group-camera');
-    //     } else if (selectedMenuLevel2Item?.label === 'Quy tắc') {
-    //       if (selectedSideMenuItem.level === 'device') {
-    //         this.router.navigateByUrl(
-    //           `manage/device-rule/${selectedSideMenuItem.id}/rule`
-    //         );
-    //       }
-    //     }
-    //   });
+    if (this._navigationService.level2 in this.menuLevel2) {
+      this.menuLevel2[this._navigationService.level2].isActive = true;
+    }
   }
 
-  updateMenuLevel2() {
-    this.menuLevel2 = this.menuLevel2.map(e => Object.assign(e, {
-      isSelected: e.path && this.router.url.startsWith(e.path)
-    }));
-  }
-
-  onMenuLevel2ItemClick(item: any) {
-    const selectedItem = this.menuLevel2.find((item) => item.isSelected);
-    if (selectedItem) {
-      selectedItem.isSelected = false;
+  onMenuItemClick(menuId: Level2Menu): void {
+    if (menuId === this._navigationService.level2) {
+      return;
     }
 
-    item.isSelected = true;
+    Object.values(this.menuLevel2).forEach((e) => (e.isActive = false));
+    this.menuLevel2[menuId].isActive = true;
+    this._navigationService.level2 = menuId;
+    this._navigationService.navigate();
 
-    if (item.path) {
-      this.router.navigateByUrl(item.path);
+    if (menuId === Level2Menu.NODE) {
+      this.store.dispatch(
+        SidebarActions.setViewMode({ viewMode: ViewMode.Logical })
+      );
+    } else if (menuId === Level2Menu.CAMERA) {
+      this.store.dispatch(
+        SidebarActions.setViewMode({ viewMode: ViewMode.Geolocation })
+      );
     }
-
-    // if (item.label === 'Quy tắc') {
-    //   if (this._selectedSideMenuItem?.level === 'device') {
-    //     this.router.navigateByUrl(
-    //       `manage/device-rule/${this._selectedSideMenuItem.id}/rule`
-    //     );
-    //   } else {
-    //     this.router.navigateByUrl(`manage/device-rule`);
-    //   }
-    // }
   }
 }

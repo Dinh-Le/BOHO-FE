@@ -26,7 +26,7 @@ import { IntegrationComponent } from './integration/integration.component';
         children: [
           {
             path: 'integration',
-            component: IntegrationComponent
+            component: IntegrationComponent,
           },
           {
             path: 'group-camera',
@@ -49,7 +49,7 @@ import { IntegrationComponent } from './integration/integration.component';
             component: CameraComponent,
           },
           {
-            path: 'camera/:cameraId',
+            path: 'node/:nodeId/camera/:cameraId',
             component: CameraDetailComponent,
             children: [
               {
@@ -85,8 +85,8 @@ import { IntegrationComponent } from './integration/integration.component';
               {
                 path: ':cameraId/schedule',
                 component: ScheduleComponent,
-              }
-            ]
+              },
+            ],
           },
           {
             path: 'vehicle-list',

@@ -7,6 +7,10 @@ import { LocationPickerComponent } from './location-picker/location-picker.compo
 import { Device } from 'src/app/data/schema/boho-v2/device';
 import { LatLng } from 'src/app/data/schema/boho-v2/latlng';
 import { Observable, of, switchMap } from 'rxjs';
+import {
+  Level3Menu,
+  NavigationService,
+} from 'src/app/data/service/navigation.service';
 
 interface CameraInfo {
   name: string;
@@ -23,6 +27,7 @@ interface CameraInfo {
 })
 export class CameraInfoComponent implements OnInit {
   modalService = inject(NgbModal);
+  private _navigationService = inject(NavigationService);
   id$: Observable<any> | undefined;
   device: Device | undefined;
   data: CameraInfo = {
@@ -38,28 +43,31 @@ export class CameraInfoComponent implements OnInit {
     private deviceService: DeviceService,
     private toastService: ToastService
   ) {
-    this.id$ = activatedRoute.parent?.params.pipe(switchMap(({cameraId}) => of(cameraId)));
+    this.id$ = activatedRoute.parent?.params.pipe(
+      switchMap(({ nodeId, cameraId }) => of({ nodeId, cameraId }))
+    );
   }
 
   ngOnInit(): void {
-    this.id$?.subscribe((id) => {
-      this.deviceService.find('0', id).subscribe((response) => {
+    this._navigationService.level3 = Level3Menu.DEVICE_INFO;
+    this.id$?.subscribe(({ nodeId, cameraId }) => {
+      this.deviceService.find(nodeId, cameraId).subscribe((response) => {
         if (!response.success) {
           this.toastService.showError('Fetch camera data failed.');
           return;
         }
-  
+
         this.device = response.data;
         this.data = {
           name: response.data.name,
           address: this.geodecode(response.data.location),
           driverName: response.data.camera.driver,
           typeName: response.data.camera.type,
-          rtspUrl: response.data.camera.connection_metadata.rtsp?.rtsp_url || '',
+          rtspUrl:
+            response.data.camera.connection_metadata.rtsp?.rtsp_url || '',
         };
       });
-    })
-    
+    });
   }
 
   async changeAddress() {

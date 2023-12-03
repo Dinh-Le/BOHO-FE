@@ -9,8 +9,12 @@ import {
 import { MenuItem } from '../menu-item';
 import { ColumnConfig } from '../expandable-table/expandable-table.component';
 import { SelectItemModel } from '@shared/models/select-item-model';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { v4 } from 'uuid';
+import {
+  Level3Menu,
+  NavigationService,
+} from 'src/app/data/service/navigation.service';
 
 export interface RowData {
   id: string;
@@ -49,7 +53,8 @@ export class RuleComponent implements OnInit, AfterViewInit {
   @ViewChild('objectColumnTemplate', { static: true })
   objectColumnTemplate!: TemplateRef<any>;
   _activatedRoute = inject(ActivatedRoute);
-  _cameraId: string|undefined;
+  _cameraId: string | undefined;
+  _navigationService = inject(NavigationService);
 
   menuItems: MenuItem[] = [
     {
@@ -168,7 +173,8 @@ export class RuleComponent implements OnInit, AfterViewInit {
   ];
 
   ngOnInit(): void {
-    this._activatedRoute.params.subscribe(({cameraId}) => {
+    this._navigationService.level3 = Level3Menu.RULE;
+    this._activatedRoute.params.subscribe(({ cameraId }) => {
       this._cameraId = cameraId;
     });
   }
@@ -207,16 +213,16 @@ export class RuleComponent implements OnInit, AfterViewInit {
   add() {
     const newRule: RowData = {
       id: v4(),
-      name:  '',
+      name: '',
       status: true,
       isEditable: true,
-      isExpanded: true
-    }
+      isExpanded: true,
+    };
     this.data.push(newRule);
   }
 
   remove(item: RowData) {
-    this.data = this.data.filter(e => e.id !== item.id);
+    this.data = this.data.filter((e) => e.id !== item.id);
   }
 
   get scheduleUrl() {

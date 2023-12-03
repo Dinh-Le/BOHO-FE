@@ -1,6 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { ToastService } from '@app/services/toast.service';
 import { SelectItemModel } from '@shared/models/select-item-model';
+import { switchMap } from 'rxjs';
+import {
+  Level3Menu,
+  NavigationService,
+} from 'src/app/data/service/navigation.service';
+import { PatrolService } from 'src/app/data/service/patrol.service';
 import { v4 } from 'uuid';
 
 interface PtzTour {
@@ -10,8 +18,6 @@ interface PtzTour {
   left: string;
   width: string;
   day: SelectItemModel;
-  // type: string;
-  // patrol: SelectItemModel;
   color: SelectItemModel;
   selected: boolean;
 }
@@ -22,12 +28,14 @@ interface PtzTour {
   styleUrls: ['tour-settings.component.scss', '../../shared/my-input.scss'],
 })
 export class TourSettingsComponent implements OnInit {
-  patrols: SelectItemModel[] = Array(5)
-    .fill(0)
-    .map((_, index) => ({
-      value: index,
-      label: `Hành trình ${index}`,
-    }));
+  private _patrolService = inject(PatrolService);
+  private _activatedRoute = inject(ActivatedRoute);
+  private _toastService = inject(ToastService);
+  private _navigationService = inject(NavigationService);
+  private _nodeId: string = '';
+  private _cameraId: string = '';
+
+  patrols: SelectItemModel[] = [];
   colors: SelectItemModel[] = [
     {
       value: 'green',
@@ -78,7 +86,38 @@ export class TourSettingsComponent implements OnInit {
   });
   selectedTour: PtzTour | undefined;
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this._navigationService.level3 = Level3Menu.TOUR_SETTINGS;
+    this._activatedRoute.parent?.params
+      .pipe(
+        switchMap(({ nodeId, cameraId }) => {
+          this._nodeId = nodeId;
+          this._cameraId = cameraId;
+
+          this.patrols = [];
+          this.data = this.data.map(() => []);
+          this.form.reset();
+          return this._patrolService.findAll(this._nodeId, this._cameraId);
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response.success) {
+            throw Error('Fetch patrol failed with error: ' + response.data);
+          }
+
+          if (!response.data) {
+            return;
+          }
+
+          this.patrols = response.data.map((e) => ({
+            value: e.id.toString(),
+            label: e.name,
+          }));
+        },
+        error: ({ message }) => this._toastService.showError(message),
+      });
+  }
 
   submit() {
     const { startTime, endTime, color, day } = this.form.value;

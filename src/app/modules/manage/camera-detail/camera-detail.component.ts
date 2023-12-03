@@ -7,40 +7,41 @@ import { ActivatedRoute, Router } from '@angular/router';
   templateUrl: 'camera-detail.component.html',
 })
 export class CameraDetailComponent implements OnInit {
+  private _activatedRoute = inject(ActivatedRoute);
+  private _router = inject(Router);
+  private _nodeId: string = '';
+  private _cameraId: string = '';
   menuItems: MenuItem[] = [
     {
       icon: 'bi-info-circle',
       title: 'Thông tin',
-      path: '/manage/camera/{id}/info',
+      path: '/info',
     },
     {
       icon: 'bi-arrows-move',
       title: 'Điểm giám sát',
-      path: '/manage/camera/{id}/preset-settings',
+      path: '/preset-settings',
     },
     {
       icon: 'bi-arrow-repeat',
       title: 'Tuần tra',
-      path: '/manage/camera/{id}/patrol-settings',
+      path: '/patrol-settings',
     },
     {
       icon: 'bi-calendar3',
       title: 'Lịch trình PTZ',
-      path: '/manage/camera/{id}/tour-settings',
+      path: '/tour-settings',
     },
   ];
-  router = inject(Router);
-
-  constructor(activatedRoute: ActivatedRoute) {
-    const id = activatedRoute.snapshot.params['cameraId'];
-    this.menuItems = this.menuItems.map(e => Object.assign(e, {
-      path: e.path?.replace('{id}', id)
-    }))
-  }
 
   ngOnInit(): void {
-    const currentUrl = this.router.url;
-    const currentMenuItem = this.menuItems.find((e) => e.path === currentUrl);
+    this._activatedRoute.params.subscribe(({ nodeId, cameraId }) => {
+      this._nodeId = nodeId;
+      this._cameraId = cameraId;
+    });
+
+    const { url } = this._router;
+    const currentMenuItem = this.menuItems.find((e) => url.endsWith(e.path!));
     if (currentMenuItem) {
       currentMenuItem.selected = true;
     }
@@ -49,6 +50,8 @@ export class CameraDetailComponent implements OnInit {
   handleMenuItemClicked(menuItem: MenuItem) {
     this.menuItems.forEach((e) => (e.selected = false));
     menuItem.selected = true;
-    this.router.navigateByUrl(menuItem.path || '');
+    this._router.navigateByUrl(
+      `/manage/node/${this._nodeId}/camera/${this._cameraId}${menuItem.path}`
+    );
   }
 }

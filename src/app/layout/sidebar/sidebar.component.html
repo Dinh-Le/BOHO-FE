@@ -31,8 +31,9 @@
     *isLoading="isLoading"
   >
     <app-tree-view
-      *ngIf="root"
-      [data]="root"
+      (ngModelChange)="onMenuItemClick($event)"
+      [ngModel]="selectedItems"
+      [data]="root!"
       [itemTemplate]="menuItemTemplate"
       [config]="{
         backgroundColor: '#494949',
@@ -41,8 +42,8 @@
       }"
     ></app-tree-view>
     <ng-template #menuItemTemplate let-item="item" let-active="active">
-      <i class="mx-1" [ngClass]="item.icon + (item.level >= 2  ? ' device-good':'')"></i
-      ><span class="mx-1">{{ item.label }}</span>
+      <app-svg-icon [icon]="item.icon" color="green"></app-svg-icon>
+      <span class="mx-1">{{ item.label }}</span>
     </ng-template>
   </div>
 </div>

@@ -19,7 +19,7 @@ export class TreeViewItemComponent {
   @Input() itemTemplate?: TemplateRef<any>;
 
   @Output()
-  click = new EventEmitter<TreeViewItemModel>();
+  itemClick = new EventEmitter<TreeViewItemModel>();
 
   isHover: boolean = false;
 
