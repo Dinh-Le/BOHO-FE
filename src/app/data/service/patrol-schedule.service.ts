@@ -7,7 +7,6 @@ import { environment } from '@env';
 
 export abstract class PatrolScheduleService {
   public abstract create(
-    userId: string,
     nodeId: string,
     deviceId: string,
     patrolId: string,
@@ -19,10 +18,9 @@ export abstract class PatrolScheduleService {
   >;
 
   public abstract findAll(
-    userId: string,
     nodeId: string,
     deviceId: string,
-    patrolId: string
+    patrolId: number
   ): Observable<
     ResponseBase & {
       data: PatrolSchedule[];
@@ -30,7 +28,6 @@ export abstract class PatrolScheduleService {
   >;
 
   public abstract find(
-    userId: string,
     nodeId: string,
     deviceId: string,
     patrolId: string,
@@ -42,7 +39,6 @@ export abstract class PatrolScheduleService {
   >;
 
   public abstract update(
-    userId: string,
     nodeId: string,
     deviceId: string,
     patrolId: string,
@@ -50,11 +46,10 @@ export abstract class PatrolScheduleService {
   ): Observable<ResponseBase>;
 
   public abstract delete(
-    userId: string,
     nodeId: string,
     deviceId: string,
-    patrolId: string,
-    patrolScheduleId: string
+    patrolId: number,
+    patrolScheduleId: number
   ): Observable<ResponseBase>;
 }
 
@@ -63,58 +58,53 @@ export class PatrolScheduleServiceImpl extends PatrolScheduleService {
   httpClient = inject(HttpClient);
 
   public override create(
-    userId: string,
     nodeId: string,
     deviceId: string,
     patrolId: string,
     data: Omit<PatrolSchedule, 'id'>
   ): Observable<ResponseBase & { data: Pick<PatrolSchedule, 'id'> }> {
-    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device/${deviceId}/patrol/${patrolId}/patrol_schedule`;
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/patrol/${patrolId}/patrol_schedule`;
     return this.httpClient.post<
       ResponseBase & { data: Pick<PatrolSchedule, 'id'> }
     >(url, data);
   }
 
   public override findAll(
-    userId: string,
     nodeId: string,
     deviceId: string,
-    patrolId: string
+    patrolId: number
   ): Observable<ResponseBase & { data: PatrolSchedule[] }> {
-    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device/${deviceId}/patrol/${patrolId}/patrol_schedule`;
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/patrol/${patrolId}/patrol_schedule`;
     return this.httpClient.get<ResponseBase & { data: PatrolSchedule[] }>(url);
   }
 
   public override find(
-    userId: string,
     nodeId: string,
     deviceId: string,
     patrolId: string,
     patrolScheduleId: string
   ): Observable<ResponseBase & { data: PatrolSchedule }> {
-    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device/${deviceId}/patrol/${patrolId}/patrol_schedule/${patrolScheduleId}`;
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/patrol/${patrolId}/patrol_schedule/${patrolScheduleId}`;
     return this.httpClient.get<ResponseBase & { data: PatrolSchedule }>(url);
   }
 
   public override update(
-    userId: string,
     nodeId: string,
     deviceId: string,
     patrolId: string,
     patrolSchedule: PatrolSchedule
   ): Observable<ResponseBase> {
-    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device/${deviceId}/patrol/${patrolId}/patrol_schedule/${patrolSchedule.id}`;
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/patrol/${patrolId}/patrol_schedule/${patrolSchedule.id}`;
     return this.httpClient.patch<ResponseBase>(url, patrolSchedule);
   }
 
   public override delete(
-    userId: string,
     nodeId: string,
     deviceId: string,
-    patrolId: string,
-    patrolScheduleId: string
+    patrolId: number,
+    patrolScheduleId: number
   ): Observable<ResponseBase> {
-    const url = `${environment.baseUrl}/api/rest/v1/user/${userId}/node/${nodeId}/device/${deviceId}/patrol/${patrolId}/patrol_schedule/${patrolScheduleId}`;
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/patrol/${patrolId}/patrol_schedule/${patrolScheduleId}`;
     return this.httpClient.delete<ResponseBase>(url);
   }
 }

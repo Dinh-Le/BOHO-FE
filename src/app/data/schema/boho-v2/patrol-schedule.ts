@@ -1,10 +1,10 @@
 export interface PatrolSchedule {
-  id: string;
-  touring_id: string;
+  id: number;
+  touring_id: number;
   color: string;
   schedule: {
-    start_time: string;
-    end_time: string;
-    day: string;
+    start_time: number;
+    end_time: number;
+    day: number;
   };
 }

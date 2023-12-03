@@ -19,11 +19,9 @@
         (click)="selectTour(tour)"
         [ngClass]="{ active: tour.selected }"
         *ngFor="let tour of dayData; index as j"
-        [ngStyle]="{
-          left: tour.left,
-          width: tour.width,
-          background: tour.color.value
-        }"
+        [style.left.%]="tour.left"
+        [style.width.%]="tour.width"
+        [style.background]="tour.color.value"
       ></div>
     </div>
   </div>
@@ -31,7 +29,9 @@
     <button class="my-button submit mx-2" (click)="deleteSelectedTour()">
       Xóa chọn
     </button>
-    <button class="my-button submit mx-2" (click)="deleteAll()">Xóa tất cả</button>
+    <button class="my-button submit mx-2" (click)="deleteAll()">
+      Xóa tất cả
+    </button>
   </div>
   <form [formGroup]="form" (ngSubmit)="submit()">
     <div class="row mt-4">
@@ -112,8 +112,8 @@
         ></app-select-2>
         <ng-template #colorItemTemplate let-item="item">
           <div class="d-flex">
-            <i class="bi bi-square-fill" [ngStyle]="{'color': item.value}"></i>
-            <label class="ms-2">{{item.label}}</label>
+            <i class="bi bi-square-fill" [ngStyle]="{ color: item.value }"></i>
+            <label class="ms-2">{{ item.label }}</label>
           </div>
         </ng-template>
       </div>

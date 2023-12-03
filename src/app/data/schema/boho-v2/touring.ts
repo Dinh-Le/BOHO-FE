@@ -1,5 +1,5 @@
 export interface Touring {
-  id: string;
+  id: number;
   type: string;
   active: boolean;
 }
