@@ -1,0 +1,15 @@
+version: "3.1"
+
+services:
+  api-server:
+    build:
+      context: ./server
+    volumes:
+      - ./server:/app
+    ports:
+      - 3000:3000
+  webapp:
+    image: blackrookie/boho:v1.0
+    restart: always
+    ports:
+      - 8081:80

@@ -1,10 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { ToastService } from '@app/services/toast.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.scss'],
 })
-export class AppComponent {
-  title = 'HOBO-v2';
+export class AppComponent implements OnInit {
+  title = 'BOHO';
+  toastService = inject(ToastService);
+
+  ngOnInit(): void {}
 }

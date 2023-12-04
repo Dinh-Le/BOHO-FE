@@ -1,0 +1,17 @@
+.camera-menu-container {
+  overflow-y: scroll;
+  height: calc(
+    100vh - 49px - 0.2rem - 0.5rem * 2 - 22.75px - 1.5rem - 27.5px - 0.5rem
+  );
+}
+
+.view-mode {
+  text-decoration: none;
+  cursor: pointer;
+  border-bottom: none;
+  color: var(--bs-light);
+}
+
+.view-mode.active {
+  border-bottom: 2px solid #517da8;
+}

@@ -1,0 +1,81 @@
+<app-form-dialog
+  [title]="'Quản lý camera thành viên nhóm camera - ' + name"
+  (cancel)="cancel()"
+  (submit)="submit()"
+>
+  <div class="row">
+    <div class="col-6">
+      <input
+        autocomplete="off"
+        placeholder="Tìm kiếm camera"
+        (keyup)="search($event)"
+      />
+    </div>
+  </div>
+  <div class="row mt-2">
+    <div class="col-6">
+      <div
+        style="
+          height: 400px;
+          overflow-y: auto;
+          background: white;
+          padding: 1rem;
+        "
+      >
+        <app-tree-view
+          [data]="treeViewData"
+          [(ngModel)]="devicesToAdd"
+          [filter]="searchText"
+          [itemTemplate]="treeItemTemplate"
+          [config]="{
+            activeBackgroundColor: '#fccece'
+          }"
+        ></app-tree-view>
+        <ng-template #treeItemTemplate let-item="item">
+          <app-svg-icon
+            class="mx-1"
+            [icon]="item.icon"
+            color="green"
+          ></app-svg-icon>
+          <span class="user-select-none" style="color: black">{{
+            item.label
+          }}</span>
+        </ng-template>
+      </div>
+    </div>
+    <div class="col-1 d-flex flex-column justify-content-center">
+      <button class="w-100 bg-primary text-white" (click)="add()">
+        Thêm <i class="bi bi-chevron-right"></i>
+      </button>
+      <button class="w-100 bg-primary text-white" (click)="remove()">
+        <i class="bi bi-chevron-left"></i>Bớt
+      </button>
+    </div>
+    <div class="col-5">
+      <div
+        style="
+          height: 400px;
+          overflow-y: auto;
+          background: white;
+          color: black;
+          padding: 1rem;
+        "
+      >
+        <app-list-view
+          [itemTemplate]="deviceListItemTemplate"
+          [items]="deviceListItems"
+          activeBackgroundColor="#c2e1ed9e"
+          [(ngModel)]="devicesToRemove"
+        ></app-list-view>
+        <ng-template #deviceListItemTemplate let-item="item">
+          <app-svg-icon
+            icon="video-camera-2"
+            class="mx-1"
+            color="green"
+          ></app-svg-icon>
+          <span class="user-select-none">{{ item.text }}</span>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</app-form-dialog>

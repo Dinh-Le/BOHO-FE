@@ -1,0 +1,37 @@
+.event-thumbnail {
+  height: auto;
+  width: 100%;
+}
+
+.playback-dialog-footer>button {
+  height: 15pt;
+  width: 60pt;
+}
+
+.video-player {
+  width: 443pt;
+  height: 249pt;
+  padding: 1px;
+  display: block;
+  margin: auto;
+}
+
+.licence-plate {
+  font-size: 20px;
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, hsl(194, 100%, 50%) 50%, #f6f6f6ca 50%);
+  height: 5px;
+  width: 100%;
+}
+
+* {
+  color: whitesmoke;
+  font-size: 16px;
+}
+
+a {
+  text-decoration: none;
+  outline: none;
+}

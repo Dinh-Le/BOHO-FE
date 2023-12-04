@@ -3,7 +3,9 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  baseUrl: 'https://aabc-2001-ee0-d741-1650-c49c-4bf6-f2ba-d843.ngrok-free.app',
+  googleMapApiKey: 'AIzaSyB582CtlnF_kREmV6TP0DjIDoAVKrmbI80',
 };
 
 /*

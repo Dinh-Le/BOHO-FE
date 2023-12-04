@@ -1,8 +1,0 @@
-<div class="d-flex">
-    <div class="map-container w-100" leaflet [leafletOptions]="options" (leafletMapReady)="onMapReady($event)"
-        (leafletClick)="mapClicked($event)">
-    </div>
-    <div class="events-container">
-        <app-event *ngFor="let event of events$ | async" [data]="event"></app-event>
-    </div>
-</div>

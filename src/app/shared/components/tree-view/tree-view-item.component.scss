@@ -1,0 +1,12 @@
+.tree-view-item {
+  width: 100%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+
+  .label {
+    display: block;
+    user-select: none;
+    text-decoration: none;
+  }
+}

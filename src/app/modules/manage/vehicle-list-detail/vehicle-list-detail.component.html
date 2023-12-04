@@ -1,0 +1,30 @@
+<div class="menu-container d-flex justify-content-start">
+  <a (click)="back()" class="btn"><i class="bi bi-chevron-left"></i></a>
+  <span class="ms-2">{{ title }}</span>
+</div>
+<div class="content-wrapper">
+  <table class="w-100">
+    <colgroup>
+      <col width="200" />
+      <col width="200" />
+      <col width="200" />
+      <col width="auto" />
+    </colgroup>
+    <thead>
+      <th>Biển số<i class="bi bi-sort-alpha-down"></i></th>
+      <th>Mô tả<i class="bi bi-sort-alpha-down"></i></th>
+      <th>Ngày hết hiệu lực<i class="bi bi-sort-alpha-down"></i></th>
+      <th></th>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of data">
+        <td>
+          {{ item.name }}
+        </td>
+        <td>{{ item.desc }}</td>
+        <td>{{ item.expiresDate.toDateString() }}</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

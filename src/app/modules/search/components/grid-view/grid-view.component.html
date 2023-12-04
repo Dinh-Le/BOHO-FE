@@ -1,0 +1,13 @@
+<div
+  class="bg-dark events-container"
+  [style.gridTemplateColumns]="gridTemplateColumns"
+  style="grid-auto-rows: 1fr"
+>
+  <div
+    *ngFor="let event of events"
+    class="border border-1 border-white bg-dark"
+  >
+    <app-event [data]="event" *ngIf="event; else elseBlock" />
+    <ng-template #elseBlock></ng-template>
+  </div>
+</div>

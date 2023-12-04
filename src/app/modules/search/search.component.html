@@ -1,29 +1,142 @@
-<div class="d-flex bg-dark h-100">
-    <div class="w-100"></div>
-    <div class="search-form p-4">
-        <div class="form-title">Bộ lọc</div>
-        <div class="form-item">
-            <div class="label">Loại rule</div>
-            <input class="control w-100"/>
+<div class="bg-dark">
+  <!-- Menu bar -->
+  <div
+    class="d-flex justify-content-between align-items-center w-100 p-1 border-bottom"
+  >
+    <div class="d-flex">
+      <app-select
+        [items]="gridColumnSelectItems"
+        label="Ô lưới"
+        [formControl]="gridViewFormControl"
+      ></app-select>
+      <div>
+        <button
+          type="button"
+          [ngClass]="
+            viewMode === 'map-view' ? 'btn-primary' : 'btn-outline-primary'
+          "
+          class="btn btn-outline-primary text-white ms-1"
+          (click)="setViewMode('map-view')"
+        >
+          Bản đồ
+        </button>
+      </div>
+      <div>
+        <button
+          type="button"
+          [ngClass]="
+            viewMode === 'list-view' ? 'btn-primary' : 'btn-outline-primary'
+          "
+          class="btn text-white ms-1"
+          (click)="setViewMode('list-view')"
+        >
+          Danh sách
+        </button>
+      </div>
+
+      <div style="width: 2px" class="bg-white mx-2"></div>
+
+      <app-select
+        [items]="startTimeDropdownItems"
+        label="Thời gian"
+        [formControl]="startTimeFormControl"
+      ></app-select>
+      <app-select
+        [items]="objectDropdownItems"
+        label="Đối tượng"
+        [multiple]="true"
+        [formControl]="objectsFormControl"
+        class="ms-1"
+      ></app-select>
+      <app-select
+        [items]="colourDropdownItems"
+        label="Màu sắc"
+        [multiple]="true"
+        [formControl]="coloursFormControl"
+        [dropdownItemTemplate]="colourDropDownItemTemplate"
+        class="ms-1"
+      ></app-select>
+      <ng-template
+        #colourDropDownItemTemplate
+        let-label="label"
+        let-value="value"
+      >
+        <div class="d-flex align-items-center">
+          <div
+            class="border border-1 me-1"
+            [ngStyle]="{'background': value, 'width': '15px', 'height': '15px',}"
+          ></div>
+          {{ label }}
         </div>
-        <div class="form-item">
-            <div class="label">Loại đối tượng</div>
-            <input class="control w-100"/>
-        </div>
-        <div class="form-item">
-            <div class="label">Thời gian nhỏ nhất</div>
-            <input class="control w-100"/>
-        </div>
-        <div class="form-item">
-            <div class="label">Khoảng thời gian</div>
-            <input class="control w-100"/>
-        </div>
-        <div class="form-item">
-            <div class="label">Giới hạn số sự kiện tìm thấy</div>
-            <input class="control w-100"/>
-        </div>
-        <div class="form-item mt-4 text-center">
-            <button class="btn btn-primary button" (click)="search()">Tìm kiếm</button>
-        </div>
+      </ng-template>
+      <app-select
+        [items]="rulesDropdownItems"
+        label="Vi phạm"
+        [multiple]="true"
+        [formControl]="rulesFormControl"
+        class="ms-1"
+      ></app-select>
+      <app-select
+        [items]="severitiesDropdownItems"
+        label="Mức độ"
+        [multiple]="true"
+        [formControl]="severitiesFormControl"
+        class="ms-1"
+      ></app-select>
     </div>
+
+    <app-search-input></app-search-input>
+  </div>
+  <div
+    class="d-flex align-items-center justify-content-between w-100 p-1 border-bottom"
+  >
+    <div class="d-flex">
+      <app-select
+        [items]="statusDropdownItems"
+        [formControl]="statusFormControl"
+        [dropdownToggleContentTemplate]="statusDropToggleContentTemplate"
+        activeClass=""
+        deactiveClass=""
+      ></app-select>
+      <ng-template #statusDropToggleContentTemplate>
+        <i class="bi bi-square"></i>
+      </ng-template>
+      <div>
+        <button type="button" class="btn text-white">
+          <i class="bi bi-clock"></i>
+        </button>
+      </div>
+      <div>
+        <button type="button" class="btn text-white">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+      </div>
+    </div>
+
+    <app-pagination
+      [pageLength]="paginationInfo.pageLength"
+      [totalItems]="paginationInfo.totalItems"
+      [(ngModel)]="paginationInfo.currentPage"
+    ></app-pagination>
+  </div>
+  <div
+    [ngSwitch]="viewMode"
+    class="view-wrapper"
+    [ngClass]="{ 'scroll-y': viewMode !== 'map-view' }"
+  >
+    <app-grid-view
+      *ngSwitchCase="'grid-view'"
+      [cols]="currentGridColumns"
+      [events]="currentEvents"
+    ></app-grid-view>
+    <app-map-view
+      *ngSwitchCase="'map-view'"
+      [events]="currentEvents"
+    ></app-map-view>
+    <app-list-view
+      *ngSwitchCase="'list-view'"
+      [events]="currentEvents"
+    ></app-list-view>
+    <div *ngSwitchDefault>Unsupported view mode</div>
+  </div>
 </div>

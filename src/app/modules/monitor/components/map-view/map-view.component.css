@@ -1,9 +1,0 @@
-.map-container {
-    height: calc(100vh - 34pt - 23pt - 2px) !important;
-}
-
-.events-container {
-    height: calc(100vh - 34pt - 23pt - 2px) !important;
-    overflow-y: auto;
-    overflow-x: hidden;
-}

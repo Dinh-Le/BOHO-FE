@@ -1,0 +1,15 @@
+<app-form-dialog
+  [formGroup]="form"
+  title="Thêm nhóm node"
+  [canSubmit]="!form.invalid"
+  (cancel)="cancel()"
+  (submit)="submit()"
+>
+  <div class="row">
+    <input
+      class="form-control form-control-sm bg-white text-dark"
+      formControlName="name"
+      required
+    />
+  </div>
+</app-form-dialog>

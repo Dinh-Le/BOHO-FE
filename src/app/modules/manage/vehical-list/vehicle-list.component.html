@@ -1,0 +1,54 @@
+<div class="menu-container d-flex justify-content-between">
+  <span class="ms-2">{{ title }}</span>
+  <div class="me-2">
+    <button class="btn btn-primary text-white px-2" (click)="add()">
+      <i class="bi bi-plus"></i>Thêm
+    </button>
+  </div>
+</div>
+<div class="content-wrapper">
+  <table class="w-100">
+    <colgroup>
+      <col width="30" />
+      <col width="400" />
+      <col width="150" />
+      <col width="150" />
+      <col width="auto" />
+    </colgroup>
+    <thead>
+      <th></th>
+      <th>Các danh sách<i class="bi bi-sort-alpha-down"></i></th>
+      <th>Loại<i class="bi bi-sort-alpha-down"></i></th>
+      <th>Số lượng biển<i class="bi bi-sort-alpha-down"></i></th>
+      <th></th>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of data; trackBy: trackById">
+        <td></td>
+        <td>
+          {{ item.name }}
+        </td>
+        <td>{{ item.type }}</td>
+        <td>{{ item.vehicleCount }}</td>
+        <td>
+          <div
+            ngbDropdown
+            container="body"
+            class="d-flex align-items-center justify-content-end pe-2"
+          >
+            <a class="cursor-pointer hide-caret" ngbDropdownToggle
+              ><i class="bi bi-three-dots"></i
+            ></a>
+            <ul class="table-row-popup-menu" ngbDropdownMenu>
+              <li (click)="view(item)"><i class="bi bi-pencil-square"></i> Xem danh sách</li>
+              <li><i class="bi bi-camera-video"></i> Nạp lại danh sách</li>
+              <li (click)="remove(item)">
+                <i class="bi bi-trash"></i> Xóa nhóm
+              </li>
+            </ul>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

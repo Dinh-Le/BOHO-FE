@@ -1,0 +1,28 @@
+@import "../../../../node_modules/bootstrap/scss/bootstrap.scss";
+
+.navbar-nav > .nav-item {
+  border: 0;
+  padding: 0;
+  padding-right: 2rem;
+}
+
+.navbar-nav > .nav-item:last-child {
+  padding-right: 0rem;
+}
+
+.navbar-nav > .nav-item > .active {
+  @extend .border-2;
+  @extend .border-bottom;
+  @extend .border-primary;
+}
+
+.navbar-nav > .nav-item > div > .nav-link {
+  color: white;
+  padding: 0;
+}
+
+:host {
+  display: grid;
+  grid-template-columns: 0.18fr 1fr auto;
+  @extend .bg-dark;
+}

@@ -1,0 +1,135 @@
+{
+  "user": [
+    {
+      "id": "0",
+      "name": "root",
+      "password": "Goback@2021",
+      "email": "admin@gmail.com"
+    }
+  ],
+  "group": [
+    {
+      "id": "a4d8651e-96e5-41f3-9769-77f268747053",
+      "name": "Group camera 1",
+      "describle": ""
+    },
+    {
+      "id": "7d28a2f6-3373-458f-aece-567147b819eb",
+      "name": "Group camera 2",
+      "describle": ""
+    }
+  ],
+  "group_management": [],
+  "node": [
+    {
+      "id": "29d5a387-5817-4989-aca1-82b71b9eaa6c",
+      "node_operator_id": "1",
+      "location": {
+        "lat": "",
+        "long": ""
+      },
+      "name": "Node 1",
+      "type": "TensorRT",
+      "ip": "192.168.1.1:5600",
+      "is_active": false,
+      "node_metadata": {
+        "user": "admin",
+        "password": "admin"
+      }
+    },
+    {
+      "id": "31da1e8b-0502-4007-abf2-b2b37da5124f",
+      "node_operator_id": "107b787a-06af-473c-ad61-a02ffac99631",
+      "location": {
+        "lat": "",
+        "long": ""
+      },
+      "name": "Node 1",
+      "type": "TensorRT",
+      "ip": "122.168.1.1:1235",
+      "is_active": false,
+      "node_metadata": {
+        "user": "admin",
+        "password": "gfhg"
+      }
+    }
+  ],
+  "node_operator": [
+    {
+      "id": "107b787a-06af-473c-ad61-a02ffac99631",
+      "name": "Group node 1",
+      "describle": "",
+      "node_id": ""
+    },
+    {
+      "id": "3e6d9e78-5bf4-4d27-8f49-c9df7fe4ac94",
+      "name": "Group node 2",
+      "describle": "",
+      "node_id": ""
+    },
+    {
+      "id": "59036518-7b5f-4458-ae3e-cfdc759edea3",
+      "name": "Group node 3",
+      "describle": "",
+      "node_id": ""
+    },
+    {
+      "id": "a32fccf6-176d-415f-a05e-dbbe7dd63730",
+      "name": "Group node 45",
+      "describle": "",
+      "node_id": ""
+    }
+  ],
+  "device": [
+    {
+      "id": "1e744fe7-06f4-4a3e-9e9d-327a0c3b402b",
+      "node_id": "31da1e8b-0502-4007-abf2-b2b37da5124f",
+      "name": "Cổng chính",
+      "device_metadata": {
+        "manufacture": "",
+        "describle": ""
+      },
+      "location": {
+        "lat": 10.778173313459495,
+        "long": 106.77154183387756
+      },
+      "type": "Cố định",
+      "camera": {
+        "driver": "rtsp",
+        "type": "Cố định",
+        "connection_metadata": {
+          "rtsp": {
+            "rtsp_url": "rtsp://192.168.1.100:554/cam0_1",
+            "user": "admin",
+            "password": "admin"
+          }
+        }
+      }
+    },
+    {
+      "id": "93c28ba2-bb3f-4a03-bd47-f671ae6ee9a7",
+      "node_id": "31da1e8b-0502-4007-abf2-b2b37da5124f",
+      "name": "Camera 1",
+      "device_metadata": {
+        "manufacture": "",
+        "describle": ""
+      },
+      "location": {
+        "lat": 11.747044573157732,
+        "long": 1548.360815048218
+      },
+      "type": "Cố định",
+      "camera": {
+        "driver": "rtsp",
+        "type": "Cố định",
+        "connection_metadata": {
+          "rtsp": {
+            "rtsp_url": "1",
+            "user": "11",
+            "password": "1"
+          }
+        }
+      }
+    }
+  ]
+}

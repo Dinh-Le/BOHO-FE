@@ -1,0 +1,65 @@
+<app-form-dialog
+  [title]="title"
+  (cancel)="cancel()"
+  (submit)="submit()"
+  [canSubmit]="canSubmit"
+>
+  <form [formGroup]="form">
+    <div class="row">
+      <div class="col-3">
+        <label for="name">Tên danh sách:</label>
+      </div>
+      <div class="col-6">
+        <input
+          class="my-input"
+          id="name"
+          name="name"
+          formControlName="name"
+          required
+        />
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col-3">
+        <label for="name">Loại:</label>
+      </div>
+      <div class="col-6">
+        <div class="form-check form-check-inline">
+          <input
+            class="form-check-input"
+            name="type"
+            id="type"
+            type="radio"
+            formControlName="type"
+            value="Danh sách đen"
+          />
+          <label class="form-check-label" for="type">Danh sách đen</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input
+            class="form-check-input"
+            name="type"
+            id="type"
+            type="radio"
+            formControlName="type"
+            value="Danh sách trắng"
+          />
+          <label class="form-check-label" for="type">Danh sách trắng</label>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col-3">
+        <label for="imported-file">Nạp danh sách</label>
+      </div>
+      <div class="col-6">
+        <input class="my-input" id="imported-file" name="imported-file" />
+      </div>
+      <div class="col-3">
+        <button class="btn btn-primary text-white w-100" type="button">
+          Duyệt file
+        </button>
+      </div>
+    </div>
+  </form>
+</app-form-dialog>

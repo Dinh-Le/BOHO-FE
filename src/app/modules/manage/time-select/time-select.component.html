@@ -1,0 +1,40 @@
+<div
+  class="d-flex flex-row align-items-center"
+  [ngClass]="isDisabled ? 'pe-none' : 'pe-auto'"
+>
+  <div>
+    <a class="btn d-flex justify-content-center" (click)="increase(1, 'hours')">
+      <i class="bi bi-chevron-up"></i>
+    </a>
+    <div
+      class="text-center py-1 px-2"
+      style="background: #3f3f3f; border: #29282a solid 2px"
+    >
+      {{ hour }}
+    </div>
+    <a class="btn d-flex justify-content-center" (click)="decrease(1, 'hours')">
+      <i class="bi bi-chevron-down"></i>
+    </a>
+  </div>
+  <div class="text-center mx-1">:</div>
+  <div>
+    <a
+      class="btn d-flex justify-content-center"
+      (click)="increase(1, 'minutes')"
+    >
+      <i class="bi bi-chevron-up"></i>
+    </a>
+    <div
+      class="text-center py-1 px-2"
+      style="background: #3f3f3f; border: #29282a solid 2px"
+    >
+      {{ minute }}
+    </div>
+    <a
+      class="btn d-flex justify-content-center"
+      (click)="decrease(1, 'minutes')"
+    >
+      <i class="bi bi-chevron-down"></i>
+    </a>
+  </div>
+</div>

@@ -1,0 +1,86 @@
+<div
+  class="menu-container d-flex justify-content-between align-items-center px-2"
+>
+  <ul>
+    <li class="mx-2">
+      <a class="text-decoration-none" [routerLink]="ruleUrl"
+        ><i class="bi bi-list-check"></i>Quy tắc</a
+      >
+    </li>
+    <li class="mx-2 active"><i class="bi bi-clock"></i>Lịch trình</li>
+  </ul>
+  <a class="btn btn-primary px-2 text-white" (click)="add()">
+    <i class="bi bi-plus"></i> Thêm</a
+  >
+</div>
+<div class="full-height">
+  <app-expandable-table
+    rowKey="id"
+    [data]="data"
+    [columns]="columns"
+    [collapseContentTemplateRef]="rowContentTemplate"
+  ></app-expandable-table>
+  <ng-template #rowContentTemplate let-data="data">
+    <div class="px-4 py-2">
+      <div class="row mt-4">
+        <div class="col-6">
+          <input
+            class="inline-input fs-16 w-100 text-white bg-transparent"
+            [(ngModel)]="data.name"
+            [disabled]="!data.isEditable"
+          />
+        </div>
+      </div>
+      <div
+        class="mt-3"
+        style="display: grid; grid-template-columns: 20px repeat(48, 1fr)"
+      >
+        <span></span>
+        <span *ngFor="let item of [].constructor(48); let i = index">
+          {{ i % 2 == 0 ? i / 2 : "" }}
+        </span>
+      </div>
+      <div
+        *ngFor="let day of data.scheduleData; let i = index"
+        style="
+          display: grid;
+          grid-template-columns: 20px repeat(48, 1fr);
+          height: 40px;
+        "
+      >
+        <span>{{ daysInWeek[i] }}</span>
+        <span
+          (click)="toggle(data, i, j)"
+          class="border border-1 border-dark cursor-pointer"
+          *ngFor="let hour of day; let j = index"
+          [ngStyle]="{ background: hour ? '#5285B6' : '#7F7F7F' }"
+        >
+        </span>
+      </div>
+      <div class="mt-4 d-flex justify-content-center">
+        <ng-container *ngIf="data.isEditable; else viewButtonsTemplate">
+          <button
+            class="my-button cancel mx-1"
+            (click)="data.isEditable = false"
+          >
+            Hủy
+          </button>
+          <button class="my-button submit mx-1" (click)="save(data)">
+            Lưu
+          </button>
+        </ng-container>
+        <ng-template #viewButtonsTemplate>
+          <button class="my-button remove mx-1" (click)="remove(data)">
+            Xóa
+          </button>
+          <button
+            class="my-button submit mx-1"
+            (click)="data.isEditable = true"
+          >
+            Chỉnh sửa
+          </button>
+        </ng-template>
+      </div>
+    </div>
+  </ng-template>
+</div>

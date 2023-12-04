@@ -1,0 +1,41 @@
+<div
+  class="tree-view-item"
+  [ngStyle]="{
+    background: isSelected
+      ? config.activeBackgroundColor
+      : config.backgroundColor
+  }"
+  *ngIf="item?.isVisible"
+  (click)="itemClick.emit(item)"
+>
+  <app-svg-icon
+    *ngIf="item?.hasChild"
+    [icon]="item?.isExpanded ? 'arrow-expand-arrow' : 'arrow-right-arrow'"
+    (click)="toggleExpand($event)"
+  ></app-svg-icon>
+  <ng-container
+    *ngIf="itemTemplate; else defaultTemplate"
+    [ngTemplateOutlet]="itemTemplate"
+    [ngTemplateOutletContext]="{item, active: isSelected }"
+  ></ng-container>
+  <ng-template #defaultTemplate>
+    <span
+      [ngStyle]="{
+        color: isSelected ? config.activeTextColor : config.textColor
+      }"
+      style="user-select: none"
+      >{{ item?.label }}</span
+    >
+  </ng-template>
+</div>
+
+<app-tree-view-item-dropdown
+  [selectedItems]="selectedItems"
+  [ngClass]="{ 'd-none': !item.isExpanded }"
+  [items]="item.children"
+  *ngIf="item && item?.hasChild && item?.isVisible"
+  (itemClick)="itemClick.emit($event)"
+  [itemTemplate]="itemTemplate"
+  [config]="config"
+>
+</app-tree-view-item-dropdown>

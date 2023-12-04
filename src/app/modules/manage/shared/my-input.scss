@@ -1,0 +1,79 @@
+.my-input {
+  padding: 2px;
+  width: 100%;
+  border: none;
+  background: white;
+  color: black;
+  border-radius: 4px;
+  padding: 0.25rem;
+  outline: none;
+}
+
+.my-input:focus {
+  box-shadow: none;
+  -webkit-box-shadow: none;
+}
+
+.my-input:invalid {
+  border: 1px solid red;
+}
+
+.my-button {
+  color: #FFFFFF;
+  min-width: 80px;
+  border-width: 1px;
+  border-radius: 4px;
+  border-style: solid;
+  border-color: #31538F;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.my-button.submit {
+  background: #5285B6;
+}
+
+.my-button.submit[disabled] {
+  background: var(--bs-secondary);
+  color: #c3bdbd;
+  cursor: not-allowed;
+}
+
+.my-button.cancel {
+  background: var(--bs-secondary);
+}
+
+.my-button.remove {
+  background: var(--bs-danger);
+}
+
+.my-input[type=checkbox] {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.my-input[type=checkbox]:checked::after {
+  content: '';
+  position: absolute;
+  display: inline-block;
+  border: solid black;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+  width: 8px;
+  height: 16px;
+}
+
+.my-input[type=checkbox]::before {
+  content: '';
+  position: absolute;
+  display:  inline-block;
+  width: 24px;
+  height: 24px;
+  background: white;
+  border-radius: 0.25rem;
+}

@@ -1,0 +1,102 @@
+<div class="menu-container d-flex justify-content-between">
+  <span class="ms-2">Nhóm camera</span>
+  <div class="me-2">
+    <button class="btn btn-primary text-white px-2" (click)="add()">
+      <i class="bi bi-plus"></i>Thêm
+    </button>
+  </div>
+</div>
+<div class="content-wrapper">
+  <table class="w-100">
+    <colgroup>
+      <col width="30" />
+      <col width="400" />
+      <col width="150" />
+      <col width="auto" />
+    </colgroup>
+    <thead>
+      <th></th>
+      <th>Tên nhóm camera<i class="bi bi-sort-alpha-down"></i></th>
+      <th>Số lượng camera<i class="bi bi-sort-alpha-down"></i></th>
+      <th></th>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of data; trackBy: trackById">
+        <td></td>
+        <td>
+          <ng-container *ngIf="!item.isEditable; else editableForm">
+            {{ item.name }}
+          </ng-container>
+          <ng-template #editableForm>
+            <div class="d-flex align-items-center px-1">
+              <input
+                class="w-100 border-0 border-light border-bottom"
+                [(ngModel)]="item.name"
+              />
+              <button
+                class="btn btn-secondary px-2 mx-1 text-white"
+                (click)="item.isEditable= false"
+              >
+                Hủy
+              </button>
+              <button
+                class="btn btn-primary px-2 text-white"
+                (click)="update(item)"
+              >
+                Lưu
+              </button>
+            </div>
+          </ng-template>
+        </td>
+        <td>{{ item.cameraCount }}</td>
+        <td>
+          <div
+            ngbDropdown
+            container="body"
+            class="d-flex align-items-center justify-content-end pe-2"
+          >
+            <a class="cursor-pointer hide-caret" ngbDropdownToggle
+              ><i class="bi bi-three-dots"></i
+            ></a>
+            <ul class="table-row-popup-menu" ngbDropdownMenu>
+              <li (click)="item.isEditable= true">
+                <i class="bi bi-pencil-square"></i> Đặt lại tên
+              </li>
+              <li (click)="showManageCameraDialog(item)">
+                <i class="bi bi-camera-video"></i> Quản lý camera
+              </li>
+              <li (click)="remove(item)">
+                <i class="bi bi-trash"></i> Xóa nhóm
+              </li>
+            </ul>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<ng-template #addRowModel let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Thêm nhóm nút</h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      <input class="form-input" />
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-outline-dark"
+      (click)="modal.close('Save click')"
+    >
+      Save
+    </button>
+  </div>
+</ng-template>

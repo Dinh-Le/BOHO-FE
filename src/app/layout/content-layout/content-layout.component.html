@@ -1,19 +1,13 @@
-<div class="content-layout">
-    <nav class="navbar navbar-expand-sm navbar-dark bg-dark" style="grid-column: 1/ span 2;">
-        <a class="navbar-brand" style="width: 138pt;" href="#">HOBO</a>
-        <ul class="navbar-nav">
-            <li *ngFor="let item of navItems" class="nav-item">
-                <div [ngClass]="{ 'active': item.active }">
-                    <a class="nav-link" [routerLink]="item.path">{{ item.title }}</a>
-                </div>
-            </li>
-        </ul>
-    </nav>
-    <aside>
-        <app-sidebar></app-sidebar>
-    </aside>
-    <main>
-        <router-outlet></router-outlet>
-    </main>
-    <ngx-loading [show]="loading" [config]="loadingConfig"></ngx-loading>
-</div>
+<app-top-bar></app-top-bar>
+<app-sidebar
+  class="pe-2 sidebar"
+  [ngClass]="{ 'd-none': !sidebarVisible }"
+></app-sidebar>
+<main
+  class="main-content"
+  [ngStyle]="{
+    marginLeft: sidebarVisible ? '250px' : '0px'
+  }"
+>
+  <router-outlet></router-outlet>
+</main>

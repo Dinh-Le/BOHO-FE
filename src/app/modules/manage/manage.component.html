@@ -1,0 +1,13 @@
+<div class="menu-container">
+  <ul>
+    <li
+      *ngFor="let item of menuLevel2 | objectEntries"
+      [ngClass]="{ active: item[1].isActive }"
+      (click)="onMenuItemClick(item[0])"
+    >
+      <app-svg-icon [icon]="item[1].icon" color="white"></app-svg-icon>
+      {{ item[1].text }}
+    </li>
+  </ul>
+</div>
+<router-outlet></router-outlet>

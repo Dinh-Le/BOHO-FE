@@ -1,0 +1,114 @@
+/* You can add global styles to this file, and also import other style files */
+@import "./variables";
+@import "../node_modules/bootstrap/scss/bootstrap.scss";
+@import "../node_modules/bootstrap-icons/font/bootstrap-icons.scss";
+@import "~leaflet/dist/leaflet.css";
+
+* {
+  font-family: "Arial";
+  font-weight: normal;
+  font-size: 14px;
+}
+
+.w-18 {
+  width: 18%;
+}
+
+.car-side-16 {
+  background-image: url("assets/icons/icons8-sedan-16.png");
+  background-size: cover;
+  width: 16px;
+  height: 16px;
+}
+
+.car-side-32 {
+  background-image: url("assets/icons/icons8-sedan-32.png");
+  background-size: cover;
+  width: 32px;
+  height: 32px;
+}
+
+.person-walking-32 {
+  background-image: url("assets/icons/icons8-person-walking-32.png");
+  background-size: cover;
+  width: 32px;
+  height: 32px;
+}
+
+.icons8-dome-camera-32 {
+  background-image: url("assets/icons/icons8-dome-camera-32.png");
+  background-size: cover;
+  width: 32px;
+  height: 32px;
+}
+
+.text-overflow-ellipsis {
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
+  overflow: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(224, 214, 214);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b30000;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+@for $size from 14 through 20 {
+  .fs-#{$size} {
+    font-size: #{$size}px;
+  }
+}
+
+.inline-input {
+  border: 0;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: var(--bs-primary);
+  outline: none;
+}
+
+.inline-input:focus {
+  outline: none;
+}
+
+.inline-input:disabled {
+  border: none;
+  color: white;
+}
+
+.node-good {
+  color: #94d82d;
+}
+
+.node-disconnected {
+  color: #fa5252;
+}
+
+.device-good {
+  color: #94d82d;
+}
+
+.device-disconnected {
+  color: #fa5252;
+}
+
+.device-failure {
+  color: #fcc419;
+}
