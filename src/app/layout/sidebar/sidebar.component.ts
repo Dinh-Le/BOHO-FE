@@ -53,17 +53,22 @@ export class SidebarComponent implements OnInit {
   selectedItems: TreeViewItemModel[] = [];
 
   ngOnInit(): void {
-    this.setViewMode('by-node');
-
     this.store
       .pipe(select('sidebar'), select('viewMode'))
       .subscribe((viewMode) => {
-        if (viewMode === ViewMode.Logical) {
-          this.setViewMode('by-node');
-        } else {
-          this.setViewMode('by-group');
+        switch (viewMode) {
+          case ViewMode.Logical:
+            this.setViewMode('by-node');
+            break;
+          case ViewMode.Geolocation:
+            this.setViewMode('by-group');
+            break;
         }
       });
+
+    this.store.dispatch(
+      SidebarActions.setViewMode({ viewMode: ViewMode.Logical })
+    );
   }
 
   @HostListener('document:click', ['$event'])
