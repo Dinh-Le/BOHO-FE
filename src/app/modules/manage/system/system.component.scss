@@ -16,10 +16,12 @@
       cursor: pointer;
     }
 
+    li:hover {
+      cursor: pointer;
+    }
+
     li.active {
-      border-bottom-style: solid;
-      border-bottom-width: 1px;
-      border-bottom-color: var(--bs-primary);
+      border-bottom: 2px solid #517da8;
       pointer-events: none;
     }
   }

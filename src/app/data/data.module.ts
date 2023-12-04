@@ -5,14 +5,30 @@ import { NodeService, NodeServiceImpl } from './service/node.service';
 import { DeviceService, DeviceServiceImpl } from './service/device.service';
 import { UserService, UserServiceImpl } from './service/user.service';
 import { GroupService, GroupServiceImpl } from './service/group.service';
-import { GroupManagementService, GroupManagementServiceImpl } from './service/group-management.service';
-import { NodeOperatorService, NodeOperatorServiceImpl } from './service/node-operator.service';
+import {
+  GroupManagementService,
+  GroupManagementServiceImpl,
+} from './service/group-management.service';
+import {
+  NodeOperatorService,
+  NodeOperatorServiceImpl,
+} from './service/node-operator.service';
 import { ObjectService, ObjectServiceImpl } from './service/object.service';
-import { PatrolManagementService, PatrolManagementServiceImpl } from './service/patrol-management.service';
-import { PatrolScheduleService, PatrolScheduleServiceImpl } from './service/patrol-schedule.service';
+import {
+  PatrolManagementService,
+  PatrolManagementServiceImpl,
+} from './service/patrol-management.service';
+import {
+  PatrolScheduleService,
+  PatrolScheduleServiceImpl,
+} from './service/patrol-schedule.service';
 import { PatrolService, PatrolServiceImpl } from './service/patrol.service';
 import { RuleService, RuleServiceImpl } from './service/rule.service';
 import { TouringService, TouringServiceImpl } from './service/touring.service';
+import {
+  MilestoneService,
+  MilestoneServiceImpl,
+} from './service/milestone.service';
 
 const providers = [
   { provide: UserService, useClass: UserServiceImpl },
@@ -27,6 +43,7 @@ const providers = [
   { provide: PatrolService, useClass: PatrolServiceImpl },
   { provide: RuleService, useClass: RuleServiceImpl },
   { provide: TouringService, useClass: TouringServiceImpl },
+  { provide: MilestoneService, useClass: MilestoneServiceImpl },
 ];
 
 @NgModule({

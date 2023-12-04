@@ -14,6 +14,7 @@ import { LoadingDirective } from './directives/loading.directive';
 import { LoadingComponent } from './components/loading/loading.component';
 import { ObjectEntries } from './pipes/object-entries.pipe';
 import { SvgIconComponent } from './components/svg-icon/svg-icon.component';
+import { MaskPipe } from './pipes/mask.pipe';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { SvgIconComponent } from './components/svg-icon/svg-icon.component';
     LoadingComponent,
     LoadingDirective,
     ObjectEntries,
+    MaskPipe,
     SvgIconComponent,
   ],
   imports: [CommonModule, FormsModule, NgbModule, FontAwesomeModule],
@@ -39,6 +41,7 @@ import { SvgIconComponent } from './components/svg-icon/svg-icon.component';
     ListViewComponent,
     LoadingDirective,
     ObjectEntries,
+    MaskPipe,
     SvgIconComponent,
   ],
 })
