@@ -1,18 +1,15 @@
 import { ControlValueAccessor } from '@angular/forms';
 
 export class ControlValueAccessorImpl<T> implements ControlValueAccessor {
-  private _model: Array<T> = [];
-  private _onChange: (_: Array<T>) => void = (_) => {};
+  protected _model!: T;
+  protected _onChange: (_: T) => void = (_) => {};
 
-  get model(): Array<T> {
+  get model(): T {
     return this._model;
   }
 
-  set model(value: Array<T>) {
-    if (
-      value.length === this._model.length &&
-      value.every((e) => this._model.some((x) => this.areEqual(x, e)))
-    ) {
+  set model(value: T) {
+    if (this.areEqual(this.model, value)) {
       return;
     }
 
@@ -20,8 +17,8 @@ export class ControlValueAccessorImpl<T> implements ControlValueAccessor {
     this._onChange(this.model);
   }
 
-  writeValue(value: Array<T>): void {
-    this.model = value || [];
+  writeValue(value: T): void {
+    this.model = value;
   }
 
   registerOnChange(fn: any): void {

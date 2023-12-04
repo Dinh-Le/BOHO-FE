@@ -7,7 +7,7 @@ import {
   EventEmitter,
 } from '@angular/core';
 import { ListViewItemModel } from './list-view-item.model';
-import { ControlValueAccessorImpl } from '@shared/helpers/control-value-accessor-impl';
+import { ArrayControlValueAccessorImpl } from '@shared/helpers/array-control-value-accessor-impl';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
@@ -22,7 +22,7 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms';
     },
   ],
 })
-export class ListViewComponent extends ControlValueAccessorImpl<ListViewItemModel> {
+export class ListViewComponent extends ArrayControlValueAccessorImpl<ListViewItemModel> {
   @Input() items: ListViewItemModel[] = [];
   @Input() itemTemplate?: TemplateRef<any>;
   @Input() backgroundColor: string = 'white';

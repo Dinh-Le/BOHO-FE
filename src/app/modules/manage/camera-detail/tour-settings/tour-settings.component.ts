@@ -3,16 +3,12 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ToastService } from '@app/services/toast.service';
 import { SelectItemModel } from '@shared/models/select-item-model';
-import { map, mergeAll, of, switchMap, zip } from 'rxjs';
+import { switchMap, zip } from 'rxjs';
 import { DaysInWeek } from 'src/app/data/constants';
-import { Patrol } from 'src/app/data/schema/boho-v2/patrol';
-import { PatrolSchedule } from 'src/app/data/schema/boho-v2/patrol-schedule';
-import { Touring } from 'src/app/data/schema/boho-v2/touring';
 import {
   Level3Menu,
   NavigationService,
 } from 'src/app/data/service/navigation.service';
-import { PatrolScheduleService } from 'src/app/data/service/patrol-schedule.service';
 import { PatrolService } from 'src/app/data/service/patrol.service';
 import { TouringService } from 'src/app/data/service/touring.service';
 import { v4 } from 'uuid';
@@ -20,15 +16,14 @@ import { v4 } from 'uuid';
 interface PtzTour {
   id: string;
   touringId: number;
-  patrolId: number;
-  patrolScheduleId: number;
+  patrolId: string;
   startTime: number;
   endTime: number;
   left: number;
   width: number;
   day: SelectItemModel;
   color: SelectItemModel;
-  selected: boolean;
+  selected?: boolean;
 }
 
 @Component({
@@ -38,7 +33,6 @@ interface PtzTour {
 })
 export class TourSettingsComponent implements OnInit {
   private _patrolService = inject(PatrolService);
-  private _patrolScheduleService = inject(PatrolScheduleService);
   private _tourService = inject(TouringService);
   private _activatedRoute = inject(ActivatedRoute);
   private _toastService = inject(ToastService);
@@ -90,10 +84,6 @@ export class TourSettingsComponent implements OnInit {
   selectedTour: PtzTour | undefined;
 
   ngOnInit(): void {
-    let tours: { [key: number]: Touring } = [];
-    let patrols: Patrol[] = [];
-    let patrolSchedules: PatrolSchedule[] = [];
-
     this._navigationService.level3 = Level3Menu.TOUR_SETTINGS;
 
     this._activatedRoute.parent?.params
@@ -102,19 +92,28 @@ export class TourSettingsComponent implements OnInit {
           this._nodeId = nodeId;
           this._cameraId = cameraId;
 
-          tours = {};
-          patrols = [];
-          patrolSchedules = [];
-
           this.patrols = [];
           this.data = this.data.map(() => []);
-          this.form.reset();
+          this.form.reset(
+            {
+              startTime: 0,
+              endTime: 0,
+              day: null,
+              type: 'patrol',
+              color: null,
+            },
+            {
+              emitEvent: true,
+            }
+          );
           return zip(
             this._patrolService.findAll(this._nodeId, this._cameraId),
             this._tourService.findAll(this._nodeId, this._cameraId)
           );
-        }),
-        switchMap((responses) => {
+        })
+      )
+      .subscribe({
+        next: (responses) => {
           const [findAllPatrolResponse, findAllTourResponse] = responses;
 
           if (!findAllPatrolResponse.success) {
@@ -132,70 +131,37 @@ export class TourSettingsComponent implements OnInit {
           }
 
           if ('data' in findAllPatrolResponse) {
-            patrols = findAllPatrolResponse.data;
+            this.patrols = findAllPatrolResponse.data.map((e) => ({
+              value: e.id,
+              label: e.name,
+            }));
           }
 
           if ('data' in findAllTourResponse) {
-            tours = findAllTourResponse.data.reduce(
-              (dict, e) => Object.assign(dict, { [e.id]: e }),
-              {}
-            );
-          }
+            findAllTourResponse.data.forEach((e) => {
+              const startTime = parseInt(e.schedule.start_time);
+              const endTime = parseInt(e.schedule.end_time);
+              const left = (startTime * 100) / 1440;
+              const width = ((endTime - startTime) * 100) / 1440;
+              const day = parseInt(e.schedule.day);
 
-          return patrols.map((e) =>
-            this._patrolScheduleService.findAll(
-              this._nodeId,
-              this._cameraId,
-              e.id
-            )
-          );
-        }),
-        mergeAll(),
-        map((response) => {
-          if (!response.success) {
-            throw Error('Fetch patrol failed with error: ' + response.data);
-          }
-
-          if ('data' in response) {
-            patrolSchedules.push(...response.data);
-          }
-        })
-      )
-      .subscribe({
-        next: () => {
-          console.log(patrolSchedules);
-          console.log(tours);
-          console.log(patrols);
-
-          this.patrols = patrols.map((e) => ({
-            value: e.id,
-            label: e.name,
-          }));
-
-          this.data = patrolSchedules.reduce((data, e) => {
-            const startTime = e.schedule.start_time;
-            const endTime = e.schedule.end_time;
-            const left = (startTime * 100) / 1440;
-            const width = ((endTime - startTime) * 100) / 1440;
-
-            data[e.schedule.day].push({
-              color: this.colors.find((x) => x.value === e.color)!,
-              day: {
-                value: e.schedule.day,
-                label: DaysInWeek[e.schedule.day],
-              },
-              startTime,
-              endTime,
-              id: v4(),
-              patrolId: 0,
-              patrolScheduleId: e.id,
-              touringId: e.touring_id,
-              left,
-              width,
-              selected: false,
+              this.data[day].push({
+                color: this.colors.find((x) => x.value === e.color)!,
+                day: {
+                  value: day,
+                  label: DaysInWeek[day],
+                },
+                startTime,
+                endTime,
+                id: v4(),
+                touringId: e.id,
+                patrolId: e.patrol_id!,
+                left,
+                width,
+                selected: false,
+              });
             });
-            return data;
-          }, this.data);
+          }
         },
         error: ({ message }) => this._toastService.showError(message),
       });
@@ -214,50 +180,27 @@ export class TourSettingsComponent implements OnInit {
       .create(this._nodeId, this._nodeId, {
         active: true,
         type,
+        color: color.value,
+        patrol_id: patrol.value.toString(),
+        schedule: {
+          day: day.value.toString(),
+          start_time: startTime.toString(),
+          end_time: endTime.toString(),
+        },
       })
-      .pipe(
-        switchMap((respone) => {
-          if (!respone.success) {
-            throw Error('Create tour failed with error: ' + respone.message);
+      .subscribe({
+        next: (response) => {
+          if (!response.success) {
+            throw Error(
+              'Create touring failed with error: ' + response.message
+            );
           }
 
-          const touringId = respone.data.id;
-          return this._patrolScheduleService
-            .create(this._nodeId, this._cameraId, patrol.value, {
-              color: color.value,
-              touring_id: touringId,
-              schedule: {
-                day: day.value,
-                start_time: startTime,
-                end_time: endTime,
-              },
-            })
-            .pipe(
-              switchMap((response) => {
-                if (!response.success) {
-                  throw Error(
-                    'Create patrol schedule failed with error: ' +
-                      response.message
-                  );
-                }
-
-                const patrolScheduleId = respone.data.id;
-                return of({
-                  touringId,
-                  patrolScheduleId,
-                });
-              })
-            );
-        })
-      )
-      .subscribe({
-        next: ({ touringId, patrolScheduleId }) => {
           const left = (startTime * 100) / 1440;
           const width = ((endTime - startTime) * 100) / 1440;
           const tour: PtzTour = {
             id: v4(),
-            touringId,
-            patrolScheduleId,
+            touringId: response.data,
             patrolId: patrol.value,
             startTime,
             endTime,
@@ -295,28 +238,8 @@ export class TourSettingsComponent implements OnInit {
       return;
     }
 
-    this._patrolScheduleService
-      .delete(
-        this._nodeId,
-        this._cameraId,
-        this.selectedTour.patrolId,
-        this.selectedTour.patrolScheduleId
-      )
-      .pipe(
-        switchMap((response) => {
-          if (!response.success) {
-            throw Error(
-              'Delete patrol schedule failed with error: ' + response.message
-            );
-          }
-
-          return this._tourService.delete(
-            this._nodeId,
-            this._cameraId,
-            this.selectedTour!.touringId
-          );
-        })
-      )
+    this._tourService
+      .delete(this._nodeId, this._cameraId, this.selectedTour!.touringId)
       .subscribe({
         next: (response) => {
           if (!response.success) {

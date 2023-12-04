@@ -1,5 +1,6 @@
 import { Component, forwardRef } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ControlValueAccessorImpl } from '@shared/helpers/control-value-accessor-impl';
 
 @Component({
   selector: 'app-time-input',
@@ -13,20 +14,17 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
     },
   ],
 })
-export class TimeInputComponent implements ControlValueAccessor {
+export class TimeInputComponent extends ControlValueAccessorImpl<number> {
   currentValue: number = 0;
 
-  onChanged: any;
-  onTouch: any;
-
-  get model() {
+  override get model() {
     return this.currentValue;
   }
 
-  set model(value: number) {
+  override set model(value: number) {
     this.currentValue = Math.max(0, Math.min(value, 1440));
-    if (this.onChanged) {
-      this.onChanged(this.currentValue);
+    if (this._onChange) {
+      this._onChange(this.currentValue);
     }
   }
 
@@ -48,18 +46,4 @@ export class TimeInputComponent implements ControlValueAccessor {
     if (!value) value = '00';
     this.model = Number.parseInt(value) * 60 + Number.parseInt(this.minute);
   }
-
-  writeValue(value: number): void {
-    this.model = value;
-  }
-
-  registerOnChange(fn: any): void {
-    this.onChanged = fn;
-  }
-
-  registerOnTouched(fn: any): void {
-    this.onTouch = fn;
-  }
-
-  setDisabledState?(isDisabled: boolean): void {}
 }

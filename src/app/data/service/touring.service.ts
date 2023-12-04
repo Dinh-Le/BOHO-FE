@@ -5,16 +5,15 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env';
 
+type CreateOrUpdateTouringRequest = Omit<Touring, 'id'>;
+type CreateTouringResponse = ResponseBase & { data: number };
+
 export abstract class TouringService {
   public abstract create(
     nodeId: string,
     deviceId: string,
-    data: Omit<Touring, 'id'>
-  ): Observable<
-    ResponseBase & {
-      data: Pick<Touring, 'id'>;
-    }
-  >;
+    data: CreateOrUpdateTouringRequest
+  ): Observable<CreateTouringResponse>;
 
   public abstract findAll(
     nodeId: string,
@@ -28,7 +27,7 @@ export abstract class TouringService {
   public abstract find(
     nodeId: string,
     deviceId: string,
-    touring_id: string
+    id: number
   ): Observable<
     ResponseBase & {
       data: Touring;
@@ -38,13 +37,14 @@ export abstract class TouringService {
   public abstract update(
     nodeId: string,
     deviceId: string,
-    touring: Touring
+    id: number,
+    data: CreateOrUpdateTouringRequest
   ): Observable<ResponseBase>;
 
   public abstract delete(
     nodeId: string,
     deviceId: string,
-    touringId: number
+    id: number
   ): Observable<ResponseBase>;
 }
 
@@ -55,13 +55,10 @@ export class TouringServiceImpl extends TouringService {
   public override create(
     nodeId: string,
     deviceId: string,
-    data: Omit<Touring, 'id'>
-  ): Observable<ResponseBase & { data: Pick<Touring, 'id'> }> {
+    data: CreateOrUpdateTouringRequest
+  ): Observable<CreateTouringResponse> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/touring`;
-    return this.httpClient.post<ResponseBase & { data: Pick<Touring, 'id'> }>(
-      url,
-      data
-    );
+    return this.httpClient.post<CreateTouringResponse>(url, data);
   }
 
   public override findAll(
@@ -75,19 +72,20 @@ export class TouringServiceImpl extends TouringService {
   public override find(
     nodeId: string,
     deviceId: string,
-    touring_id: string
+    id: number
   ): Observable<ResponseBase & { data: Touring }> {
-    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/touring/${touring_id}`;
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/touring/${id}`;
     return this.httpClient.get<ResponseBase & { data: Touring }>(url);
   }
 
   public override update(
     nodeId: string,
     deviceId: string,
-    touring: Touring
+    id: number,
+    data: CreateOrUpdateTouringRequest
   ): Observable<ResponseBase> {
-    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/touring/${touring.id}`;
-    return this.httpClient.patch<ResponseBase>(url, touring);
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/touring/${id}`;
+    return this.httpClient.patch<ResponseBase>(url, data);
   }
 
   public override delete(
