@@ -16,6 +16,7 @@ import { Milestone } from 'src/app/data/schema/boho-v2/milestone';
 import { MilestoneService } from 'src/app/data/service/milestone.service';
 import { ToastService } from '@app/services/toast.service';
 import { text } from '@fortawesome/fontawesome-svg-core';
+import { of, switchMap } from 'rxjs';
 
 class RowItemModel extends ExpandableTableRowItemModelBase {
   static counter: number = 1;
@@ -311,5 +312,53 @@ export class SystemComponent implements AfterViewInit, OnInit {
       },
       error: ({ message }) => this._toastService.showError(message),
     });
+  }
+
+  verify(item: RowItemModel) {
+    this._milestoneSevice
+      .verify(item.data)
+      .pipe(
+        switchMap((response) => {
+          if (!response.success) {
+            throw Error(
+              'Test connection failed with error: ' + response.message
+            );
+          }
+
+          return of(response);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this._toastService.showSuccess(
+            `Test sending to the ${item.name} successfully`
+          );
+        },
+        error: ({ message }) => this._toastService.showError(message),
+      });
+  }
+
+  connect(item: RowItemModel) {
+    this._milestoneSevice
+      .connect(item.data)
+      .pipe(
+        switchMap((response) => {
+          if (!response.success) {
+            throw Error(
+              'Test connection failed with error: ' + response.message
+            );
+          }
+
+          return of(response);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this._toastService.showSuccess(
+            `Test connection to the ${item.name} successfully`
+          );
+        },
+        error: ({ message }) => this._toastService.showError(message),
+      });
   }
 }

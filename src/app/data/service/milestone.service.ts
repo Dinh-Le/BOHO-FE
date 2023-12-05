@@ -20,6 +20,8 @@ export abstract class MilestoneService extends RestfullApiService {
     data: CreateOrUpdateMilestoneRequest
   ): Observable<ResponseBase>;
   public abstract delete(id: number): Observable<ResponseBase>;
+  public abstract connect(milestone: Milestone): Observable<ResponseBase>;
+  public abstract verify(milestone: Milestone): Observable<ResponseBase>;
 }
 
 export class MilestoneServiceImpl extends MilestoneService {
@@ -49,5 +51,17 @@ export class MilestoneServiceImpl extends MilestoneService {
   public override delete(id: number): Observable<ResponseBase> {
     const url = `${environment.baseUrl}/api/rest/v1/milestone/${id}`;
     return this.httpClient.delete<ResponseBase>(url);
+  }
+  public override connect(milestone: Milestone): Observable<ResponseBase> {
+    const url = `${environment.baseUrl}/api/rest/v1/milestone/${milestone.id}/connect`;
+    return this.httpClient.post<ResponseBase>(url, milestone.login_info);
+  }
+  public override verify(milestone: Milestone): Observable<ResponseBase> {
+    const url = `${environment.baseUrl}/api/rest/v1/milestone/${milestone.id}/verify`;
+    const { host, port } = milestone.login_info;
+    return this.httpClient.post<ResponseBase>(url, {
+      host,
+      port,
+    });
   }
 }
