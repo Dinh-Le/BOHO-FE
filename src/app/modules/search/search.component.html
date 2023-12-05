@@ -1,4 +1,134 @@
-<div class="bg-dark">
+<div class="toolbar">
+  <app-svg-icon
+    icon="grid-2"
+    class="grid-size"
+    height="24px"
+    width="24px"
+    color="#FFFFFF"
+  ></app-svg-icon>
+  <app-svg-icon
+    icon="grid-3"
+    class="grid-size"
+    width="24px"
+    height="24px"
+  ></app-svg-icon>
+  <app-svg-icon
+    icon="grid-4"
+    class="grid-size"
+    width="24px"
+    height="24px"
+  ></app-svg-icon>
+  <app-svg-icon
+    icon="grid-5"
+    class="grid-size"
+    width="24px"
+    height="24px"
+  ></app-svg-icon>
+  <button type="button" class="active">Ô lưới</button>
+  <button type="button">Bản đồ</button>
+  <button type="button">Danh sách</button>
+</div>
+
+<div class="content">
+  <div
+    [ngSwitch]="viewMode"
+    class="view-wrapper"
+    [ngClass]="{ 'scroll-y': viewMode !== 'map-view' }"
+  >
+    <app-grid-view
+      *ngSwitchCase="'grid-view'"
+      [cols]="currentGridColumns"
+      [events]="currentEvents"
+    ></app-grid-view>
+    <app-map-view
+      *ngSwitchCase="'map-view'"
+      [events]="currentEvents"
+    ></app-map-view>
+    <app-list-view
+      *ngSwitchCase="'list-view'"
+      [events]="currentEvents"
+    ></app-list-view>
+    <div *ngSwitchDefault>Unsupported view mode</div>
+  </div>
+</div>
+<form class="search-form">
+  <div class="form-item">
+    <label for="startTime" class="label">Thời gian bắt đầu</label>
+    <input class="control w-100" id="startTime" type="datetime-local" />
+  </div>
+  <div class="form-item">
+    <label for="endTime" class="label">Thời gian kết thúc</label>
+    <input class="control w-100" id="endTime" type="datetime-local" />
+  </div>
+  <div class="form-item">
+    <label>Đối đối tượng</label>
+    <div style="height: 50px" class="control"></div>
+    <button class="active mt-1">Thêm</button>
+  </div>
+  <div class="form-item">
+    <label class="label">Quy tắc</label>
+    <app-select-2
+      [styles]="{
+        'border-radius': 0
+      }"
+    ></app-select-2>
+  </div>
+  <div class="form-item">
+    <label class="label">T.gian giữa 2 kết quả</label>
+    <div class="d-flex">
+      <app-numeric-input
+        class="control"
+        unit="min"
+        [min]="0"
+        [max]="59"
+        [style]="{
+          background: '#d0cece',
+          padding: 0,
+          flex: 1,
+          marginRight: '1px',
+        }"
+      ></app-numeric-input>
+      <app-numeric-input
+        class="control"
+        unit="sec"
+        [min]="0"
+        [max]="59"
+        [style]="{
+          background: '#d0cece',
+          padding: 0,
+          flex: 1,
+          marginLeft: '1px',
+        }"
+      ></app-numeric-input>
+    </div>
+  </div>
+  <div class="form-item">
+    <label for="licencePlate" class="label">Biển số xe</label>
+    <input
+      type="text"
+      id="licencePlate"
+      autocomplete="off"
+      class="control w-100"
+    />
+  </div>
+  <div class="form-item d-flex align-items-center">
+    <label for="displayWithLicensePlateOnly">Chỉ h.thị xe có b.số</label>
+    <input
+      id="displayWithLicensePlateOnly"
+      type="checkbox"
+      class="ms-2"
+      style="width: 24px; height: 24px"
+    />
+  </div>
+  <div class="form-item">
+    <button type="reset">Reset</button>
+  </div>
+  <div class="form-item">
+    <button class="active w-100">Tìm kiếm</button>
+  </div>
+</form>
+
+<div class="bg-dark d-none">
   <!-- Menu bar -->
   <div
     class="d-flex justify-content-between align-items-center w-100 p-1 border-bottom"
@@ -118,25 +248,5 @@
       [totalItems]="paginationInfo.totalItems"
       [(ngModel)]="paginationInfo.currentPage"
     ></app-pagination>
-  </div>
-  <div
-    [ngSwitch]="viewMode"
-    class="view-wrapper"
-    [ngClass]="{ 'scroll-y': viewMode !== 'map-view' }"
-  >
-    <app-grid-view
-      *ngSwitchCase="'grid-view'"
-      [cols]="currentGridColumns"
-      [events]="currentEvents"
-    ></app-grid-view>
-    <app-map-view
-      *ngSwitchCase="'map-view'"
-      [events]="currentEvents"
-    ></app-map-view>
-    <app-list-view
-      *ngSwitchCase="'list-view'"
-      [events]="currentEvents"
-    ></app-list-view>
-    <div *ngSwitchDefault>Unsupported view mode</div>
   </div>
 </div>

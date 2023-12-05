@@ -1,0 +1,14 @@
+<div class="content">
+  <input
+    #input
+    type="text"
+    [(ngModel)]="model"
+    (keydown)="onKeyDown($event)"
+    (ngModelChange)="onChange($event, input)"
+  />
+  <span *ngIf="unit">{{ unit }}</span>
+</div>
+<a class="up" (click)="up()"><i class="bi bi-caret-up-fill"></i></a>
+<a class="down" (click)="down()">
+  <i class="bi bi-caret-down-fill"></i>
+</a>

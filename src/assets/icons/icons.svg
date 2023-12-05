@@ -38,54 +38,49 @@
       <path
         d="M 9.15625 6.3125 L 6.3125 9.15625 L 22.15625 25 L 6.21875 40.96875 L 9.03125 43.78125 L 25 27.84375 L 40.9375 43.78125 L 43.78125 40.9375 L 27.84375 25 L 43.6875 9.15625 L 40.84375 6.3125 L 25 22.15625 Z" />
     </symbol>
-    <symbol id="grid-3" viewBox="0 0 64 64">
-      <path
-        d="M9 9H22V22H9zM26 9H39V22H26zM43 9H56V22H43zM9 26H22V39H9zM26 26H39V39H26zM43 26H56V39H43zM9 43H22V56H9zM26 43H39V56H26zM43 43H56V56H43z" />
+    <symbol id="grid-3" viewBox="0 0 24 24">
+      <!-- Create the grid cells with white background and black border -->
+      <rect width="24" height="24" fill="white" stroke="black" stroke-width="1" />
+      <!-- Vertical Lines -->
+      <path d="M8 0 V24" stroke="black" stroke-width="1" />
+      <path d="M16 0 V24" stroke="black" stroke-width="1" />
+      <!-- Horizontal Lines -->
+      <path d="M0 8 H24" stroke="black" stroke-width="1" />
+      <path d="M0 16 H24" stroke="black" stroke-width="1" />
     </symbol>
-    <symbol id="grid-4" viewBox="0 0 64 64">
-      <path
-        d="M6 6H16V16H6zM6 20H16V30H6zM6 34H16V44H6zM6 48H16V58H6zM20 6H30V16H20zM20 20H30V30H20zM20 34H30V44H20zM20 48H30V58H20zM34 6H44V16H34zM34 20H44V30H34zM34 34H44V44H34zM34 48H44V58H34zM48 6H58V16H48zM48 20H58V30H48zM48 34H58V44H48zM48 48H58V58H48z" />
+    <symbol id="grid-4" viewBox="0 0 24 24">
+      <!-- Create the grid cells with white background and black border -->
+      <rect width="24" height="24" fill="white" stroke="black" stroke-width="1" />
+      <!-- Vertical Lines -->
+      <path d="M6 0 V24" stroke="black" stroke-width="1" />
+      <path d="M12 0 V24" stroke="black" stroke-width="1" />
+      <path d="M18 0 V24" stroke="black" stroke-width="1" />
+      <!-- Horizontal Lines -->
+      <path d="M0 6 H24" stroke="black" stroke-width="1" />
+      <path d="M0 12 H24" stroke="black" stroke-width="1" />
+      <path d="M0 18 H24" stroke="black" stroke-width="1" />
     </symbol>
-    <symbol id="grid-5" viewBox="0 0 1080 1080">
-      <rect x="0" y="0" width="100%" height="100%" fill="transparent"></rect>
-      <g transform="matrix(1 0 0 1 540 540)" id="951a81c0-3cd1-4b18-9f1b-3e6bff0b7755">
-        <rect
-          style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-rule: nonzero; opacity: 1; visibility: hidden;"
-          vector-effect="non-scaling-stroke" x="-540" y="-540" rx="0" ry="0" width="1080" height="1080" />
-      </g>
-      <g transform="matrix(1 0 0 1 540 540)" id="2bf379e0-9ccd-4565-89ec-bbbcaea02c50">
-      </g>
-      <g transform="matrix(1 0 0 1 540 540)">
-        <path
-          style="stroke: rgb(0,0,0); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"
-          vector-effect="non-scaling-stroke" transform=" translate(-32, -32)"
-          d="M 6 6 L 16 6 L 16 16 L 6 16 z M 6 20 L 16 20 L 16 30 L 6 30 z M 6 34 L 16 34 L 16 44 L 6 44 z M 6 48 L 16 48 L 16 58 L 6 58 z M 20 6 L 30 6 L 30 16 L 20 16 z M 20 20 L 30 20 L 30 30 L 20 30 z M 20 34 L 30 34 L 30 44 L 20 44 z M 20 48 L 30 48 L 30 58 L 20 58 z M 34 6 L 44 6 L 44 16 L 34 16 z M 34 20 L 44 20 L 44 30 L 34 30 z M 34 34 L 44 34 L 44 44 L 34 44 z M 34 48 L 44 48 L 44 58 L 34 58 z M 48 6 L 58 6 L 58 16 L 48 16 z M 48 20 L 58 20 L 58 30 L 48 30 z M 48 34 L 58 34 L 58 44 L 48 44 z M 48 48 L 58 48 L 58 58 L 48 58 z"
-          stroke-linecap="round" />
-      </g>
-      <g transform="matrix(1 0 0 1 554.1 540)">
-        <path
-          style="stroke: rgb(0,0,0); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"
-          vector-effect="non-scaling-stroke" transform=" translate(-32, -32)"
-          d="M 6 6 L 16 6 L 16 16 L 6 16 z M 6 20 L 16 20 L 16 30 L 6 30 z M 6 34 L 16 34 L 16 44 L 6 44 z M 6 48 L 16 48 L 16 58 L 6 58 z M 20 6 L 30 6 L 30 16 L 20 16 z M 20 20 L 30 20 L 30 30 L 20 30 z M 20 34 L 30 34 L 30 44 L 20 44 z M 20 48 L 30 48 L 30 58 L 20 58 z M 34 6 L 44 6 L 44 16 L 34 16 z M 34 20 L 44 20 L 44 30 L 34 30 z M 34 34 L 44 34 L 44 44 L 34 44 z M 34 48 L 44 48 L 44 58 L 34 58 z M 48 6 L 58 6 L 58 16 L 48 16 z M 48 20 L 58 20 L 58 30 L 48 30 z M 48 34 L 58 34 L 58 44 L 48 44 z M 48 48 L 58 48 L 58 58 L 48 58 z"
-          stroke-linecap="round" />
-      </g>
-      <g transform="matrix(1 0 0 1 554.1 526)">
-        <path
-          style="stroke: rgb(0,0,0); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"
-          vector-effect="non-scaling-stroke" transform=" translate(-32, -32)"
-          d="M 6 6 L 16 6 L 16 16 L 6 16 z M 6 20 L 16 20 L 16 30 L 6 30 z M 6 34 L 16 34 L 16 44 L 6 44 z M 6 48 L 16 48 L 16 58 L 6 58 z M 20 6 L 30 6 L 30 16 L 20 16 z M 20 20 L 30 20 L 30 30 L 20 30 z M 20 34 L 30 34 L 30 44 L 20 44 z M 20 48 L 30 48 L 30 58 L 20 58 z M 34 6 L 44 6 L 44 16 L 34 16 z M 34 20 L 44 20 L 44 30 L 34 30 z M 34 34 L 44 34 L 44 44 L 34 44 z M 34 48 L 44 48 L 44 58 L 34 58 z M 48 6 L 58 6 L 58 16 L 48 16 z M 48 20 L 58 20 L 58 30 L 48 30 z M 48 34 L 58 34 L 58 44 L 48 44 z M 48 48 L 58 48 L 58 58 L 48 58 z"
-          stroke-linecap="round" />
-      </g>
-      <g transform="matrix(1 0 0 1 540.1 526)">
-        <path
-          style="stroke: rgb(0,0,0); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"
-          vector-effect="non-scaling-stroke" transform=" translate(-32, -32)"
-          d="M 6 6 L 16 6 L 16 16 L 6 16 z M 6 20 L 16 20 L 16 30 L 6 30 z M 6 34 L 16 34 L 16 44 L 6 44 z M 6 48 L 16 48 L 16 58 L 6 58 z M 20 6 L 30 6 L 30 16 L 20 16 z M 20 20 L 30 20 L 30 30 L 20 30 z M 20 34 L 30 34 L 30 44 L 20 44 z M 20 48 L 30 48 L 30 58 L 20 58 z M 34 6 L 44 6 L 44 16 L 34 16 z M 34 20 L 44 20 L 44 30 L 34 30 z M 34 34 L 44 34 L 44 44 L 34 44 z M 34 48 L 44 48 L 44 58 L 34 58 z M 48 6 L 58 6 L 58 16 L 48 16 z M 48 20 L 58 20 L 58 30 L 48 30 z M 48 34 L 58 34 L 58 44 L 48 44 z M 48 48 L 58 48 L 58 58 L 48 58 z"
-          stroke-linecap="round" />
-      </g>
+    <symbol id="grid-5" viewBox="0 0 24 24">
+      <!-- Create the grid cells with white background and black border -->
+      <rect width="24" height="24" fill="white" stroke="black" stroke-width="1" />
+      <!-- Vertical Lines -->
+      <path d="M5 0 V25" stroke="black" stroke-width="1" />
+      <path d="M10 0 V25" stroke="black" stroke-width="1" />
+      <path d="M15 0 V25" stroke="black" stroke-width="1" />
+      <path d="M20 0 V25" stroke="black" stroke-width="1" />
+      <!-- Horizontal Lines -->
+      <path d="M0 5 H25" stroke="black" stroke-width="1" />
+      <path d="M0 10 H25" stroke="black" stroke-width="1" />
+      <path d="M0 15 H25" stroke="black" stroke-width="1" />
+      <path d="M0 20 H25" stroke="black" stroke-width="1" />
     </symbol>
-    <symbol id="grid-2" viewBox="0 0 64 64">
-      <path d="M8 8h22v22H8V8zM8 34h22v22H8V34zM34 8h22v22H34V8zM34 34h22v22H34V34z" />
+    <symbol id="grid-2" viewBox="0 0 24 24">
+      <!-- Create the grid cells with white background and black border -->
+      <rect width="24" height="24" fill="white" stroke="black" stroke-width="1" />
+      <!-- Vertical Lines -->
+      <path d="M12 0 V24" stroke="black" stroke-width="1" />
+      <!-- Horizontal Lines -->
+      <path d="M0 12 H24" stroke="black" stroke-width="1" />
     </symbol>
     <symbol id="refresh" viewBox="0 0 30 30">
       <path

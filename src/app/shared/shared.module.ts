@@ -15,6 +15,7 @@ import { LoadingComponent } from './components/loading/loading.component';
 import { ObjectEntries } from './pipes/object-entries.pipe';
 import { SvgIconComponent } from './components/svg-icon/svg-icon.component';
 import { MaskPipe } from './pipes/mask.pipe';
+import { NumberToStringPipe } from './pipes/number-to-string.pipe';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import { MaskPipe } from './pipes/mask.pipe';
     LoadingDirective,
     ObjectEntries,
     MaskPipe,
+    NumberToStringPipe,
     SvgIconComponent,
   ],
   imports: [CommonModule, FormsModule, NgbModule, FontAwesomeModule],
@@ -42,6 +44,7 @@ import { MaskPipe } from './pipes/mask.pipe';
     LoadingDirective,
     ObjectEntries,
     MaskPipe,
+    NumberToStringPipe,
     SvgIconComponent,
   ],
 })

@@ -210,7 +210,7 @@ export class SearchComponent implements OnInit {
   severitiesFormControl: FormControl = new FormControl([]);
   rulesFormControl: FormControl = new FormControl([]);
   statusFormControl: FormControl = new FormControl(this.statusDropdownItems[0]);
-  viewMode: string = 'map-view';
+  viewMode: string = 'grid-view';
 
   paginationInfo: {
     currentPage: number;

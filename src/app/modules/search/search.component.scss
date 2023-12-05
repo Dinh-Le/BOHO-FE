@@ -1,3 +1,15 @@
+:host {
+  margin-top: 2px;
+  display: grid;
+  column-gap: 2px;
+  row-gap: 2px;
+  grid-template:
+    "toolbar toolbar"
+    "content searchForm";
+  grid-column: 1fr 180px;
+  grid-template-rows: 36px 1fr;
+}
+
 * {
   font-size: 14px !important;
 }
@@ -39,9 +51,98 @@
 
 .view-wrapper {
   /* navbar: 51px, toolbar: 34px * 2, row-gap: 1px * 2 */
-  height: calc(100vh - 51px - 34px * 2 - 2px) !important;
+  height: calc(100vh - 51px - 34px - 2px) !important;
 }
 
 .scroll-y {
   overflow-y: scroll;
+}
+
+button {
+  color: #ffffff;
+  background: #7f7f7f;
+  border: 1px solid #2f528f;
+  border-radius: 5px;
+}
+
+button.active {
+  background: #5285b6;
+}
+
+.toolbar {
+  grid-area: toolbar;
+  background: #4a494b;
+  display: flex;
+  justify-content: flex-end;
+
+  .grid-size {
+    cursor: pointer;
+    align-self: center;
+    margin-right: 4px;
+  }
+  .grid-size.active {
+    pointer-events: none;
+    cursor: none;
+  }
+
+  button {
+    width: 90px;
+    align-self: center;
+    margin-left: 2px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
+  button:last-child {
+    margin-right: 20px;
+  }
+  button.active {
+    pointer-events: none;
+    cursor: none;
+  }
+}
+
+.content {
+  grid-area: content;
+}
+
+.search-form {
+  grid-area: searchForm;
+  display: flex;
+  flex-direction: column;
+  background: #4a494b;
+  padding: 15px;
+
+  .form-item {
+    .label {
+      display: block;
+    }
+
+    .control {
+      border-radius: 0;
+      border: 1px solid white;
+      padding: 2px;
+      background: #7f7f7f;
+    }
+
+    .input-min::after {
+      content: "min";
+      display: block;
+    }
+  }
+
+  .form-item:first-child {
+    margin-top: 0px;
+  }
+
+  .form-item {
+    margin-top: 10px;
+  }
+
+  .form-item:last-child {
+    margin-top: 30px;
+  }
+
+  button {
+    padding: 3px 20px;
+  }
 }
