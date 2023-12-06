@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ToastService } from '@app/services/toast.service';
-import { FormDialogComponent } from '@modules/manage/form-dialog/form-dialog.component';
+import { FormDialogComponent } from '@shared/components/form-dialog/form-dialog.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { TreeViewItemModel } from '@shared/components/tree-view/tree-view-item.model';
 import { ViewMode } from '@shared/components/tree-view/view-mode.enum';

@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { FormDialogComponent } from '@modules/manage/form-dialog/form-dialog.component';
+import { FormDialogComponent } from '@shared/components/form-dialog/form-dialog.component';
 import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -14,7 +14,12 @@ import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: 'add-vehicle-list.component.html',
   styleUrls: ['../../shared/my-input.scss', '../../shared/my-modal.scss'],
   standalone: true,
-  imports: [NgbModalModule, FormsModule, ReactiveFormsModule, FormDialogComponent],
+  imports: [
+    NgbModalModule,
+    FormsModule,
+    ReactiveFormsModule,
+    FormDialogComponent,
+  ],
 })
 export class AddVehicleListComponent {
   activeModal = inject(NgbActiveModal);
