@@ -7,7 +7,10 @@ import {
   inject,
 } from '@angular/core';
 import { MenuItem } from '../menu-item';
-import { ColumnConfig } from '../expandable-table/expandable-table.component';
+import {
+  ColumnConfig,
+  ExpandableTableRowItemModelBase,
+} from '../expandable-table/expandable-table.component';
 import { SelectItemModel } from '@shared/models/select-item-model';
 import { ActivatedRoute } from '@angular/router';
 import { v4 } from 'uuid';
@@ -15,33 +18,77 @@ import {
   Level3Menu,
   NavigationService,
 } from 'src/app/data/service/navigation.service';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-export interface RowData {
-  id: string;
-  name: string;
-  status?: boolean;
-  type?: SelectItemModel;
-  objects?: SelectItemModel[];
-  tour?: {
-    id: string;
-    name: string;
-  };
-  tenTichHop?: string;
-  diemGiamSat?: {
-    id: string;
-    name: string;
-  };
-  thoiGianVuot?: number;
-  severity?: {
-    id: string;
-    name: string;
-  };
-  schedule?: {
-    id: string;
-    name: string;
-  };
-  isExpanded?: boolean;
-  isEditable?: boolean;
+export class RowItemModel extends ExpandableTableRowItemModelBase {
+  id = v4();
+  form = new FormGroup({
+    name: new FormControl<string>('', [Validators.required]),
+    status: new FormControl<boolean>(true, [Validators.required]),
+    integration: new FormControl<string>(''),
+    preset: new FormControl<SelectItemModel | undefined>(undefined, [
+      Validators.required,
+    ]),
+    type: new FormControl<SelectItemModel | undefined>(undefined, [
+      Validators.required,
+    ]),
+    objects: new FormControl<SelectItemModel[]>([], [Validators.required]),
+    exceedingTime: new FormControl<number>(5, [Validators.required]),
+    severity: new FormControl<SelectItemModel | undefined>(undefined, [
+      Validators.required,
+    ]),
+    schedule: new FormControl<SelectItemModel | undefined>(undefined, [
+      Validators.required,
+    ]),
+  });
+
+  get name() {
+    return this.form.get('name')?.value;
+  }
+
+  get status() {
+    return this.form.get('status')?.value;
+  }
+
+  get integration() {
+    return this.form.get('integrationName')?.value;
+  }
+
+  get preset() {
+    return this.form.get('preset')?.value;
+  }
+
+  get type() {
+    return this.form.get('type')?.value;
+  }
+
+  get objects() {
+    return this.form.get('objects')?.value;
+  }
+
+  get exceedingTime() {
+    return this.form.get('exceedingTime')?.value;
+  }
+
+  get severity() {
+    return this.form.get('severity')?.value;
+  }
+
+  get schedule() {
+    return this.form.get('schedule')?.value;
+  }
+
+  get canSubmit() {
+    return this.form.valid;
+  }
+
+  get boundingBoxType() {
+    if (this.type?.value === 4 || this.type?.value === 5) {
+      return 'line';
+    } else {
+      return 'polygon';
+    }
+  }
 }
 
 @Component({
@@ -63,7 +110,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
       onclick: this.add.bind(this),
     },
   ];
-  data: RowData[] = [];
+  data: RowItemModel[] = [];
   presets: SelectItemModel[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((e) => ({
     value: e,
     label: `Điểm giám sát ${e}`,
@@ -98,32 +145,32 @@ export class RuleComponent implements OnInit, AfterViewInit {
     {
       value: 1,
       label: 'Người',
-      icon: 'bi bi-person-walking',
+      icon: 'walking-person',
     },
     {
       value: 2,
       label: 'Xe đạp',
-      icon: 'fas,bicycle',
+      icon: 'bicycle',
     },
     {
       value: 3,
       label: 'Xe mô-tô',
-      icon: 'fas,motorcycle',
+      icon: 'motocycle',
     },
     {
       value: 4,
       label: 'Ô tô',
-      icon: 'fas,car-side',
+      icon: 'side-car',
     },
     {
       value: 5,
       label: 'Xe bus',
-      icon: 'bi bi-bus-front-fill',
+      icon: 'bus-side-view',
     },
     {
       value: 6,
       label: 'Xe tải',
-      icon: 'bi bi-truck',
+      icon: 'side-truck',
     },
   ];
   severities: SelectItemModel[] = [
@@ -211,17 +258,16 @@ export class RuleComponent implements OnInit, AfterViewInit {
   }
 
   add() {
-    const newRule: RowData = {
-      id: v4(),
-      name: '',
-      status: true,
-      isEditable: true,
-      isExpanded: true,
-    };
-    this.data.push(newRule);
+    const newItem = new RowItemModel();
+    newItem.isEditable = true;
+    newItem.isExpanded = true;
+    newItem.isNew = true;
+    this.data.push(newItem);
   }
 
-  remove(item: RowData) {
+  submit(item: RowItemModel) {}
+
+  remove(item: RowItemModel) {
     this.data = this.data.filter((e) => e.id !== item.id);
   }
 
