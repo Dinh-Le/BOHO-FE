@@ -16,6 +16,7 @@ import { ObjectEntries } from './pipes/object-entries.pipe';
 import { SvgIconComponent } from './components/svg-icon/svg-icon.component';
 import { MaskPipe } from './pipes/mask.pipe';
 import { NumberToStringPipe } from './pipes/number-to-string.pipe';
+import { BoundingBoxEditorComponent } from '@modules/search/components/bounding-box-editor/bounding-box-editor.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { NumberToStringPipe } from './pipes/number-to-string.pipe';
     MaskPipe,
     NumberToStringPipe,
     SvgIconComponent,
+    BoundingBoxEditorComponent,
   ],
   imports: [CommonModule, FormsModule, NgbModule, FontAwesomeModule],
   exports: [
@@ -46,6 +48,7 @@ import { NumberToStringPipe } from './pipes/number-to-string.pipe';
     MaskPipe,
     NumberToStringPipe,
     SvgIconComponent,
+    BoundingBoxEditorComponent,
   ],
 })
 export class SharedModule {}

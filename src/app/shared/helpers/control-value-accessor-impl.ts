@@ -3,6 +3,7 @@ import { ControlValueAccessor } from '@angular/forms';
 export class ControlValueAccessorImpl<T> implements ControlValueAccessor {
   protected _model!: T;
   protected _onChange: (_: T) => void = (_) => {};
+  protected _isDisabled: boolean = false;
 
   get model(): T {
     return this._model;
@@ -27,7 +28,9 @@ export class ControlValueAccessorImpl<T> implements ControlValueAccessor {
 
   registerOnTouched(fn: any): void {}
 
-  setDisabledState?(isDisabled: boolean): void {}
+  setDisabledState?(isDisabled: boolean): void {
+    this._isDisabled = isDisabled;
+  }
 
   areEqual(x: T, y: T): boolean {
     return x == y;
