@@ -1,0 +1,100 @@
+<app-form-dialog
+  title="Đối tượng tìm kiếm"
+  (cancel)="cancel()"
+  (submit)="submit()"
+>
+  <div class="row">
+    <app-list-view
+      class="col-6"
+      [itemTemplate]="listItemTemplate"
+      [items]="objectItemModels"
+      backgroundColor="black"
+      textColor="white"
+      (itemClick)="onObjectSelected($event)"
+      [multiple]="false"
+    ></app-list-view>
+    <ng-template #listItemTemplate let-item="item">
+      <div class="d-flex align-items-center">
+        <input
+          type="checkbox"
+          class="mx-1"
+          (click)="$event.stopPropagation()"
+        />
+        <app-svg-icon
+          [icon]="item.data.icon"
+          class="mx-1 cursor-pointer"
+        ></app-svg-icon>
+        <span class="mx-1 cursor-pointer">{{ item.text }}</span>
+      </div>
+    </ng-template>
+    <div
+      class="col-6"
+      style="
+        display: grid;
+        grid-template-columns: 1fr auto;
+        grid-template-rows: 1fr 1fr;
+      "
+    >
+      <ng-container
+        *ngIf="!showHumanColorSelection; else humanColorSelectionTemplate"
+      >
+        <span>Màu</span>
+        <div>
+          <div
+            style="
+              display: grid;
+              grid-template-columns: repeat(3, 1fr);
+              row-gap: 2px;
+              column-gap: 2px;
+            "
+          >
+            <div
+              *ngFor="let item of colors"
+              [style.background]="item"
+              class="cursor-pointer"
+              style="width: 24px; height: 24px"
+            ></div>
+          </div>
+        </div>
+      </ng-container>
+      <ng-template #humanColorSelectionTemplate>
+        <span>Màu thân trên</span>
+        <div>
+          <div
+            style="
+              display: grid;
+              grid-template-columns: repeat(3, 1fr);
+              row-gap: 2px;
+              column-gap: 2px;
+            "
+          >
+            <div
+              *ngFor="let item of colors"
+              [style.background]="item"
+              class="cursor-pointer"
+              style="width: 24px; height: 24px"
+            ></div>
+          </div>
+        </div>
+        <span>Màu thân dưới</span>
+        <div>
+          <div
+            style="
+              display: grid;
+              grid-template-columns: repeat(3, 1fr);
+              row-gap: 2px;
+              column-gap: 2px;
+            "
+          >
+            <div
+              *ngFor="let item of colors"
+              [style.background]="item"
+              class="cursor-pointer"
+              style="width: 24px; height: 24px"
+            ></div>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</app-form-dialog>

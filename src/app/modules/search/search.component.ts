@@ -1,10 +1,12 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { LoadingService } from '@app/services/loading.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SelectItemModel } from '@shared/models/select-item-model';
 import * as moment from 'moment';
 import { EventInfo } from 'src/app/data/schema/event-info';
 import { EventService } from 'src/app/data/service/event.service';
+import { SelectObjectDialogComponent } from './components/select-object-dialog/select-object-dialog.component';
 
 interface ItemModel {
   label: string;
@@ -22,6 +24,7 @@ interface ItemModel {
 export class SearchComponent implements OnInit {
   private eventService = inject(EventService);
   private loadingService = inject(LoadingService);
+  private modelService = inject(NgbModal);
 
   gridColumnSelectItems: SelectItemModel[] = [
     {
@@ -277,5 +280,9 @@ export class SearchComponent implements OnInit {
 
   onPageChanged(value: number) {
     this.paginationInfo.currentPage = value;
+  }
+
+  addObject() {
+    this.modelService.open(SelectObjectDialogComponent, {});
   }
 }
