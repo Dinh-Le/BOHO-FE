@@ -100,7 +100,8 @@ export class RuleComponent implements OnInit, AfterViewInit {
   @ViewChild('objectColumnTemplate', { static: true })
   objectColumnTemplate!: TemplateRef<any>;
   _activatedRoute = inject(ActivatedRoute);
-  _cameraId: string | undefined;
+  _cameraId = '';
+  _nodeId = '';
   _navigationService = inject(NavigationService);
 
   menuItems: MenuItem[] = [
@@ -221,8 +222,9 @@ export class RuleComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this._navigationService.level3 = Level3Menu.RULE;
-    this._activatedRoute.params.subscribe(({ cameraId }) => {
+    this._activatedRoute.params.subscribe(({ nodeId, cameraId }) => {
       this._cameraId = cameraId;
+      this._nodeId = nodeId;
     });
   }
 
@@ -272,6 +274,6 @@ export class RuleComponent implements OnInit, AfterViewInit {
   }
 
   get scheduleUrl() {
-    return `/manage/device-rule/${this._cameraId}/schedule`;
+    return `/manage/device-rule/node/${this._nodeId}/camera/${this._cameraId}/schedule`;
   }
 }

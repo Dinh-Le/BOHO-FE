@@ -5,5 +5,6 @@
 }
 
 ::ng-deep .full-height {
-  height: calc(100vh - 49px - 36px - 36px - 0.2rem * 2);
+  // height: calc(100vh - 49px - 36px - 36px - 0.2rem * 2);
+  min-height: calc(100vh - 49px - 36px - 36px - 0.2rem * 2);
 }

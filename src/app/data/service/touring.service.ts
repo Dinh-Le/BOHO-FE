@@ -5,16 +5,45 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env';
 
-type CreateOrUpdateTouringRequest = Omit<Touring, 'id'>;
-type CreateTouringResponse = ResponseBase & { data: number };
+export type CreateOrUpdateTouringScheduleRequest = {
+  preset_setting?: {
+    preset_id: number;
+    color: string;
+    schedule: {
+      day: number;
+      start_time: string;
+      end_time: string;
+    }[];
+  };
+  patrol_setting?: {
+    patrol_id: number;
+    color: string;
+    schedule: {
+      day: number;
+      start_time: string;
+      end_time: string;
+    }[];
+  };
+};
+
+export type UpdateTouringScheduleRequest = {
+  schedule_type: string;
+  color: string;
+  schedule: {
+    start_time: string;
+    end_time: string;
+    day: number;
+  }[];
+};
+
+export type CreateOrUpdateTouringScheduleResponse = ResponseBase & {
+  data: {
+    id: number;
+    type: string;
+  };
+};
 
 export abstract class TouringService {
-  public abstract create(
-    nodeId: string,
-    deviceId: string,
-    data: CreateOrUpdateTouringRequest
-  ): Observable<CreateTouringResponse>;
-
   public abstract findAll(
     nodeId: string,
     deviceId: string
@@ -34,11 +63,27 @@ export abstract class TouringService {
     }
   >;
 
-  public abstract update(
+  public abstract createOrUpdateTouringSchedule(
     nodeId: string,
     deviceId: string,
     id: number,
-    data: CreateOrUpdateTouringRequest
+    data: CreateOrUpdateTouringScheduleRequest
+  ): Observable<CreateOrUpdateTouringScheduleResponse>;
+
+  public abstract updateTouringSchedule(
+    nodeId: string,
+    deviceId: string,
+    touringId: number,
+    scheduleId: number,
+    data: UpdateTouringScheduleRequest
+  ): Observable<CreateOrUpdateTouringScheduleResponse>;
+
+  public abstract deleteTouringSchedule(
+    nodeId: string,
+    deviceId: string,
+    touringId: number,
+    scheduleId: number,
+    schedule_type: 'patrol' | 'preset'
   ): Observable<ResponseBase>;
 
   public abstract delete(
@@ -51,15 +96,6 @@ export abstract class TouringService {
 @Injectable({ providedIn: 'root' })
 export class TouringServiceImpl extends TouringService {
   httpClient = inject(HttpClient);
-
-  public override create(
-    nodeId: string,
-    deviceId: string,
-    data: CreateOrUpdateTouringRequest
-  ): Observable<CreateTouringResponse> {
-    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/touring`;
-    return this.httpClient.post<CreateTouringResponse>(url, data);
-  }
 
   public override findAll(
     nodeId: string,
@@ -78,14 +114,46 @@ export class TouringServiceImpl extends TouringService {
     return this.httpClient.get<ResponseBase & { data: Touring }>(url);
   }
 
-  public override update(
+  public override createOrUpdateTouringSchedule(
     nodeId: string,
     deviceId: string,
     id: number,
-    data: CreateOrUpdateTouringRequest
+    data: CreateOrUpdateTouringScheduleRequest
+  ): Observable<CreateOrUpdateTouringScheduleResponse> {
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/touring/${id}/schedule`;
+    return this.httpClient.post<CreateOrUpdateTouringScheduleResponse>(
+      url,
+      data
+    );
+  }
+
+  public override updateTouringSchedule(
+    nodeId: string,
+    deviceId: string,
+    touringId: number,
+    scheduleId: number,
+    data: UpdateTouringScheduleRequest
+  ): Observable<CreateOrUpdateTouringScheduleResponse> {
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/touring/${touringId}/schedule/${scheduleId}`;
+    return this.httpClient.patch<CreateOrUpdateTouringScheduleResponse>(
+      url,
+      data
+    );
+  }
+
+  public override deleteTouringSchedule(
+    nodeId: string,
+    deviceId: string,
+    touringId: number,
+    scheduleId: number,
+    schedule_type: 'patrol' | 'preset'
   ): Observable<ResponseBase> {
-    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/touring/${id}`;
-    return this.httpClient.patch<ResponseBase>(url, data);
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/touring/${touringId}/schedule/${scheduleId}`;
+    return this.httpClient.delete<ResponseBase>(url, {
+      body: {
+        schedule_type,
+      },
+    });
   }
 
   public override delete(
