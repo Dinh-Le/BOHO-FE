@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   OnInit,
   TemplateRef,
@@ -111,6 +112,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
   _presetService = inject(PresetService);
   _scheduleService = inject(ScheduleService);
   _toastService = inject(ToastService);
+  _changeDetectorRef = inject(ChangeDetectorRef);
 
   menuItems: MenuItem[] = [
     {
@@ -194,33 +196,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
     },
   ];
   schedules: SelectItemModel[] = [];
-  columns: ColumnConfig[] = [
-    {
-      label: 'Tên quy tắc',
-      prop: 'name',
-      sortable: true,
-    },
-    {
-      label: 'Điểm giám sát',
-      prop: 'diemGiamSat.name',
-      sortable: true,
-    },
-    {
-      label: 'Loại quy tắc',
-      prop: 'type.label',
-      sortable: true,
-    },
-    {
-      label: 'Loại đối tượng',
-      prop: 'objects',
-      sortable: true,
-    },
-    {
-      label: 'Lịch trình',
-      prop: 'schedule.name',
-      sortable: true,
-    },
-  ];
+  columns: ColumnConfig[] = [];
 
   ngOnInit(): void {
     this._navigationService.level3 = Level3Menu.RULE;
@@ -311,6 +287,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
         sortable: true,
       },
     ];
+    this._changeDetectorRef.detectChanges();
   }
 
   add() {

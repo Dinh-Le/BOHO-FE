@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   OnInit,
   TemplateRef,
@@ -124,6 +125,7 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
 export class SystemComponent implements AfterViewInit, OnInit {
   private _milestoneSevice = inject(MilestoneService);
   private _toastService = inject(ToastService);
+  private _changeDetectorRef = inject(ChangeDetectorRef);
 
   @ViewChild('statusCellTemplateRef') statusCellTemplateRef!: TemplateRef<any>;
 
@@ -139,33 +141,7 @@ export class SystemComponent implements AfterViewInit, OnInit {
     },
   ];
   selectedSystem: SelectItemModel = this.systems[0];
-  columns: ColumnConfig[] = [
-    {
-      label: 'Tên giao tiếp',
-      prop: 'name',
-      sortable: true,
-    },
-    {
-      label: 'Loại',
-      prop: 'type',
-      sortable: true,
-    },
-    {
-      label: 'Host',
-      prop: 'host',
-      sortable: true,
-    },
-    {
-      label: 'Cổng',
-      prop: 'port',
-      sortable: true,
-    },
-    {
-      label: 'Trạng thái',
-      prop: 'status',
-      sortable: true,
-    },
-  ];
+  columns: ColumnConfig[] = [];
   data: RowItemModel[] = [];
 
   ngOnInit(): void {
@@ -217,6 +193,7 @@ export class SystemComponent implements AfterViewInit, OnInit {
         contentTemplateRef: this.statusCellTemplateRef,
       },
     ];
+    this._changeDetectorRef.detectChanges();
   }
 
   selectSystem(item: SelectItemModel) {
