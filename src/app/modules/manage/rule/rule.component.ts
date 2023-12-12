@@ -19,6 +19,10 @@ import {
   NavigationService,
 } from 'src/app/data/service/navigation.service';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { PresetService } from 'src/app/data/service/preset.service';
+import { ScheduleService } from 'src/app/data/service/schedule.service';
+import { of, switchMap } from 'rxjs';
+import { ToastService } from '@app/services/toast.service';
 
 export class RowItemModel extends ExpandableTableRowItemModelBase {
   id = v4();
@@ -99,10 +103,14 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
 export class RuleComponent implements OnInit, AfterViewInit {
   @ViewChild('objectColumnTemplate', { static: true })
   objectColumnTemplate!: TemplateRef<any>;
-  _activatedRoute = inject(ActivatedRoute);
+
   _cameraId = '';
   _nodeId = '';
+  _activatedRoute = inject(ActivatedRoute);
   _navigationService = inject(NavigationService);
+  _presetService = inject(PresetService);
+  _scheduleService = inject(ScheduleService);
+  _toastService = inject(ToastService);
 
   menuItems: MenuItem[] = [
     {
@@ -112,10 +120,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
     },
   ];
   data: RowItemModel[] = [];
-  presets: SelectItemModel[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((e) => ({
-    value: e,
-    label: `Điểm giám sát ${e}`,
-  }));
+  presets: SelectItemModel[] = [];
   ruleTypes: SelectItemModel[] = [
     {
       value: 1,
@@ -188,10 +193,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
       label: 'Cao',
     },
   ];
-  schedules: SelectItemModel[] = [1, 2, 3, 4].map((e) => ({
-    value: e,
-    label: 'Lịch trình ' + e,
-  }));
+  schedules: SelectItemModel[] = [];
   columns: ColumnConfig[] = [
     {
       label: 'Tên quy tắc',
@@ -225,6 +227,58 @@ export class RuleComponent implements OnInit, AfterViewInit {
     this._activatedRoute.params.subscribe(({ nodeId, cameraId }) => {
       this._cameraId = cameraId;
       this._nodeId = nodeId;
+
+      this._presetService
+        .findAll(this._nodeId, this._cameraId)
+        .pipe(
+          switchMap((response) => {
+            if (!response.success) {
+              throw Error(
+                `Fetch the preset list failed with error: ${response.message}`
+              );
+            }
+
+            return of(response.data);
+          })
+        )
+        .subscribe({
+          next: (presets) => {
+            this.presets = presets.map((e) => ({
+              label: e.name,
+              value: e.id,
+            }));
+          },
+          error: ({ message }) => {
+            this._toastService.showError(message);
+            this.presets = [];
+          },
+        });
+
+      this._scheduleService
+        .findAll(this._nodeId, this._cameraId)
+        .pipe(
+          switchMap((response) => {
+            if (!response.success) {
+              throw Error(
+                `Fetch the schedule list failed with error: ${response.message}`
+              );
+            }
+
+            return of(response.data);
+          })
+        )
+        .subscribe({
+          next: (schedules) => {
+            this.schedules = schedules.map((e) => ({
+              label: e.name,
+              value: e.id,
+            }));
+          },
+          error: ({ message }) => {
+            this._toastService.showError(message);
+            this.schedules = [];
+          },
+        });
     });
   }
 
