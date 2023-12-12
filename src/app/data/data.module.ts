@@ -33,6 +33,7 @@ import {
   ScheduleService,
   ScheduleServiceImpl,
 } from './service/schedule.service';
+import { PresetService, PresetServiceImpl } from './service/preset.service';
 
 const providers = [
   { provide: UserService, useClass: UserServiceImpl },
@@ -49,6 +50,7 @@ const providers = [
   { provide: TouringService, useClass: TouringServiceImpl },
   { provide: MilestoneService, useClass: MilestoneServiceImpl },
   { provide: ScheduleService, useClass: ScheduleServiceImpl },
+  { provide: PresetService, useClass: PresetServiceImpl },
 ];
 
 @NgModule({
