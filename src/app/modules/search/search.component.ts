@@ -6,7 +6,10 @@ import { SelectItemModel } from '@shared/models/select-item-model';
 import * as moment from 'moment';
 import { EventInfo } from 'src/app/data/schema/event-info';
 import { EventService } from 'src/app/data/service/event.service';
-import { SelectObjectDialogComponent } from './components/select-object-dialog/select-object-dialog.component';
+import {
+  ObjectItemModel,
+  SelectObjectDialogComponent,
+} from './components/select-object-dialog/select-object-dialog.component';
 
 interface ItemModel {
   label: string;
@@ -264,6 +267,10 @@ export class SearchComponent implements OnInit {
     return (this.gridViewFormControl.value as SelectItemModel)?.value || '0';
   }
 
+  trackById(_: any, item: any) {
+    return item.id;
+  }
+
   setViewMode(mode: string) {
     if (mode != this.viewMode) {
       this.viewMode = mode;
@@ -282,7 +289,17 @@ export class SearchComponent implements OnInit {
     this.paginationInfo.currentPage = value;
   }
 
+  objectItems: ObjectItemModel[] = [];
+
   addObject() {
-    this.modelService.open(SelectObjectDialogComponent, {});
+    const modalRef = this.modelService.open(SelectObjectDialogComponent, {});
+
+    (modalRef.componentInstance as SelectObjectDialogComponent).data =
+      this.objectItems;
+
+    modalRef.result.then(
+      ({ data }) => (this.objectItems = data),
+      () => {}
+    );
   }
 }

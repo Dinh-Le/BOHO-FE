@@ -8,8 +8,9 @@
       class="col-6"
       [itemTemplate]="listItemTemplate"
       [items]="objectItemModels"
-      backgroundColor="black"
+      backgroundColor="#1C1C19"
       textColor="white"
+      activeBackgroundColor="#5285B6"
       (itemClick)="onObjectSelected($event)"
       [multiple]="false"
     ></app-list-view>
@@ -18,16 +19,21 @@
         <input
           type="checkbox"
           class="mx-1"
-          (click)="$event.stopPropagation()"
+          [(ngModel)]="item.isSelected"
+          (ngModelChange)="onSelectionChange($event)"
         />
-        <app-svg-icon
-          [icon]="item.data.icon"
-          class="mx-1 cursor-pointer"
-        ></app-svg-icon>
-        <span class="mx-1 cursor-pointer">{{ item.text }}</span>
+        <label class="w-100 cursor-pointer" style="color: white">
+          <app-svg-icon
+            [icon]="item.icon"
+            color="white"
+            class="mx-1 cursor-pointer"
+          ></app-svg-icon
+          >{{ item.text }}</label
+        >
       </div>
     </ng-template>
     <div
+      *ngIf="this.selectedItem"
       class="col-6"
       style="
         display: grid;
@@ -51,6 +57,11 @@
             <div
               *ngFor="let item of colors"
               [style.background]="item"
+              [class.active]="item == this.selectedItem.colors[0]"
+              (click)="
+                this.selectedItem.colors[0] = item;
+                this.selectedItem.isSelected = true
+              "
               class="cursor-pointer"
               style="width: 24px; height: 24px"
             ></div>
@@ -71,6 +82,11 @@
             <div
               *ngFor="let item of colors"
               [style.background]="item"
+              [class.active]="item == this.selectedItem.colors[0]"
+              (click)="
+                this.selectedItem.colors[0] = item;
+                this.selectedItem.isSelected = true
+              "
               class="cursor-pointer"
               style="width: 24px; height: 24px"
             ></div>
@@ -89,6 +105,11 @@
             <div
               *ngFor="let item of colors"
               [style.background]="item"
+              [class.active]="item == this.selectedItem.colors[1]"
+              (click)="
+                this.selectedItem.colors[1] = item;
+                this.selectedItem.isSelected = true
+              "
               class="cursor-pointer"
               style="width: 24px; height: 24px"
             ></div>

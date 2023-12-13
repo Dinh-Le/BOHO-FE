@@ -62,8 +62,37 @@
   </div>
   <div class="form-item">
     <label>Đối đối tượng</label>
-    <div style="height: 50px" class="control"></div>
-    <button class="active mt-1" (click)="addObject()">Thêm</button>
+    <ul
+      style="
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        height: 50px;
+        overflow-y: auto;
+      "
+      class="control"
+    >
+      <li
+        *ngFor="let item of objectItems; trackBy: trackById"
+        class="d-flex align-items-center"
+      >
+        <app-svg-icon class="mx-1" [icon]="item.icon"></app-svg-icon>
+        <div
+          class="mx-1"
+          style="width: 12px; height: 12px"
+          [style.background]="item.colors[0]"
+        ></div>
+        <div
+          class="mx-1"
+          *ngIf="item.colors[1]"
+          style="width: 12px; height: 12px"
+          [style.background]="item.colors[1]"
+        ></div>
+      </li>
+    </ul>
+    <button type="button" class="active mt-1" (click)="addObject()">
+      Thêm
+    </button>
   </div>
   <div class="form-item">
     <label class="label">Quy tắc</label>
@@ -124,129 +153,6 @@
     <button type="reset">Reset</button>
   </div>
   <div class="form-item">
-    <button class="active w-100">Tìm kiếm</button>
+    <button type="submit" class="active w-100">Tìm kiếm</button>
   </div>
 </form>
-
-<div class="bg-dark d-none">
-  <!-- Menu bar -->
-  <div
-    class="d-flex justify-content-between align-items-center w-100 p-1 border-bottom"
-  >
-    <div class="d-flex">
-      <app-select
-        [items]="gridColumnSelectItems"
-        label="Ô lưới"
-        [formControl]="gridViewFormControl"
-      ></app-select>
-      <div>
-        <button
-          type="button"
-          [ngClass]="
-            viewMode === 'map-view' ? 'btn-primary' : 'btn-outline-primary'
-          "
-          class="btn btn-outline-primary text-white ms-1"
-          (click)="setViewMode('map-view')"
-        >
-          Bản đồ
-        </button>
-      </div>
-      <div>
-        <button
-          type="button"
-          [ngClass]="
-            viewMode === 'list-view' ? 'btn-primary' : 'btn-outline-primary'
-          "
-          class="btn text-white ms-1"
-          (click)="setViewMode('list-view')"
-        >
-          Danh sách
-        </button>
-      </div>
-
-      <div style="width: 2px" class="bg-white mx-2"></div>
-
-      <app-select
-        [items]="startTimeDropdownItems"
-        label="Thời gian"
-        [formControl]="startTimeFormControl"
-      ></app-select>
-      <app-select
-        [items]="objectDropdownItems"
-        label="Đối tượng"
-        [multiple]="true"
-        [formControl]="objectsFormControl"
-        class="ms-1"
-      ></app-select>
-      <app-select
-        [items]="colourDropdownItems"
-        label="Màu sắc"
-        [multiple]="true"
-        [formControl]="coloursFormControl"
-        [dropdownItemTemplate]="colourDropDownItemTemplate"
-        class="ms-1"
-      ></app-select>
-      <ng-template
-        #colourDropDownItemTemplate
-        let-label="label"
-        let-value="value"
-      >
-        <div class="d-flex align-items-center">
-          <div
-            class="border border-1 me-1"
-            [ngStyle]="{'background': value, 'width': '15px', 'height': '15px',}"
-          ></div>
-          {{ label }}
-        </div>
-      </ng-template>
-      <app-select
-        [items]="rulesDropdownItems"
-        label="Vi phạm"
-        [multiple]="true"
-        [formControl]="rulesFormControl"
-        class="ms-1"
-      ></app-select>
-      <app-select
-        [items]="severitiesDropdownItems"
-        label="Mức độ"
-        [multiple]="true"
-        [formControl]="severitiesFormControl"
-        class="ms-1"
-      ></app-select>
-    </div>
-
-    <app-search-input></app-search-input>
-  </div>
-  <div
-    class="d-flex align-items-center justify-content-between w-100 p-1 border-bottom"
-  >
-    <div class="d-flex">
-      <app-select
-        [items]="statusDropdownItems"
-        [formControl]="statusFormControl"
-        [dropdownToggleContentTemplate]="statusDropToggleContentTemplate"
-        activeClass=""
-        deactiveClass=""
-      ></app-select>
-      <ng-template #statusDropToggleContentTemplate>
-        <i class="bi bi-square"></i>
-      </ng-template>
-      <div>
-        <button type="button" class="btn text-white">
-          <i class="bi bi-clock"></i>
-        </button>
-      </div>
-      <div>
-        <button type="button" class="btn text-white">
-          <i class="bi bi-arrow-clockwise"></i>
-        </button>
-      </div>
-    </div>
-
-    <app-pagination
-      [pageLength]="paginationInfo.pageLength"
-      [totalItems]="paginationInfo.totalItems"
-      [(ngModel)]="paginationInfo.currentPage"
-    ></app-pagination>
-  </div>
-</div>
