@@ -1,23 +1,14 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { FormControl } from '@angular/forms';
 import { LoadingService } from '@app/services/loading.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { SelectItemModel } from '@shared/models/select-item-model';
-import * as moment from 'moment';
 import { EventInfo } from 'src/app/data/schema/event-info';
 import { EventService } from 'src/app/data/service/event.service';
 import {
   ObjectItemModel,
   SelectObjectDialogComponent,
 } from './components/select-object-dialog/select-object-dialog.component';
-
-interface ItemModel {
-  label: string;
-  value: string;
-  data?: any;
-  class?: string;
-  selected?: boolean;
-}
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { SelectItemModel } from '@shared/models/select-item-model';
 
 @Component({
   selector: 'app-search',
@@ -29,194 +20,8 @@ export class SearchComponent implements OnInit {
   private loadingService = inject(LoadingService);
   private modelService = inject(NgbModal);
 
-  gridColumnSelectItems: SelectItemModel[] = [
-    {
-      label: '2 cot',
-      value: '2',
-    },
-    {
-      label: '3 cot',
-      value: '3',
-    },
-    {
-      label: '4 cot',
-      value: '4',
-    },
-    {
-      label: '5 cot',
-      value: '5',
-    },
-  ];
-  startTimeDropdownItems: ItemModel[] = [
-    {
-      label: '5p trước',
-      value: '5m',
-      data: () => moment().subtract(5, 'minute'),
-    },
-    {
-      label: '10p trước',
-      value: '10m',
-      data: () => moment().subtract(10, 'minute'),
-    },
-    {
-      label: '30p trước',
-      value: '30m',
-      data: () => moment().subtract(30, 'minute'),
-    },
-    {
-      label: '1h trước',
-      value: '1h',
-      data: () => moment().subtract(1, 'hour'),
-    },
-    {
-      label: 'Hôm nay',
-      value: 'today',
-      data: () => moment().startOf('day'),
-    },
-    {
-      label: 'Hôm qua',
-      value: 'yester',
-      data: () => moment().startOf('day').subtract(1, 'day'),
-    },
-    {
-      label: 'Tuần qua',
-      value: 'last-week',
-      data: () => moment().startOf('week'),
-    },
-  ];
-  objectDropdownItems: ItemModel[] = [
-    {
-      label: 'Người',
-      value: 'human',
-    },
-    {
-      label: 'Xe máy',
-      value: 'motorbike',
-    },
-    {
-      label: 'Ô-tô con',
-      value: 'car',
-    },
-    {
-      label: 'Xe tải',
-      value: 'truck',
-    },
-  ];
-  colourDropdownItems: ItemModel[] = [
-    {
-      label: 'Đen',
-      value: '#000000',
-    },
-    {
-      label: 'Bạc',
-      value: '#C0C0C0',
-    },
-    {
-      label: 'Xám',
-      value: '#808080',
-    },
-    {
-      label: 'Trắng',
-      value: '#FFFFFF',
-    },
-    {
-      label: 'Đỏ',
-      value: '#FF0000',
-    },
-    {
-      label: 'Tím',
-      value: '#800080',
-    },
-    {
-      label: 'Hồng',
-      value: '#FF00FF',
-    },
-    {
-      label: 'Xanh lá',
-      value: '#008000',
-    },
-    {
-      label: 'Vàng',
-      value: '#FFFF00',
-    },
-    {
-      label: 'Xanh da trời',
-      value: '#0000FF',
-    },
-  ];
-  rulesDropdownItems: ItemModel[] = [
-    {
-      label: 'Vào vùng cấm',
-      value: 'vao_vung_cam',
-    },
-    {
-      label: 'Vượt đường kẻ',
-      value: 'vuot_duong_ke',
-    },
-    {
-      label: 'Đi lãng vãng',
-      value: 'di_lang_vang',
-    },
-    {
-      label: 'Tác động',
-      value: 'tac_dong',
-    },
-  ];
-  severitiesDropdownItems: ItemModel[] = [
-    {
-      label: 'Cao',
-      value: 'high',
-    },
-    {
-      label: 'Trung bình',
-      value: 'medium',
-    },
-    {
-      label: 'Bình thường',
-      value: 'normal',
-    },
-  ];
-  statusDropdownItems: ItemModel[] = [
-    {
-      label: 'Tất cả',
-      value: 'all',
-    },
-    {
-      label: 'Đã xem',
-      value: 'read',
-    },
-    {
-      label: 'Chưa xem',
-      value: 'unread',
-    },
-    {
-      label: 'Có sao',
-      value: 'valid',
-    },
-    {
-      label: 'Không sao',
-      value: 'invalid',
-    },
-    {
-      label: 'Thật',
-      value: 'real',
-    },
-    {
-      label: 'Giả',
-      value: 'Fake',
-    },
-  ];
-
-  gridViewFormControl: FormControl = new FormControl(
-    this.gridColumnSelectItems[3]
-  );
-  startTimeFormControl: FormControl = new FormControl(null);
-  objectsFormControl: FormControl = new FormControl([]);
-  coloursFormControl: FormControl = new FormControl([]);
-  severitiesFormControl: FormControl = new FormControl([]);
-  rulesFormControl: FormControl = new FormControl([]);
-  statusFormControl: FormControl = new FormControl(this.statusDropdownItems[0]);
-  viewMode: string = 'grid-view';
+  viewMode: string = 'map-view';
+  gridColumn: string = '3';
 
   paginationInfo: {
     currentPage: number;
@@ -229,17 +34,27 @@ export class SearchComponent implements OnInit {
   };
   events: EventInfo[] = [];
 
-  ngOnInit(): void {
-    this.gridViewFormControl.valueChanges.subscribe((value) => {
-      if (value) {
-        this.viewMode = 'grid-view';
-      }
-    });
+  form = new FormGroup({
+    startTime: new FormControl(null, [Validators.required]),
+    endTime: new FormControl(null, [Validators.required]),
+    objects: new FormControl(),
+    rule: new FormControl(),
+    resolutionMinute: new FormControl(0, [Validators.required]),
+    resolutionSecond: new FormControl(0, [Validators.required]),
+    licensePlate: new FormControl(''),
+    showVehileOnly: new FormControl(false, [Validators.required]),
+  });
+  ruleItems: SelectItemModel[] = [{ value: '1', label: 'Vượt đường kẻ' }];
 
+  ngOnInit(): void {
     this.eventService.findAll().subscribe((events) => {
       this.events = events;
       this.paginationInfo.totalItems = this.events.length;
     });
+  }
+
+  get canSubmit() {
+    return this.form.valid;
   }
 
   get currentEvents(): (EventInfo | null)[] {
@@ -263,21 +78,13 @@ export class SearchComponent implements OnInit {
     return currentEvents;
   }
 
-  get currentGridColumns() {
-    return (this.gridViewFormControl.value as SelectItemModel)?.value || '0';
+  setGridColumn(value: string) {
+    this.gridColumn = value;
+    this.viewMode = 'grid-view';
   }
 
   trackById(_: any, item: any) {
     return item.id;
-  }
-
-  setViewMode(mode: string) {
-    if (mode != this.viewMode) {
-      this.viewMode = mode;
-      if (mode !== 'grid-view') {
-        this.gridViewFormControl.setValue(null);
-      }
-    }
   }
 
   search() {
