@@ -97,7 +97,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
     this.map = map;
     this.markers = this.cameraList.map((e) => {
       const marker = new Leaflet.Marker(e.latlng, {
-        icon: this.createMarkerIcon(e.type, false),
+        icon: this.createMarkerIcon(e.type, true),
       });
 
       // marker.on('mouseover', (event: Leaflet.LeafletMouseEvent) => {
@@ -216,13 +216,15 @@ export class MapViewComponent implements OnInit, OnDestroy {
     numOfEvent: number = 0
   ): Leaflet.DivIcon {
     return Leaflet.divIcon({
-      className: `leaflet-div-icon camera-icon-container event-${
-        isSeen ? 'seen' : 'unseen'
-      }`,
+      className: `leaflet-div-icon camera-icon-container`,
       html:
         type === 'static'
-          ? `<i class="bi bi-camera-video-fill me-2"></i><span style="color: black; text-align: right; font-size: 16pt">${numOfEvent}<span>`
-          : '<img src="assets/icons/icons8-dome-camera-32.png"/>', // Bootstrap icon class here
+          ? `<div class="marker-icon-container me-2 ${
+              isSeen ? 'event-seen' : 'event-unseen'
+            }"><i class="bi bi-camera-video-fill"></i></div><span>${numOfEvent}<span>`
+          : `<div class="marker-icon-container me-2 ${
+              isSeen ? 'event-seen' : 'event-unseen'
+            }"><img src="assets/icons/icons8-dome-camera-32.png"/></div><span>${numOfEvent}<span>`, // Bootstrap icon class here
       iconSize: [28, 28], // Size of the icon
     });
   }
