@@ -214,6 +214,15 @@ export class ScheduleComponent implements OnInit {
     }
   }
 
+  cancel(item: RowItemModel) {
+    if (item.isNew) {
+      this.data = this.data.filter((e) => e.id !== item.id);
+      return;
+    }
+
+    item.isEditable = false;
+  }
+
   remove(item: RowItemModel) {
     this._scheduleService
       .delete(this._nodeId!, this._cameraId!, item.id)

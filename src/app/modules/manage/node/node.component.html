@@ -80,12 +80,17 @@
           <div class="row mt-4">
             <div class="offset-8 col-auto">
               <button
+                type="button"
                 class="my-button cancel mx-1"
-                (click)="data.isEditable = false"
+                (click)="cancel(data)"
               >
                 Huỷ
               </button>
-              <button class="my-button submit mx-1" (click)="save(data)">
+              <button
+                type="button"
+                class="my-button submit mx-1"
+                (click)="save(data)"
+              >
                 Lưu
               </button>
             </div>
@@ -107,11 +112,12 @@
           </div>
           <div class="row mt-1">
             <div class="col-3">Mật khẩu</div>
-            <div class="col-6"></div>
+            <div class="col-6">{{ data.password | mask }}</div>
           </div>
           <div class="row mt-4">
             <div class="offset-8 col-auto">
               <button
+                type="button"
                 class="my-button remove mx-1"
                 (click)="remove(data)"
               >

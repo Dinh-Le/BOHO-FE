@@ -236,31 +236,33 @@ export class CameraComponent implements OnInit, AfterViewInit {
     }
   }
 
-  remove(item: RowItemModel) {
+  cancel(item: RowItemModel) {
     if (item.isNew) {
       this.data = this.data.filter((e) => e.id !== item.id);
       return;
     }
 
+    item.isEditable = false;
+  }
+
+  remove(item: RowItemModel) {
     this._deviceService
       .delete(this.node!.id, item.id)
       .pipe(
-        catchError(({ message }) =>
-          of({
-            success: false,
-            message: message,
-          })
-        )
-      )
-      .subscribe((response) => {
-        if (!response.success) {
-          this._toastService.showError(
-            'Delete camera failed. Reason: ' + response.message
-          );
-          return;
-        }
+        switchMap((response) => {
+          if (!response.success) {
+            throw Error('Delete camera failed. Reason: ' + response.message);
+          }
 
-        this.data = this.data.filter((e) => e.id !== item.id);
+          return of(response);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this._toastService.showSuccess('Delete camera successfully');
+          this.data = this.data.filter((e) => e.id !== item.id);
+        },
+        error: ({ message }) => this._toastService.showError(message),
       });
   }
 

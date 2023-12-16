@@ -1,7 +1,11 @@
 <div class="menu-container d-flex justify-content-between">
   <span class="ms-2">Camera</span>
   <div class="me-2">
-    <button class="btn btn-primary text-white px-2" (click)="add()">
+    <button
+      type="button"
+      class="btn btn-primary text-white px-2"
+      (click)="add()"
+    >
       <i class="bi bi-plus"></i>Thêm
     </button>
   </div>
@@ -203,7 +207,10 @@
                 </div>
                 <div class="row mt-2">
                   <div class="offset-4 col-auto">
-                    <button class="btn btn-primary px-4 text-white">
+                    <button
+                      type="button"
+                      class="btn btn-primary px-4 text-white"
+                    >
                       Kết nối
                     </button>
                   </div>
@@ -290,8 +297,9 @@
             <div class="row mt-4">
               <div class="d-flex justify-content-end">
                 <button
+                  type="button"
                   class="my-button cancel mx-1"
-                  (click)="data.isEditable = false"
+                  (click)="cancel(data)"
                 >
                   Hủy
                 </button>
@@ -346,7 +354,7 @@
             <div class="row mt-2">
               <div class="col-4">Mật khẩu:</div>
               <div class="col-8">
-                {{ data.password }}
+                {{ data.password | mask }}
               </div>
             </div>
           </ng-container>
@@ -366,13 +374,13 @@
             <div class="row mt-2">
               <div class="col-4">ID người dùng:</div>
               <div class="col-8">
-                {{ data.form.get("subForm.userId").value }}
+                {{ data.userId }}
               </div>
             </div>
             <div class="row mt-2">
               <div class="col-4">Mật khẩu:</div>
               <div class="col-8">
-                {{ data.form.get("subForm.password").value }}
+                {{ data.password | mask }}
               </div>
             </div>
             <div class="row mt-2">
@@ -411,12 +419,14 @@
           <div class="row mt-4">
             <div class="d-flex justify-content-end">
               <button
+                type="button"
                 class="btn btn-danger px-4 mx-1 text-white"
                 (click)="remove(data)"
               >
                 Xóa
               </button>
               <button
+                type="submit"
                 class="btn btn-primary px-4 mx-1 text-white"
                 (click)="data.isEditable = true"
               >
@@ -439,16 +449,10 @@
     <span class="px-2 device-status bg-good" *ngIf="row.isGood">
       {{ row.status }}
     </span>
-    <span
-      class="px-2 device-status bg-error"
-      *ngIf="row.isFailure"
-    >
+    <span class="px-2 device-status bg-error" *ngIf="row.isFailure">
       {{ row.status }}
     </span>
-    <span
-      class="px-2 device-status bg-disconnected"
-      *ngIf="row.isDiconnected"
-    >
+    <span class="px-2 device-status bg-disconnected" *ngIf="row.isDiconnected">
       {{ row.status }}
     </span>
   </ng-template>
