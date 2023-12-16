@@ -77,6 +77,70 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     this.store.dispatch(
       SidebarActions.setViewMode({ viewMode: ViewMode.Logical })
     );
+
+    this._navigationService.treeItemChange$.subscribe(
+      ({ type, action, data }) => {
+        if (type === SideMenuItemType.NODE) {
+          const id = DeviceTreeBuilder.NodeIDPrefix + data.id;
+
+          if (action === 'create') {
+            const nodeOperatorId =
+              DeviceTreeBuilder.NodeOperatorIDPrefix + data.node_operator_id;
+            const parent = this.root?.find(nodeOperatorId);
+            if (!parent) {
+              console.log(
+                `The parent with id ${nodeOperatorId} does not exists`
+              );
+              return;
+            }
+            const item = new TreeViewItemModel(
+              id,
+              data.name,
+              DeviceTreeBuilder.NodeIcon
+            );
+            item.data = data;
+            parent.add(item);
+          } else if (action === 'update') {
+            const item = this.root?.find(id);
+            if (!item) {
+              console.log(`The node with id ${id} does not exits`);
+              return;
+            }
+
+            item.label = data.name;
+          } else if (action === 'delete') {
+            this.root?.remove(id);
+          } else {
+            // Do nothing
+          }
+        } else if (type === SideMenuItemType.DEVICE) {
+          const id = DeviceTreeBuilder.DeviceIDPrefix + data.id;
+        } else if (type === SideMenuItemType.NODE_OPERATOR) {
+          const id = DeviceTreeBuilder.NodeOperatorIDPrefix + data.id;
+          if (action === 'create') {
+            const item = new TreeViewItemModel(
+              id,
+              data.name,
+              DeviceTreeBuilder.NodeOperatorIcon
+            );
+            item.data = data;
+            this.root?.add(item);
+          } else if (action === 'update') {
+            const item = this.root?.find(id);
+            if (!item) {
+              console.log(`The node with id ${id} does not exits`);
+              return;
+            }
+
+            item.label = data.name;
+          } else if (action === 'delete') {
+            this.root?.remove(id);
+          } else {
+            // Do nothing
+          }
+        }
+      }
+    );
   }
 
   ngAfterViewInit(): void {

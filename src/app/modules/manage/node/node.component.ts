@@ -13,8 +13,13 @@ import {
 import { ToastService } from '@app/services/toast.service';
 import { NodeOperatorService } from 'src/app/data/service/node-operator.service';
 import { NodeOperator } from 'src/app/data/schema/boho-v2/node-operator';
+import { Node } from 'src/app/data/schema/boho-v2/node';
 import { catchError, of, switchMap } from 'rxjs';
 import { NodeTypes } from 'src/app/data/constants';
+import {
+  NavigationService,
+  SideMenuItemType,
+} from 'src/app/data/service/navigation.service';
 
 interface RowItemModel extends ExpandableTableRowData {
   id: string;
@@ -40,6 +45,7 @@ export class NodeComponent implements OnInit {
   private _nodeOperatorService = inject(NodeOperatorService);
   private _nodeService = inject(NodeService);
   private _toastService = inject(ToastService);
+  private _navigationService = inject(NavigationService);
 
   _nodeOperator: NodeOperator | undefined;
   data: RowItemModel[] = [];
@@ -150,45 +156,55 @@ export class NodeComponent implements OnInit {
       this._nodeService
         .create(node)
         .pipe(
-          catchError(({ message }) =>
-            of({
-              success: false,
-              message,
-            })
-          )
-        )
-        .subscribe((response) => {
-          if (!response.success) {
-            this._toastService.showError(
-              'Create new node failed. Reason: ' + response.message
-            );
-            return;
-          }
+          switchMap((response) => {
+            if (!response.success) {
+              throw Error(`Create node failed with error: ${response.message}`);
+            }
 
-          data.isNewNode = false;
-          data.id = (response as { data: string }).data;
-          data.isEditable = false;
+            return of(response);
+          })
+        )
+        .subscribe({
+          next: (response) => {
+            this._toastService.showSuccess('Create node successfully');
+            data.isNewNode = false;
+            data.id = (response as { data: string }).data;
+            data.isEditable = false;
+            this._navigationService.treeItemChange$.next({
+              type: SideMenuItemType.NODE,
+              action: 'create',
+              data: Object.assign({}, node, {
+                id: data.id,
+              }),
+            });
+          },
+          error: ({ message }) => this._toastService.showError(message),
         });
     } else {
       this._nodeService
         .update(data.id, node)
         .pipe(
-          catchError(({ message }) =>
-            of({
-              success: false,
-              message,
-            })
-          )
-        )
-        .subscribe((response) => {
-          if (!response.success) {
-            this._toastService.showError(
-              'Create new node failed. Reason: ' + response.message
-            );
-            return;
-          }
+          switchMap((response) => {
+            if (!response.success) {
+              throw Error(`Update node failed with error: ${response.message}`);
+            }
 
-          data.isEditable = false;
+            return of(response);
+          })
+        )
+        .subscribe({
+          next: () => {
+            this._toastService.showSuccess('Update node successfully');
+            data.isEditable = false;
+            this._navigationService.treeItemChange$.next({
+              type: SideMenuItemType.NODE,
+              action: 'update',
+              data: Object.assign({}, node, {
+                id: data.id,
+              }),
+            });
+          },
+          error: ({ message }) => this._toastService.showError(message),
         });
     }
   }
@@ -222,6 +238,13 @@ export class NodeComponent implements OnInit {
         }
 
         this.data = this.data.filter((e) => e.id !== id);
+        this._navigationService.treeItemChange$.next({
+          type: SideMenuItemType.NODE,
+          action: 'delete',
+          data: {
+            id,
+          },
+        });
       });
   }
 }

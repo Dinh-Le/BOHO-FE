@@ -1,5 +1,7 @@
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Injectable } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
+import { NodeOperator } from '../schema/boho-v2';
 
 export enum Level1Menu {
   SEARCH = 'SEARCH',
@@ -47,6 +49,11 @@ export class NavigationService {
     data?: any;
   } = {};
   selectedDeviceIds = new Set<string>();
+  treeItemChange$ = new Subject<{
+    type: SideMenuItemType;
+    action: 'create' | 'update' | 'delete';
+    data: any;
+  }>();
 
   constructor(private router: Router) {
     this.onUrlChange();

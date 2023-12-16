@@ -30,6 +30,10 @@ export class TreeViewItemModel {
     return this._label;
   }
 
+  set label(value: string) {
+    this._label = value;
+  }
+
   get icon() {
     return this._icon;
   }
@@ -126,5 +130,23 @@ export class TreeViewItemModel {
       callback(ancestor);
       ancestor = ancestor._parent;
     }
+  }
+
+  remove(id: string) {
+    let child = this.find(id);
+    if (!child) {
+      console.debug(`Child with id ${id} does not exists`);
+      return;
+    }
+
+    const parent = child._parent;
+    if (!parent) {
+      console.debug(`Can not remove child without parent`);
+      return;
+    }
+
+    parent._children = parent._children.filter((e) => e.id !== id);
+    child._parent = undefined;
+    child = undefined;
   }
 }

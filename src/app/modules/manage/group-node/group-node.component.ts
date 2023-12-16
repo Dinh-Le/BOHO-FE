@@ -5,6 +5,11 @@ import { NodeOperatorService } from 'src/app/data/service/node-operator.service'
 import { v4 } from 'uuid';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AddGroupNodeComponent } from './add-group-node/add-group-node.component';
+import {
+  NavigationService,
+  SideMenuItemType,
+} from 'src/app/data/service/navigation.service';
+import { of, switchMap } from 'rxjs';
 
 interface RowData {
   id: string;
@@ -19,15 +24,16 @@ interface RowData {
   styleUrls: ['group-node.component.scss', '../shared/table.scss'],
 })
 export class GroupNodeComponent implements OnInit {
+  private _navigationService = inject(NavigationService);
+  private _toastService = inject(ToastService);
   modalService = inject(NgbModal);
   nodeOperatorService = inject(NodeOperatorService);
-  toastService = inject(ToastService);
   data: RowData[] = [];
 
   ngOnInit(): void {
     this.nodeOperatorService.findAll().subscribe((response) => {
       if (!response.success) {
-        this.toastService.showError('Fetch node operator failed');
+        this._toastService.showError('Fetch node operator failed');
         return;
       }
 
@@ -48,19 +54,39 @@ export class GroupNodeComponent implements OnInit {
         id: v4(),
         name,
       };
-      this.nodeOperatorService.create(newNodeOperator).subscribe((response) => {
-        if (!response.success) {
-          this.toastService.showError('Create new node operator failed');
-          return;
-        }
+      this.nodeOperatorService
+        .create(newNodeOperator)
+        .pipe(
+          switchMap((response) => {
+            if (!response.success) {
+              throw Error(
+                `Create node operator failed with error: ${response.message}`
+              );
+            }
 
-        this.data.push({
-          id: response.data,
-          name: newNodeOperator.name,
-          nodeCount: 0,
-          editable: false,
+            return of(response);
+          })
+        )
+        .subscribe({
+          next: (response) => {
+            this._toastService.showSuccess('Create node operator successfully');
+            this.data.push({
+              id: response.data,
+              name: newNodeOperator.name,
+              nodeCount: 0,
+              editable: false,
+            });
+            this._navigationService.treeItemChange$.next({
+              type: SideMenuItemType.NODE_OPERATOR,
+              action: 'create',
+              data: {
+                id: response.data,
+                name: newNodeOperator.name,
+              },
+            });
+          },
+          error: ({ message }) => this._toastService.showError(message),
         });
-      });
     } catch {
       // Do nothing
     }
@@ -71,14 +97,30 @@ export class GroupNodeComponent implements OnInit {
   }
 
   remove(item: RowData) {
-    this.nodeOperatorService.delete(item.id).subscribe((response) => {
-      if (!response.success) {
-        this.toastService.showError('Delete node operator failed');
-        return;
-      }
+    this.nodeOperatorService
+      .delete(item.id)
+      .pipe(
+        switchMap((response) => {
+          if (!response.success) {
+            throw Error(
+              `Delete node operator failed with error: ${response.message}`
+            );
+          }
 
-      this.data = this.data.filter((e) => e.id !== item.id);
-    });
+          return of(response);
+        })
+      )
+      .subscribe(() => {
+        this._toastService.showSuccess('Delete node operator successfully');
+        this.data = this.data.filter((e) => e.id !== item.id);
+        this._navigationService.treeItemChange$.next({
+          type: SideMenuItemType.NODE_OPERATOR,
+          action: 'delete',
+          data: {
+            id: item.id,
+          },
+        });
+      });
   }
 
   update(item: RowData) {
@@ -87,13 +129,31 @@ export class GroupNodeComponent implements OnInit {
         id: item.id,
         name: item.name,
       })
-      .subscribe((response) => {
-        if (!response.success) {
-          this.toastService.showError('Update node operator failed');
-          return;
-        }
+      .pipe(
+        switchMap((response) => {
+          if (!response.success) {
+            throw Error(
+              `Update node operator failed with error: ${response.message}`
+            );
+          }
 
-        item.editable = false;
+          return of(response);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this._toastService.showSuccess('Update node operator successfully');
+          item.editable = false;
+          this._navigationService.treeItemChange$.next({
+            type: SideMenuItemType.NODE_OPERATOR,
+            action: 'update',
+            data: {
+              id: item.id,
+              name: item.name,
+            },
+          });
+        },
+        error: ({ message }) => this._toastService.showError(message),
       });
   }
 }

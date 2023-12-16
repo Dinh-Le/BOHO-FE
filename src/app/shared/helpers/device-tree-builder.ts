@@ -9,9 +9,9 @@ import {
 } from 'src/app/data/schema/boho-v2';
 
 export class DeviceTreeBuilder {
-  private readonly NodeOperatorIcon = 'folder';
-  private readonly NodeIcon = 'node';
-  private readonly DeviceIcon = 'video-camera-2';
+  static readonly NodeOperatorIcon = 'folder';
+  static readonly NodeIcon = 'node';
+  static readonly DeviceIcon = 'video-camera-2';
   private _viewMode = ViewMode.None;
 
   static readonly NodeOperatorIDPrefix = 'node-operator-';
@@ -59,7 +59,7 @@ export class DeviceTreeBuilder {
     const root = new TreeViewItemModel(
       'user-0',
       'Admin',
-      this.NodeOperatorIcon
+      DeviceTreeBuilder.NodeOperatorIcon
     );
 
     if (this._viewMode === ViewMode.Logical) {
@@ -67,7 +67,7 @@ export class DeviceTreeBuilder {
         const item = new TreeViewItemModel(
           DeviceTreeBuilder.NodeOperatorIDPrefix + nodeOperator.id,
           nodeOperator.name,
-          this.NodeOperatorIcon
+          DeviceTreeBuilder.NodeOperatorIcon
         );
         item.data = nodeOperator;
         root.add(item);
@@ -84,7 +84,7 @@ export class DeviceTreeBuilder {
         const nodeItem = new TreeViewItemModel(
           DeviceTreeBuilder.NodeIDPrefix + node.id,
           node.name,
-          this.NodeIcon
+          DeviceTreeBuilder.NodeIcon
         );
         nodeItem.data = node;
         nodeOperatorItem.add(nodeItem);
@@ -101,7 +101,7 @@ export class DeviceTreeBuilder {
         const deviceItem = new TreeViewItemModel(
           DeviceTreeBuilder.DeviceIDPrefix + device.id,
           device.name,
-          this.DeviceIcon
+          DeviceTreeBuilder.DeviceIcon
         );
         deviceItem.data = device;
         nodeItem.add(deviceItem);
@@ -111,7 +111,7 @@ export class DeviceTreeBuilder {
         const item = new TreeViewItemModel(
           DeviceTreeBuilder.GroupIDPrefix + group.id,
           group.name,
-          this.NodeOperatorIcon
+          DeviceTreeBuilder.NodeOperatorIcon
         );
         item.data = group;
         root.add(item);
@@ -133,7 +133,7 @@ export class DeviceTreeBuilder {
         const item = new TreeViewItemModel(
           DeviceTreeBuilder.DeviceIDPrefix + device.id,
           device.name,
-          this.DeviceIcon
+          DeviceTreeBuilder.DeviceIcon
         );
         item.data = device;
         groupItem.add(item);
