@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   ElementRef,
   HostListener,
@@ -8,7 +9,7 @@ import {
 } from '@angular/core';
 import { ToastService } from '@app/services/toast.service';
 import { Store, select } from '@ngrx/store';
-import { catchError, of, switchMap, zip } from 'rxjs';
+import { catchError, debounceTime, fromEvent, of, switchMap, zip } from 'rxjs';
 import { Device } from 'src/app/data/schema/boho-v2/device';
 import { DeviceService } from 'src/app/data/service/device.service';
 import { NodeOperatorService } from 'src/app/data/service/node-operator.service';
@@ -30,7 +31,7 @@ import {
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, AfterViewInit {
   private _nodeOperatorService = inject(NodeOperatorService);
   private _nodeService = inject(NodeService);
   private _deviceService = inject(DeviceService);
@@ -45,12 +46,14 @@ export class SidebarComponent implements OnInit {
   );
 
   @ViewChild('menu') menu!: ElementRef;
+  @ViewChild('searchDeviceInput') searchDeviceInput!: ElementRef;
 
   mode: string = '';
   autoHideEnabled: boolean = false;
   root?: TreeViewItemModel;
   isLoading: boolean = true;
   selectedItems: TreeViewItemModel[] = [];
+  searchText: string = '';
 
   ngOnInit(): void {
     this.store
@@ -69,6 +72,15 @@ export class SidebarComponent implements OnInit {
     this.store.dispatch(
       SidebarActions.setViewMode({ viewMode: ViewMode.Logical })
     );
+  }
+
+  ngAfterViewInit(): void {
+    fromEvent(this.searchDeviceInput.nativeElement as HTMLInputElement, 'input')
+      .pipe(debounceTime(500))
+      .subscribe((ev: Event) => {
+        const el = ev.target as HTMLInputElement;
+        this.searchText = el.value;
+      });
   }
 
   @HostListener('document:click', ['$event'])
@@ -117,6 +129,10 @@ export class SidebarComponent implements OnInit {
     } else if (this.mode === 'by-group') {
       this.loadGeolocation();
     }
+  }
+
+  onInput(ev: InputEvent) {
+    console.log(ev);
   }
 
   private loadGeolocation(): void {

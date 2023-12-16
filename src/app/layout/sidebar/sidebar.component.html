@@ -1,6 +1,6 @@
 <div
   class="bg-dark h-100 p-2"
-  style="display: grid; grid-template-rows: auto auto minmax(500px, 1fr)"
+  style="display: grid; grid-template-rows: auto auto auto minmax(500px, 1fr)"
 >
   <div class="d-flex justify-content-between">
     <span class="text-white">Tự động ẩn</span>
@@ -27,6 +27,35 @@
     >
   </div>
   <div
+    style="
+      width: 100%;
+      border: 1px solid #7f7f7f;
+      border-radius: 20px;
+      padding: 0px 4px;
+      display: flex;
+      align-items: center;
+      margin-top: 1rem;
+    "
+  >
+    <i class="bi bi-search cursor-pointer"></i>
+    <input
+      #searchDeviceInput
+      autocomplete="off"
+      id="search"
+      type="text"
+      placeholder="Tìm kiếm thiết bị"
+      maxlength="40"
+      style="
+        margin-left: 5px;
+        border: none;
+        outline: none;
+        width: 100%;
+        color: white;
+        background: transparent;
+      "
+    />
+  </div>
+  <div
     class="bg-dark text-light mt-2 camera-menu-container"
     *isLoading="isLoading"
   >
@@ -40,6 +69,7 @@
         activeBackgroundColor: '#a1a1a1',
         multiple: false
       }"
+      [filter]="searchText"
     ></app-tree-view>
     <ng-template #menuItemTemplate let-item="item" let-active="active">
       <app-svg-icon [icon]="item.icon" color="green"></app-svg-icon>
