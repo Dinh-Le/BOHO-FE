@@ -31,7 +31,7 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
           if (value) {
             if (acc.length === 0 || acc[acc.length - 1].end_time !== '') {
               acc.push({
-                start_time: i.toString(),
+                start_time: this.toTimeString(i),
                 end_time: '',
                 day,
               });
@@ -39,11 +39,13 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
               i === schedule.length - 1 &&
               acc[acc.length - 1].end_time === ''
             ) {
-              acc[acc.length - 1].end_time = i.toString();
+              acc[acc.length - 1].end_time = '24:00';
+            } else {
+              // Do nothing
             }
           } else {
-            if (acc.length > 0 && acc[acc.length - 1].end_time !== '') {
-              acc[acc.length - 1].end_time = (i - 1).toString();
+            if (acc.length > 0 && acc[acc.length - 1].end_time === '') {
+              acc[acc.length - 1].end_time = this.toTimeString(i);
             }
           }
           return acc;
@@ -70,13 +72,24 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
       .map((_) => Array(48).fill(false));
 
     for (const { start_time, end_time, day } of time_info) {
-      const startTime = parseInt(start_time);
-      const endTime = parseInt(end_time);
+      const startTime = this.fromTimeString(start_time);
+      const endTime = this.fromTimeString(end_time);
 
       for (let i = startTime; i <= endTime; i++) {
         this.scheduleData[day][i] = true;
       }
     }
+  }
+
+  toTimeString(value: number): string {
+    const hour = Math.floor(value / 2);
+    const minute = value % 2 === 0 ? 0 : 30;
+    return `${hour}:${minute}:0`;
+  }
+
+  fromTimeString(s: string): number {
+    const parts = s.split(':').map((e) => parseInt(e));
+    return Math.min(47, parts[0] * 2 + Math.ceil(parts[1] / 30));
   }
 }
 
@@ -153,6 +166,7 @@ export class ScheduleComponent implements OnInit {
     const data: CreateOrUpdateScheduleRequest = Object.assign({}, item.data, {
       id: undefined,
     });
+
     if (item.isNew) {
       this._scheduleService
         .create(this._nodeId!, this._cameraId!, data)
