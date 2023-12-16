@@ -21,6 +21,11 @@ export class LocationPickerComponent {
     },
     {
       draggable: true,
+      icon: Leaflet.divIcon({
+        className: 'border-0',
+        html: `<i  class="bi bi-geo-alt-fill text-primary" style="font-size: 48px"></i>`,
+        iconSize: [48, 48], // Size of the icon
+      }),
     }
   );
 

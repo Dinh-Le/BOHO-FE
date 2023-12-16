@@ -1,6 +1,5 @@
 import {
   Component,
-  ComponentRef,
   Input,
   OnDestroy,
   OnInit,
@@ -9,10 +8,9 @@ import {
 } from '@angular/core';
 import * as Leaflet from 'leaflet';
 import { EventInfo } from 'src/app/data/schema/event-info';
-import { EventComponent } from '../event/event.component';
 import { Store } from '@ngrx/store';
 import { SidebarState } from 'src/app/state/sidebar.state';
-import { Subscription, map } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { Device } from 'src/app/data/schema/boho-v2/device';
 import { LatLng } from 'leaflet';
 
@@ -225,7 +223,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
           : `<div class="marker-icon-container me-2 ${
               isSeen ? 'event-seen' : 'event-unseen'
             }"><img src="assets/icons/icons8-dome-camera-32.png"/></div><span>${numOfEvent}<span>`, // Bootstrap icon class here
-      iconSize: [28, 28], // Size of the icon
+      iconSize: [80, 42], // Size of the icon
     });
   }
 }
