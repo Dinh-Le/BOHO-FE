@@ -56,6 +56,11 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
     ]),
   });
 
+  constructor() {
+    super();
+    this.form.disable();
+  }
+
   get name() {
     return this.form.get('name')?.value || '';
   }
@@ -320,6 +325,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
     newItem.isEditable = true;
     newItem.isExpanded = true;
     newItem.isNew = true;
+    newItem.form.enable();
     this.data.push(newItem);
   }
 
@@ -344,6 +350,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
             this._toastService.showSuccess('Create rule successfully');
             item.isNew = false;
             item.isEditable = false;
+            item.form.disable();
             item.id = response.data.toString();
           },
           error: ({ message }) => this._toastService.showError(message),
@@ -364,6 +371,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
           next: () => {
             this._toastService.showSuccess('Update rule successfully');
             item.isEditable = false;
+            item.form.disable();
           },
           error: ({ message }) => this._toastService.showError(message),
         });
@@ -372,6 +380,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
 
   edit(item: RowItemModel) {
     item.isEditable = true;
+    item.form.enable();
   }
 
   cancel(item: RowItemModel) {
@@ -380,7 +389,6 @@ export class RuleComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    item.isEditable = false;
     this._ruleService
       .find(this._nodeId, this._cameraId, item.id)
       .pipe(
@@ -397,7 +405,10 @@ export class RuleComponent implements OnInit, AfterViewInit {
           item.setData(rule, this.schedules, this.presets);
         },
         error: ({ message }) => this._toastService.showError(message),
-        complete: () => (item.isEditable = false),
+        complete: () => {
+          item.isEditable = false;
+          item.form.disable();
+        },
       });
   }
 

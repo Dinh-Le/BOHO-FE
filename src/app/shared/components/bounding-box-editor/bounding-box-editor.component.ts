@@ -64,7 +64,6 @@ export class BoundingBoxEditorComponent
   }
 
   @HostListener('')
-
   ngAfterViewInit(): void {
     if (this.src && this.canvas) {
       this._image = new Image(this.width, this.height);
@@ -80,7 +79,7 @@ export class BoundingBoxEditorComponent
   }
 
   onMouseMove(ev: MouseEvent): void {
-    if (!this._isDrawing) {
+    if (!this._isDrawing || this._isDisabled) {
       return;
     }
 
@@ -94,6 +93,10 @@ export class BoundingBoxEditorComponent
   }
 
   onClick(ev: MouseEvent): void {
+    if (this._isDisabled) {
+      return;
+    }
+
     const { x, y } = this.getMousePosition(ev);
 
     if (!this._isDrawing && this.model.length === 0) {
@@ -111,11 +114,19 @@ export class BoundingBoxEditorComponent
   }
 
   onDblClick(ev: Event): void {
+    if (this._isDisabled) {
+      return;
+    }
+
     this._isDrawing = false;
     this.update();
   }
 
   onKeyDown(ev: KeyboardEvent): boolean {
+    if (this._isDisabled) {
+      return false;
+    }
+
     if (ev.key === 'Delete') {
       this.model = [];
       this._isDrawing = false;
