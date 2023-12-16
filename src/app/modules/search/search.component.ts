@@ -9,6 +9,8 @@ import {
 } from './components/select-object-dialog/select-object-dialog.component';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { SelectItemModel } from '@shared/models/select-item-model';
+import { NavigationService } from 'src/app/data/service/navigation.service';
+import { ToastService } from '@app/services/toast.service';
 
 @Component({
   selector: 'app-search',
@@ -17,8 +19,9 @@ import { SelectItemModel } from '@shared/models/select-item-model';
 })
 export class SearchComponent implements OnInit {
   private eventService = inject(EventService);
-  private loadingService = inject(LoadingService);
   private modelService = inject(NgbModal);
+  private _navigationService = inject(NavigationService);
+  private _toastService = inject(ToastService);
 
   viewMode: string = 'map-view';
   gridColumn: string = '3';
@@ -88,8 +91,9 @@ export class SearchComponent implements OnInit {
   }
 
   search() {
-    this.loadingService.loading = true;
-    setTimeout(() => (this.loadingService.loading = false), 3000);
+    if (this._navigationService.selectedDeviceIds.size === 0) {
+      this._toastService.showError('No device selected');
+    }
   }
 
   onPageChanged(value: number) {
