@@ -22,6 +22,7 @@ import { DeviceTreeBuilder } from '@shared/helpers/device-tree-builder';
 import { ViewMode } from '@shared/components/tree-view/view-mode.enum';
 import { TreeViewItemModel } from '@shared/components/tree-view/tree-view-item.model';
 import {
+  Level1Menu,
   NavigationService,
   SideMenuItemType,
 } from 'src/app/data/service/navigation.service';
@@ -54,6 +55,10 @@ export class SidebarComponent implements OnInit, AfterViewInit {
   isLoading: boolean = true;
   selectedItems: TreeViewItemModel[] = [];
   searchText: string = '';
+
+  get showCheckbox() {
+    return this._navigationService.level1 === Level1Menu.SEARCH;
+  }
 
   ngOnInit(): void {
     this.store
@@ -92,8 +97,28 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     }
   }
 
+  onCheckboxChanged(item: TreeViewItemModel) {
+    item.traverse((child) => {
+      child.checked = item.checked;
+
+      const isDevice = child.id.startsWith(DeviceTreeBuilder.DeviceIDPrefix);
+      if (!isDevice) {
+        return;
+      }
+      if (item.checked) {
+        this._navigationService.selectedDeviceIds.add(child.data.id);
+      } else {
+        this._navigationService.selectedDeviceIds.delete(child.data.id);
+      }
+    });
+  }
+
   onMenuItemClick(event: TreeViewItemModel[]) {
     this.selectedItems = event as TreeViewItemModel[];
+
+    if (this._navigationService.level1 === Level1Menu.SEARCH) {
+      return;
+    }
 
     const item = this.selectedItems[0];
 
@@ -128,10 +153,6 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     } else if (this.mode === 'by-group') {
       this.loadGeolocation();
     }
-  }
-
-  onInput(ev: InputEvent) {
-    console.log(ev);
   }
 
   private loadGeolocation(): void {

@@ -4,10 +4,11 @@ export class TreeViewItemModel {
   private _icon?: string;
   private _children: TreeViewItemModel[] = [];
   private _parent?: TreeViewItemModel;
+  public checked: boolean = false;
 
   isVisible: boolean = true;
   isExpanded: boolean = false;
-  data?:any;
+  data?: any;
 
   constructor(
     id: string,

@@ -46,6 +46,7 @@ export class NavigationService {
     type?: SideMenuItemType;
     data?: any;
   } = {};
+  selectedDeviceIds = new Set<string>();
 
   constructor(private router: Router) {
     this.onUrlChange();
@@ -53,7 +54,6 @@ export class NavigationService {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.onUrlChange();
-        console.log(this);
       }
     });
   }
@@ -62,10 +62,10 @@ export class NavigationService {
     const url = this.router.url;
     const segments = url.split('/');
 
-    console.log(segments[1]);
     switch (segments[1]) {
       case 'search':
         this.level1 = Level1Menu.SEARCH;
+        this.selectedDeviceIds.clear();
         break;
       case 'alert':
         this.level1 = Level1Menu.ALERT;

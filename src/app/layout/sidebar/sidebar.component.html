@@ -66,14 +66,26 @@
       [itemTemplate]="menuItemTemplate"
       [config]="{
         backgroundColor: '#494949',
-        activeBackgroundColor: '#a1a1a1',
+        activeBackgroundColor: '#5285B6',
         multiple: false
       }"
       [filter]="searchText"
     ></app-tree-view>
     <ng-template #menuItemTemplate let-item="item" let-active="active">
-      <app-svg-icon [icon]="item.icon" color="green"></app-svg-icon>
-      <span class="mx-1">{{ item.label }}</span>
+      <input
+        [id]="'ckb-' + item.id"
+        type="checkbox"
+        class="mx-1"
+        [(ngModel)]="item.checked"
+        (ngModelChange)="onCheckboxChanged(item)"
+        *ngIf="showCheckbox"
+      />
+      <label
+        [htmlFor]="'ckb-' + item.id"
+        class="d-flex align-items-center user-select-none w-100"
+        ><app-svg-icon [icon]="item.icon" color="green"></app-svg-icon>
+        <div class="mx-1 text-truncate">{{ item.label }}</div></label
+      >
     </ng-template>
   </div>
 </div>
