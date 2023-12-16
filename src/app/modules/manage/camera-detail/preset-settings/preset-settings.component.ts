@@ -8,7 +8,7 @@ import { ToastService } from '@app/services/toast.service';
 @Component({
   selector: 'app-preset-settings',
   templateUrl: 'preset-settings.component.html',
-  styleUrls: ['../../shared/my-input.scss'],
+  styleUrls: ['preset-settings.component.scss', '../../shared/my-input.scss'],
 })
 export class PresetSettingsComponent implements OnInit {
   private _activatedRoute = inject(ActivatedRoute);

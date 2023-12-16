@@ -157,8 +157,8 @@ export class TourSettingsComponent implements OnInit {
               e.patrol_setting.forEach((setting) => {
                 const { patrol_id, patrol_schedule_id, color } = setting;
                 setting.schedule.forEach((schedule) => {
-                  const startTime = parseInt(schedule.start_time);
-                  const endTime = parseInt(schedule.end_time);
+                  const startTime = this.fromTimeString(schedule.start_time);
+                  const endTime = this.fromTimeString(schedule.end_time);
                   const left = (startTime * 100) / 1440;
                   const width = ((endTime - startTime) * 100) / 1440;
                   const day = schedule.day;
@@ -181,8 +181,8 @@ export class TourSettingsComponent implements OnInit {
               e.preset_setting.forEach((setting) => {
                 const { preset_id, color, preset_schedule_id } = setting;
                 setting.schedule.forEach((schedule) => {
-                  const startTime = parseInt(schedule.start_time);
-                  const endTime = parseInt(schedule.end_time);
+                  const startTime = this.fromTimeString(schedule.start_time);
+                  const endTime = this.fromTimeString(schedule.end_time);
                   const left = (startTime * 100) / 1440;
                   const width = ((endTime - startTime) * 100) / 1440;
                   const day = schedule.day;
@@ -227,8 +227,8 @@ export class TourSettingsComponent implements OnInit {
         patrol_id: (patrol as SelectItemModel).value,
         schedule: [
           {
-            start_time: startTime.toString(),
-            end_time: endTime.toString(),
+            start_time: this.toTimeString(startTime),
+            end_time: this.toTimeString(endTime),
             day: (day as SelectItemModel).value,
           },
         ],
@@ -315,8 +315,8 @@ export class TourSettingsComponent implements OnInit {
         .flat()
         .filter((e) => e.scheduleId === patrolScheduleId && e.id != id)
         .map((e) => ({
-          start_time: e.startTime.toString(),
-          end_time: e.endTime.toString(),
+          start_time: this.toTimeString(e.startTime),
+          end_time: this.toTimeString(e.endTime),
           day: e.day,
         })),
     };
@@ -350,7 +350,7 @@ export class TourSettingsComponent implements OnInit {
         })
       )
       .subscribe({
-        next: (response) => {
+        next: () => {
           this._toastService.showSuccess(
             'Delete a touring schedule successfully'
           );
@@ -530,5 +530,16 @@ export class TourSettingsComponent implements OnInit {
         emitEvent: true,
       }
     );
+  }
+
+  private fromTimeString(s: string): number {
+    const parts = s.split(':').map((e) => parseInt(e));
+    return parts[0] * 60 + parts[1];
+  }
+
+  private toTimeString(value: number): string {
+    const hour = Math.floor(value / 60);
+    const minute = value % 60;
+    return `${hour}:${minute}:0`;
   }
 }

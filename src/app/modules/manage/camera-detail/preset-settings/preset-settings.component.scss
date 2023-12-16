@@ -1,0 +1,21 @@
+.container {
+  display: grid;
+  grid-template-areas:
+    "preset preview"
+    "none none";
+  grid-template-rows: 3fr 1fr;
+  padding: 20px;
+  row-gap: 30px;
+  column-gap: 30px;
+  background: #4a494b;
+}
+
+.preset {
+  grid-area: preset;
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+
+.preview {
+  grid-area: preview;
+}
