@@ -1,15 +1,19 @@
-import { Component, OnInit, inject } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  OnInit,
+  TemplateRef,
+  ViewChild,
+  inject,
+} from '@angular/core';
 import {
   ColumnConfig,
-  ExpandableTableRowData,
+  ExpandableTableRowItemModelBase,
 } from '../expandable-table/expandable-table.component';
 import { SelectItemModel } from '@shared/models/select-item-model';
 import { v4 } from 'uuid';
 import { ActivatedRoute } from '@angular/router';
-import {
-  CreateOrUpdateNodeDto,
-  NodeService,
-} from 'src/app/data/service/node.service';
+import { NodeService } from 'src/app/data/service/node.service';
 import { ToastService } from '@app/services/toast.service';
 import { NodeOperatorService } from 'src/app/data/service/node-operator.service';
 import { NodeOperator } from 'src/app/data/schema/boho-v2/node-operator';
@@ -20,19 +24,83 @@ import {
   NavigationService,
   SideMenuItemType,
 } from 'src/app/data/service/navigation.service';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-interface RowItemModel extends ExpandableTableRowData {
-  id: string;
-  name: string;
-  group: string;
-  type: SelectItemModel;
-  host: string;
-  port: number;
-  userId: string;
-  password: string;
-  status?: boolean;
-  isEditable?: boolean;
-  isNewNode?: boolean;
+class RowItemModel extends ExpandableTableRowItemModelBase {
+  id: string = v4();
+  status: boolean = false;
+  nodeOperatorId: string = '';
+  form = new FormGroup({
+    name: new FormControl<string>('', [Validators.required]),
+    type: new FormControl<SelectItemModel | null | undefined>(null, [
+      Validators.required,
+    ]),
+    host: new FormControl<string>('', [Validators.required]),
+    port: new FormControl<number>(80, [Validators.required]),
+    userId: new FormControl<string>(''),
+    password: new FormControl<string>(''),
+  });
+
+  get name() {
+    return this.form.value.name;
+  }
+
+  get type() {
+    return this.form.value.type;
+  }
+
+  get host() {
+    return this.form.value.host;
+  }
+
+  get port() {
+    return this.form.value.port;
+  }
+
+  get userId() {
+    return this.form.value.userId;
+  }
+
+  get password() {
+    return this.form.value.password;
+  }
+
+  get canSubmit() {
+    return this.form.valid;
+  }
+
+  get data(): Node {
+    return {
+      id: this.id,
+      name: this.name!,
+      ip: this.host!,
+      port: this.port!,
+      is_active: this.status!,
+      node_operator_id: this.nodeOperatorId,
+      type: this.type?.value!,
+      node_metadata: {
+        user: this.userId!,
+        password: this.password!,
+      },
+    };
+  }
+
+  set data(node: Node) {
+    this.id = node.id;
+    this.status = node.is_active;
+    this.nodeOperatorId = node.node_operator_id;
+    this.form.reset({
+      name: node.name,
+      host: node.ip,
+      port: node.port,
+      userId: node.node_metadata.user,
+      password: node.node_metadata.password,
+      type: {
+        value: node.type,
+        label: node.type,
+      },
+    });
+  }
 }
 
 @Component({
@@ -40,42 +108,18 @@ interface RowItemModel extends ExpandableTableRowData {
   templateUrl: 'node.component.html',
   styleUrls: ['node.component.scss', '../shared/my-input.scss'],
 })
-export class NodeComponent implements OnInit {
+export class NodeComponent implements OnInit, AfterViewInit {
   private _activatedRoute = inject(ActivatedRoute);
   private _nodeOperatorService = inject(NodeOperatorService);
   private _nodeService = inject(NodeService);
   private _toastService = inject(ToastService);
   private _navigationService = inject(NavigationService);
 
+  @ViewChild('statusTemplate') statusTemplateRef!: TemplateRef<any>;
+
   _nodeOperator: NodeOperator | undefined;
   data: RowItemModel[] = [];
-  columns: ColumnConfig[] = [
-    {
-      label: 'Tên nút',
-      prop: 'name',
-      sortable: true,
-    },
-    {
-      label: 'Loại',
-      prop: 'typeName',
-      sortable: true,
-    },
-    {
-      label: 'Host',
-      prop: 'host',
-      sortable: true,
-    },
-    {
-      label: 'Cổng',
-      prop: 'port',
-      sortable: true,
-    },
-    {
-      label: 'Trạng thái',
-      prop: 'status',
-      sortable: true,
-    },
-  ];
+  columns: ColumnConfig[] = [];
   types: SelectItemModel[] = NodeTypes.map((e) => ({
     value: e,
     label: e,
@@ -104,57 +148,67 @@ export class NodeComponent implements OnInit {
       )
       .subscribe((response) => {
         if (response?.success) {
-          this.data = response.data.map((e) => ({
-            id: e.id,
-            name: e.name,
-            group: this._nodeOperator!.name,
-            type: {
-              label: e.type,
-              value: e.type,
-            },
-            host: e.ip,
-            port: e.port,
-            userId: e.node_metadata.user,
-            password: e.node_metadata.password,
-            status: e.is_active,
-            isEditable: false,
-          }));
+          this.data = response.data.map((node) => {
+            const item = new RowItemModel();
+            item.data = node;
+            return item;
+          });
         }
       });
   }
 
-  add() {
-    this.data.push({
-      id: v4(),
-      name: '',
-      group: this._nodeOperator!.name,
-      type: this.types[0],
-      host: '',
-      port: 80,
-      userId: '',
-      password: '',
-      isExpanded: true,
-      isEditable: true,
-      isNewNode: true,
-    });
+  ngAfterViewInit(): void {
+    this.columns = [
+      {
+        label: 'Tên nút',
+        prop: 'name',
+        sortable: true,
+      },
+      {
+        label: 'Loại',
+        prop: 'type.label',
+        sortable: true,
+      },
+      {
+        label: 'Host',
+        prop: 'host',
+        sortable: true,
+      },
+      {
+        label: 'Cổng',
+        prop: 'port',
+        sortable: true,
+      },
+      {
+        label: 'Trạng thái',
+        prop: 'status',
+        sortable: true,
+        width: '150px',
+        contentTemplateRef: this.statusTemplateRef,
+      },
+    ];
   }
 
-  save(data: RowItemModel) {
-    const node: CreateOrUpdateNodeDto = {
-      node_operator_id: this._nodeOperator!.id,
-      name: data.name,
-      type: data.type.value,
-      ip: data.host,
-      port: data.port,
-      node_metadata: {
-        user: data.userId,
-        password: data.password,
-      },
-    };
+  add() {
+    const item = new RowItemModel();
+    item.isEditable = true;
+    item.isNew = true;
+    item.isExpanded = true;
+    this.data.push(item);
+  }
 
-    if (data.isNewNode) {
+  edit(item: RowItemModel) {
+    item.form.enable();
+    item.isEditable = true;
+  }
+
+  submit(item: RowItemModel) {
+    const data = Object.assign({}, item.data, {
+      id: undefined,
+    });
+    if (item.isNew) {
       this._nodeService
-        .create(node)
+        .create(data)
         .pipe(
           switchMap((response) => {
             if (!response.success) {
@@ -167,14 +221,15 @@ export class NodeComponent implements OnInit {
         .subscribe({
           next: (response) => {
             this._toastService.showSuccess('Create node successfully');
-            data.isNewNode = false;
-            data.id = (response as { data: string }).data;
-            data.isEditable = false;
+            item.isNew = false;
+            item.isEditable = false;
+            item.form.disable();
+            item.id = response.data;
             this._navigationService.treeItemChange$.next({
               type: SideMenuItemType.NODE,
               action: 'create',
-              data: Object.assign({}, node, {
-                id: data.id,
+              data: Object.assign({}, data, {
+                id: response.data,
               }),
             });
           },
@@ -182,7 +237,7 @@ export class NodeComponent implements OnInit {
         });
     } else {
       this._nodeService
-        .update(data.id, node)
+        .update(item.id, data)
         .pipe(
           switchMap((response) => {
             if (!response.success) {
@@ -195,12 +250,13 @@ export class NodeComponent implements OnInit {
         .subscribe({
           next: () => {
             this._toastService.showSuccess('Update node successfully');
-            data.isEditable = false;
+            item.isEditable = false;
+            item.form.disable();
             this._navigationService.treeItemChange$.next({
               type: SideMenuItemType.NODE,
               action: 'update',
-              data: Object.assign({}, node, {
-                id: data.id,
+              data: Object.assign({}, data, {
+                id: item.id,
               }),
             });
           },
@@ -210,12 +266,13 @@ export class NodeComponent implements OnInit {
   }
 
   cancel(item: RowItemModel) {
-    if (item.isNewNode) {
+    if (item.isNew) {
       this.data = this.data.filter((e) => e.id !== item.id);
       return;
     }
 
     item.isEditable = false;
+    item.form.disable();
   }
 
   remove({ id }: RowItemModel) {
