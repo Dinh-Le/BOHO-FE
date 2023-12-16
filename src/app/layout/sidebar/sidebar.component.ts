@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   ElementRef,
   HostListener,
@@ -8,7 +9,7 @@ import {
 } from '@angular/core';
 import { ToastService } from '@app/services/toast.service';
 import { Store, select } from '@ngrx/store';
-import { catchError, of, switchMap, zip } from 'rxjs';
+import { catchError, debounceTime, fromEvent, of, switchMap, zip } from 'rxjs';
 import { Device } from 'src/app/data/schema/boho-v2/device';
 import { DeviceService } from 'src/app/data/service/device.service';
 import { NodeOperatorService } from 'src/app/data/service/node-operator.service';
@@ -21,6 +22,7 @@ import { DeviceTreeBuilder } from '@shared/helpers/device-tree-builder';
 import { ViewMode } from '@shared/components/tree-view/view-mode.enum';
 import { TreeViewItemModel } from '@shared/components/tree-view/tree-view-item.model';
 import {
+  Level1Menu,
   NavigationService,
   SideMenuItemType,
 } from 'src/app/data/service/navigation.service';
@@ -30,7 +32,7 @@ import {
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, AfterViewInit {
   private _nodeOperatorService = inject(NodeOperatorService);
   private _nodeService = inject(NodeService);
   private _deviceService = inject(DeviceService);
@@ -45,12 +47,18 @@ export class SidebarComponent implements OnInit {
   );
 
   @ViewChild('menu') menu!: ElementRef;
+  @ViewChild('searchDeviceInput') searchDeviceInput!: ElementRef;
 
   mode: string = '';
   autoHideEnabled: boolean = false;
   root?: TreeViewItemModel;
   isLoading: boolean = true;
   selectedItems: TreeViewItemModel[] = [];
+  searchText: string = '';
+
+  get showCheckbox() {
+    return this._navigationService.level1 === Level1Menu.SEARCH;
+  }
 
   ngOnInit(): void {
     this.store
@@ -69,6 +77,79 @@ export class SidebarComponent implements OnInit {
     this.store.dispatch(
       SidebarActions.setViewMode({ viewMode: ViewMode.Logical })
     );
+
+    this._navigationService.treeItemChange$.subscribe(
+      ({ type, action, data }) => {
+        if (type === SideMenuItemType.NODE) {
+          const id = DeviceTreeBuilder.NodeIDPrefix + data.id;
+
+          if (action === 'create') {
+            const nodeOperatorId =
+              DeviceTreeBuilder.NodeOperatorIDPrefix + data.node_operator_id;
+            const parent = this.root?.find(nodeOperatorId);
+            if (!parent) {
+              console.log(
+                `The parent with id ${nodeOperatorId} does not exists`
+              );
+              return;
+            }
+            const item = new TreeViewItemModel(
+              id,
+              data.name,
+              DeviceTreeBuilder.NodeIcon
+            );
+            item.data = data;
+            parent.add(item);
+          } else if (action === 'update') {
+            const item = this.root?.find(id);
+            if (!item) {
+              console.log(`The node with id ${id} does not exits`);
+              return;
+            }
+
+            item.label = data.name;
+          } else if (action === 'delete') {
+            this.root?.remove(id);
+          } else {
+            // Do nothing
+          }
+        } else if (type === SideMenuItemType.DEVICE) {
+          const id = DeviceTreeBuilder.DeviceIDPrefix + data.id;
+        } else if (type === SideMenuItemType.NODE_OPERATOR) {
+          const id = DeviceTreeBuilder.NodeOperatorIDPrefix + data.id;
+          if (action === 'create') {
+            const item = new TreeViewItemModel(
+              id,
+              data.name,
+              DeviceTreeBuilder.NodeOperatorIcon
+            );
+            item.data = data;
+            this.root?.add(item);
+          } else if (action === 'update') {
+            const item = this.root?.find(id);
+            if (!item) {
+              console.log(`The node with id ${id} does not exits`);
+              return;
+            }
+
+            item.label = data.name;
+          } else if (action === 'delete') {
+            this.root?.remove(id);
+          } else {
+            // Do nothing
+          }
+        }
+      }
+    );
+  }
+
+  ngAfterViewInit(): void {
+    fromEvent(this.searchDeviceInput.nativeElement as HTMLInputElement, 'input')
+      .pipe(debounceTime(500))
+      .subscribe((ev: Event) => {
+        const el = ev.target as HTMLInputElement;
+        this.searchText = el.value;
+      });
   }
 
   @HostListener('document:click', ['$event'])
@@ -80,11 +161,30 @@ export class SidebarComponent implements OnInit {
     }
   }
 
+  onCheckboxChanged(item: TreeViewItemModel) {
+    item.traverse((child) => {
+      child.checked = item.checked;
+
+      const isDevice = child.id.startsWith(DeviceTreeBuilder.DeviceIDPrefix);
+      if (!isDevice) {
+        return;
+      }
+      if (item.checked) {
+        this._navigationService.selectedDeviceIds.add(child.data.id);
+      } else {
+        this._navigationService.selectedDeviceIds.delete(child.data.id);
+      }
+    });
+  }
+
   onMenuItemClick(event: TreeViewItemModel[]) {
     this.selectedItems = event as TreeViewItemModel[];
 
+    if (this._navigationService.level1 === Level1Menu.SEARCH) {
+      return;
+    }
+
     const item = this.selectedItems[0];
-    console.log(item);
 
     let type = SideMenuItemType.USER;
     if (item.id.startsWith(DeviceTreeBuilder.NodeOperatorIDPrefix)) {
