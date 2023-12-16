@@ -119,6 +119,7 @@ export class BoundingBoxEditorComponent
     }
 
     this._isDrawing = false;
+    this.model.pop();
     this.update();
   }
 
@@ -136,6 +137,7 @@ export class BoundingBoxEditorComponent
 
     if (ev.key === 'Escape') {
       this._isDrawing = false;
+      this.model.pop();
       this.update();
       return true;
     }
