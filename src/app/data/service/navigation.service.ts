@@ -53,6 +53,7 @@ export class NavigationService {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.onUrlChange();
+        console.log(this);
       }
     });
   }
@@ -61,17 +62,18 @@ export class NavigationService {
     const url = this.router.url;
     const segments = url.split('/');
 
+    console.log(segments[1]);
     switch (segments[1]) {
-      case '/search':
+      case 'search':
         this.level1 = Level1Menu.SEARCH;
         break;
-      case '/alert':
+      case 'alert':
         this.level1 = Level1Menu.ALERT;
         break;
-      case '/report':
+      case 'report':
         this.level1 = Level1Menu.REPORT;
         break;
-      case '/manage':
+      case 'manage':
         this.level1 = Level1Menu.MANAGE;
         break;
     }

@@ -96,7 +96,6 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     this.selectedItems = event as TreeViewItemModel[];
 
     const item = this.selectedItems[0];
-    console.log(item);
 
     let type = SideMenuItemType.USER;
     if (item.id.startsWith(DeviceTreeBuilder.NodeOperatorIDPrefix)) {
