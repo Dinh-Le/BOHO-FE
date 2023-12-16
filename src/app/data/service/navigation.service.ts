@@ -76,23 +76,19 @@ export class NavigationService {
         break;
     }
 
-    if (this.level1 === Level1Menu.MANAGE && segments.length > 1) {
+    if (this.level1 === Level1Menu.MANAGE && segments.length > 2) {
       switch (segments[2]) {
         case 'system':
           this.level2 = Level2Menu.SYSTEM;
           break;
-        case 'node':
         case 'group-node':
-          if (segments.length > 2) {
-            this.sideMenu.id = segments[3];
-          }
           this.level2 = Level2Menu.NODE;
+          this.sideMenu.type = SideMenuItemType.NODE_OPERATOR;
+          this.sideMenu.id = segments[3];
           break;
-        case 'camera':
-          if (segments.length > 2) {
-            this.sideMenu.id = segments[3];
-          }
+        case 'node':
           this.level2 = Level2Menu.NODE;
+
           if (segments.length > 5) {
             if (segments[4] === 'info') {
               this.level3 = Level3Menu.DEVICE_INFO;
@@ -105,20 +101,34 @@ export class NavigationService {
             } else {
               this.level3 = Level3Menu.NONE;
             }
+
+            this.sideMenu.id = segments[5];
+            this.sideMenu.type = SideMenuItemType.DEVICE;
+            this.sideMenu.data = {
+              id: segments[5],
+              node_id: segments[3],
+            };
+          } else {
+            this.sideMenu.type = SideMenuItemType.NODE;
+            this.sideMenu.id = segments[3];
           }
           break;
         case 'group-camera':
           this.level2 = Level2Menu.CAMERA;
           break;
         case 'device-rule':
-          if (segments.length > 2) {
-            this.sideMenu.id = segments[3];
-          }
           this.level2 = Level2Menu.RULE;
-          if (segments.length > 5) {
-            if (segments[4] === 'rule') {
+
+          if (segments.length === 6) {
+            this.sideMenu.id = segments[6];
+            this.sideMenu.type = SideMenuItemType.DEVICE;
+            this.sideMenu.data = {
+              id: segments[6],
+              node_id: segments[4],
+            };
+            if (segments[8] === 'rule') {
               this.level3 = Level3Menu.RULE;
-            } else if (segments[4] === 'schedule') {
+            } else if (segments[8] === 'schedule') {
               this.level3 = Level3Menu.SCHEDULE;
             }
           }
@@ -192,11 +202,12 @@ export class NavigationService {
         break;
       case Level2Menu.RULE:
         targetUrl += '/device-rule';
+        const nodeId = this.sideMenu.data?.node_id;
         if (this.sideMenu?.type === SideMenuItemType.DEVICE) {
           if (this.level3 === Level3Menu.SCHEDULE) {
-            targetUrl += `/${this.sideMenu.id}/schedule`;
+            targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/schedule`;
           } else {
-            targetUrl += `/${this.sideMenu.id}/rule`;
+            targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/rule`;
           }
         }
         break;

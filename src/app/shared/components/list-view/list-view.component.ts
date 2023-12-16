@@ -9,6 +9,7 @@ import {
 import { ListViewItemModel } from './list-view-item.model';
 import { ArrayControlValueAccessorImpl } from '@shared/helpers/array-control-value-accessor-impl';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { faLessThanEqual } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-list-view',
@@ -29,6 +30,7 @@ export class ListViewComponent extends ArrayControlValueAccessorImpl<ListViewIte
   @Input() textColor: string = 'black';
   @Input() activeBackgroundColor: string = 'skyblue';
   @Input() activeTextColor: string = 'black';
+  @Input() multiple: boolean = true;
   @Output() itemClick = new EventEmitter<ListViewItemModel>();
 
   trackById(_: any, item: ListViewItemModel) {
@@ -36,12 +38,23 @@ export class ListViewComponent extends ArrayControlValueAccessorImpl<ListViewIte
   }
 
   onItemClick(item: ListViewItemModel) {
-    item.isActive = !item.isActive;
+    if (this.multiple) {
+      item.isActive = !item.isActive;
 
-    if (item.isActive) {
-      this.model = [...this.model, item];
+      if (this.multiple) {
+        if (item.isActive) {
+          this.model = [...this.model, item];
+        } else {
+          this.model = this.model.filter((e) => e.id != item.id);
+        }
+      }
     } else {
-      this.model = this.model.filter((e) => e.id != item.id);
+      if (this.model.length > 0) {
+        this.model.forEach((e) => (e.isActive = false));
+      }
+
+      item.isActive = true;
+      this.model = [item];
     }
 
     this.itemClick.emit(item);

@@ -21,7 +21,7 @@ interface RowItemModel extends ExpandableTableRowData {
 @Component({
   selector: 'app-integration',
   templateUrl: 'integration.component.html',
-  styleUrls: ['../shared/my-input.scss']
+  styleUrls: ['../shared/my-input.scss'],
 })
 export class IntegrationComponent {
   _modalService = inject(NgbModal);
@@ -65,13 +65,13 @@ export class IntegrationComponent {
   }
 
   remove(row: RowItemModel) {
-    this.data = this.data.filter(e => e.id !== row.id);
+    this.data = this.data.filter((e) => e.id !== row.id);
   }
 
   onEventSourceClick(item: RowItemModel) {
-    const modal = this._modalService.open(EventSourceComponent, {
+    this._modalService.open(EventSourceComponent, {
       size: 'xl',
-      centered: true
+      centered: true,
     });
   }
 }

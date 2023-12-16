@@ -1,13 +1,38 @@
 <div
-  class="bg-dark events-container"
   [style.gridTemplateColumns]="gridTemplateColumns"
-  style="grid-auto-rows: 1fr"
+  style="
+    grid-auto-rows: 1fr;
+    display: grid;
+    row-gap: 1px;
+    column-gap: 1px;
+    background: white;
+  "
 >
   <div
     *ngFor="let event of events"
-    class="border border-1 border-white bg-dark"
+    style="position: relative; background: #28282a; padding: 5px"
   >
-    <app-event [data]="event" *ngIf="event; else elseBlock" />
+    <ng-container *ngIf="event; else elseBlock">
+      <img
+        [src]="event.thumbnailUrl"
+        *ngIf="event; else elseBlock"
+        style="width: 100%; height: auto"
+      />
+      <span
+        style="
+          position: absolute;
+          bottom: 5px;
+          left: 50%;
+          transform: translateX(-25px);
+          background-color: #7f7f7f7f;
+          width: 50px;
+          text-align: center;
+          color: white;
+        "
+        >10:00</span
+      >
+    </ng-container>
+
     <ng-template #elseBlock></ng-template>
   </div>
 </div>

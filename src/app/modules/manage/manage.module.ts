@@ -50,7 +50,7 @@ import { IntegrationComponent } from './integration/integration.component';
     VehicleListDetailComponent,
     TimeInputComponent,
     EditableListViewComponent,
-    IntegrationComponent
+    IntegrationComponent,
   ],
   imports: [
     CommonModule,

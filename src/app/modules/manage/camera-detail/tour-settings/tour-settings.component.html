@@ -16,24 +16,24 @@
     >
       <div
         class="tour"
-        (click)="selectTour(tour)"
+        (click)="selectSchedule(tour)"
         [ngClass]="{ active: tour.selected }"
         *ngFor="let tour of dayData; index as j"
         [style.left.%]="tour.left"
         [style.width.%]="tour.width"
-        [style.background]="tour.color.value"
+        [style.background]="tour.color"
       ></div>
     </div>
   </div>
   <div class="d-flex mt-4 justify-content-center">
-    <button class="my-button submit mx-2" (click)="deleteSelectedTour()">
+    <button type="button" class="my-button submit mx-2" (click)="delete()">
       Xóa chọn
     </button>
-    <button class="my-button submit mx-2" (click)="deleteAll()">
+    <button type="button" class="my-button submit mx-2" (click)="deleteAll()">
       Xóa tất cả
     </button>
   </div>
-  <form [formGroup]="form" (ngSubmit)="submit()">
+  <form [formGroup]="form" (ngSubmit)="add()">
     <div class="row mt-4">
       <div class="col-4">
         <div class="d-flex align-items-center">
@@ -118,7 +118,7 @@
         </ng-template>
       </div>
       <div class="col-4">
-        <button class="my-button submit" [disabled]="!canSubmit()">
+        <button class="my-button submit" [disabled]="!canAdd()">
           Thêm lịch trình
         </button>
       </div>
@@ -126,7 +126,17 @@
   </form>
 
   <div class="d-flex justify-content-center align-items-center mt-4">
-    <button type="button" class="my-button cancel mx-1">Hủy</button>
-    <button type="submit" class="my-button submit mx-1">Lưu</button>
+    <button type="button" class="my-button cancel mx-1" (click)="cancel()">
+      Hủy
+    </button>
+    <button
+      type="submit"
+      class="my-button submit mx-1"
+      type="button"
+      [disabled]="!canSave"
+      (click)="save()"
+    >
+      Lưu
+    </button>
   </div>
 </div>

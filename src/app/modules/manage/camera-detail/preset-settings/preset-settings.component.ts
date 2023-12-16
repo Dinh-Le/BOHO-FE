@@ -1,20 +1,43 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { EditableListViewItemModel } from '../editable-list-view/editable-list-view-item.model';
+import { PresetService } from 'src/app/data/service/preset.service';
+import { ActivatedRoute } from '@angular/router';
+import { of, switchMap } from 'rxjs';
+import { ToastService } from '@app/services/toast.service';
 
 @Component({
   selector: 'app-preset-settings',
   templateUrl: 'preset-settings.component.html',
-  styleUrls: ['../../shared/my-input.scss'],
+  styleUrls: ['preset-settings.component.scss', '../../shared/my-input.scss'],
 })
 export class PresetSettingsComponent implements OnInit {
+  private _activatedRoute = inject(ActivatedRoute);
+  private _presetService = inject(PresetService);
+  private _toastService = inject(ToastService);
   presetList: EditableListViewItemModel[] = [];
-  selectedItem: EditableListViewItemModel|undefined;
+  selectedItem: EditableListViewItemModel | undefined;
+  nodeId = '';
+  cameraId = '';
 
   ngOnInit(): void {
-    this.presetList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((e) => ({
-      id: e.toString(),
-      label: `Điểm giám sát ${e}`,
-    }));
+    this._activatedRoute.parent?.params
+      .pipe(
+        switchMap(({ nodeId, cameraId }) => {
+          this.nodeId = nodeId;
+          this.cameraId = cameraId;
+          console.log({ nodeId, cameraId });
+          return this._presetService.findAll(nodeId, cameraId);
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          this.presetList = response.data.map((e) => ({
+            id: e.id.toString(),
+            label: e.name,
+          }));
+        },
+        error: ({ message }) => this._toastService.showError(message),
+      });
   }
 
   load() {
@@ -26,8 +49,44 @@ export class PresetSettingsComponent implements OnInit {
   }
 
   remove(item: EditableListViewItemModel) {
-    this.presetList = this.presetList.filter((e) => e.id !== item.id);
+    this._presetService
+      .delete(this.nodeId, this.cameraId, parseInt(item.id))
+      .pipe(
+        switchMap((response) => {
+          if (!response.success) {
+            throw Error(`Delete preset failed with error: ${response.message}`);
+          }
+
+          return of(response);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this._toastService.showSuccess('Delete preset successfully');
+          this.presetList = this.presetList.filter((e) => e.id !== item.id);
+        },
+        error: ({ message }) => this._toastService.showError(message),
+      });
   }
 
-  save(item: EditableListViewItemModel) {}
+  save(item: EditableListViewItemModel) {
+    this._presetService
+      .update(this.nodeId, this.cameraId, parseInt(item.id), {
+        name: item.label,
+      })
+      .pipe(
+        switchMap((response) => {
+          if (!response.success) {
+            throw Error(`Update preset failed with error: ${response.message}`);
+          }
+
+          return of(response);
+        })
+      )
+      .subscribe({
+        next: () =>
+          this._toastService.showSuccess('Update preset successfully'),
+        error: ({ message }) => this._toastService.showError(message),
+      });
+  }
 }

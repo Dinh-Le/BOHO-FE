@@ -79,11 +79,11 @@ import { IntegrationComponent } from './integration/integration.component';
             path: 'device-rule',
             children: [
               {
-                path: ':cameraId/rule',
+                path: 'node/:nodeId/camera/:cameraId/rule',
                 component: RuleComponent,
               },
               {
-                path: ':cameraId/schedule',
+                path: 'node/:nodeId/camera/:cameraId/schedule',
                 component: ScheduleComponent,
               },
             ],

@@ -13,7 +13,7 @@
     <i class="bi bi-plus"></i> Thêm</a
   >
 </div>
-<div class="full-height">
+<div class="full-height content-wrapper">
   <app-expandable-table
     rowKey="id"
     [data]="data"
@@ -60,8 +60,9 @@
       <div class="mt-4 d-flex justify-content-center">
         <ng-container *ngIf="data.isEditable; else viewButtonsTemplate">
           <button
+            type="button"
             class="my-button cancel mx-1"
-            (click)="data.isEditable = false"
+            (click)="cancel(data)"
           >
             Hủy
           </button>
@@ -70,7 +71,11 @@
           </button>
         </ng-container>
         <ng-template #viewButtonsTemplate>
-          <button class="my-button remove mx-1" (click)="remove(data)">
+          <button
+            type="button"
+            class="my-button remove mx-1"
+            (click)="remove(data)"
+          >
             Xóa
           </button>
           <button

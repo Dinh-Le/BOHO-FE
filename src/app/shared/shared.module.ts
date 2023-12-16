@@ -15,6 +15,9 @@ import { LoadingComponent } from './components/loading/loading.component';
 import { ObjectEntries } from './pipes/object-entries.pipe';
 import { SvgIconComponent } from './components/svg-icon/svg-icon.component';
 import { MaskPipe } from './pipes/mask.pipe';
+import { NumberToStringPipe } from './pipes/number-to-string.pipe';
+import { BoundingBoxEditorComponent } from '@shared/components/bounding-box-editor/bounding-box-editor.component';
+import { FormDialogComponent } from './components/form-dialog/form-dialog.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +32,9 @@ import { MaskPipe } from './pipes/mask.pipe';
     LoadingDirective,
     ObjectEntries,
     MaskPipe,
+    NumberToStringPipe,
     SvgIconComponent,
+    BoundingBoxEditorComponent,
   ],
   imports: [CommonModule, FormsModule, NgbModule, FontAwesomeModule],
   exports: [
@@ -42,7 +47,9 @@ import { MaskPipe } from './pipes/mask.pipe';
     LoadingDirective,
     ObjectEntries,
     MaskPipe,
+    NumberToStringPipe,
     SvgIconComponent,
+    BoundingBoxEditorComponent,
   ],
 })
 export class SharedModule {}

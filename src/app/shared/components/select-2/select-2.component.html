@@ -6,6 +6,7 @@
 <div
   class="form-select form-select-sm bg-dark border-light w-100"
   (click)="menuVisible = true"
+  [style]="styles"
 >
   <ng-container
     *ngIf="contentTemplateRef; else defaultContentTemplate"

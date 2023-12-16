@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { FormDialogComponent } from '@modules/manage/form-dialog/form-dialog.component';
+import { FormDialogComponent } from '@shared/components/form-dialog/form-dialog.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({

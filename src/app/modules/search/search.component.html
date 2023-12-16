@@ -1,142 +1,201 @@
-<div class="bg-dark">
-  <!-- Menu bar -->
-  <div
-    class="d-flex justify-content-between align-items-center w-100 p-1 border-bottom"
+<div class="toolbar">
+  <app-svg-icon
+    icon="grid-2"
+    class="grid-size"
+    height="24px"
+    width="24px"
+    color="#FFFFFF"
+    (click)="setGridColumn('2')"
+  ></app-svg-icon>
+  <app-svg-icon
+    icon="grid-3"
+    class="grid-size"
+    width="24px"
+    height="24px"
+    (click)="setGridColumn('3')"
+  ></app-svg-icon>
+  <app-svg-icon
+    icon="grid-4"
+    class="grid-size"
+    width="24px"
+    height="24px"
+    (click)="setGridColumn('4')"
+  ></app-svg-icon>
+  <app-svg-icon
+    icon="grid-5"
+    class="grid-size"
+    width="24px"
+    height="24px"
+    (click)="setGridColumn('5')"
+  ></app-svg-icon>
+  <button
+    type="button"
+    [class.active]="viewMode === 'grid-view'"
+    (click)="viewMode = 'grid-view'"
   >
-    <div class="d-flex">
-      <app-select
-        [items]="gridColumnSelectItems"
-        label="Ô lưới"
-        [formControl]="gridViewFormControl"
-      ></app-select>
-      <div>
-        <button
-          type="button"
-          [ngClass]="
-            viewMode === 'map-view' ? 'btn-primary' : 'btn-outline-primary'
-          "
-          class="btn btn-outline-primary text-white ms-1"
-          (click)="setViewMode('map-view')"
-        >
-          Bản đồ
-        </button>
-      </div>
-      <div>
-        <button
-          type="button"
-          [ngClass]="
-            viewMode === 'list-view' ? 'btn-primary' : 'btn-outline-primary'
-          "
-          class="btn text-white ms-1"
-          (click)="setViewMode('list-view')"
-        >
-          Danh sách
-        </button>
-      </div>
-
-      <div style="width: 2px" class="bg-white mx-2"></div>
-
-      <app-select
-        [items]="startTimeDropdownItems"
-        label="Thời gian"
-        [formControl]="startTimeFormControl"
-      ></app-select>
-      <app-select
-        [items]="objectDropdownItems"
-        label="Đối tượng"
-        [multiple]="true"
-        [formControl]="objectsFormControl"
-        class="ms-1"
-      ></app-select>
-      <app-select
-        [items]="colourDropdownItems"
-        label="Màu sắc"
-        [multiple]="true"
-        [formControl]="coloursFormControl"
-        [dropdownItemTemplate]="colourDropDownItemTemplate"
-        class="ms-1"
-      ></app-select>
-      <ng-template
-        #colourDropDownItemTemplate
-        let-label="label"
-        let-value="value"
-      >
-        <div class="d-flex align-items-center">
-          <div
-            class="border border-1 me-1"
-            [ngStyle]="{'background': value, 'width': '15px', 'height': '15px',}"
-          ></div>
-          {{ label }}
-        </div>
-      </ng-template>
-      <app-select
-        [items]="rulesDropdownItems"
-        label="Vi phạm"
-        [multiple]="true"
-        [formControl]="rulesFormControl"
-        class="ms-1"
-      ></app-select>
-      <app-select
-        [items]="severitiesDropdownItems"
-        label="Mức độ"
-        [multiple]="true"
-        [formControl]="severitiesFormControl"
-        class="ms-1"
-      ></app-select>
-    </div>
-
-    <app-search-input></app-search-input>
-  </div>
-  <div
-    class="d-flex align-items-center justify-content-between w-100 p-1 border-bottom"
+    Ô lưới
+  </button>
+  <button
+    type="button"
+    [class.active]="viewMode === 'map-view'"
+    (click)="viewMode = 'map-view'"
   >
-    <div class="d-flex">
-      <app-select
-        [items]="statusDropdownItems"
-        [formControl]="statusFormControl"
-        [dropdownToggleContentTemplate]="statusDropToggleContentTemplate"
-        activeClass=""
-        deactiveClass=""
-      ></app-select>
-      <ng-template #statusDropToggleContentTemplate>
-        <i class="bi bi-square"></i>
-      </ng-template>
-      <div>
-        <button type="button" class="btn text-white">
-          <i class="bi bi-clock"></i>
-        </button>
-      </div>
-      <div>
-        <button type="button" class="btn text-white">
-          <i class="bi bi-arrow-clockwise"></i>
-        </button>
-      </div>
-    </div>
-
-    <app-pagination
-      [pageLength]="paginationInfo.pageLength"
-      [totalItems]="paginationInfo.totalItems"
-      [(ngModel)]="paginationInfo.currentPage"
-    ></app-pagination>
-  </div>
-  <div
-    [ngSwitch]="viewMode"
-    class="view-wrapper"
-    [ngClass]="{ 'scroll-y': viewMode !== 'map-view' }"
+    Bản đồ
+  </button>
+  <button
+    type="button"
+    [class.active]="viewMode === 'list-view'"
+    (click)="viewMode = 'list-view'"
   >
-    <app-grid-view
-      *ngSwitchCase="'grid-view'"
-      [cols]="currentGridColumns"
-      [events]="currentEvents"
-    ></app-grid-view>
-    <app-map-view
-      *ngSwitchCase="'map-view'"
-      [events]="currentEvents"
-    ></app-map-view>
-    <app-list-view
-      *ngSwitchCase="'list-view'"
-      [events]="currentEvents"
-    ></app-list-view>
-    <div *ngSwitchDefault>Unsupported view mode</div>
-  </div>
+    Danh sách
+  </button>
 </div>
+
+<div
+  [ngSwitch]="viewMode"
+  class="view-wrapper content"
+  [ngClass]="{ 'scroll-y': viewMode !== 'map-view' }"
+>
+  <app-grid-view
+    *ngSwitchCase="'grid-view'"
+    [cols]="gridColumn"
+    [events]="currentEvents"
+  ></app-grid-view>
+  <app-map-view
+    *ngSwitchCase="'map-view'"
+    [events]="currentEvents"
+  ></app-map-view>
+  <app-list-view
+    *ngSwitchCase="'list-view'"
+    [events]="currentEvents"
+  ></app-list-view>
+  <div *ngSwitchDefault>Unsupported view mode</div>
+</div>
+
+<form class="search-form" [formGroup]="form" (submit)="search()">
+  <div class="form-item">
+    <label for="startTime" class="label">Thời gian bắt đầu</label>
+    <input
+      class="control w-100"
+      id="startTime"
+      type="datetime-local"
+      formControlName="startTime"
+      required
+    />
+  </div>
+  <div class="form-item">
+    <label for="endTime" class="label">Thời gian kết thúc</label>
+    <input
+      class="control w-100"
+      id="endTime"
+      type="datetime-local"
+      formControlName="endTime"
+      required
+    />
+  </div>
+  <div class="form-item">
+    <label>Đối đối tượng</label>
+    <ul
+      style="
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        height: 50px;
+        overflow-y: auto;
+      "
+      class="control"
+    >
+      <li
+        *ngFor="let item of objectItems; trackBy: trackById"
+        class="d-flex align-items-center"
+      >
+        <app-svg-icon class="mx-1" [icon]="item.icon"></app-svg-icon>
+        <div
+          class="mx-1"
+          style="width: 12px; height: 12px"
+          [style.background]="item.colors[0]"
+        ></div>
+        <div
+          class="mx-1"
+          *ngIf="item.colors[1]"
+          style="width: 12px; height: 12px"
+          [style.background]="item.colors[1]"
+        ></div>
+      </li>
+    </ul>
+    <button type="button" class="active mt-1" (click)="addObject()">
+      Thêm
+    </button>
+  </div>
+  <div class="form-item">
+    <label class="label">Quy tắc</label>
+    <app-select-2
+      [styles]="{
+        'border-radius': 0
+      }"
+      [items]="ruleItems"
+      formControlName="rule"
+    ></app-select-2>
+  </div>
+  <div class="form-item">
+    <label class="label">T.gian giữa 2 kết quả</label>
+    <div class="d-flex">
+      <app-numeric-input
+        class="control"
+        unit="min"
+        formControlName="resolutionMinute"
+        required
+        [min]="0"
+        [max]="59"
+        [style]="{
+          background: '#d0cece',
+          padding: 0,
+          flex: 1,
+          marginRight: '1px',
+        }"
+      ></app-numeric-input>
+      <app-numeric-input
+        class="control"
+        unit="sec"
+        formControlName="resolutionSecond"
+        required
+        [min]="0"
+        [max]="59"
+        [style]="{
+          background: '#d0cece',
+          padding: 0,
+          flex: 1,
+          marginLeft: '1px',
+        }"
+      ></app-numeric-input>
+    </div>
+  </div>
+  <div class="form-item">
+    <label for="licensePlate" class="label">Biển số xe</label>
+    <input
+      type="text"
+      id="licensePlate"
+      autocomplete="off"
+      class="control w-100"
+      formControlName="licensePlate"
+    />
+  </div>
+  <div class="form-item d-flex align-items-center">
+    <label for="showVehileOnly">Chỉ h.thị xe có b.số</label>
+    <input
+      id="displayWithLicensePlateOnly"
+      type="checkbox"
+      class="ms-2"
+      style="width: 18px; height: 18px"
+      formControlName="showVehileOnly"
+    />
+  </div>
+  <div class="form-item">
+    <button type="reset">Reset</button>
+  </div>
+  <div class="form-item">
+    <button type="submit" class="active w-100" [disabled]="!canSubmit">
+      Tìm kiếm
+    </button>
+  </div>
+</form>

@@ -1,4 +1,10 @@
-import { Component, inject } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  HostListener,
+  inject,
+} from '@angular/core';
 import { SelectItemModel } from '@shared/models/select-item-model';
 import { EditableListViewItemModel } from '../editable-list-view/editable-list-view-item.model';
 import { ActivatedRoute } from '@angular/router';
@@ -14,7 +20,7 @@ import {
 @Component({
   selector: 'app-patrol-settings',
   templateUrl: 'patrol-settings.component.html',
-  styleUrls: ['../../shared/my-input.scss'],
+  styleUrls: ['patrol-settings.component.scss', '../../shared/my-input.scss'],
 })
 export class PatrolSettingsComponent {
   private _activatedRoute = inject(ActivatedRoute);
@@ -110,6 +116,11 @@ export class PatrolSettingsComponent {
   play() {}
 
   remove(item: EditableListViewItemModel) {
+    if (item.id.startsWith('new_')) {
+      this.patrols = this.patrols.filter((e) => e.id !== item.id);
+      return;
+    }
+
     this._patrolService
       .delete(this._nodeId, this._cameraId, item.id)
       .subscribe({

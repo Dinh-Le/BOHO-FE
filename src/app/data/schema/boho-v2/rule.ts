@@ -1,17 +1,22 @@
 export interface Rule {
-  id: string;
+  id: number;
   name: string;
   combine_name: string;
   active: boolean;
-  post_action: any;
+  post_action?: any;
   alarm_type: string;
   points: number[][];
-  level: string;
+  level: number;
+  preset_id: number;
+  schedule_id: number;
   alarm_metadata: {
-    loitering: {
+    loitering?: {
       time_stand: string;
     };
-    sobatage: any;
+    sobatage?: any;
+    tripwire?: {
+      direction: 'right to left' | 'left to right' | string;
+    };
   };
-  objects: number[];
+  objects: string[];
 }

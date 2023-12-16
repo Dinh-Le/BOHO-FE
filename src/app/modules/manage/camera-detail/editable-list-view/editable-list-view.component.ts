@@ -1,4 +1,13 @@
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  Output,
+  EventEmitter,
+  AfterViewInit,
+  inject,
+  ElementRef,
+} from '@angular/core';
 import { EditableListViewItemModel } from './editable-list-view-item.model';
 
 @Component({
@@ -6,7 +15,9 @@ import { EditableListViewItemModel } from './editable-list-view-item.model';
   templateUrl: 'editable-list-view.component.html',
   styleUrls: ['editable-list-view.component.scss'],
 })
-export class EditableListViewComponent implements OnInit {
+export class EditableListViewComponent implements OnInit, AfterViewInit {
+  private _elRef = inject(ElementRef);
+
   @Input()
   title: string = '';
 
@@ -22,7 +33,14 @@ export class EditableListViewComponent implements OnInit {
   @Output()
   change: EventEmitter<EditableListViewItemModel> = new EventEmitter(true);
 
+  height: string = 'auto';
+
   ngOnInit(): void {}
+
+  ngAfterViewInit(): void {
+    const { height } = this._elRef.nativeElement.getBoundingClientRect();
+    this.height = height - 38 + 'px';
+  }
 
   trackById(_: any, item: EditableListViewItemModel) {
     return item.id;

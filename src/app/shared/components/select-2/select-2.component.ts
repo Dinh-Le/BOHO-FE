@@ -1,7 +1,15 @@
-import { Component, ElementRef, HostListener, Input, TemplateRef, forwardRef, inject } from "@angular/core";
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
-import { SelectItemModel } from "@shared/models/select-item-model";
-import { SidebarActions } from "src/app/state/sidebar.action";
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  Input,
+  TemplateRef,
+  forwardRef,
+  inject,
+} from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { SelectItemModel } from '@shared/models/select-item-model';
+import { SidebarActions } from 'src/app/state/sidebar.action';
 
 @Component({
   selector: 'app-select-2',
@@ -33,6 +41,8 @@ export class Select2Component implements ControlValueAccessor {
 
   @Input()
   placeHolder: string = 'Select item...';
+
+  @Input() styles: any = {};
 
   menuVisible: boolean = false;
 
@@ -68,9 +78,11 @@ export class Select2Component implements ControlValueAccessor {
       }
     }
 
-    this.items.forEach(e => e.selected = false);
-    this.currentItems = this.items.filter(e => newValues.some(({ value }) => e.value === value));
-    this.currentItems.forEach(e => e.selected = true);
+    this.items.forEach((e) => (e.selected = false));
+    this.currentItems = this.items.filter((e) =>
+      newValues.some(({ value }) => e.value === value)
+    );
+    this.currentItems.forEach((e) => (e.selected = true));
     this.onChange(this.model);
   }
 

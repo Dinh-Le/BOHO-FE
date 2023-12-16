@@ -1,0 +1,26 @@
+.container {
+  padding: 20px;
+  display: grid;
+  row-gap: 30px;
+  column-gap: 30px;
+  background: #4a494b;
+  grid-template-areas:
+    "patrol preview"
+    "preset preset";
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+.patrol {
+  grid-area: patrol;
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+
+.preview {
+  grid-area: preview;
+}
+
+.preset {
+  grid-area: preset;
+}

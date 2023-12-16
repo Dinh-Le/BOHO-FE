@@ -5,6 +5,7 @@ import {
   ViewChild,
   AfterViewInit,
   inject,
+  ChangeDetectorRef,
 } from '@angular/core';
 
 import { v4 } from 'uuid';
@@ -44,6 +45,7 @@ export class CameraComponent implements OnInit, AfterViewInit {
   private _nodeService = inject(NodeService);
   private _deviceService = inject(DeviceService);
   private _toastService = inject(ToastService);
+  private _changeDetectorRef = inject(ChangeDetectorRef);
 
   cameraDrivers: SelectItemModel[] = CameraDrivers.map((e) => ({
     value: e,
@@ -51,32 +53,7 @@ export class CameraComponent implements OnInit, AfterViewInit {
   }));
   node: Node | undefined;
   data: RowItemModel[] = [];
-  columns: ColumnConfig[] = [
-    {
-      label: 'Tên camera',
-      prop: 'name',
-      sortable: true,
-    },
-    {
-      label: 'Địa chỉ RTSP',
-      prop: 'rtspUrl',
-      sortable: true,
-    },
-    {
-      label: 'Loại',
-      prop: 'type',
-      sortable: true,
-    },
-    {
-      label: 'Nút',
-      prop: 'nodeName',
-    },
-    {
-      label: 'Trạng thái',
-      prop: 'status',
-      width: '200',
-    },
-  ];
+  columns: ColumnConfig[] = [];
   milestoneServers: SelectItemModel[] = ['1', '2', '3'].map((e) => ({
     label: `Máy chủ ${e}`,
     value: `server-${e}`,
@@ -114,6 +91,7 @@ export class CameraComponent implements OnInit, AfterViewInit {
         contentTemplateRef: this.statusColumnTemplate,
       },
     ];
+    this._changeDetectorRef.detectChanges();
   }
 
   ngOnInit(): void {
@@ -258,31 +236,33 @@ export class CameraComponent implements OnInit, AfterViewInit {
     }
   }
 
-  remove(item: RowItemModel) {
+  cancel(item: RowItemModel) {
     if (item.isNew) {
       this.data = this.data.filter((e) => e.id !== item.id);
       return;
     }
 
+    item.isEditable = false;
+  }
+
+  remove(item: RowItemModel) {
     this._deviceService
       .delete(this.node!.id, item.id)
       .pipe(
-        catchError(({ message }) =>
-          of({
-            success: false,
-            message: message,
-          })
-        )
-      )
-      .subscribe((response) => {
-        if (!response.success) {
-          this._toastService.showError(
-            'Delete camera failed. Reason: ' + response.message
-          );
-          return;
-        }
+        switchMap((response) => {
+          if (!response.success) {
+            throw Error('Delete camera failed. Reason: ' + response.message);
+          }
 
-        this.data = this.data.filter((e) => e.id !== item.id);
+          return of(response);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this._toastService.showSuccess('Delete camera successfully');
+          this.data = this.data.filter((e) => e.id !== item.id);
+        },
+        error: ({ message }) => this._toastService.showError(message),
       });
   }
 

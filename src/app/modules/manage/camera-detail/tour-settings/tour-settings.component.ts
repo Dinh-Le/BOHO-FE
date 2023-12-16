@@ -3,26 +3,31 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ToastService } from '@app/services/toast.service';
 import { SelectItemModel } from '@shared/models/select-item-model';
-import { switchMap, zip } from 'rxjs';
+import { from, map, mergeAll, of, switchMap, zip, zipAll } from 'rxjs';
 import { DaysInWeek } from 'src/app/data/constants';
 import {
   Level3Menu,
   NavigationService,
 } from 'src/app/data/service/navigation.service';
 import { PatrolService } from 'src/app/data/service/patrol.service';
-import { TouringService } from 'src/app/data/service/touring.service';
+import {
+  CreateOrUpdateTouringScheduleRequest,
+  TouringService,
+  UpdateTouringScheduleRequest,
+} from 'src/app/data/service/touring.service';
 import { v4 } from 'uuid';
 
-interface PtzTour {
+interface PtzSchedule {
   id: string;
-  touringId: number;
-  patrolId: string;
+  patrolId: number;
+  scheduleId: number;
+  type: 'patrol' | 'preset';
   startTime: number;
   endTime: number;
   left: number;
   width: number;
-  day: SelectItemModel;
-  color: SelectItemModel;
+  day: number;
+  color: string;
   selected?: boolean;
 }
 
@@ -39,6 +44,7 @@ export class TourSettingsComponent implements OnInit {
   private _navigationService = inject(NavigationService);
   private _nodeId: string = '';
   private _cameraId: string = '';
+  private _touringId: number = -1;
 
   patrols: SelectItemModel[] = [];
   colors: SelectItemModel[] = [
@@ -70,18 +76,24 @@ export class TourSettingsComponent implements OnInit {
   hoursInDay: number[] = Array(24)
     .fill(0)
     .map((_, index) => index);
-  data: PtzTour[][] = Array(DaysInWeek.length)
+  data: PtzSchedule[][] = Array(DaysInWeek.length)
     .fill(0)
     .map(() => []);
   form: FormGroup = new FormGroup({
-    startTime: new FormControl(0),
-    endTime: new FormControl(0),
-    day: new FormControl(null, [Validators.required]),
-    type: new FormControl('patrol'),
-    patrol: new FormControl(null, [Validators.required]),
-    color: new FormControl(null, [Validators.required]),
+    startTime: new FormControl<number>(0, [Validators.required]),
+    endTime: new FormControl<number>(0, [Validators.required]),
+    day: new FormControl<SelectItemModel | undefined>(undefined, [
+      Validators.required,
+    ]),
+    type: new FormControl<'patrol' | 'preset'>('patrol', [Validators.required]),
+    patrol: new FormControl<SelectItemModel | undefined>(undefined, [
+      Validators.required,
+    ]),
+    color: new FormControl<SelectItemModel | undefined>(undefined, [
+      Validators.required,
+    ]),
   });
-  selectedTour: PtzTour | undefined;
+  selectedSchedule: PtzSchedule | undefined;
 
   ngOnInit(): void {
     this._navigationService.level3 = Level3Menu.TOUR_SETTINGS;
@@ -91,6 +103,7 @@ export class TourSettingsComponent implements OnInit {
         switchMap(({ nodeId, cameraId }) => {
           this._nodeId = nodeId;
           this._cameraId = cameraId;
+          this._touringId = -1;
 
           this.patrols = [];
           this.data = this.data.map(() => []);
@@ -100,6 +113,7 @@ export class TourSettingsComponent implements OnInit {
               endTime: 0,
               day: null,
               type: 'patrol',
+              patrol: undefined,
               color: null,
             },
             {
@@ -139,26 +153,53 @@ export class TourSettingsComponent implements OnInit {
 
           if ('data' in findAllTourResponse) {
             findAllTourResponse.data.forEach((e) => {
-              const startTime = parseInt(e.schedule.start_time);
-              const endTime = parseInt(e.schedule.end_time);
-              const left = (startTime * 100) / 1440;
-              const width = ((endTime - startTime) * 100) / 1440;
-              const day = parseInt(e.schedule.day);
+              this._touringId = e.id;
+              e.patrol_setting.forEach((setting) => {
+                const { patrol_id, patrol_schedule_id, color } = setting;
+                setting.schedule.forEach((schedule) => {
+                  const startTime = this.fromTimeString(schedule.start_time);
+                  const endTime = this.fromTimeString(schedule.end_time);
+                  const left = (startTime * 100) / 1440;
+                  const width = ((endTime - startTime) * 100) / 1440;
+                  const day = schedule.day;
+                  const ptzSchedule: PtzSchedule = {
+                    id: v4(),
+                    type: 'patrol',
+                    patrolId: patrol_id,
+                    scheduleId: patrol_schedule_id,
+                    startTime,
+                    endTime,
+                    day,
+                    color,
+                    left: left,
+                    width: width,
+                  };
+                  this.data[day].push(ptzSchedule);
+                });
+              });
 
-              this.data[day].push({
-                color: this.colors.find((x) => x.value === e.color)!,
-                day: {
-                  value: day,
-                  label: DaysInWeek[day],
-                },
-                startTime,
-                endTime,
-                id: v4(),
-                touringId: e.id,
-                patrolId: e.patrol_id!,
-                left,
-                width,
-                selected: false,
+              e.preset_setting.forEach((setting) => {
+                const { preset_id, color, preset_schedule_id } = setting;
+                setting.schedule.forEach((schedule) => {
+                  const startTime = this.fromTimeString(schedule.start_time);
+                  const endTime = this.fromTimeString(schedule.end_time);
+                  const left = (startTime * 100) / 1440;
+                  const width = ((endTime - startTime) * 100) / 1440;
+                  const day = schedule.day;
+                  const ptzSchedule: PtzSchedule = {
+                    id: v4(),
+                    type: 'preset',
+                    patrolId: preset_id,
+                    scheduleId: preset_schedule_id,
+                    startTime,
+                    endTime,
+                    day,
+                    color,
+                    left: left,
+                    width: width,
+                  };
+                  this.data[day].push(ptzSchedule);
+                });
               });
             });
           }
@@ -167,99 +208,338 @@ export class TourSettingsComponent implements OnInit {
       });
   }
 
-  submit() {
+  canAdd() {
+    return this.selectedSchedule == undefined && this.form.valid;
+  }
+
+  add() {
     const { startTime, endTime, color, day, patrol, type } = this.form.value;
     if (startTime >= endTime) {
       this._toastService.showError(
-        'Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc'
+        'The end time must be greater than the start time'
       );
       return;
     }
 
+    const data: CreateOrUpdateTouringScheduleRequest = {
+      patrol_setting: {
+        color: (color as SelectItemModel).value,
+        patrol_id: (patrol as SelectItemModel).value,
+        schedule: [
+          {
+            start_time: this.toTimeString(startTime),
+            end_time: this.toTimeString(endTime),
+            day: (day as SelectItemModel).value,
+          },
+        ],
+      },
+    };
     this._tourService
-      .create(this._nodeId, this._nodeId, {
-        active: true,
-        type,
-        color: color.value,
-        patrol_id: patrol.value.toString(),
-        schedule: {
-          day: day.value.toString(),
-          start_time: startTime.toString(),
-          end_time: endTime.toString(),
-        },
-      })
-      .subscribe({
-        next: (response) => {
+      .createOrUpdateTouringSchedule(
+        this._nodeId,
+        this._cameraId,
+        this._touringId,
+        data
+      )
+      .pipe(
+        switchMap((response) => {
           if (!response.success) {
             throw Error(
-              'Create touring failed with error: ' + response.message
+              'Add tour schedule for patrol or preset failed with error: ' +
+                response.message
             );
           }
-
+          return of(response);
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          this._toastService.showSuccess(
+            'Create touring schedule successfully'
+          );
           const left = (startTime * 100) / 1440;
           const width = ((endTime - startTime) * 100) / 1440;
-          const tour: PtzTour = {
+          const schedule: PtzSchedule = {
             id: v4(),
-            touringId: response.data,
-            patrolId: patrol.value,
+            type,
+            patrolId: (patrol as SelectItemModel).value,
+            scheduleId: response.data.id,
             startTime,
             endTime,
-            day,
-            color,
+            day: (day as SelectItemModel).value,
+            color: (color as SelectItemModel).value,
             left: left,
             width: width,
-            selected: true,
+            selected: false,
           };
-          if (this.selectedTour) {
-            this.selectedTour.selected = false;
-          }
-          this.selectedTour = tour;
-          this.data[day.value].push(tour);
+          this.data[schedule.day].push(schedule);
+          this.resetForm();
         },
         error: ({ message }) => this._toastService.showError(message),
       });
   }
 
-  canSubmit() {
-    return this.form.valid;
-  }
-
-  selectTour(tour: PtzTour) {
-    if (this.selectedTour) {
-      this.selectedTour.selected = false;
+  selectSchedule(schedule: PtzSchedule) {
+    if (this.selectedSchedule) {
+      this.selectedSchedule.selected = false;
     }
 
-    this.selectedTour = tour;
-    this.selectedTour.selected = true;
+    this.selectedSchedule = schedule;
+    this.selectedSchedule.selected = true;
+    this.form.reset({
+      startTime: schedule.startTime,
+      endTime: schedule.endTime,
+      day: this.daysInWeek.find((e) => e.value === schedule.day),
+      type: schedule.type,
+      patrol: this.patrols.find((e) => e.value === schedule.patrolId),
+      color: this.colors.find((e) => e.value === schedule.color),
+    });
   }
 
-  deleteSelectedTour() {
-    if (!this.selectedTour) {
+  delete() {
+    if (!this.selectedSchedule) {
       return;
     }
 
-    this._tourService
-      .delete(this._nodeId, this._cameraId, this.selectedTour!.touringId)
-      .subscribe({
-        next: (response) => {
+    const {
+      id,
+      day,
+      scheduleId: patrolScheduleId,
+      color,
+      type,
+    } = this.selectedSchedule;
+    const data: UpdateTouringScheduleRequest = {
+      color,
+      schedule_type: type,
+      schedule: this.data
+        .flat()
+        .filter((e) => e.scheduleId === patrolScheduleId && e.id != id)
+        .map((e) => ({
+          start_time: this.toTimeString(e.startTime),
+          end_time: this.toTimeString(e.endTime),
+          day: e.day,
+        })),
+    };
+
+    const response$ =
+      data.schedule.length > 0
+        ? this._tourService.updateTouringSchedule(
+            this._nodeId,
+            this._cameraId,
+            this._touringId,
+            patrolScheduleId,
+            data
+          )
+        : this._tourService.deleteTouringSchedule(
+            this._nodeId,
+            this._cameraId,
+            this._touringId,
+            patrolScheduleId,
+            type
+          );
+    response$
+      .pipe(
+        switchMap((response) => {
           if (!response.success) {
             throw Error(
-              'Delete touring failed with error: ' + response.message
+              'Delete a touring schedule for patrol or preset failed with error: ' +
+                response.message
             );
           }
-
-          const day = this.selectedTour?.day.value;
-          this.data[day] = this.data[day].filter(
-            (e) => e.id !== this.selectedTour?.id
+          return of(response);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this._toastService.showSuccess(
+            'Delete a touring schedule successfully'
           );
-          this.selectedTour = undefined;
+          this.data[day] = this.data[day].filter((e) => e.id !== id);
+          this.resetForm();
+          this.selectedSchedule = undefined;
         },
         error: ({ message }) => this._toastService.showError(message),
       });
   }
 
   deleteAll() {
-    this.selectedTour = undefined;
-    this.data = this.data.map(() => []);
+    const patrolSchedules = this.data.flat().reduce(
+      (acc, e) =>
+        Object.assign(acc, {
+          [e.scheduleId.toString()]: e.type,
+        }),
+      {} as {
+        [key: string]: 'preset' | 'patrol';
+      }
+    );
+    from(Object.entries(patrolSchedules))
+      .pipe(
+        map(([scheduleId, type]) =>
+          this._tourService.deleteTouringSchedule(
+            this._nodeId,
+            this._cameraId,
+            this._touringId,
+            parseInt(scheduleId),
+            type
+          )
+        ),
+        mergeAll(),
+        map((response) => {
+          if (!response.success) {
+            throw Error(
+              `Delete touring schedule failed with error: ${response.message}`
+            );
+          }
+
+          return of(response);
+        }),
+        zipAll()
+      )
+      .subscribe({
+        next: () => {
+          this._toastService.showSuccess('Delete all successfully');
+          this.selectedSchedule = undefined;
+          this.data = this.data.map(() => []);
+        },
+        error: ({ message }) => this._toastService.showError(message),
+      });
+  }
+
+  cancel() {
+    if (this.selectedSchedule) {
+      this.selectedSchedule.selected = false;
+      this.selectedSchedule = undefined;
+    }
+
+    this.resetForm();
+  }
+
+  get canSave(): boolean {
+    return this.selectedSchedule !== undefined && this.form.valid;
+  }
+
+  save() {
+    const { startTime, endTime, color, day, patrol, type } = this.form.value;
+
+    // const schedulesGroupByTypeAndPatrolId: {
+    //   [key: string]: PtzSchedule[];
+    // } = this.data
+    //   .filter((e) => e.length > 0)
+    //   .flatMap((e) => e)
+    //   .reduce(
+    //     (dict, e) => {
+    //       const key = `${e.type}-${e.patrolId}`;
+    //       if (!(key in dict)) {
+    //         dict[key] = [];
+    //       }
+    //       dict[key].push(e);
+    //       return dict;
+    //     },
+    //     {} as {
+    //       [key: string]: PtzSchedule[];
+    //     }
+    //   );
+    // const { patrol_setting, preset_setting } = Object.values(
+    //   schedulesGroupByTypeAndPatrolId
+    // ).reduce(
+    //   (acc, schedules) => {
+    //     if (schedules[0].type === 'patrol') {
+    //       acc.patrol_setting.push({
+    //         patrol_id: schedules[0].patrolId,
+    //         color: schedules[0].color,
+    //         schedule: schedules.map((e) => ({
+    //           start_time: e.startTime.toString(),
+    //           end_time: e.endTime.toString(),
+    //           days: e.day.toString(),
+    //         })),
+    //       });
+    //     }
+    //     if (schedules[0].type === 'preset') {
+    //       acc.preset_setting.push({
+    //         preset_id: schedules[0].patrolId,
+    //         color: schedules[0].color,
+    //         schedule: schedules.map((e) => ({
+    //           start_time: e.startTime.toString(),
+    //           end_time: e.endTime.toString(),
+    //           days: e.day.toString(),
+    //         })),
+    //       });
+    //     }
+    //     return acc;
+    //   },
+    //   {
+    //     patrol_setting: [],
+    //     preset_setting: [],
+    //   } as {
+    //     patrol_setting: any[];
+    //     preset_setting: any[];
+    //   }
+    // );
+    // const data: CreateOrUpdateTouringRequest = {
+    //   patrol_setting: patrol_setting,
+    //   preset_setting: preset_setting,
+    // };
+    // if (this._touringId >= 0) {
+    //   this._tourService
+    //     .update(this._nodeId, this._cameraId, this._touringId, data)
+    //     .pipe(
+    //       switchMap((response) => {
+    //         if (!response.success) {
+    //           throw Error(
+    //             'Update tour for patrol or preset failed with error: ' +
+    //               response.message
+    //           );
+    //         }
+    //         return of(response);
+    //       })
+    //     )
+    //     .subscribe({
+    //       error: ({ message }) => this._toastService.showError(message),
+    //     });
+    // } else {
+    //   this._tourService
+    //     .create(this._nodeId, this._cameraId, data)
+    //     .pipe(
+    //       switchMap((response) => {
+    //         if (!response.success) {
+    //           throw Error(
+    //             'Create tour for patrol or preset failed with error: ' +
+    //               response.message
+    //           );
+    //         }
+    //         return of(response);
+    //       })
+    //     )
+    //     .subscribe({
+    //       error: ({ message }) => this._toastService.showError(message),
+    //     });
+    // }
+  }
+
+  private resetForm(): void {
+    this.form.reset(
+      {
+        startTime: 0,
+        endTime: 0,
+        day: undefined,
+        type: 'patrol',
+        patrol: undefined,
+        color: undefined,
+      },
+      {
+        emitEvent: true,
+      }
+    );
+  }
+
+  private fromTimeString(s: string): number {
+    const parts = s.split(':').map((e) => parseInt(e));
+    return parts[0] * 60 + parts[1];
+  }
+
+  private toTimeString(value: number): string {
+    const hour = Math.floor(value / 60);
+    const minute = value % 60;
+    return `${hour}:${minute}:0`;
   }
 }

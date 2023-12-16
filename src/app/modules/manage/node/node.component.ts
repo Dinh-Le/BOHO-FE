@@ -193,6 +193,15 @@ export class NodeComponent implements OnInit {
     }
   }
 
+  cancel(item: RowItemModel) {
+    if (item.isNewNode) {
+      this.data = this.data.filter((e) => e.id !== item.id);
+      return;
+    }
+
+    item.isEditable = false;
+  }
+
   remove({ id }: RowItemModel) {
     this._nodeService
       .delete(id)

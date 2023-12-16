@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
-import { FormDialogComponent } from '@modules/manage/form-dialog/form-dialog.component';
+import { FormDialogComponent } from '@shared/components/form-dialog/form-dialog.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Leaflet from 'leaflet';
 
@@ -14,14 +14,22 @@ import * as Leaflet from 'leaflet';
 export class LocationPickerComponent {
   activeModal = inject(NgbActiveModal);
 
-  marker = new Leaflet.Marker({
-    lat: 10.7750185,
-    lng: 106.7588497,
-  }, {
-    draggable: true
-  });
+  marker = new Leaflet.Marker(
+    {
+      lat: 10.7750185,
+      lng: 106.7588497,
+    },
+    {
+      draggable: true,
+      icon: Leaflet.divIcon({
+        className: 'border-0',
+        html: `<i  class="bi bi-geo-alt-fill text-primary" style="font-size: 48px"></i>`,
+        iconSize: [48, 48], // Size of the icon
+      }),
+    }
+  );
 
-  set latLng({ lat, lng }: { lat: number; lng: number }) {    
+  set latLng({ lat, lng }: { lat: number; lng: number }) {
     this.marker.setLatLng({ lat, lng });
     if (this.map) {
       this.map.panTo(this.marker.getLatLng());
@@ -29,8 +37,8 @@ export class LocationPickerComponent {
   }
 
   get latLng() {
-    const {lat, lng} = this.marker.getLatLng();
-    return {lat, lng};
+    const { lat, lng } = this.marker.getLatLng();
+    return { lat, lng };
   }
 
   map: Leaflet.Map | undefined;
@@ -47,13 +55,13 @@ export class LocationPickerComponent {
 
   onMapReady($event: any) {
     this.map = $event as Leaflet.Map;
-    this.marker.addTo(this.map);    
-    this.map.panTo(this.marker.getLatLng());    
+    this.marker.addTo(this.map);
+    this.map.panTo(this.marker.getLatLng());
   }
 
   mapClicked($event: any) {
-    const {lat, lng} = $event.latlng;
-    this.marker.setLatLng({lat, lng});
+    const { lat, lng } = $event.latlng;
+    this.marker.setLatLng({ lat, lng });
   }
 
   cancel() {
