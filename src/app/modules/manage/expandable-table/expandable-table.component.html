@@ -38,7 +38,7 @@
           </ng-template>
         </td>
       </tr>
-      <tr *ngIf="collapseContentTemplateRef" [ngClass]="{'hide': !row.isExpanded}">
+      <tr *ngIf="row.isExpanded && collapseContentTemplateRef">
         <td [colSpan]="columns.length + 1">
           <div class="show px-4 py-2">
             <ng-container

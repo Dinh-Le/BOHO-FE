@@ -1,41 +1,36 @@
 export const Objects: {
-  id: number;
+  id: string;
   name: string;
   icon: string;
 }[] = [
   {
-    id: 0,
+    id: 'people',
     name: 'Người',
     icon: 'walking-person',
   },
   {
-    id: 1,
-    name: 'Xe đạp',
-    icon: 'bicycle',
-  },
-  {
-    id: 2,
+    id: 'bike',
     name: 'Xe máy',
     icon: 'motocycle',
   },
   {
-    id: 3,
+    id: 'car',
     name: 'Xe ô-tô',
     icon: 'side-car',
   },
   {
-    id: 4,
-    name: 'Xe van',
-    icon: 'semi-truck',
-  },
-  {
-    id: 5,
-    name: 'Xe buýt',
-    icon: 'bus-side-view',
-  },
-  {
-    id: 6,
+    id: 'truck',
     name: 'Xe tải lớn',
     icon: 'side-truck',
+  },
+  {
+    id: 'ambulance',
+    name: 'Xe cứu thương',
+    icon: 'pickup',
+  },
+  {
+    id: 'bus',
+    name: 'Xe buýt',
+    icon: 'bus-side-view',
   },
 ];

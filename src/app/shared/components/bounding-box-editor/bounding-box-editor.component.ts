@@ -8,11 +8,14 @@ import {
   inject,
   OnChanges,
   SimpleChanges,
+  forwardRef,
+  HostListener,
 } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ControlValueAccessorImpl } from '@shared/helpers/control-value-accessor-impl';
 import { v4 } from 'uuid';
 
-interface Point {
+export declare interface Point {
   x: number;
   y: number;
 }
@@ -21,6 +24,13 @@ interface Point {
   selector: 'app-bounding-box-editor',
   templateUrl: 'bounding-box-editor.component.html',
   styleUrls: ['bounding-box-editor.component.scss'],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => BoundingBoxEditorComponent),
+      multi: true,
+    },
+  ],
 })
 export class BoundingBoxEditorComponent
   extends ControlValueAccessorImpl<Point[]>
@@ -52,6 +62,8 @@ export class BoundingBoxEditorComponent
       this.update();
     }
   }
+
+  @HostListener('')
 
   ngAfterViewInit(): void {
     if (this.src && this.canvas) {

@@ -22,8 +22,16 @@ import {
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { PresetService } from 'src/app/data/service/preset.service';
 import { ScheduleService } from 'src/app/data/service/schedule.service';
-import { of, switchMap } from 'rxjs';
+import { concatMap, finalize, of, switchMap } from 'rxjs';
 import { ToastService } from '@app/services/toast.service';
+import { Objects, RuleTypes, Severities } from 'src/app/data/constants';
+import { Point } from '@shared/components/bounding-box-editor/bounding-box-editor.component';
+import { Rule } from 'src/app/data/schema/boho-v2/rule';
+import { RuleService } from 'src/app/data/service/rule.service';
+
+declare interface CustomSelectItemModel extends SelectItemModel {
+  data: any;
+}
 
 export class RowItemModel extends ExpandableTableRowItemModelBase {
   id = v4();
@@ -34,9 +42,10 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
     preset: new FormControl<SelectItemModel | undefined>(undefined, [
       Validators.required,
     ]),
-    type: new FormControl<SelectItemModel | undefined>(undefined, [
+    type: new FormControl<CustomSelectItemModel | undefined>(undefined, [
       Validators.required,
     ]),
+    points: new FormControl<Point[]>([]),
     objects: new FormControl<SelectItemModel[]>([], [Validators.required]),
     exceedingTime: new FormControl<number>(5, [Validators.required]),
     severity: new FormControl<SelectItemModel | undefined>(undefined, [
@@ -48,11 +57,11 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
   });
 
   get name() {
-    return this.form.get('name')?.value;
+    return this.form.get('name')?.value || '';
   }
 
   get status() {
-    return this.form.get('status')?.value;
+    return this.form.get('status')?.value || false;
   }
 
   get integration() {
@@ -63,7 +72,7 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
     return this.form.get('preset')?.value;
   }
 
-  get type() {
+  get type(): CustomSelectItemModel | null | undefined {
     return this.form.get('type')?.value;
   }
 
@@ -88,11 +97,93 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
   }
 
   get boundingBoxType() {
-    if (this.type?.value === 4 || this.type?.value === 5) {
+    if (!this.type) {
+      return 'polygon';
+    }
+
+    const id = this.type.data.id;
+    if (id && id.includes('tripwire')) {
       return 'line';
     } else {
       return 'polygon';
     }
+  }
+
+  get points(): Point[] {
+    return this.form.get('points')?.value || [];
+  }
+
+  get data(): Rule {
+    const [alarm_type, direction] = (this.type?.data.id as string)
+      .split(',')
+      .map((e) => e.trim());
+
+    const rule: Rule = {
+      id: this.isNew ? -1 : parseInt(this.id),
+      active: this.status!,
+      name: this.name!,
+      level: this.severity?.value!,
+      objects: this.objects!.map((e) => e.value),
+      combine_name: '',
+      alarm_type: alarm_type,
+      preset_id: this.preset?.value!,
+      schedule_id: this.schedule?.value!,
+      points: this.points.map((e) => [e.x, e.y]),
+      alarm_metadata: {},
+    };
+
+    if (alarm_type === 'loitering event') {
+      rule.alarm_metadata.loitering = {
+        time_stand: this.exceedingTime!.toString(),
+      };
+    } else if (alarm_type === 'tripwire event') {
+      rule.alarm_metadata.tripwire = {
+        direction: direction,
+      };
+    }
+
+    return rule;
+  }
+
+  setData(
+    rule: Rule,
+    schedules: SelectItemModel[],
+    presets: SelectItemModel[]
+  ) {
+    this.id = rule.id.toString();
+    const severityIndex = Severities.findIndex((e) => e.id === rule.level);
+    const typeIndex = RuleTypes.findIndex((e) =>
+      e.id.startsWith(rule.alarm_type)
+    );
+    const objects = Objects.filter((e) => rule.objects.includes(e.id)).map(
+      (e) => ({
+        value: e.id,
+        label: e.name,
+        icon: e.icon,
+      })
+    );
+    this.form.reset({
+      name: rule.name,
+      exceedingTime: parseInt(rule.alarm_metadata.loitering?.time_stand || '5'),
+      integration: '',
+      objects: objects,
+      points: rule.points.map((e) => ({
+        x: e[0],
+        y: e[1],
+      })),
+      preset: presets.find((e) => e.value === rule.preset_id),
+      schedule: schedules.find((e) => e.value === rule.schedule_id),
+      severity: {
+        value: Severities[severityIndex].id,
+        label: Severities[severityIndex].name,
+      },
+      status: rule.active,
+      type: {
+        value: typeIndex,
+        label: RuleTypes[typeIndex].name,
+        data: RuleTypes[typeIndex],
+      },
+    });
   }
 }
 
@@ -113,6 +204,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
   _scheduleService = inject(ScheduleService);
   _toastService = inject(ToastService);
   _changeDetectorRef = inject(ChangeDetectorRef);
+  _ruleService = inject(RuleService);
 
   menuItems: MenuItem[] = [
     {
@@ -123,78 +215,20 @@ export class RuleComponent implements OnInit, AfterViewInit {
   ];
   data: RowItemModel[] = [];
   presets: SelectItemModel[] = [];
-  ruleTypes: SelectItemModel[] = [
-    {
-      value: 1,
-      label: 'Đi vào vùng',
-    },
-    {
-      value: 2,
-      label: 'Đi ra khỏi vùng',
-    },
-    {
-      value: 3,
-      label: 'Đi luẩn quẩn',
-    },
-    {
-      value: 4,
-      label: 'Vượt đường kẻ trái sang phải',
-    },
-    {
-      value: 5,
-      label: 'Vượt đường kẻ phải sang trái',
-    },
-    {
-      value: 6,
-      label: 'Đối tượng để lại',
-    },
-  ];
-  objects: SelectItemModel[] = [
-    {
-      value: 1,
-      label: 'Người',
-      icon: 'walking-person',
-    },
-    {
-      value: 2,
-      label: 'Xe đạp',
-      icon: 'bicycle',
-    },
-    {
-      value: 3,
-      label: 'Xe mô-tô',
-      icon: 'motocycle',
-    },
-    {
-      value: 4,
-      label: 'Ô tô',
-      icon: 'side-car',
-    },
-    {
-      value: 5,
-      label: 'Xe bus',
-      icon: 'bus-side-view',
-    },
-    {
-      value: 6,
-      label: 'Xe tải',
-      icon: 'side-truck',
-    },
-  ];
-  severities: SelectItemModel[] = [
-    {
-      value: 1,
-      label: 'Thấp',
-    },
-    {
-      value: 2,
-      label: 'Bình thường',
-    },
-    {
-      value: 3,
-      label: 'Cao',
-    },
-  ];
+  ruleTypes: CustomSelectItemModel[] = RuleTypes.map((e, index) => ({
+    value: index,
+    label: e.name,
+    data: e,
+  }));
+  objects: SelectItemModel[] = Objects.map((e) => ({
+    value: e.id,
+    label: e.name,
+    icon: e.icon,
+  }));
+  severities: SelectItemModel[] = Severities.map((e) => ({
+    value: e.id,
+    label: e.name,
+  }));
   schedules: SelectItemModel[] = [];
   columns: ColumnConfig[] = [];
 
@@ -207,53 +241,44 @@ export class RuleComponent implements OnInit, AfterViewInit {
       this._presetService
         .findAll(this._nodeId, this._cameraId)
         .pipe(
-          switchMap((response) => {
+          concatMap((response) => {
             if (!response.success) {
               throw Error(
                 `Fetch the preset list failed with error: ${response.message}`
               );
             }
 
-            return of(response.data);
-          })
-        )
-        .subscribe({
-          next: (presets) => {
-            this.presets = presets.map((e) => ({
+            this.presets = response.data.map((e) => ({
               label: e.name,
               value: e.id,
             }));
-          },
-          error: ({ message }) => {
-            this._toastService.showError(message);
-            this.presets = [];
-          },
-        });
 
-      this._scheduleService
-        .findAll(this._nodeId, this._cameraId)
-        .pipe(
-          switchMap((response) => {
+            return this._scheduleService.findAll(this._nodeId, this._cameraId);
+          }),
+          concatMap((response) => {
             if (!response.success) {
               throw Error(
                 `Fetch the schedule list failed with error: ${response.message}`
               );
             }
 
-            return of(response.data);
-          })
-        )
-        .subscribe({
-          next: (schedules) => {
-            this.schedules = schedules.map((e) => ({
+            this.schedules = response.data.map((e) => ({
               label: e.name,
               value: e.id,
             }));
+
+            return this._ruleService.findAll(this._nodeId, this._cameraId);
+          })
+        )
+        .subscribe({
+          next: (response) => {
+            this.data = response.data.map((e) => {
+              const item = new RowItemModel();
+              item.setData(e, this.schedules, this.presets);
+              return item;
+            });
           },
-          error: ({ message }) => {
-            this._toastService.showError(message);
-            this.schedules = [];
-          },
+          error: ({ message }) => this._toastService.showError(message),
         });
     });
   }
@@ -267,7 +292,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
       },
       {
         label: 'Điểm giám sát',
-        prop: 'diemGiamSat.name',
+        prop: 'preset.label',
         sortable: true,
       },
       {
@@ -283,7 +308,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
       },
       {
         label: 'Lịch trình',
-        prop: 'schedule.name',
+        prop: 'schedule.label',
         sortable: true,
       },
     ];
@@ -298,10 +323,109 @@ export class RuleComponent implements OnInit, AfterViewInit {
     this.data.push(newItem);
   }
 
-  submit(item: RowItemModel) {}
+  submit(item: RowItemModel) {
+    const data = Object.assign({}, item.data, {
+      id: undefined,
+    });
+    if (item.isNew) {
+      this._ruleService
+        .create(this._nodeId, this._cameraId, data)
+        .pipe(
+          switchMap((response) => {
+            if (!response.success) {
+              throw Error(`Create rule failed with error: ${response.message}`);
+            }
+
+            return of(response);
+          })
+        )
+        .subscribe({
+          next: (response) => {
+            this._toastService.showSuccess('Create rule successfully');
+            item.isNew = false;
+            item.isEditable = false;
+            item.id = response.data.toString();
+          },
+          error: ({ message }) => this._toastService.showError(message),
+        });
+    } else {
+      this._ruleService
+        .update(this._nodeId, this._cameraId, parseInt(item.id), data)
+        .pipe(
+          switchMap((response) => {
+            if (!response.success) {
+              throw Error(`Update rule failed with error: ${response.message}`);
+            }
+
+            return of(response);
+          })
+        )
+        .subscribe({
+          next: () => {
+            this._toastService.showSuccess('Update rule successfully');
+            item.isEditable = false;
+          },
+          error: ({ message }) => this._toastService.showError(message),
+        });
+    }
+  }
+
+  edit(item: RowItemModel) {
+    item.isEditable = true;
+  }
+
+  cancel(item: RowItemModel) {
+    if (item.isNew) {
+      this.data = this.data.filter((e) => e.id !== item.id);
+      return;
+    }
+
+    item.isEditable = false;
+    this._ruleService
+      .find(this._nodeId, this._cameraId, item.id)
+      .pipe(
+        switchMap((response) => {
+          if (!response.success) {
+            throw Error(`Fetch rule failed with error: ${response.message}`);
+          }
+
+          return of(response.data);
+        })
+      )
+      .subscribe({
+        next: (rule) => {
+          item.setData(rule, this.schedules, this.presets);
+        },
+        error: ({ message }) => this._toastService.showError(message),
+        complete: () => (item.isEditable = false),
+      });
+  }
 
   remove(item: RowItemModel) {
-    this.data = this.data.filter((e) => e.id !== item.id);
+    if (item.isNew) {
+      this.data = this.data.filter((e) => e.id !== item.id);
+      this._toastService.showSuccess('Delete rule successfully');
+      return;
+    }
+
+    this._ruleService
+      .delete(this._nodeId, this._cameraId, item.id)
+      .pipe(
+        switchMap((response) => {
+          if (!response.success) {
+            throw Error(`Delete rule failed with error: ${response.message}`);
+          }
+
+          return of(response);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.data = this.data.filter((e) => e.id !== item.id);
+          this._toastService.showSuccess('Delete rule successfully');
+        },
+        error: ({ message }) => this._toastService.showError(message),
+      });
   }
 
   get scheduleUrl() {

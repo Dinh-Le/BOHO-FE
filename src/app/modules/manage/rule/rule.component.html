@@ -29,7 +29,6 @@
         <input
           class="w-100 inline-input fs-16 text-white bg-transparent"
           formControlName="name"
-          [disabled]="!data.isEditable"
         />
       </div>
     </div>
@@ -211,7 +210,7 @@
             <button
               type="reset"
               class="my-button cancel mx-1"
-              (click)="data.isEditable = false"
+              (click)="cancel(data)"
             >
               Hủy
             </button>
@@ -225,9 +224,6 @@
           </div>
         </ng-container>
         <ng-template #viewModeTemplate>
-          <div class="row">
-            <span class="fs-16">{{ data.name }}</span>
-          </div>
           <div class="form-group row mt-4">
             <div class="col-4">
               <span>Hoạt động:</span>
@@ -306,12 +302,17 @@
             </div>
           </div>
           <div class="form-group d-flex justify-content-end">
-            <button class="my-button cancel mx-1" (click)="remove(data)">
+            <button
+              type="button"
+              class="my-button cancel mx-1"
+              (click)="remove(data)"
+            >
               Xóa
             </button>
             <button
+              type="button"
               class="my-button submit mx-1"
-              (click)="data.isEditable = true"
+              (click)="edit(data)"
             >
               Chỉnh
             </button>
@@ -320,11 +321,11 @@
       </div>
       <div class="col-5">
         <app-bounding-box-editor
-          [ariaDisabled]="!data.isEditable"
           [width]="800"
           [height]="600"
           class="w-100 h-100"
           [type]="data.boundingBoxType"
+          formControlName="points"
           src="https://upload.wikimedia.org/wikipedia/commons/b/b5/800x600_Wallpaper_Blue_Sky.png"
         ></app-bounding-box-editor>
       </div>

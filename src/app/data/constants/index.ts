@@ -6,5 +6,7 @@ export * from './locations.constanst';
 export * from './device-types.constant';
 export * from './device-status.constant';
 export * from './datetime.constant';
+export * from './rule-types.constant';
+export * from './severities.constant';
 
 export const InvalidId = '-1';
