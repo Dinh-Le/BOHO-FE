@@ -3,32 +3,52 @@ import {
   Input,
   OnDestroy,
   OnInit,
+  TemplateRef,
+  ViewChild,
   ViewContainerRef,
   inject,
 } from '@angular/core';
 import * as Leaflet from 'leaflet';
-import { EventInfo } from 'src/app/data/schema/event-info';
 import { Store } from '@ngrx/store';
 import { SidebarState } from 'src/app/state/sidebar.state';
 import { Subscription } from 'rxjs';
 import { Device } from 'src/app/data/schema/boho-v2/device';
 import { LatLng } from 'leaflet';
+import { NgModel } from '@angular/forms';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { EventInfo } from 'src/app/data/schema/event-info';
 
 class ExtendedMarker extends Leaflet.Marker {
-  private _device: Device;
+  private _camera: CameraInfo;
 
   constructor(
     latLng: L.LatLngExpression,
-    device: Device,
+    camera: CameraInfo,
     options?: L.MarkerOptions
   ) {
     super(latLng, options);
-    this._device = device;
+    this._camera = camera;
   }
 
-  get device() {
-    return this._device;
+  get camera() {
+    return this._camera;
   }
+}
+
+declare class CameraInfo {
+  latlng: LatLng;
+  type: 'ptz' | 'static';
+  numOfEvent: number;
+  events: MyEventInfo[];
+}
+
+declare class MyEventInfo {
+  seen: boolean;
+  boundingBoxes: number[][];
+  date: string;
+  time: string;
+  imgUrl: string;
+  checkboxVisible?: boolean;
 }
 
 @Component({
@@ -40,9 +60,13 @@ export class MapViewComponent implements OnInit, OnDestroy {
   private viewContainerRef: ViewContainerRef = inject(ViewContainerRef);
   private store = inject(Store<{ sidebar: SidebarState }>);
   private devicesSubscription: Subscription | undefined;
+  private _modalService = inject(NgbModal);
+
+  @ViewChild('eventListDialogTemplate')
+  eventListDialogTemplateRef!: TemplateRef<any>;
 
   map: Leaflet.Map | undefined;
-  markers: Leaflet.Marker[] = [];
+  markers: ExtendedMarker[] = [];
   options: Leaflet.MapOptions = {
     layers: [
       Leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -57,25 +81,63 @@ export class MapViewComponent implements OnInit, OnDestroy {
   @Input()
   events: (EventInfo | null)[] = [];
 
-  cameraList: {
-    latlng: LatLng;
-    type: 'ptz' | 'static';
-    numOfEvent: number;
-  }[] = [
+  cameraList: CameraInfo[] = [
     {
       latlng: new LatLng(10.769906, 106.775626),
       numOfEvent: 20,
       type: 'ptz',
+      events: Array(20)
+        .fill(0)
+        .map((e, index) =>
+          Object.assign(
+            {},
+            {
+              seen: false,
+              boundingBoxes: [],
+              date: '12-20-2023',
+              time: '11:11:11',
+              imgUrl: '/assets/images/car.png',
+            }
+          )
+        ),
     },
     {
       latlng: new LatLng(10.780198, 106.762805),
       numOfEvent: 10,
       type: 'static',
+      events: Array(20)
+        .fill(0)
+        .map((e, index) =>
+          Object.assign(
+            {},
+            {
+              seen: false,
+              boundingBoxes: [],
+              date: '12-20-2023',
+              time: '11:11:11',
+              imgUrl: '/assets/images/car.png',
+            }
+          )
+        ),
     },
     {
       latlng: new LatLng(10.774633, 106.781173),
       numOfEvent: 1,
       type: 'static',
+      events: Array(20)
+        .fill(0)
+        .map((e, index) =>
+          Object.assign(
+            {},
+            {
+              seen: false,
+              boundingBoxes: [],
+              date: '12-20-2023',
+              time: '11:11:11',
+              imgUrl: '/assets/images/car.png',
+            }
+          )
+        ),
     },
   ];
 
@@ -91,11 +153,24 @@ export class MapViewComponent implements OnInit, OnDestroy {
     this.devicesSubscription?.unsubscribe();
   }
 
+  _selectedMarker: ExtendedMarker | undefined;
+
+  get eventList(): MyEventInfo[] {
+    return this._selectedMarker?.camera.events || [];
+  }
+
   onMapReady(map: Leaflet.Map) {
     this.map = map;
     this.markers = this.cameraList.map((e) => {
-      const marker = new Leaflet.Marker(e.latlng, {
+      const marker = new ExtendedMarker(e.latlng, e, {
         icon: this.createMarkerIcon(e.type, true),
+      });
+
+      marker.on('click', (ev) => {
+        this._selectedMarker = ev.sourceTarget as ExtendedMarker;
+        this._modalService
+          .open(this.eventListDialogTemplateRef, {})
+          .closed.subscribe(() => (this._selectedMarker = undefined));
       });
 
       // marker.on('mouseover', (event: Leaflet.LeafletMouseEvent) => {
@@ -226,4 +301,10 @@ export class MapViewComponent implements OnInit, OnDestroy {
       iconSize: [80, 42], // Size of the icon
     });
   }
+
+  closeDialog() {
+    this._modalService.dismissAll();
+  }
+
+  onSeenCheckboxChanged(event: MyEventInfo) {}
 }

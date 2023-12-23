@@ -65,3 +65,63 @@
 ::ng-deep .event-seen {
   background: #3c3b3e;
 }
+.events-container {
+  height: 80vh;
+  overflow-y: auto;
+  margin: 20px;
+  background: #3d3b3e;
+
+  .event-container {
+    position: relative;
+    height: 250px;
+    background: #1c1c19;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-left: 1px solid white;
+    border-right: 1px solid white;
+    border-top: 1px solid white;
+
+    .event-image {
+      width: auto;
+      height: 100%;
+    }
+
+    .event-date {
+      width: 80px;
+      position: absolute;
+      text-align: center;
+      background: #7f7f7f7f;
+      color: white;
+      top: 10px;
+      left: 50%;
+
+      transform: translateX(-40px);
+    }
+
+    .event-time {
+      width: 80px;
+      position: absolute;
+      text-align: center;
+      background: #7f7f7f7f;
+      color: white;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-40px);
+    }
+
+    .seen-checkbox {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      border: 1px solid white;
+      width: 1.5em;
+      height: 1.5em;
+    }
+  }
+
+  .event-container:last-child {
+    border-bottom: 1px solid white;
+  }
+}

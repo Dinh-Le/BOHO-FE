@@ -5,3 +5,40 @@
   (leafletMapReady)="onMapReady($event)"
   (leafletClick)="mapClicked($event)"
 ></div>
+
+<ng-template #eventListDialogTemplate>
+  <div style="background: #3d3b3e">
+    <div
+      style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 20px 10px;
+      "
+    >
+      <span style="color: white; font-size: 14pt">Cổng chính</span>
+      <a (click)="closeDialog()"
+        ><i class="bi bi-x" style="font-size: 20pt; color: white"></i
+      ></a>
+    </div>
+    <div class="events-container">
+      <div
+        (mouseenter)="item.checkboxVisible = true"
+        (mouseleave)="item.checkboxVisible = false"
+        class="event-container"
+        *ngFor="let item of eventList"
+      >
+        <img class="event-image" [src]="item.imgUrl" />
+        <div class="event-date">{{ item.date }}</div>
+        <div class="event-time">{{ item.time }}</div>
+        <input
+          class="seen-checkbox"
+          type="checkbox"
+          [(ngModel)]="item.seen"
+          (ngModelChange)="onSeenCheckboxChanged(item)"
+          [style.display]="item.checkboxVisible ? 'block' : 'none'"
+        />
+      </div>
+    </div>
+  </div>
+</ng-template>

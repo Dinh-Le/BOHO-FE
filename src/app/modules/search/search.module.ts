@@ -4,6 +4,7 @@ import { SearchComponent } from './search.component';
 import { SearchRoutingModule } from './search-routing.module';
 import {
   NgbDropdownModule,
+  NgbModalModule,
   NgbPaginationModule,
   NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap';

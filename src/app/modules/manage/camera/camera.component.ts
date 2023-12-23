@@ -31,6 +31,10 @@ import { NodeService } from 'src/app/data/service/node.service';
 import { of } from 'rxjs';
 import { RowItemModel } from './row-item.model';
 import { Device, Node } from 'src/app/data/schema/boho-v2';
+import {
+  NavigationService,
+  SideMenuItemType,
+} from 'src/app/data/service/navigation.service';
 
 @Component({
   selector: 'app-camera',
@@ -46,6 +50,7 @@ export class CameraComponent implements OnInit, AfterViewInit {
   private _deviceService = inject(DeviceService);
   private _toastService = inject(ToastService);
   private _changeDetectorRef = inject(ChangeDetectorRef);
+  private _navigationService = inject(NavigationService);
 
   cameraDrivers: SelectItemModel[] = CameraDrivers.map((e) => ({
     value: e,
@@ -191,47 +196,58 @@ export class CameraComponent implements OnInit, AfterViewInit {
       this._deviceService
         .create(this.node!.id, data)
         .pipe(
-          catchError(({ message }) =>
-            of({
-              success: false,
-              message,
-              data: InvalidId,
-            })
-          )
-        )
-        .subscribe((response) => {
-          if (!response.success) {
-            this._toastService.showError(
-              'Create camera failed with error: ' + response.message
-            );
-            return;
-          }
+          switchMap((response) => {
+            if (!response.success) {
+              throw Error(
+                `Create camera failed with error: ${response.message}`
+              );
+            }
 
-          item.id = response.data.toString();
-          item.isNew = false;
-          item.isEditable = false;
+            return of(response.data);
+          })
+        )
+        .subscribe({
+          next: ({ id, status }) => {
+            this._toastService.showSuccess('Create camera successfully');
+            item.id = id.toString();
+            item.isNew = false;
+            item.isEditable = false;
+            this._navigationService.treeItemChange$.next({
+              type: SideMenuItemType.DEVICE,
+              action: 'create',
+              data: Object.assign({}, data, {
+                id,
+                node_id: this.node!.id,
+              }),
+            });
+          },
+          error: ({ message }) => this._toastService.showError(message),
         });
     } else {
       this._deviceService
         .update(this.node!.id, item.id, data)
         .pipe(
-          catchError(({ message }) =>
-            of({
-              success: false,
-              message,
-              data: InvalidId,
-            })
-          )
-        )
-        .subscribe((response) => {
-          if (!response.success) {
-            this._toastService.showError(
-              'Update camera failed with error: ' + response.message
-            );
-            return;
-          }
+          switchMap((response) => {
+            if (!response.success) {
+              throw Error(
+                `Update camera failed with error: ${response.message}`
+              );
+            }
 
-          item.isEditable = false;
+            return of();
+          })
+        )
+        .subscribe({
+          next: () => {
+            this._toastService.showSuccess('Update camera successfully');
+            item.isEditable = false;
+            this._navigationService.treeItemChange$.next({
+              type: SideMenuItemType.DEVICE,
+              action: 'update',
+              data: Object.assign({}, data),
+            });
+          },
+          error: ({ message }) => this._toastService.showError(message),
         });
     }
   }
@@ -261,6 +277,13 @@ export class CameraComponent implements OnInit, AfterViewInit {
         next: () => {
           this._toastService.showSuccess('Delete camera successfully');
           this.data = this.data.filter((e) => e.id !== item.id);
+          this._navigationService.treeItemChange$.next({
+            type: SideMenuItemType.DEVICE,
+            action: 'delete',
+            data: {
+              id: item.id,
+            },
+          });
         },
         error: ({ message }) => this._toastService.showError(message),
       });
