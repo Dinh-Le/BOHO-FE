@@ -1,10 +1,28 @@
+<img
+  src="/assets/images/background.jpg"
+  style="height: 100vh; width: auto; position: absolute"
+/>
 <form
   [formGroup]="loginForm"
-  class="border-primary rounded-1 p-3 bg-light"
+  class="login-form"
   (ngSubmit)="submit()"
+  style="background: #7f7f7f7f; border: 1px solid black; border-radius: 5px"
 >
-  <div class="form-group text-center">
-    <span class="fs-2 text-dark">BOHO</span>
+  <div class="header">
+    <span class="title">BOHO</span>
+  </div>
+  <div class="body">
+    <div class="form-item">
+      <i class="bi bi-person"></i>
+      <input class="form-input" formControlName="username" />
+    </div>
+    <div class="form-item">
+      <i class="bi bi-person"></i>
+      <input class="form-input" formControlName="username" />
+      <i class="bi bi-eye-fill"></i>
+    </div>
+    <button type="submit" class="submit-button">Sign in</button>
+    <a class="forget-password">Forget password</a>
   </div>
 
   <div class="form-floating mt-3">
