@@ -115,6 +115,34 @@ export class SidebarComponent implements OnInit, AfterViewInit {
           }
         } else if (type === SideMenuItemType.DEVICE) {
           const id = DeviceTreeBuilder.DeviceIDPrefix + data.id;
+
+          if (action === 'create') {
+            const nodeId = DeviceTreeBuilder.NodeIDPrefix + data.node_id;
+            const parent = this.root?.find(nodeId);
+            if (!parent) {
+              console.log(`The parent with id ${nodeId} does not exists`);
+              return;
+            }
+            const item = new TreeViewItemModel(
+              id,
+              data.name,
+              DeviceTreeBuilder.DeviceIcon
+            );
+            item.data = data;
+            parent.add(item);
+          } else if (action === 'update') {
+            const item = this.root?.find(id);
+            if (!item) {
+              console.log(`The node with id ${id} does not exits`);
+              return;
+            }
+
+            item.label = data.name;
+          } else if (action === 'delete') {
+            this.root?.remove(id);
+          } else {
+            // Do nothing
+          }
         } else if (type === SideMenuItemType.NODE_OPERATOR) {
           const id = DeviceTreeBuilder.NodeOperatorIDPrefix + data.id;
           if (action === 'create') {

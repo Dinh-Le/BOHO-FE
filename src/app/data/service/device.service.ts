@@ -11,7 +11,12 @@ export type CreateOrUpdateDeviceRequestDto = Pick<
   'name' | 'is_active' | 'type' | 'camera'
 >;
 
-export type CreateDeviceResponeDto = ResponseBase & { data: number };
+export type CreateDeviceResponeDto = ResponseBase & {
+  data: {
+    id: number;
+    status: string;
+  };
+};
 
 export abstract class DeviceService extends RestfullApiService {
   public abstract create(

@@ -15,8 +15,6 @@ import { v4 } from 'uuid';
 import { ActivatedRoute } from '@angular/router';
 import { NodeService } from 'src/app/data/service/node.service';
 import { ToastService } from '@app/services/toast.service';
-import { NodeOperatorService } from 'src/app/data/service/node-operator.service';
-import { NodeOperator } from 'src/app/data/schema/boho-v2/node-operator';
 import { Node } from 'src/app/data/schema/boho-v2/node';
 import { catchError, of, switchMap } from 'rxjs';
 import { NodeTypes } from 'src/app/data/constants';
@@ -74,8 +72,8 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
       id: this.id,
       name: this.name!,
       ip: this.host!,
+      is_active: true,
       port: this.port!,
-      is_active: this.status!,
       node_operator_id: this.nodeOperatorId,
       type: this.type?.value!,
       node_metadata: {
@@ -110,50 +108,46 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
 })
 export class NodeComponent implements OnInit, AfterViewInit {
   private _activatedRoute = inject(ActivatedRoute);
-  private _nodeOperatorService = inject(NodeOperatorService);
   private _nodeService = inject(NodeService);
   private _toastService = inject(ToastService);
   private _navigationService = inject(NavigationService);
 
   @ViewChild('statusTemplate') statusTemplateRef!: TemplateRef<any>;
 
-  _nodeOperator: NodeOperator | undefined;
   data: RowItemModel[] = [];
   columns: ColumnConfig[] = [];
   types: SelectItemModel[] = NodeTypes.map((e) => ({
     value: e,
     label: e,
   }));
+  _nodeOperatorId = '';
 
   ngOnInit(): void {
     this._activatedRoute.params
       .pipe(
-        switchMap((params) =>
-          this._nodeOperatorService.find(params['nodeOperatorId'])
-        ),
+        switchMap(({ nodeOperatorId }) => {
+          this._nodeOperatorId = nodeOperatorId;
+          return this._nodeService.findAll(this._nodeOperatorId);
+        }),
         switchMap((response) => {
           if (!response.success) {
-            throw Error(
-              'Fetch group node data failed with error: ' + response.message
+            throw new Error(
+              `Fetch node data failed with error: ${response.message}`
             );
           }
 
-          this._nodeOperator = response.data;
-          return this._nodeService.findAll(this._nodeOperator.id);
-        }),
-        catchError((error) => {
-          this._toastService.showError(error);
-          return of(null);
+          return of(response.data);
         })
       )
-      .subscribe((response) => {
-        if (response?.success) {
-          this.data = response.data.map((node) => {
+      .subscribe({
+        next: (nodes) => {
+          this.data = nodes.map((node) => {
             const item = new RowItemModel();
             item.data = node;
             return item;
           });
-        }
+        },
+        error: ({ message }) => this._toastService.showError(message),
       });
   }
 
@@ -194,6 +188,7 @@ export class NodeComponent implements OnInit, AfterViewInit {
     item.isEditable = true;
     item.isNew = true;
     item.isExpanded = true;
+    item.nodeOperatorId = this._nodeOperatorId;
     this.data.push(item);
   }
 
@@ -205,6 +200,7 @@ export class NodeComponent implements OnInit, AfterViewInit {
   submit(item: RowItemModel) {
     const data = Object.assign({}, item.data, {
       id: undefined,
+      is_active: undefined,
     });
     if (item.isNew) {
       this._nodeService
