@@ -19,6 +19,7 @@ export class AuthLayoutComponent implements OnInit {
     username: new FormControl('root', [Validators.required]),
     password: new FormControl('Goback@2021', [Validators.required]),
   });
+  passwordVisible: boolean = false;
 
   ngOnInit(): void {}
 
