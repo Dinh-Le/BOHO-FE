@@ -23,7 +23,7 @@ export class SearchComponent implements OnInit {
   private _navigationService = inject(NavigationService);
   private _toastService = inject(ToastService);
 
-  viewMode: string = 'map-view';
+  viewMode: string = 'list-view';
   gridColumn: string = '3';
 
   paginationInfo: {

@@ -1,10 +1,78 @@
-@import "../../../../../variables";
-
-.event-thumbnail {
+:host {
+  background: #28282aff;
+  display: grid;
+  grid-template-areas:
+    "event-image event-detail"
+    "event-list event-list";
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 0.75fr 1fr;
   height: 100%;
-  width: auto;
+  overflow-y: hidden;
 }
 
-:host {
-  background: $body-bg;
+.event-image {
+  grid-area: event-image;
+  min-width: 480px;
+  display: flex;
+  align-items: center;
+}
+
+.event-detail {
+  grid-area: event-detail;
+  padding: 1.5rem;
+
+  .event-prop {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+
+    .prop-label {
+      width: 150px;
+    }
+
+    p {
+      margin: 0;
+      padding: 0;
+    }
+  }
+}
+
+.event-list {
+  grid-area: event-list;
+  overflow: auto;
+  border-top: 1px solid #d8d8d8;
+  padding: 0px 10px;
+
+  table {
+    width: 100%;
+
+    thead {
+      position: sticky;
+    }
+
+    thead,
+    tr {
+      border-bottom: 1px solid #d8d8d8;
+    }
+
+    tr.active {
+      background: #7f7f7fff;
+    }
+
+    th,
+    td {
+      margin: 0;
+      padding: 2px;
+    }
+
+    td,
+    td > * {
+      color: #ededed;
+    }
+
+    img.cropped-image {
+      width: 50px;
+      height: 50px;
+    }
+  }
 }
