@@ -196,3 +196,20 @@
     </button>
   </div>
 </form>
+
+<div class="pagination-bar">
+  <div class="page-length button-group">
+    <button
+      *ngFor="let item of pageLengthList"
+      (click)="paginationInfo.pageLength = item"
+      [class.active]="paginationInfo.pageLength === item"
+    >
+      {{ item }}
+    </button>
+  </div>
+  <app-pagination
+    [pageLength]="paginationInfo.pageLength"
+    [totalItems]="paginationInfo.totalItems"
+    [(ngModel)]="paginationInfo.currentPage"
+  ></app-pagination>
+</div>

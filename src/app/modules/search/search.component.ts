@@ -25,6 +25,7 @@ export class SearchComponent implements OnInit {
 
   viewMode: string = 'list-view';
   gridColumn: string = '3';
+  pageLengthList = [25, 50, 100];
 
   paginationInfo: {
     currentPage: number;
@@ -32,7 +33,7 @@ export class SearchComponent implements OnInit {
     totalItems: number;
   } = {
     currentPage: 1,
-    pageLength: 30,
+    pageLength: 50,
     totalItems: 0,
   };
   events: EventInfo[] = [];

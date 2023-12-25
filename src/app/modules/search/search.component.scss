@@ -5,53 +5,20 @@
   row-gap: 2px;
   grid-template:
     "toolbar toolbar"
-    "content searchForm";
-  grid-template-columns: 1fr 180px;
-  grid-template-rows: 36px 1fr;
+    "content searchForm"
+    "pagination pagination";
+  grid-template-columns: 1fr 240px;
+  grid-template-rows: 36px 1fr 36px;
 }
 
 * {
   font-size: 14px !important;
-}
-
-.my-pagination {
-  display: flex;
-  align-items: center;
-  align-content: flex-start;
-}
-
-.my-pagination a {
-  color: white;
-  text-decoration: none;
-  padding: 2px 2px;
-  outline: none;
-  border: none;
-}
-
-.my-pagination a:hover:not(.active) {
-  color: black;
-  background-color: lightgray;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  padding: 0;
-  text-align: center;
-}
-
-.my-pagination a.active {
-  background-color: lightskyblue;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  text-align: center;
-  color: black;
-  margin: auto;
-  padding: 0;
+  color: #ffffff;
 }
 
 .view-wrapper {
   /* navbar: 51px, toolbar: 34px * 2, row-gap: 1px * 2 */
-  height: calc(100vh - 51px - 34px - 2px) !important;
+  height: calc(100vh - 51px - 72px - 8px) !important;
 }
 
 .scroll-y {
@@ -107,7 +74,7 @@ button:disabled {
 
 .content {
   grid-area: content;
-  border: 1px solid white;
+  border: 1px solid #bfbfbf;
 }
 
 .search-form {
@@ -116,6 +83,7 @@ button:disabled {
   flex-direction: column;
   background: #4a494b;
   padding: 15px;
+  border-bottom: 1px solid #bfbfbf;
 
   .form-item {
     .label {
@@ -149,5 +117,29 @@ button:disabled {
 
   button {
     padding: 3px 20px;
+  }
+}
+
+.pagination-bar {
+  grid-area: pagination;
+  background: #4a494bff;
+  padding: 0rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .button-group {
+    button {
+      border: 1px solid #5285b6;
+      border-radius: 2px;
+      margin-right: 1px;
+      width: 40px;
+    }
+    button:last-child {
+      margin-right: 0px;
+    }
+    button.active {
+      background: #5285b6ff;
+    }
   }
 }
