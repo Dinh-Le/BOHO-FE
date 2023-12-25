@@ -23,7 +23,7 @@ export class SearchComponent implements OnInit {
   private _navigationService = inject(NavigationService);
   private _toastService = inject(ToastService);
 
-  viewMode: string = 'list-view';
+  viewMode: string = 'grid-view';
   gridColumn: string = '3';
   pageLengthList = [25, 50, 100];
 
@@ -48,7 +48,15 @@ export class SearchComponent implements OnInit {
     licensePlate: new FormControl(''),
     showVehileOnly: new FormControl(false, [Validators.required]),
   });
-  ruleItems: SelectItemModel[] = [{ value: '1', label: 'Vượt đường kẻ' }];
+  ruleItems: SelectItemModel[] = [
+    'Vượt đường kẻ',
+    'Xâm nhập vùng',
+    'Đi luẩn quẩn',
+    'Đỗ xe sai nơi quy định',
+  ].map((name, index) => ({
+    value: index,
+    label: name,
+  }));
 
   ngOnInit(): void {
     this.eventService.findAll().subscribe((events) => {

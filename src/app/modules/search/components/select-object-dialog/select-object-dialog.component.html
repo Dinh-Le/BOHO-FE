@@ -4,16 +4,19 @@
   (submit)="submit()"
 >
   <div class="row">
-    <app-list-view
-      class="col-6"
-      [itemTemplate]="listItemTemplate"
-      [items]="objectItemModels"
-      backgroundColor="#1C1C19"
-      textColor="white"
-      activeBackgroundColor="#5285B6"
-      (itemClick)="onObjectSelected($event)"
-      [multiple]="false"
-    ></app-list-view>
+    <div class="col-6">
+      <div style="border: 1px solid #d8d8d8">
+        <app-list-view
+          [itemTemplate]="listItemTemplate"
+          [items]="objectItemModels"
+          backgroundColor="#1c1c19ff"
+          textColor="white"
+          activeBackgroundColor="#5285b6ff"
+          (itemClick)="onObjectSelected($event)"
+          [multiple]="false"
+        ></app-list-view>
+      </div>
+    </div>
     <ng-template #listItemTemplate let-item="item">
       <div class="d-flex align-items-center">
         <input
@@ -39,6 +42,7 @@
         display: grid;
         grid-template-columns: 1fr auto;
         grid-template-rows: 1fr 1fr;
+        row-gap: 1rem;
       "
     >
       <ng-container

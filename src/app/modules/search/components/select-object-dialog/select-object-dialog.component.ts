@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormDialogComponent } from '@shared/components/form-dialog/form-dialog.component';
 import { ListViewItemModel } from '@shared/components/list-view/list-view-item.model';
@@ -63,21 +63,13 @@ export class SelectObjectDialogComponent {
   }
 
   onObjectSelected(item: ListViewItemModel): void {
-    this.showHumanColorSelection = item.id === '0';
+    this.showHumanColorSelection = item.id === 'people';
     this.selectedItem = item as ObjectItemModel;
   }
 
   onSelectionChange(value: boolean) {
     if (!value && this.selectedItem) {
       this.selectedItem.colors = ['', ''];
-      return;
-    }
-
-    if (value && this.selectedItem) {
-      this.selectedItem.colors =
-        this.selectedItem.id === '0'
-          ? [this.colors[0], this.colors[0]]
-          : [this.colors[0], ''];
     }
   }
 
