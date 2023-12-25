@@ -11,7 +11,7 @@ export class GridViewComponent {
   cols: string = '3';
 
   @Input()
-  events: (EventInfo | null)[] = [];
+  events: any[] = [];
 
   get gridTemplateColumns() {
     return `repeat(${this.cols}, 1fr)`;

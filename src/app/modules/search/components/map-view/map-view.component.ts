@@ -12,10 +12,8 @@ import * as Leaflet from 'leaflet';
 import { Store } from '@ngrx/store';
 import { SidebarState } from 'src/app/state/sidebar.state';
 import { Subscription } from 'rxjs';
-import { Device } from 'src/app/data/schema/boho-v2/device';
 import { LatLng } from 'leaflet';
-import { NgModel } from '@angular/forms';
-import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventInfo } from 'src/app/data/schema/event-info';
 
 class ExtendedMarker extends Leaflet.Marker {
@@ -79,7 +77,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
   };
 
   @Input()
-  events: (EventInfo | null)[] = [];
+  events: any[] = [];
 
   cameraList: CameraInfo[] = [
     {

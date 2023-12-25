@@ -1,7 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { LoadingService } from '@app/services/loading.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { EventInfo } from 'src/app/data/schema/event-info';
 import { EventService } from 'src/app/data/service/event.service';
 import {
   ObjectItemModel,
@@ -11,6 +9,12 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { SelectItemModel } from '@shared/models/select-item-model';
 import { NavigationService } from 'src/app/data/service/navigation.service';
 import { ToastService } from '@app/services/toast.service';
+import {
+  SearchQuery,
+  SearchService,
+} from 'src/app/data/service/search.service';
+import { finalize, from, map, mergeAll, of, tap } from 'rxjs';
+import { EventInfo } from 'src/app/data/schema/boho-v2/event';
 
 @Component({
   selector: 'app-search',
@@ -22,6 +26,7 @@ export class SearchComponent implements OnInit {
   private modelService = inject(NgbModal);
   private _navigationService = inject(NavigationService);
   private _toastService = inject(ToastService);
+  private _searchService = inject(SearchService);
 
   viewMode: string = 'grid-view';
   gridColumn: string = '3';
@@ -59,10 +64,10 @@ export class SearchComponent implements OnInit {
   }));
 
   ngOnInit(): void {
-    this.eventService.findAll().subscribe((events) => {
-      this.events = events;
-      this.paginationInfo.totalItems = this.events.length;
-    });
+    // this.eventService.findAll().subscribe((events) => {
+    //   this.events = events;
+    //   this.paginationInfo.totalItems = this.events.length;
+    // });
   }
 
   get canSubmit() {
@@ -100,9 +105,44 @@ export class SearchComponent implements OnInit {
   }
 
   search() {
-    if (this._navigationService.selectedDeviceIds.size === 0) {
-      this._toastService.showError('No device selected');
-    }
+    this.events = [];
+    from(
+      Object.entries(this._navigationService.selectedDeviceIds).filter(
+        ([k, v]) => v.size > 0
+      )
+    )
+      .pipe(
+        tap(() => this.form.disable()),
+        map(([nodeId, deviceIds]) => {
+          const query: SearchQuery = {
+            dis: [...deviceIds],
+            oit: [],
+            tq: '',
+            eit: [],
+            limit: 100,
+            start: '',
+            end: '',
+          };
+          return this._searchService.search(nodeId, query);
+        }),
+        mergeAll(),
+        map((response) => {
+          if (!response.success) {
+            throw Error(
+              `Fetch event data failed with error: ${response.message}`
+            );
+          }
+
+          return response.data;
+        }),
+        finalize(() => this.form.enable())
+      )
+      .subscribe({
+        next: (events: EventInfo[]) => {
+          this.events.push(...events);
+        },
+        error: ({ message }) => this._toastService.showError(message),
+      });
   }
 
   onPageChanged(value: number) {
