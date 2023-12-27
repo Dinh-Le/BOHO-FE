@@ -54,21 +54,17 @@
 <div
   [ngSwitch]="viewMode"
   class="view-wrapper content"
-  [ngClass]="{ 'scroll-y': viewMode !== 'map-view' }"
+  [ngClass]="{ 'scroll-y': viewMode === 'grid-view' }"
 >
   <app-grid-view
     *ngSwitchCase="'grid-view'"
     [cols]="gridColumn"
-    [events]="currentEvents"
   ></app-grid-view>
   <app-map-view
     *ngSwitchCase="'map-view'"
     [events]="currentEvents"
   ></app-map-view>
-  <app-list-view
-    *ngSwitchCase="'list-view'"
-    [events]="currentEvents"
-  ></app-list-view>
+  <app-list-view-search *ngSwitchCase="'list-view'"></app-list-view-search>
   <div *ngSwitchDefault>Unsupported view mode</div>
 </div>
 
@@ -199,3 +195,20 @@
     </button>
   </div>
 </form>
+
+<div class="pagination-bar">
+  <div class="page-length button-group">
+    <button
+      *ngFor="let item of pageLengthList"
+      (click)="paginationInfo.pageLength = item"
+      [class.active]="paginationInfo.pageLength === item"
+    >
+      {{ item }}
+    </button>
+  </div>
+  <app-pagination
+    [pageLength]="paginationInfo.pageLength"
+    [totalItems]="paginationInfo.totalItems"
+    [(ngModel)]="paginationInfo.currentPage"
+  ></app-pagination>
+</div>

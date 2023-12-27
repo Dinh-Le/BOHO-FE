@@ -197,10 +197,21 @@ export class SidebarComponent implements OnInit, AfterViewInit {
       if (!isDevice) {
         return;
       }
+
+      if (!(child.data.node_id in this._navigationService.selectedDeviceIds)) {
+        this._navigationService.selectedDeviceIds[child.data.node_id] =
+          new Set();
+      }
+
       if (item.checked) {
-        this._navigationService.selectedDeviceIds.add(child.data.id);
+        if (child.data.node_id in this._navigationService.selectedDeviceIds)
+          this._navigationService.selectedDeviceIds[child.data.node_id].add(
+            child.data.id
+          );
       } else {
-        this._navigationService.selectedDeviceIds.delete(child.data.id);
+        this._navigationService.selectedDeviceIds[child.data.node_id].delete(
+          child.data.id
+        );
       }
     });
   }

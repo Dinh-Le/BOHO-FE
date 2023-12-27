@@ -12,11 +12,9 @@ import * as Leaflet from 'leaflet';
 import { Store } from '@ngrx/store';
 import { SidebarState } from 'src/app/state/sidebar.state';
 import { Subscription } from 'rxjs';
-import { Device } from 'src/app/data/schema/boho-v2/device';
 import { LatLng } from 'leaflet';
-import { NgModel } from '@angular/forms';
-import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { EventInfo } from 'src/app/data/schema/event-info';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { EventDetailComponent } from '../event-detail/event-detail.component';
 
 class ExtendedMarker extends Leaflet.Marker {
   private _camera: CameraInfo;
@@ -79,7 +77,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
   };
 
   @Input()
-  events: (EventInfo | null)[] = [];
+  events: any[] = [];
 
   cameraList: CameraInfo[] = [
     {
@@ -307,4 +305,10 @@ export class MapViewComponent implements OnInit, OnDestroy {
   }
 
   onSeenCheckboxChanged(event: MyEventInfo) {}
+
+  showEventDetail() {
+    this._modalService.open(EventDetailComponent, {
+      size: 'xl',
+    });
+  }
 }

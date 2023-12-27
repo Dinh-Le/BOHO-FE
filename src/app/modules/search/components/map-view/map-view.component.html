@@ -21,7 +21,7 @@
         ><i class="bi bi-x" style="font-size: 20pt; color: white"></i
       ></a>
     </div>
-    <div class="events-container">
+    <div class="events-container" (click)="showEventDetail()">
       <div
         (mouseenter)="item.checkboxVisible = true"
         (mouseleave)="item.checkboxVisible = false"
