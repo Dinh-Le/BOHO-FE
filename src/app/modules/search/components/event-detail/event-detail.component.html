@@ -1,0 +1,45 @@
+<div class="header">
+  <span class="title">Chi tiết sự kiện</span>
+  <button class="close-button" (click)="close()">
+    <i class="bi bi-x-lg"></i>
+  </button>
+</div>
+<div class="event-image">
+  <img src="/assets/images/car.png" />
+</div>
+<div class="event-info">
+  <p>Chi tiết đối tượng</p>
+  <p>Camera:</p>
+  <p>Điểm giám sát:</p>
+  <p>Thời gian:</p>
+  <p>ID đối tượng:</p>
+  <p>Loại:</p>
+  <p>Màu sắc:</p>
+  <p>Biển số:</p>
+</div>
+<div class="progress-bar">
+  <div class="progress"></div>
+</div>
+<div class="toolbar">
+  <app-svg-icon
+    width="1.5em"
+    height="1.5em"
+    rotate="180"
+    icon="next"
+  ></app-svg-icon>
+  <app-svg-icon width="1.5em" height="1.5em" icon="next"></app-svg-icon>
+  <app-svg-icon width="1.5em" height="1.5em" icon="rewind"></app-svg-icon>
+  <app-svg-icon width="1.5em" height="1.5em" icon="previous"></app-svg-icon>
+  <span>hh:mm:ss</span>
+  <app-svg-icon
+    width="1.5em"
+    height="1.5em"
+    [rotate]="180"
+    icon="previous"
+  ></app-svg-icon>
+  <app-svg-icon width="1.5em" height="1.5em" icon="fast-forward"></app-svg-icon>
+</div>
+<div class="footer">
+  <button class="reject">Công nhận giả</button>
+  <button class="accept">Công nhận thật</button>
+</div>

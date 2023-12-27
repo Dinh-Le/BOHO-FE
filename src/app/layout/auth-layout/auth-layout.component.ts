@@ -45,7 +45,6 @@ export class AuthLayoutComponent implements OnInit {
       .subscribe((response) => {
         if (response?.success) {
           this._userService.currentUser = response.data;
-          console.log(this._userService.currentUser);
           this._router.navigateByUrl('/search');
         }
       });

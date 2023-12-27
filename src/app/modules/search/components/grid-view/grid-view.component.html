@@ -11,6 +11,7 @@
   <div
     *ngFor="let event of events"
     style="position: relative; background: #28282a; padding: 5px"
+    (click)="showEventDetail()"
   >
     <ng-container *ngIf="event; else elseBlock">
       <img

@@ -14,7 +14,7 @@ import { SidebarState } from 'src/app/state/sidebar.state';
 import { Subscription } from 'rxjs';
 import { LatLng } from 'leaflet';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { EventInfo } from 'src/app/data/schema/event-info';
+import { EventDetailComponent } from '../event-detail/event-detail.component';
 
 class ExtendedMarker extends Leaflet.Marker {
   private _camera: CameraInfo;
@@ -305,4 +305,10 @@ export class MapViewComponent implements OnInit, OnDestroy {
   }
 
   onSeenCheckboxChanged(event: MyEventInfo) {}
+
+  showEventDetail() {
+    this._modalService.open(EventDetailComponent, {
+      size: 'xl',
+    });
+  }
 }
