@@ -1,1 +1,63 @@
-<p>alert works!</p>
+<div class="toolbar">
+  <div class="left">
+    <button><i class="bi bi-pause-fill"></i></button>
+    <button><i class="bi bi-volume-mute-fill"></i></button>
+    <button><i class="bi bi-clock"></i></button>
+    <button><i class="bi bi-funnel"></i></button>
+    <app-select-2 [items]="timePeriods"></app-select-2>
+  </div>
+  <div class="right">
+    <app-svg-icon
+      icon="grid-2"
+      class="grid-size"
+      height="24px"
+      width="24px"
+      color="#FFFFFF"
+    ></app-svg-icon>
+    <app-svg-icon
+      icon="grid-3"
+      class="grid-size"
+      width="24px"
+      height="24px"
+    ></app-svg-icon>
+    <app-svg-icon
+      icon="grid-4"
+      class="grid-size"
+      width="24px"
+      height="24px"
+    ></app-svg-icon>
+    <app-svg-icon
+      icon="grid-5"
+      class="grid-size"
+      width="24px"
+      height="24px"
+    ></app-svg-icon>
+    <button
+      type="button"
+      [class.active]="viewMode === 'grid-view'"
+      (click)="viewMode = 'grid-view'"
+    >
+      Ô lưới
+    </button>
+    <button
+      type="button"
+      [class.active]="viewMode === 'map-view'"
+      (click)="viewMode = 'map-view'"
+    >
+      Bản đồ
+    </button>
+    <button
+      type="button"
+      [class.active]="viewMode === 'list-view'"
+      (click)="viewMode = 'list-view'"
+    >
+      Danh sách
+    </button>
+  </div>
+</div>
+<div class="content">
+  <!-- <app-grid-view></app-grid-view> -->
+  <app-map-view></app-map-view>
+</div>
+
+<app-pagination class="paginationbar" [totalItems]="1000"></app-pagination>

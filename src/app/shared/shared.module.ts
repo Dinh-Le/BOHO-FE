@@ -18,6 +18,7 @@ import { MaskPipe } from './pipes/mask.pipe';
 import { NumberToStringPipe } from './pipes/number-to-string.pipe';
 import { BoundingBoxEditorComponent } from '@shared/components/bounding-box-editor/bounding-box-editor.component';
 import { FormDialogComponent } from './components/form-dialog/form-dialog.component';
+import { PaginationComponent } from './components/pagination/pagination.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { FormDialogComponent } from './components/form-dialog/form-dialog.compon
     NumberToStringPipe,
     SvgIconComponent,
     BoundingBoxEditorComponent,
+    PaginationComponent,
   ],
   imports: [CommonModule, FormsModule, NgbModule, FontAwesomeModule],
   exports: [
@@ -50,6 +52,7 @@ import { FormDialogComponent } from './components/form-dialog/form-dialog.compon
     NumberToStringPipe,
     SvgIconComponent,
     BoundingBoxEditorComponent,
+    PaginationComponent,
   ],
 })
 export class SharedModule {}

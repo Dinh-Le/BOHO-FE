@@ -15,7 +15,7 @@ import { GridViewComponent } from './components/grid-view/grid-view.component';
 import { EventComponent } from './components/event/event.component';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { PaginationComponent } from './components/pagination/pagination.component';
+
 import { NumericInputComponent } from './components/numeric-input/numeric-input.component';
 
 @NgModule({
@@ -25,7 +25,6 @@ import { NumericInputComponent } from './components/numeric-input/numeric-input.
     MapViewComponent,
     GridViewComponent,
     EventComponent,
-    PaginationComponent,
     NumericInputComponent,
   ],
   imports: [

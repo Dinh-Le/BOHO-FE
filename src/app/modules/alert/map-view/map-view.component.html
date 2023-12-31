@@ -1,0 +1,13 @@
+<div
+  class="map"
+  leaflet
+  class="w-100 h-100"
+  [leafletOptions]="options"
+  (leafletMapReady)="onMapReady($event)"
+  (leafletClick)="mapClicked($event)"
+></div>
+<div class="event-list">
+  <app-map-event-info
+    *ngFor="let item of [].constructor(25)"
+  ></app-map-event-info>
+</div>

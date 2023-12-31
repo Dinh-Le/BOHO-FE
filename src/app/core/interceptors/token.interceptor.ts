@@ -29,7 +29,7 @@ export class TokenInterceptor implements HttpInterceptor {
     }
 
     if (this.tokenService.isExpired) {
-      this.router.navigateByUrl('/login');
+      // this.router.navigateByUrl('/login');
     }
 
     const authReq = req.clone({

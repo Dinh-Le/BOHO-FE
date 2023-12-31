@@ -27,6 +27,8 @@ export class PaginationComponent implements ControlValueAccessor {
   onTouched: any;
   isDisabled: boolean = false;
 
+  pageLengthList: number[] = [25, 50, 100];
+
   private _currentPage: number = 1;
 
   get currentPage(): number {
