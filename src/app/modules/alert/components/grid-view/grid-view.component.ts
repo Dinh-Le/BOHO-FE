@@ -15,9 +15,10 @@ import { EventInfo } from '../../models';
 })
 export class GridViewComponent implements OnChanges {
   private _viewContainerRef = inject(ViewContainerRef);
-  @Input() events: EventInfo[] = [{}];
+  @Input() events: EventInfo[] = [];
   @Input() col: number = 2;
   @Input() maxLength: number = 50;
+  
 
   ngOnChanges(changes: SimpleChanges): void {
     if ('col' in changes) {

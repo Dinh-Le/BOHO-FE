@@ -97,56 +97,62 @@
       height="24px"
       width="24px"
       color="#FFFFFF"
-      (click)="gridCol = 2"
+      (click)="gridCol = 2; viewMode = 'grid'"
     ></app-svg-icon>
     <app-svg-icon
       icon="grid-3"
       class="grid-size"
       width="24px"
       height="24px"
-      (click)="gridCol = 3"
+      (click)="gridCol = 3; viewMode = 'grid'"
     ></app-svg-icon>
     <app-svg-icon
       icon="grid-4"
       class="grid-size"
       width="24px"
       height="24px"
-      (click)="gridCol = 4"
+      (click)="gridCol = 4; viewMode = 'grid'"
     ></app-svg-icon>
     <app-svg-icon
       icon="grid-5"
       class="grid-size"
       width="24px"
       height="24px"
-      (click)="gridCol = 5"
+      (click)="gridCol = 5; viewMode = 'grid'"
     ></app-svg-icon>
     <button
       type="button"
-      [class.active]="viewMode === 'grid-view'"
-      (click)="viewMode = 'grid-view'"
+      [class.active]="viewMode === 'grid'"
+      (click)="viewMode = 'grid'"
     >
       Ô lưới
     </button>
     <button
       type="button"
-      [class.active]="viewMode === 'map-view'"
-      (click)="viewMode = 'map-view'"
+      [class.active]="viewMode === 'map'"
+      (click)="viewMode = 'map'"
     >
       Bản đồ
     </button>
     <button
       type="button"
-      [class.active]="viewMode === 'list-view'"
-      (click)="viewMode = 'list-view'"
+      [class.active]="viewMode === 'list'"
+      (click)="viewMode = 'list'"
     >
       Danh sách
     </button>
   </div>
 </div>
 <div class="content">
-  <app-grid-view [col]="gridCol" [maxLength]="25"></app-grid-view>
-  <!-- <app-map-view></app-map-view> -->
-  <!-- <app-list-view-alert></app-list-view-alert> -->
+  <container-element [ngSwitch]="viewMode">
+    <app-grid-view
+      *ngSwitchCase="'grid'"
+      [col]="gridCol"
+      [maxLength]="25"
+    ></app-grid-view>
+    <app-map-view *ngSwitchCase="'map'"></app-map-view>
+    <app-list-view-alert *ngSwitchCase="'list'"></app-list-view-alert>
+  </container-element>
 </div>
 
 <app-pagination class="paginationbar" [totalItems]="1000"></app-pagination>

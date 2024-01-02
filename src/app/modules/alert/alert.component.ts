@@ -7,7 +7,6 @@ import { SelectItemModel } from '@shared/models/select-item-model';
   styleUrls: ['./alert.component.scss'],
 })
 export class AlertComponent {
-  viewMode = 'grid-view';
   timePeriods: SelectItemModel[] = [
     {
       value: '30p',
@@ -39,4 +38,5 @@ export class AlertComponent {
     },
   ];
   gridCol: number = 5;
+  viewMode: 'grid' | 'map' | 'list' = 'grid';
 }
