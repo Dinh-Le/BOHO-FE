@@ -19,7 +19,7 @@ export class AlertComponent {
     },
     {
       value: '6h',
-      label: 'h trước',
+      label: '6h trước',
     },
     {
       value: '12h',

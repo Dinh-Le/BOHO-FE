@@ -16,8 +16,6 @@ import { EventComponent } from './components/event/event.component';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { NumericInputComponent } from './components/numeric-input/numeric-input.component';
-
 @NgModule({
   declarations: [
     SearchComponent,
@@ -25,7 +23,6 @@ import { NumericInputComponent } from './components/numeric-input/numeric-input.
     MapViewComponent,
     GridViewComponent,
     EventComponent,
-    NumericInputComponent,
   ],
   imports: [
     CommonModule,

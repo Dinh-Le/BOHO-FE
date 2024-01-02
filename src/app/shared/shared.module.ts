@@ -19,6 +19,7 @@ import { NumberToStringPipe } from './pipes/number-to-string.pipe';
 import { BoundingBoxEditorComponent } from '@shared/components/bounding-box-editor/bounding-box-editor.component';
 import { FormDialogComponent } from './components/form-dialog/form-dialog.component';
 import { PaginationComponent } from './components/pagination/pagination.component';
+import { NumericInputComponent } from './components/numeric-input/numeric-input.component';
 
 @NgModule({
   declarations: [
@@ -37,6 +38,7 @@ import { PaginationComponent } from './components/pagination/pagination.componen
     SvgIconComponent,
     BoundingBoxEditorComponent,
     PaginationComponent,
+    NumericInputComponent,
   ],
   imports: [CommonModule, FormsModule, NgbModule, FontAwesomeModule],
   exports: [
@@ -53,6 +55,7 @@ import { PaginationComponent } from './components/pagination/pagination.componen
     SvgIconComponent,
     BoundingBoxEditorComponent,
     PaginationComponent,
+    NumericInputComponent,
   ],
 })
 export class SharedModule {}
