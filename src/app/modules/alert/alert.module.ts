@@ -7,11 +7,13 @@ import { GridViewComponent } from './grid-view/grid-view.component';
 import { MapViewComponent } from './map-view/map-view.component';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { MapEventInfoComponent } from './map-view/map-event-info/map-event-info.component';
+import { ListViewComponent } from './list-view/list-view.component';
 
 @NgModule({
   declarations: [
     AlertComponent,
     GridViewComponent,
+    ListViewComponent,
     MapViewComponent,
     MapEventInfoComponent,
   ],
