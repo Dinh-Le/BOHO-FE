@@ -1,6 +1,5 @@
 :host {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
   background: #bfbfbf;
   gap: 1px;
   border: 1px solid #bfbfbf;
@@ -35,8 +34,10 @@
       }
     }
   }
+
   .event-image {
     width: 100%;
-    height: auto;
+    aspect-ratio: 16/9;
+    display: block;
   }
 }

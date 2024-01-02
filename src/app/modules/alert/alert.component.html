@@ -97,24 +97,28 @@
       height="24px"
       width="24px"
       color="#FFFFFF"
+      (click)="gridCol = 2"
     ></app-svg-icon>
     <app-svg-icon
       icon="grid-3"
       class="grid-size"
       width="24px"
       height="24px"
+      (click)="gridCol = 3"
     ></app-svg-icon>
     <app-svg-icon
       icon="grid-4"
       class="grid-size"
       width="24px"
       height="24px"
+      (click)="gridCol = 4"
     ></app-svg-icon>
     <app-svg-icon
       icon="grid-5"
       class="grid-size"
       width="24px"
       height="24px"
+      (click)="gridCol = 5"
     ></app-svg-icon>
     <button
       type="button"
@@ -140,9 +144,9 @@
   </div>
 </div>
 <div class="content">
-  <!-- <app-grid-view></app-grid-view> -->
+  <app-grid-view [col]="gridCol" [maxLength]="25"></app-grid-view>
   <!-- <app-map-view></app-map-view> -->
-  <app-list-view-alert></app-list-view-alert>
+  <!-- <app-list-view-alert></app-list-view-alert> -->
 </div>
 
 <app-pagination class="paginationbar" [totalItems]="1000"></app-pagination>

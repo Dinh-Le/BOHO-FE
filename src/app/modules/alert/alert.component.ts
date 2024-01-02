@@ -38,4 +38,5 @@ export class AlertComponent {
       label: 'Tuần trước',
     },
   ];
+  gridCol: number = 5;
 }
