@@ -147,6 +147,7 @@
   <container-element [ngSwitch]="viewMode">
     <app-grid-view
       *ngSwitchCase="'grid'"
+      [events]="events"
       [col]="gridCol"
       [maxLength]="25"
     ></app-grid-view>

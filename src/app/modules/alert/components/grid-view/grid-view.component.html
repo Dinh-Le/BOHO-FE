@@ -4,7 +4,10 @@
 >
   <ng-container *ngIf="i < events.length; else emptyEventInfo">
     <div class="event-info">
-      <input type="checkbox" class="seen-checkbox" />
+      <label class="custom-checkbox">
+        <input type="checkbox" class="seen-checkbox" />
+      </label>
+
       <app-svg-icon
         class="object-icon"
         width="24px"

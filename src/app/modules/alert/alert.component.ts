@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { SelectItemModel } from '@shared/models/select-item-model';
+import { EventInfo } from './models';
 
 @Component({
   selector: 'app-alert',
@@ -38,5 +39,6 @@ export class AlertComponent {
     },
   ];
   gridCol: number = 5;
-  viewMode: 'grid' | 'map' | 'list' = 'grid';
+  viewMode: 'grid' | 'map' | 'list' = 'list';
+  events: EventInfo[] = [{}];
 }
