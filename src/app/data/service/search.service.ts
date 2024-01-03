@@ -14,6 +14,8 @@ export interface SearchQuery {
   limit: number;
   start: string;
   end: string;
+  p?: number;
+  pl?: number;
 }
 
 export abstract class SearchService extends RestfullApiService {
