@@ -1,1 +1,159 @@
-<p>alert works!</p>
+<div class="toolbar">
+  <div class="left">
+    <button><i class="bi bi-pause-fill"></i></button>
+    <button><i class="bi bi-volume-mute-fill"></i></button>
+    <div class="time-intervals">
+      <button><i class="bi bi-clock"></i></button>
+      <div class="dropdown-content">
+        <span>Khoảng thời gian hiển thị</span>
+        <div class="time-period-input-group">
+          <app-numeric-input
+            unit="min"
+            [min]="0"
+            [max]="59"
+            style="background: #f2f2f2ff !important; padding: 0; flex: 1"
+          ></app-numeric-input>
+          <app-numeric-input
+            unit="sec"
+            [min]="0"
+            [max]="59"
+            style="background: #f2f2f2ff !important; padding: 0; flex: 1"
+          ></app-numeric-input>
+        </div>
+        <div class="button-container">
+          <button>Áp dụng</button>
+        </div>
+      </div>
+    </div>
+    <div class="filter">
+      <button><i class="bi bi-funnel"></i></button>
+      <ul class="menu">
+        <li>
+          <div class="title">
+            <span>Loại đối tượng</span> <i class="bi bi-chevron-right"></i>
+          </div>
+          <ul class="menu sub-menu">
+            <li>Người</li>
+            <li>Ô tô</li>
+          </ul>
+        </li>
+        <li>
+          <div class="title">
+            <span>Mức độ nghiêm trọng</span> <i class="bi bi-chevron-right"></i>
+          </div>
+          <ul class="menu sub-menu">
+            <li>Cao</li>
+            <li>Trung bình</li>
+            <li>Bình thường</li>
+          </ul>
+        </li>
+        <li>
+          <div class="title">
+            <span>Nhóm quy tắc</span> <i class="bi bi-chevron-right"></i>
+          </div>
+          <ul class="menu sub-menu">
+            <li>Vượt đường kẻ</li>
+            <li>Xâm nhập vùng</li>
+            <li>Đi luẩn quẩn</li>
+            <li>Đỗ xe sai nơi quy định</li>
+          </ul>
+        </li>
+        <li>Loại quy tắc</li>
+        <li>
+          <div class="title">
+            <span>Trạng thái sự kiện</span> <i class="bi bi-chevron-right"></i>
+          </div>
+          <ul class="menu sub-menu">
+            <li>Tất cả</li>
+            <li>Đã xem</li>
+            <li>Chưa xem</li>
+            <li>Có sao</li>
+            <li>Không sao</li>
+            <li>Thật</li>
+            <li>Giả</li>
+          </ul>
+        </li>
+        <li class="seperator"></li>
+        <li>Xóa sự kiện</li>
+      </ul>
+    </div>
+
+    <div class="time-periods">
+      <div class="selected-item">
+        <span>12h trước</span>
+        <i class="bi bi-chevron-down"></i>
+      </div>
+      <ul class="menu">
+        <li class="menu-item" *ngFor="let item of timePeriods">
+          {{ item.label }}
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="right">
+    <app-svg-icon
+      icon="grid-2"
+      class="grid-size"
+      height="24px"
+      width="24px"
+      color="#FFFFFF"
+      (click)="gridCol = 2; viewMode = 'grid'"
+    ></app-svg-icon>
+    <app-svg-icon
+      icon="grid-3"
+      class="grid-size"
+      width="24px"
+      height="24px"
+      (click)="gridCol = 3; viewMode = 'grid'"
+    ></app-svg-icon>
+    <app-svg-icon
+      icon="grid-4"
+      class="grid-size"
+      width="24px"
+      height="24px"
+      (click)="gridCol = 4; viewMode = 'grid'"
+    ></app-svg-icon>
+    <app-svg-icon
+      icon="grid-5"
+      class="grid-size"
+      width="24px"
+      height="24px"
+      (click)="gridCol = 5; viewMode = 'grid'"
+    ></app-svg-icon>
+    <button
+      type="button"
+      [class.active]="viewMode === 'grid'"
+      (click)="viewMode = 'grid'"
+    >
+      Ô lưới
+    </button>
+    <button
+      type="button"
+      [class.active]="viewMode === 'map'"
+      (click)="viewMode = 'map'"
+    >
+      Bản đồ
+    </button>
+    <button
+      type="button"
+      [class.active]="viewMode === 'list'"
+      (click)="viewMode = 'list'"
+    >
+      Danh sách
+    </button>
+  </div>
+</div>
+<div class="content">
+  <container-element [ngSwitch]="viewMode">
+    <app-grid-view
+      *ngSwitchCase="'grid'"
+      [events]="events"
+      [col]="gridCol"
+      [maxLength]="25"
+    ></app-grid-view>
+    <app-map-view *ngSwitchCase="'map'"></app-map-view>
+    <app-list-view-alert *ngSwitchCase="'list'"></app-list-view-alert>
+  </container-element>
+</div>
+
+<app-pagination class="paginationbar" [totalItems]="1000"></app-pagination>

@@ -1,0 +1,239 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #4a494bff;
+  gap: 2px;
+}
+
+button {
+  color: #ffffff;
+  background: #7f7f7f;
+  border: 1px solid #2f528f;
+  border-radius: 5px;
+}
+
+button.active {
+  background: #5285b6;
+}
+
+button:disabled {
+  background: #7f7f7f;
+}
+
+.toolbar {
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .time-intervals:hover {
+    .dropdown-content {
+      display: flex;
+      gap: 1rem;
+      flex-direction: column;
+    }
+    > button > i {
+      color: #5285b6;
+    }
+  }
+
+  .time-intervals {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .dropdown-content {
+      position: absolute;
+      z-index: 1000;
+      display: none;
+      top: 30px;
+      left: 0px;
+      background: #4a494bff;
+      border: 1px solid #5285b6;
+      border-radius: 5px;
+      width: 200px;
+      padding: 0.5rem 1rem;
+
+      .time-period-input-group {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .button-container {
+        display: flex;
+        justify-content: center;
+
+        button {
+          background: #7f7f7fff;
+          border: 1px solid #5285b6;
+          padding: 0.25rem 0.5rem;
+        }
+      }
+    }
+  }
+
+  .time-periods:hover {
+    .menu {
+      display: block;
+    }
+  }
+
+  .time-periods {
+    display: flex;
+    position: relative;
+
+    .selected-item {
+      border: 1px solid #31538f;
+      border-radius: 5px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0.25rem 1rem;
+      min-width: 150px;
+      background: #5285b6ff;
+    }
+
+    .menu {
+      list-style: none;
+      display: none;
+      position: absolute;
+      top: 30px;
+      left: 0px;
+      padding: 0;
+      margin: 0;
+      background: #4a494bff;
+      border: 1px solid #5285b6;
+      z-index: 1000;
+      min-width: 150px;
+
+      .menu-item {
+        padding: 0.25rem 1rem;
+        color: white;
+      }
+
+      .menu-item:hover {
+        background: #5285b6ff;
+      }
+    }
+  }
+
+  .left {
+    display: flex;
+
+    button {
+      outline: none;
+      border: none;
+      background: #4a494bff;
+      align-self: center;
+    }
+
+    .filter:hover {
+      .menu {
+        display: block;
+        top: 30px;
+      }
+
+      > button > i {
+        color: #5285b6;
+      }
+    }
+
+    .filter {
+      position: relative;
+      display: flex;
+
+      .menu {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        z-index: 1000;
+        border: 1px solid #5285b6;
+        width: 200px;
+        display: none;
+      }
+
+      .sub-menu {
+        left: 200px;
+        top: 0px !important;
+      }
+
+      .menu > li {
+        .sub-menu {
+          display: none;
+        }
+      }
+
+      .menu > li:hover {
+        .sub-menu {
+          display: block;
+        }
+      }
+
+      li {
+        color: white;
+        background: #4a494bff;
+        padding: 0.25rem 0.5rem;
+        cursor: pointer;
+        user-select: none;
+        position: relative;
+
+        .title {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+        }
+      }
+
+      li.seperator {
+        border-top: 1px solid #f2f2f2;
+        height: 0px;
+        padding: 0;
+      }
+
+      li:hover {
+        background: #5285b6ff;
+      }
+    }
+  }
+
+  .right {
+    .grid-size {
+      cursor: pointer;
+      align-self: center;
+      margin-right: 4px;
+    }
+    .grid-size.active {
+      pointer-events: none;
+      cursor: none;
+    }
+
+    button {
+      width: 90px;
+      align-self: center;
+      margin-left: 2px;
+      padding-top: 3px;
+      padding-bottom: 3px;
+    }
+    button:last-child {
+      margin-right: 20px;
+    }
+    button.active {
+      pointer-events: none;
+      cursor: none;
+    }
+  }
+}
+
+.content {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.paginationbar {
+  height: 38px;
+  padding: 0.5rem;
+}

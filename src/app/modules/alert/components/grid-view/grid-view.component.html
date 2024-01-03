@@ -1,0 +1,35 @@
+<div
+  *ngFor="let item of [].constructor(count); let i = index"
+  class="event-container"
+>
+  <ng-container *ngIf="i < events.length; else emptyEventInfo">
+    <div class="event-info">
+      <label class="custom-checkbox">
+        <input type="checkbox" class="seen-checkbox" />
+      </label>
+
+      <app-svg-icon
+        class="object-icon"
+        width="24px"
+        height="24px"
+        icon="bicycle"
+      ></app-svg-icon>
+      <div class="event-detail">
+        <div>10:56:32 16-08-2... {{ i }}</div>
+        <div>Sảnh siêu thị Co...</div>
+        <div>Người di chuyển ...</div>
+      </div>
+      <div class="event-controls">
+        <button><i class="bi bi-circle"></i></button>
+        <button><i class="bi bi-geo-alt-fill"></i></button>
+      </div>
+    </div>
+    <div class="event-image">
+      <img class="w-100" src="/assets/images/car.png" />
+    </div>
+  </ng-container>
+  <ng-template #emptyEventInfo>
+    <div style="height: 70px"></div>
+    <div class="event-image"></div>
+  </ng-template>
+</div>

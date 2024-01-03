@@ -1,0 +1,53 @@
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.left {
+  display: flex;
+
+  button {
+    border: 1px solid #5285b6;
+    border-radius: 2px;
+    margin-right: 1px;
+    width: 40px;
+  }
+  button:last-child {
+    margin-right: 0px;
+  }
+  button.active {
+    background: #5285b6ff;
+  }
+}
+
+.right {
+  display: flex;
+  align-items: center;
+
+  a {
+    color: white;
+    text-decoration: none;
+    padding: 2px 2px;
+    outline: none;
+    border: none;
+  }
+  a:hover:not(.active) {
+    color: black;
+    background-color: lightgray;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    text-align: center;
+  }
+  a.active {
+    background-color: #5285b6ff;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    margin: auto;
+    padding: 0;
+  }
+}

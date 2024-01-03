@@ -1,4 +1,13 @@
-<div class="bg-dark text-white my-pagination">
+<div class="left">
+  <button
+    *ngFor="let item of pageLengthList"
+    (click)="pageLength = item"
+    [class.active]="pageLength === item"
+  >
+    {{ item }}
+  </button>
+</div>
+<div class="right">
   <span class="fw-bold">{{ totalItems }} kết quả</span>
   <a
     href="javascript:0"

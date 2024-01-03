@@ -1,0 +1,60 @@
+<div class="top">
+  <div class="left">
+    <div
+      class="map"
+      leaflet
+      [leafletOptions]="options"
+      (leafletMapReady)="map = $event"
+    ></div>
+  </div>
+
+  <div class="right">
+    <img src="/assets/images/car.png" />
+  </div>
+</div>
+<div class="bottom">
+  <table>
+    <colgroup>
+      <col width="24" />
+      <col span="5" width="auto" />
+      <col width="24" />
+    </colgroup>
+    <thead>
+      <th></th>
+      <th>Thời gian</th>
+      <th>Camera</th>
+      <th>Nội dụng</th>
+      <th>Đối tượng</th>
+      <th>Nghiêm trọng</th>
+      <th></th>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <label class="custom-checkbox">
+            <input type="checkbox" />
+          </label>
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td><i class="bi bi-circle"></i></td>
+      </tr>
+      <tr>
+        <td>
+          <label class="custom-checkbox">
+            <input type="checkbox" />
+          </label>
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td><i class="bi bi-circle"></i></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

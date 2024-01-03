@@ -1,0 +1,43 @@
+:host {
+  display: grid;
+  background: #bfbfbf;
+  gap: 1px;
+  border: 1px solid #bfbfbf;
+}
+
+.event-container {
+  background: #28282aff;
+
+  .event-info {
+    display: flex;
+    align-items: center;
+    background: #4a494bff;
+    padding: 0.25rem;
+    gap: 1rem;
+
+    .event-detail {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .event-controls {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+
+      button {
+        border: none;
+        outline: none;
+        background: transparent;
+      }
+    }
+  }
+
+  .event-image {
+    width: 100%;
+    aspect-ratio: 16/9;
+    display: block;
+  }
+}

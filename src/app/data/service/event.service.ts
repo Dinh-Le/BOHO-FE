@@ -1,51 +1,62 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { EventInfo } from '../schema/event-info';
+import { Observable } from 'rxjs';
+import { RestfullApiService } from './restful-api.service';
+import { ResponseBase } from '../schema/boho-v2/response-base';
+import { environment } from '@env';
+import { HttpParams } from '@angular/common/http';
 
+export abstract class EventService extends RestfullApiService {
+  public abstract update(
+    nodeId: string,
+    deviceId: number,
+    eventId: number,
+    data: Partial<{
+      is_watch: boolean;
+      is_verify: boolean;
+    }>
+  ): Observable<ResponseBase>;
+  public abstract delete(
+    nodeId: string,
+    deviceId: number,
+    eventId: number
+  ): Observable<ResponseBase>;
+  public abstract getImage(
+    nodeId: string,
+    deviceId: number,
+    eventId: number,
+    type: 'full' | 'crop'
+  ): Observable<any>;
+}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class EventService {
-  events: EventInfo[] = [];
-  humanEventInfo: EventInfo = {
-    thumbnailUrl: `\/assets\/images\/human.png`,
-    videoUrl: '\/assets\/videos\/event.mp4',
-    eventType: 'Phat hien nguoi',
-    timestamp: new Date().toISOString(),
-    level: 'normal',
-    object: 'human',
-    address: 'Sanh sieu thi Coop',
-    favorite: false,
-    seen: true,
-  };
-  carEventInfo: EventInfo = {
-    thumbnailUrl: `\/assets\/images\/car.png`,
-    videoUrl: '\/assets\/videos\/event.mp4',
-    eventType: 'Phat hien xe trong danh sach den',
-    timestamp: new Date().toISOString(),
-    level: 'high',
-    object: 'car',
-    licencePlate: '51H-95175',
-    address: 'Nga 4 H Dieu - TV Dien',
-    favorite: true,
-    seen: false,
-  };
-
-  constructor() {
-    this.events = Array(82)
-      .fill(0)
-      .map(
-        (_, index) => Object.assign(
-          {},
-          index % 2 == 0 
-            ? this.humanEventInfo 
-            : this.carEventInfo
-        )
-      );
+@Injectable({ providedIn: 'root' })
+export class EventServiceImpl extends EventService {
+  public override update(
+    nodeId: string,
+    deviceId: number,
+    eventId: number,
+    data: Partial<{ is_watch: boolean; is_verify: boolean }>
+  ): Observable<ResponseBase> {
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/event/${eventId}`;
+    return this.httpClient.patch<ResponseBase>(url, data);
   }
 
-  findAll(): Observable<EventInfo[]> {
-    return of(this.events);
+  public override delete(
+    nodeId: string,
+    deviceId: number,
+    eventId: number
+  ): Observable<ResponseBase> {
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/event/${eventId}`;
+    return this.httpClient.delete<ResponseBase>(url);
+  }
+
+  public override getImage(
+    nodeId: string,
+    deviceId: number,
+    eventId: number,
+    type: 'full' | 'crop'
+  ): Observable<string> {
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/event/${eventId}/image`;
+    const params = new HttpParams().append('type', type);
+    return this.httpClient.get<string>(url, { params });
   }
 }
