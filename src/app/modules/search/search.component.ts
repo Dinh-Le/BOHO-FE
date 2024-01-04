@@ -125,9 +125,6 @@ export class SearchComponent implements OnInit {
       )
       .subscribe({
         next: (response) => {
-          this.paginationInfo = Object.assign({}, this.paginationInfo, {
-            pageIndex: 1,
-          });
           this.totalEvents = response.data.total;
           this.events = response.data.events.map((e) =>
             Object.assign(e, {
