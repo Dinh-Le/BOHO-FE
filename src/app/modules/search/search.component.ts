@@ -62,7 +62,7 @@ export class SearchComponent implements OnInit {
   ngOnInit(): void {}
 
   get canSubmit() {
-    return this.form.valid;
+    return this.form.valid || true;
   }
 
   get currentEvents(): (EventInfo | null)[] {
@@ -95,6 +95,11 @@ export class SearchComponent implements OnInit {
     return item.id;
   }
 
+  submit() {
+    this.paginationInfo.pageIndex = 1;
+    this.search();
+  }
+
   search() {
     this.events = [];
     const nodes = Object.entries(
@@ -108,7 +113,7 @@ export class SearchComponent implements OnInit {
     const query: SearchQuery = {
       dis: [...deviceIds],
       tq: 'week',
-      p: 1,
+      p: this.paginationInfo.pageIndex,
       pl: this.paginationInfo.pageLength,
     };
 

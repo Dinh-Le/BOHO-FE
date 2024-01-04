@@ -26,6 +26,15 @@ export abstract class EventService extends RestfullApiService {
     eventId: number,
     type: 'full' | 'crop'
   ): Observable<Blob>;
+  public abstract verify(
+    nodeId: string,
+    deviceId: number,
+    eventId: number,
+    data: Partial<{
+      is_verify: boolean;
+      is_watch: boolean;
+    }>
+  ): Observable<ResponseBase>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -58,5 +67,15 @@ export class EventServiceImpl extends EventService {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/event/${eventId}/image`;
     const params = new HttpParams().append('type', type);
     return this.httpClient.get(url, { params, responseType: 'blob' });
+  }
+
+  public override verify(
+    nodeId: string,
+    deviceId: number,
+    eventId: number,
+    data: Partial<{ is_verify: boolean; is_watch: boolean }>
+  ): Observable<ResponseBase> {
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/event/${eventId}/verify`;
+    return this.httpClient.patch<ResponseBase>(url, data);
   }
 }

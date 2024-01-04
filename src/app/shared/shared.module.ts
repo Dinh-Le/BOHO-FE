@@ -21,6 +21,7 @@ import { FormDialogComponent } from './components/form-dialog/form-dialog.compon
 import { PaginationComponent } from './components/pagination/pagination.component';
 import { NumericInputComponent } from './components/numeric-input/numeric-input.component';
 import { EventImage } from './components/event-image/event-image.component';
+import { DateTimeFormatPipe } from './pipes/datetime.pipe';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { EventImage } from './components/event-image/event-image.component';
     ObjectEntries,
     MaskPipe,
     NumberToStringPipe,
+    DateTimeFormatPipe,
     SvgIconComponent,
     BoundingBoxEditorComponent,
     PaginationComponent,
@@ -54,6 +56,7 @@ import { EventImage } from './components/event-image/event-image.component';
     ObjectEntries,
     MaskPipe,
     NumberToStringPipe,
+    DateTimeFormatPipe,
     SvgIconComponent,
     BoundingBoxEditorComponent,
     PaginationComponent,

@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import {
   AfterViewInit,
   Component,
@@ -11,53 +10,114 @@ import { EventService } from 'src/app/data/service/event.service';
 
 @Component({
   selector: 'app-event-image',
-  template: '<canvas #canvas style="width: 100%; height: 100%"></canvas>',
+  template: '<canvas #canvas></canvas>',
+  styles: [':host{display: block; width: 100%; height: 100%}'],
 })
 export class EventImage implements AfterViewInit {
   @ViewChild('canvas') canvasRef!: ElementRef;
   @Input() event: any;
+  @Input() type: 'full' | 'crop' = 'full';
 
   constructor(
+    private elRef: ElementRef,
     private eventService: EventService,
-    private toastService: ToastService,
-    private httpClient: HttpClient
+    private toastService: ToastService
   ) {}
 
   ngAfterViewInit(): void {
-    // console.log(this.imageRef.nativeElement);
-    // console.log(this.event);
     this.eventService
       .getImage(
         this.event.node_id,
         this.event.device_id,
-        this.event.images_info[0].event_id,
+        this.event.images_info[0].detection_id,
         'full'
       )
       .subscribe({
         next: (blod) => {
           const image = new Image();
           image.onload = () => {
-            const width = image.width;
-            const height = image.height;
+            const width =
+              this.type === 'full'
+                ? image.width
+                : image.width *
+                  Math.abs(
+                    this.event.images_info[0].bounding_box.bottomrightx -
+                      this.event.images_info[0].bounding_box.topleftx
+                  );
+            const height =
+              this.type === 'full'
+                ? image.height
+                : image.height *
+                  Math.abs(
+                    this.event.images_info[0].bounding_box.bottomrighty -
+                      this.event.images_info[0].bounding_box.toplefty
+                  );
+            const sx =
+              this.type === 'full'
+                ? 0
+                : this.event.images_info[0].bounding_box.bottomrightx * width;
+            const sy =
+              this.type === 'full'
+                ? 0
+                : this.event.images_info[0].bounding_box.bottomrighty * height;
+
+            const rect = this.elRef.nativeElement.getBoundingClientRect();
+            const scaleFactor = Math.min(
+              rect.width / width,
+              rect.height / height
+            );
 
             const canvas = this.canvasRef.nativeElement as HTMLCanvasElement;
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+
             const context = canvas.getContext('2d')!;
-            const rect = canvas.getBoundingClientRect();
-
-            console.log({ width, height, rect });
-
-            const scaleFactor =
-              Math.min(rect.width / width, rect.height / height) / 2;
 
             const dx = (rect.width - width * scaleFactor) / 2;
             const dy = (rect.height - height * scaleFactor) / 2;
             context.drawImage(
               image,
-              0,
-              0,
+              sx,
+              sy,
+              width,
+              height,
+              dx,
+              dy,
               width * scaleFactor,
               height * scaleFactor
             );
+
+            // Render the bounding box if full image
+            if (this.type === 'full') {
+              context.beginPath();
+              const bx =
+                dx +
+                width *
+                  scaleFactor *
+                  this.event.images_info[0].bounding_box.bottomrightx;
+              const by =
+                dy +
+                height *
+                  scaleFactor *
+                  this.event.images_info[0].bounding_box.bottomrighty;
+              const bw =
+                Math.abs(
+                  this.event.images_info[0].bounding_box.bottomrightx -
+                    this.event.images_info[0].bounding_box.topleftx
+                ) *
+                width *
+                scaleFactor;
+              const bh =
+                Math.abs(
+                  this.event.images_info[0].bounding_box.bottomrighty -
+                    this.event.images_info[0].bounding_box.toplefty
+                ) *
+                height *
+                scaleFactor;
+              context.strokeStyle = 'red';
+              context.rect(bx, by, bw, bh);
+              context.stroke();
+            }
           };
           image.src = URL.createObjectURL(blod);
         },

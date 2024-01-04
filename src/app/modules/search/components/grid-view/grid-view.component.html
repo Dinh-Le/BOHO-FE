@@ -15,10 +15,7 @@
   >
     <ng-container *ngIf="i < events.length; else elseBlock">
       <div style="display: block; width: 100%; aspect-ratio: 16/9">
-        <app-event-image
-          [event]="events[i]"
-          style="height: 100%; width: auto"
-        ></app-event-image>
+        <app-event-image [event]="events[i]"></app-event-image>
       </div>
       <span
         style="
@@ -31,7 +28,9 @@
           text-align: center;
           color: white;
         "
-        >{{ events[i].images_info.event_time }}</span
+        >{{
+          events[i].images_info[0].detection_time | datetime : "HH:mm"
+        }}</span
       >
     </ng-container>
 
