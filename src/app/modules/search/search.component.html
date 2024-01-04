@@ -66,7 +66,10 @@
     *ngSwitchCase="'map-view'"
     [events]="currentEvents"
   ></app-map-view>
-  <app-list-view-search *ngSwitchCase="'list-view'"></app-list-view-search>
+  <app-list-view-search
+    *ngSwitchCase="'list-view'"
+    [events]="events"
+  ></app-list-view-search>
   <div *ngSwitchDefault>Unsupported view mode</div>
 </div>
 
