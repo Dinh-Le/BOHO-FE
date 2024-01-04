@@ -14,46 +14,60 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
   ],
 })
 export class PaginationComponent implements ControlValueAccessor {
+  readonly WINDOW_SIZE: number = 5;
+
   @Input()
   totalItems: number = 0;
-
-  @Input()
-  pageLength: number = 20; // the number items per page
-
-  @Input()
-  windowSize: number = 5;
 
   onChange: any;
   onTouched: any;
   isDisabled: boolean = false;
-
   pageLengthList: number[] = [25, 50, 100];
 
-  private _currentPage: number = 1;
+  private _data: {
+    pageIndex: number;
+    pageLength: number;
+  } = {
+    pageIndex: 1,
+    pageLength: 25,
+  };
 
   get currentPage(): number {
-    return this._currentPage;
+    return this._data.pageIndex;
   }
 
   set currentPage(value: number) {
-    if (value !== this._currentPage) {
-      this._currentPage = value;
+    if (value !== this._data.pageIndex) {
+      this._data.pageIndex = value;
       if (this.onChange) {
-        this.onChange(this._currentPage);
+        this.onChange({ ...this._data });
+      }
+    }
+  }
+
+  get pageLength() {
+    return this._data.pageLength;
+  }
+
+  set pageLength(value: number) {
+    if (value !== this._data.pageLength) {
+      this._data.pageLength = value;
+      if (this.onChange) {
+        this.onChange({ ...this._data });
       }
     }
   }
 
   get totalPages(): number {
-    return Math.ceil(this.totalItems / this.pageLength);
+    return Math.ceil(this.totalItems / this._data.pageLength);
   }
 
   get halfWindowSize(): number {
-    return Math.floor(this.windowSize / 2);
+    return Math.floor(this.WINDOW_SIZE / 2);
   }
 
   get pages(): number[] {
-    if (this.totalPages <= this.windowSize) {
+    if (this.totalPages <= this.WINDOW_SIZE) {
       return Array(this.totalPages)
         .fill(0)
         .map((_, index) => index + 1);
@@ -61,10 +75,10 @@ export class PaginationComponent implements ControlValueAccessor {
 
     let start = Math.min(
       Math.max(1, this.currentPage - this.halfWindowSize),
-      this.totalPages - this.windowSize + 1
+      this.totalPages - this.WINDOW_SIZE + 1
     );
 
-    return Array(this.windowSize)
+    return Array(this.WINDOW_SIZE)
       .fill(start)
       .map((base, index) => base + index);
   }
@@ -89,8 +103,16 @@ export class PaginationComponent implements ControlValueAccessor {
     this.currentPage = this.totalPages;
   }
 
-  writeValue(value: number): void {
-    this.currentPage = value;
+  writeValue(
+    data: Partial<{ pageIndex: number; pageLength: number } | null>
+  ): void {
+    if (data?.pageIndex) {
+      this.currentPage = data.pageIndex;
+    }
+
+    if (data?.pageLength) {
+      this.pageLength = data.pageLength;
+    }
   }
 
   registerOnChange(fn: any): void {

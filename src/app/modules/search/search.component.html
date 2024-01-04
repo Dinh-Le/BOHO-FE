@@ -5,28 +5,28 @@
     height="24px"
     width="24px"
     color="#FFFFFF"
-    (click)="setGridColumn('2')"
+    (click)="setGridColumn(2)"
   ></app-svg-icon>
   <app-svg-icon
     icon="grid-3"
     class="grid-size"
     width="24px"
     height="24px"
-    (click)="setGridColumn('3')"
+    (click)="setGridColumn(3)"
   ></app-svg-icon>
   <app-svg-icon
     icon="grid-4"
     class="grid-size"
     width="24px"
     height="24px"
-    (click)="setGridColumn('4')"
+    (click)="setGridColumn(4)"
   ></app-svg-icon>
   <app-svg-icon
     icon="grid-5"
     class="grid-size"
     width="24px"
     height="24px"
-    (click)="setGridColumn('5')"
+    (click)="setGridColumn(5)"
   ></app-svg-icon>
   <button
     type="button"
@@ -59,6 +59,8 @@
   <app-grid-view
     *ngSwitchCase="'grid-view'"
     [cols]="gridColumn"
+    [pageLength]="paginationInfo.pageLength"
+    [events]="events"
   ></app-grid-view>
   <app-map-view
     *ngSwitchCase="'map-view'"
@@ -196,19 +198,9 @@
   </div>
 </form>
 
-<div class="pagination-bar">
-  <div class="page-length button-group">
-    <button
-      *ngFor="let item of pageLengthList"
-      (click)="paginationInfo.pageLength = item"
-      [class.active]="paginationInfo.pageLength === item"
-    >
-      {{ item }}
-    </button>
-  </div>
-  <app-pagination
-    [pageLength]="paginationInfo.pageLength"
-    [totalItems]="paginationInfo.totalItems"
-    [(ngModel)]="paginationInfo.currentPage"
-  ></app-pagination>
-</div>
+<app-pagination
+  class="pagination-bar"
+  [totalItems]="totalEvents"
+  [(ngModel)]="paginationInfo"
+  (ngModelChange)="search()"
+></app-pagination>

@@ -1,8 +1,18 @@
+
 GET https://8e03-2001-ee0-d741-1650-542d-5d86-c285-43c3.ngrok-free.app/api/rest/v1/node/e47928ba-5e5e-42ee-a546-a6a895a1ae87/device/events?dis=14&tq=week
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJ1c2VyX2lkIjoiYjQzMGY1NDUtOTdjMS00NGU2LTkyNjktMWRkM2M3YjczMTViIiwiZXhwIjoxNzA0NDAyNzkzfQ.Tvz4kKMVkdTJ8UscyMsMh51xwzKHzw2d0R_cgGg58Sk
 
 ###
-GET https://8e03-2001-ee0-d741-1650-542d-5d86-c285-43c3.ngrok-free.app/api/rest/v1/node/e47928ba-5e5e-42ee-a546-a6a895a1ae87/device/14/event/2469f1fd-6881-4ef8-a2f2-c330e04e54ad/image?type=full
+GET https://8e03-2001-ee0-d741-1650-542d-5d86-c285-43c3.ngrok-free.app/api/rest/v1/node/08a359ec-48cd-40ae-8536-dc83b8e77a39/device/14/event/08a359ec-48cd-40ae-8536-dc83b8e77a39/image?type=full
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJ1c2VyX2lkIjoiYjQzMGY1NDUtOTdjMS00NGU2LTkyNjktMWRkM2M3YjczMTViIiwiZXhwIjoxNzA0NDAyNzkzfQ.Tvz4kKMVkdTJ8UscyMsMh51xwzKHzw2d0R_cgGg58Sk 
+
+###
+PATCH https://8e03-2001-ee0-d741-1650-542d-5d86-c285-43c3.ngrok-free.app/api/rest/v1/node/08a359ec-48cd-40ae-8536-dc83b8e77a39/device/14/event/08a359ec-48cd-40ae-8536-dc83b8e77a39
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJ1c2VyX2lkIjoiYjQzMGY1NDUtOTdjMS00NGU2LTkyNjktMWRkM2M3YjczMTViIiwiZXhwIjoxNzA0NDAyNzkzfQ.Tvz4kKMVkdTJ8UscyMsMh51xwzKHzw2d0R_cgGg58Sk 
+
+{
+  "is_verify": true
+}

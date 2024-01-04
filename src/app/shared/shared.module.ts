@@ -20,6 +20,7 @@ import { BoundingBoxEditorComponent } from '@shared/components/bounding-box-edit
 import { FormDialogComponent } from './components/form-dialog/form-dialog.component';
 import { PaginationComponent } from './components/pagination/pagination.component';
 import { NumericInputComponent } from './components/numeric-input/numeric-input.component';
+import { EventImage } from './components/event-image/event-image.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { NumericInputComponent } from './components/numeric-input/numeric-input.
     BoundingBoxEditorComponent,
     PaginationComponent,
     NumericInputComponent,
+    EventImage,
   ],
   imports: [CommonModule, FormsModule, NgbModule, FontAwesomeModule],
   exports: [
@@ -56,6 +58,7 @@ import { NumericInputComponent } from './components/numeric-input/numeric-input.
     BoundingBoxEditorComponent,
     PaginationComponent,
     NumericInputComponent,
+    EventImage,
   ],
 })
 export class SharedModule {}

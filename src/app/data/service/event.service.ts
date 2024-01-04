@@ -25,7 +25,7 @@ export abstract class EventService extends RestfullApiService {
     deviceId: number,
     eventId: number,
     type: 'full' | 'crop'
-  ): Observable<any>;
+  ): Observable<Blob>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -54,9 +54,9 @@ export class EventServiceImpl extends EventService {
     deviceId: number,
     eventId: number,
     type: 'full' | 'crop'
-  ): Observable<string> {
+  ): Observable<Blob> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/event/${eventId}/image`;
     const params = new HttpParams().append('type', type);
-    return this.httpClient.get<string>(url, { params });
+    return this.httpClient.get(url, { params, responseType: 'blob' });
   }
 }

@@ -122,24 +122,4 @@ button:disabled {
 
 .pagination-bar {
   grid-area: pagination;
-  background: #4a494bff;
-  padding: 0rem 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  .button-group {
-    button {
-      border: 1px solid #5285b6;
-      border-radius: 2px;
-      margin-right: 1px;
-      width: 40px;
-    }
-    button:last-child {
-      margin-right: 0px;
-    }
-    button.active {
-      background: #5285b6ff;
-    }
-  }
 }

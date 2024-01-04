@@ -9,16 +9,17 @@
   "
 >
   <div
-    *ngFor="let event of events"
+    *ngFor="let item of [].constructor(count); let i = index"
     style="position: relative; background: #28282a; padding: 5px"
-    (click)="showEventDetail()"
+    (click)="i < events.length && showEventDetail()"
   >
-    <ng-container *ngIf="event; else elseBlock">
-      <img
-        [src]="event.thumbnailUrl"
-        *ngIf="event; else elseBlock"
-        style="width: 100%; height: auto"
-      />
+    <ng-container *ngIf="i < events.length; else elseBlock">
+      <div style="display: block; width: 100%; aspect-ratio: 16/9">
+        <app-event-image
+          [event]="events[i]"
+          style="height: 100%; width: auto"
+        ></app-event-image>
+      </div>
       <span
         style="
           position: absolute;
@@ -30,12 +31,12 @@
           text-align: center;
           color: white;
         "
-        >10:00</span
+        >{{ events[i].images_info.event_time }}</span
       >
     </ng-container>
 
     <ng-template #elseBlock>
-      <div style="min-height: 100px; display: block"></div>
+      <div style="display: block; width: 100%; aspect-ratio: 16/9"></div>
     </ng-template>
   </div>
 </div>

@@ -1,6 +1,5 @@
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { v4 } from 'uuid';
 import { EventDetailComponent } from '../event-detail/event-detail.component';
 
 @Component({
@@ -11,29 +10,11 @@ import { EventDetailComponent } from '../event-detail/event-detail.component';
 export class GridViewComponent implements OnInit {
   private _modalService = inject(NgbModal);
 
-  @Input()
-  cols: string = '3';
+  @Input() cols: number = 3;
+  @Input() events: any[] = [];
+  @Input() pageLength: number = 50;
 
-  events: any[] = [];
-
-  ngOnInit(): void {
-    this.events = Array(10)
-      .fill('/assets/images/car.png')
-      .map((e, index) => ({
-        id: v4(),
-        thumbnailUrl: e,
-        imageUrl: e,
-        licencePlate: '65G8944' + index.toString(),
-        model: 'Camry',
-        manufacturer: 'Toyota',
-        color: 'Xanh',
-        ruleType: 'Đỗ xe sai quy định',
-        address: 'Số 23 Đường số 10, Linh Chiểu, Thủ Đức',
-        object: 'car',
-        datetime: '10:25:30 16-11-2023',
-        seen: false,
-      }));
-  }
+  ngOnInit(): void {}
 
   get gridTemplateColumns() {
     return `repeat(${this.cols}, 1fr)`;
@@ -43,5 +24,10 @@ export class GridViewComponent implements OnInit {
     this._modalService.open(EventDetailComponent, {
       size: 'xl',
     });
+  }
+
+  get count(): number {
+    const numRow = Math.ceil(this.pageLength / this.cols);
+    return numRow * this.cols;
   }
 }
