@@ -22,14 +22,15 @@
           position: absolute;
           bottom: 5px;
           left: 50%;
-          transform: translateX(-25px);
+          transform: translateX(-75px);
           background-color: #7f7f7f7f;
-          width: 50px;
+          width: 150px;
           text-align: center;
           color: white;
         "
         >{{
-          events[i].images_info[0].detection_time | datetime : "HH:mm"
+          events[i].images_info[0].detection_time
+            | datetime : "DD/MM/YYYY HH:mm"
         }}</span
       >
     </ng-container>

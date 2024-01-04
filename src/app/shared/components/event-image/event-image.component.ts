@@ -10,13 +10,15 @@ import { EventService } from 'src/app/data/service/event.service';
 
 @Component({
   selector: 'app-event-image',
-  template: '<canvas #canvas></canvas>',
+  template: '<canvas #canvas style="width: 100%; height: 100%"></canvas>',
   styles: [':host{display: block; width: 100%; height: 100%}'],
 })
 export class EventImage implements AfterViewInit {
   @ViewChild('canvas') canvasRef!: ElementRef;
   @Input() event: any;
   @Input() type: 'full' | 'crop' = 'full';
+
+  image: HTMLImageElement | undefined;
 
   constructor(
     private elRef: ElementRef,
@@ -34,20 +36,20 @@ export class EventImage implements AfterViewInit {
       )
       .subscribe({
         next: (blod) => {
-          const image = new Image();
-          image.onload = () => {
+          this.image = new Image();
+          this.image.onload = () => {
             const width =
               this.type === 'full'
-                ? image.width
-                : image.width *
+                ? this.image!.width
+                : this.image!.width *
                   Math.abs(
                     this.event.images_info[0].bounding_box.bottomrightx -
                       this.event.images_info[0].bounding_box.topleftx
                   );
             const height =
               this.type === 'full'
-                ? image.height
-                : image.height *
+                ? this.image!.height
+                : this.image!.height *
                   Math.abs(
                     this.event.images_info[0].bounding_box.bottomrighty -
                       this.event.images_info[0].bounding_box.toplefty
@@ -76,7 +78,7 @@ export class EventImage implements AfterViewInit {
             const dx = (rect.width - width * scaleFactor) / 2;
             const dy = (rect.height - height * scaleFactor) / 2;
             context.drawImage(
-              image,
+              this.image!,
               sx,
               sy,
               width,
@@ -119,7 +121,7 @@ export class EventImage implements AfterViewInit {
               context.stroke();
             }
           };
-          image.src = URL.createObjectURL(blod);
+          this.image.src = URL.createObjectURL(blod);
         },
         error: ({ message }) => this.toastService.showError(message),
       });
