@@ -104,14 +104,14 @@ export class SearchComponent implements OnInit {
     this.events = [];
     const nodes = Object.entries(
       this._navigationService.selectedDeviceIds
-    ).filter(([k, v]) => v.size > 0);
+    ).filter(([k, v]) => Object.keys(v).length > 0);
     if (nodes.length == 0) {
       return;
     }
 
-    const [nodeId, deviceIds] = nodes[0];
+    const [nodeId, devices] = nodes[0];
     const query: SearchQuery = {
-      dis: [...deviceIds],
+      dis: Object.keys(devices),
       tq: 'week',
       p: this.paginationInfo.pageIndex,
       pl: this.paginationInfo.pageLength,

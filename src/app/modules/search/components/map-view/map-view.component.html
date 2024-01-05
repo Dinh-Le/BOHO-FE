@@ -3,7 +3,6 @@
   class="w-100 h-100"
   [leafletOptions]="options"
   (leafletMapReady)="onMapReady($event)"
-  (leafletClick)="mapClicked($event)"
 ></div>
 
 <ng-template #eventListDialogTemplate>
@@ -28,13 +27,18 @@
         class="event-container"
         *ngFor="let item of eventList"
       >
-        <img class="event-image" [src]="item.imgUrl" />
-        <div class="event-date">{{ item.date }}</div>
-        <div class="event-time">{{ item.time }}</div>
+        <!-- <img class="event-image" [src]="item.imgUrl" /> -->
+        <app-event-image class="event-image" [event]="item"></app-event-image>
+        <div class="event-date">
+          {{ item.images_info[0].detection_time | datetime : "DD/MM/YYYY" }}
+        </div>
+        <div class="event-time">
+          {{ item.images_info[0].detection_time | datetime : "HH:mm" }}
+        </div>
         <input
           class="seen-checkbox"
           type="checkbox"
-          [(ngModel)]="item.seen"
+          [(ngModel)]="item.is_watch"
           (ngModelChange)="onSeenCheckboxChanged(item)"
           [style.display]="item.checkboxVisible ? 'block' : 'none'"
         />

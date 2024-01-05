@@ -62,10 +62,7 @@
     [pageLength]="paginationInfo.pageLength"
     [events]="events"
   ></app-grid-view>
-  <app-map-view
-    *ngSwitchCase="'map-view'"
-    [events]="currentEvents"
-  ></app-map-view>
+  <app-map-view *ngSwitchCase="'map-view'" [events]="events"></app-map-view>
   <app-list-view-search
     *ngSwitchCase="'list-view'"
     [events]="events"

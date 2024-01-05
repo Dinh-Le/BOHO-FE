@@ -16,3 +16,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iL
 {
   "is_verify": true
 }
+
+###
+POST https://8a2f-2001-ee0-d741-1650-ec69-dbf-839d-20d7.ngrok-free.app/api/rest/v1/node/08a359ec-48cd-40ae-8536-dc83b8e77a39/device/scan_profile
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJ1c2VyX2lkIjoiYjQzMGY1NDUtOTdjMS00NGU2LTkyNjktMWRkM2M3YjczMTViIiwiZXhwIjoxNzA0NTU3OTU5fQ.rsP7MlVHYGJkXdM_XWqJe8u__tKGUFX2A2mj-jVa-Vg
+
+{
+  "ip": "192.168.100.188",
+  "port": 8018,
+  "user": "root",
+  "password": "root"
+}

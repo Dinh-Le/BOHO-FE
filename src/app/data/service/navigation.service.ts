@@ -48,8 +48,11 @@ export class NavigationService {
     data?: any;
   } = {};
   selectedDeviceIds: {
-    [key: string]: Set<string>;
+    [key: string]: {
+      [key: string]: any;
+    };
   } = {};
+  selectedDeviceChange$ = new Subject();
   treeItemChange$ = new Subject<{
     type: SideMenuItemType;
     action: 'create' | 'update' | 'delete';
