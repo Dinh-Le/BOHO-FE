@@ -169,7 +169,7 @@
                       type="number"
                       min="1"
                       max="65535"
-                      formControlName="port"
+                      formControlName="httpPort"
                       class="form-control bg-transparent border-light form-control-sm"
                       required
                     />
@@ -209,7 +209,8 @@
                   <div class="offset-4 col-auto">
                     <button
                       type="button"
-                      class="btn btn-primary px-4 text-white"
+                      class="connect-button"
+                      (click)="getOnvifProfiles($event, data)"
                     >
                       Kết nối
                     </button>
@@ -222,12 +223,10 @@
                     >
                   </div>
                   <div class="col-8">
-                    <input
-                      [id]="data.id + '-onvif-profile'"
+                    <app-select-2
                       formControlName="profile"
-                      class="form-control bg-transparent border-light form-control-sm"
-                      required
-                    />
+                      [items]="data.onvifProfiles"
+                    ></app-select-2>
                   </div>
                 </div>
                 <div class="row mt-2">
@@ -362,13 +361,13 @@
             <div class="row mt-2">
               <div class="col-4">IP:</div>
               <div class="col-8">
-                {{ data.form.get("subForm.ip").value }}
+                {{ data.ip }}
               </div>
             </div>
             <div class="row mt-2">
               <div class="col-4">Cổng:</div>
               <div class="col-8">
-                {{ data.form.get("subForm.port").value }}
+                {{ data.httpPort }}
               </div>
             </div>
             <div class="row mt-2">
@@ -386,13 +385,13 @@
             <div class="row mt-2">
               <div class="col-4">Profile:</div>
               <div class="col-8">
-                {{ data.form.get("subForm.profile").value }}
+                {{ data.onvifProfileName }}
               </div>
             </div>
             <div class="row mt-2">
               <div class="col-4">Địa chỉ RTSP:</div>
               <div class="col-8">
-                {{ data.form.get("subForm.rtspUrl").value }}
+                {{ data.rtspUrl }}
               </div>
             </div>
           </ng-container>
@@ -447,13 +446,13 @@
   </ng-template>
   <ng-template #statusColumnTemplate let-row="row">
     <span class="px-2 device-status bg-good" *ngIf="row.isGood">
-      {{ row.status }}
+      {{ row.status | translate }}
     </span>
     <span class="px-2 device-status bg-error" *ngIf="row.isFailure">
-      {{ row.status }}
+      {{ row.status | translate }}
     </span>
     <span class="px-2 device-status bg-disconnected" *ngIf="row.isDiconnected">
-      {{ row.status }}
+      {{ row.status | translate }}
     </span>
   </ng-template>
 </div>

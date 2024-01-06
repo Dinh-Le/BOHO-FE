@@ -15,3 +15,15 @@
 .bg-disconnected {
   background: #fa0b00;
 }
+
+.connect-button {
+  background: #5285b6ff;
+  border: 1px solid #31538f;
+  color: #ffffff;
+  border-radius: 5px;
+  padding: 0.25rem 1rem;
+}
+
+.connect-button:disabled {
+  background: gray;
+}
