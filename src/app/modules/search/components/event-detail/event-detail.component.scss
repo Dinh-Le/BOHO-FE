@@ -37,11 +37,7 @@
 
 .event-image {
   grid-area: event-image;
-
-  img {
-    width: 100%;
-    height: auto;
-  }
+  aspect-ratio: 16/9;
 }
 
 .event-info {

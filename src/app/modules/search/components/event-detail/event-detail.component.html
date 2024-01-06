@@ -5,17 +5,17 @@
   </button>
 </div>
 <div class="event-image">
-  <img src="/assets/images/car.png" />
+  <app-event-image [event]="event"></app-event-image>
 </div>
 <div class="event-info">
   <p>Chi tiết đối tượng</p>
-  <p>Camera:</p>
+  <p>Camera: {{ event?.device_name }}</p>
   <p>Điểm giám sát:</p>
-  <p>Thời gian:</p>
-  <p>ID đối tượng:</p>
-  <p>Loại:</p>
-  <p>Màu sắc:</p>
-  <p>Biển số:</p>
+  <p>Thời gian: {{ event?.images_info[0].detection_time }}</p>
+  <p>ID đối tượng: {{ event?.images_info[0].recognize_result.detection_id }}</p>
+  <p>Loại: {{ event?.images_info[0].recognize_result.event_type }}</p>
+  <p>Màu sắc: {{ event?.images_info[0].recognize_result.color }}</p>
+  <p>Biển số: {{ event?.images_info[0].recognize_result.lisence_plate }}</p>
 </div>
 <div class="progress-bar">
   <div class="progress"></div>
@@ -40,6 +40,10 @@
   <app-svg-icon width="1.5em" height="1.5em" icon="fast-forward"></app-svg-icon>
 </div>
 <div class="footer">
-  <button class="reject">Công nhận giả</button>
-  <button class="accept">Công nhận thật</button>
+  <button class="reject" type="button" (click)="verify($event, false)">
+    Công nhận giả
+  </button>
+  <button class="accept" type="button" (click)="verify($event, true)">
+    Công nhận thật
+  </button>
 </div>

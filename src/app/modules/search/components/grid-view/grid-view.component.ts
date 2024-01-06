@@ -20,10 +20,12 @@ export class GridViewComponent implements OnInit {
     return `repeat(${this.cols}, 1fr)`;
   }
 
-  showEventDetail() {
-    this._modalService.open(EventDetailComponent, {
+  showEventDetail(index: number) {
+    const modalRef = this._modalService.open(EventDetailComponent, {
       size: 'xl',
     });
+    const component = modalRef.componentInstance as EventDetailComponent;
+    component.event = this.events[index];
   }
 
   get count(): number {

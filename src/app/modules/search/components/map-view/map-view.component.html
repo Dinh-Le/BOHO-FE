@@ -20,14 +20,14 @@
         ><i class="bi bi-x" style="font-size: 20pt; color: white"></i
       ></a>
     </div>
-    <div class="events-container" (click)="showEventDetail()">
+    <div class="events-container">
       <div
         (mouseenter)="item.checkboxVisible = true"
         (mouseleave)="item.checkboxVisible = false"
         class="event-container"
+        (click)="showEventDetail(item)"
         *ngFor="let item of eventList"
       >
-        <!-- <img class="event-image" [src]="item.imgUrl" /> -->
         <app-event-image class="event-image" [event]="item"></app-event-image>
         <div class="event-date">
           {{ item.images_info[0].detection_time | datetime : "DD/MM/YYYY" }}
@@ -35,13 +35,16 @@
         <div class="event-time">
           {{ item.images_info[0].detection_time | datetime : "HH:mm" }}
         </div>
-        <input
-          class="seen-checkbox"
-          type="checkbox"
-          [(ngModel)]="item.is_watch"
-          (ngModelChange)="onSeenCheckboxChanged(item)"
-          [style.display]="item.checkboxVisible ? 'block' : 'none'"
-        />
+        <label class="custom-input">
+          <input
+            class="seen-checkbox"
+            type="checkbox"
+            (click)="$event.stopPropagation()"
+            [(ngModel)]="item.is_watch"
+            (ngModelChange)="onSeenCheckboxChanged(item)"
+            [style.display]="item.checkboxVisible ? 'block' : 'none'"
+          />
+        </label>
       </div>
     </div>
   </div>

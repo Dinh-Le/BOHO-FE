@@ -11,7 +11,7 @@
   <div
     *ngFor="let item of [].constructor(count); let i = index"
     style="position: relative; background: #28282a; padding: 5px"
-    (click)="i < events.length && showEventDetail()"
+    (click)="i < events.length && showEventDetail(i)"
   >
     <ng-container *ngIf="i < events.length; else elseBlock">
       <div style="display: block; width: 100%; aspect-ratio: 16/9">

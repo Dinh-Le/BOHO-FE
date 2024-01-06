@@ -16,6 +16,8 @@ import { EventDetailComponent } from '../event-detail/event-detail.component';
 import { CustomMarker } from '@shared/models/custom-marker';
 import { NavigationService } from 'src/app/data/service/navigation.service';
 import { Subscription } from 'rxjs';
+import { EventService } from 'src/app/data/service/event.service';
+import { ToastService } from '@app/services/toast.service';
 
 declare class CameraInfo {
   latlng: LatLng;
@@ -31,6 +33,8 @@ declare class CameraInfo {
 export class MapViewComponent implements OnInit, OnChanges, OnDestroy {
   private _modalService = inject(NgbModal);
   private _navigationService = inject(NavigationService);
+  private _eventService = inject(EventService);
+  private _toastService = inject(ToastService);
 
   @ViewChild('eventListDialogTemplate')
   eventListDialogTemplateRef!: TemplateRef<any>;
@@ -153,11 +157,29 @@ export class MapViewComponent implements OnInit, OnChanges, OnDestroy {
     this._modalService.dismissAll();
   }
 
-  onSeenCheckboxChanged(event: any) {}
+  onSeenCheckboxChanged(event: any) {
+    this._eventService
+      .verify(
+        event.node_id,
+        event.device_id,
+        event.images_info[0].detection_id,
+        {
+          is_watch: event.is_watch,
+        }
+      )
+      .subscribe({
+        error: ({ message }) => this._toastService.showError(message),
+        complete: () => {
+          this._toastService.showSuccess('Update event successfully');
+        },
+      });
+  }
 
-  showEventDetail() {
-    this._modalService.open(EventDetailComponent, {
+  showEventDetail(event: any) {
+    const modalRef = this._modalService.open(EventDetailComponent, {
       size: 'xl',
     });
+    const component = modalRef.componentInstance as EventDetailComponent;
+    component.event = event;
   }
 }
