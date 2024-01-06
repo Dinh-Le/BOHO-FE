@@ -1,6 +1,6 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ExpandableTableRowItemModelBase } from '../expandable-table/expandable-table.component';
-import { Device, Node } from 'src/app/data/schema/boho-v2';
+import { Device } from 'src/app/data/schema/boho-v2';
 import { SelectItemModel } from '@shared/models/select-item-model';
 import {
   CameraDriver_RTSP,
@@ -13,16 +13,14 @@ import {
 
 export class RowItemModel extends ExpandableTableRowItemModelBase {
   id: string;
-  node: Node;
   status?: string;
   form: FormGroup<any>;
   onvifProfiles: SelectItemModel[] = [];
 
-  constructor(device: Device, node: Node) {
+  constructor(device: Device) {
     super();
 
     this.id = device.id;
-    this.node = node;
 
     this.form = new FormGroup<any>({
       name: new FormControl(device.name, [Validators.required]),
@@ -44,10 +42,6 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
 
   get name() {
     return this.form.get('name')?.value;
-  }
-
-  get nodeName() {
-    return this.node.name;
   }
 
   get isActive() {
