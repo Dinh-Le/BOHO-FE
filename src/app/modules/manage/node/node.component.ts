@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   OnInit,
   TemplateRef,
@@ -111,6 +112,7 @@ export class NodeComponent implements OnInit, AfterViewInit {
   private _nodeService = inject(NodeService);
   private _toastService = inject(ToastService);
   private _navigationService = inject(NavigationService);
+  private _changeDetectorRef = inject(ChangeDetectorRef);
 
   @ViewChild('statusTemplate') statusTemplateRef!: TemplateRef<any>;
 
@@ -181,6 +183,7 @@ export class NodeComponent implements OnInit, AfterViewInit {
         contentTemplateRef: this.statusTemplateRef,
       },
     ];
+    this._changeDetectorRef.detectChanges();
   }
 
   add() {
