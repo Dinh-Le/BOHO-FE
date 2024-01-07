@@ -46,12 +46,29 @@ export class PresetSettingsComponent implements OnInit {
   }
 
   load() {
-    console.log(this.selectedItem);
+    this._presetService
+      .loadFromCamera(this.nodeId, this.cameraId)
+      .pipe(
+        switchMap((response) => {
+          if (!response.success) {
+            throw Error(`Load preset failed with error: ${response.message}`);
+          }
+
+          return of(response.data);
+        })
+      )
+      .subscribe({
+        error: ({ message }) => this._toastService.showError(message),
+        next: (presets) => {
+          this.presetList = presets.map((e) => ({
+            id: e.id.toString(),
+            label: e.name,
+          }));
+        },
+      });
   }
 
-  play() {
-    console.log(this.presetList);
-  }
+  play() {}
 
   remove(item: EditableListViewItemModel) {
     this._presetService

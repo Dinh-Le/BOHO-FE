@@ -1,0 +1,27 @@
+<app-form-dialog
+  [formGroup]="form"
+  title="Preset"
+  [canSubmit]="!form.invalid"
+  (cancel)="cancel()"
+  (submit)="submit()"
+>
+  <app-select-2
+    [multiple]="true"
+    [items]="presets"
+    formControlName="presets"
+    [contentTemplateRef]="templateRef"
+  ></app-select-2>
+  <ng-template #templateRef let-model="model">
+    <span
+      style="
+        padding: 0.25rem 0.5rem;
+        color: white;
+        border: 1px solid lightskyblue;
+        border-radius: 5px;
+        margin-right: 0.25rem;
+      "
+      *ngFor="let item of model"
+      >{{ item.label }}</span
+    >
+  </ng-template>
+</app-form-dialog>
