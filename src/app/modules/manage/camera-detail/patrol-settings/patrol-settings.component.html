@@ -22,64 +22,56 @@
       />
     </div>
   </div>
-  <div class="preset">
-    <div class="row">
-      <div class="col-8">
-        <table class="w-100">
+  <div class="preset-management">
+    <div class="preset-management left">
+      <div class="table-wrapper">
+        <table>
           <colgroup>
-            <col />
+            <col width="auto" />
             <col span="2" width="150" />
             <col width="32" />
           </colgroup>
-          <thead style="background: rgb(41, 40, 42)">
-            <th class="p-1">Điểmm giám sát</th>
-            <th class="p-1">Thời gian dừng (s)</th>
-            <th class="p-1">Thời gian chuyển (s)</th>
+          <thead>
+            <th>Điểmm giám sát</th>
+            <th>Thời gian dừng (s)</th>
+            <th>Thời gian chuyển (s)</th>
             <th></th>
           </thead>
-        </table>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-8" style="max-height: 200px; overflow-y: scroll">
-        <table class="w-100">
-          <colgroup>
-            <col />
-            <col span="2" width="150" />
-            <col width="32" />
-          </colgroup>
           <tbody>
-            <tr *ngFor="let item of presetList">
-              <td class="p-1">{{ item.name }}</td>
-              <td class="p-1">{{ item.stand_time }}</td>
-              <td class="p-1">{{ item.moving_time }}</td>
+            <tr *ngFor="let item of patrolManagementList; trackBy: trackById">
+              <td>{{ item.presetName }}</td>
               <td>
-                <a class="btn" (click)="removePreset(item)"
-                  ><i class="bi bi-trash-fill"></i
-                ></a>
+                {{ item.stand_time }}
+              </td>
+              <td>
+                {{ item.moving_time }}
+              </td>
+              <td>
+                <i
+                  class="func-button bi bi-trash-fill"
+                  (click)="detetePatrolManagement(item)"
+                ></i>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-      <div class="col-4 d-flex flex-column justify-content-between">
-        <button
-          type="button"
-          class="btn btn-primary text-white"
-          style="max-width: 100px"
-          (click)="addPreset()"
-        >
-          Thêm
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary text-white"
-          style="max-width: 100px"
-          (click)="updatePresetList()"
-        >
-          Lưu
-        </button>
-      </div>
+    </div>
+    <div class="preset-management right">
+      <button
+        type="button"
+        (click)="addPatrolManagement()"
+        [disabled]="!selectedPatrol"
+      >
+        Thêm
+      </button>
+      <button
+        type="button"
+        (click)="updatePatrolManagementList()"
+        [disabled]="!selectedPatrol || patrolManagementList.length === 0"
+      >
+        Lưu
+      </button>
     </div>
   </div>
 </div>

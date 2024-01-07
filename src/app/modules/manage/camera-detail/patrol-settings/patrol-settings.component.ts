@@ -13,6 +13,19 @@ import {
 import { PresetService } from 'src/app/data/service/preset.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PresetSelectDialogComponent } from './preset-select-dialog/preset-select-dialog.component';
+import {
+  CreatePatrolManagementDto,
+  PatrolManagementService,
+} from 'src/app/data/service/patrol-management.service';
+import { PatrolManagement } from 'src/app/data/schema/boho-v2/patrol-management';
+import { Preset } from 'src/app/data/schema/boho-v2/preset';
+import { CreateDeviceResponeDto } from 'src/app/data/service/device.service';
+
+type PatrolManagementRowItem = PatrolManagement &
+  Partial<{
+    presetName: string;
+    isNew: boolean;
+  }>;
 
 @Component({
   selector: 'app-patrol-settings',
@@ -23,6 +36,7 @@ export class PatrolSettingsComponent implements OnInit {
   private _activatedRoute = inject(ActivatedRoute);
   private _toastService = inject(ToastService);
   private _patrolService = inject(PatrolService);
+  private _patrolManagementService = inject(PatrolManagementService);
   private _presetService = inject(PresetService);
   private _modalService = inject(NgbModal);
   private _navigationService = inject(NavigationService);
@@ -30,14 +44,9 @@ export class PatrolSettingsComponent implements OnInit {
   private _cameraId: string = '';
 
   patrols: EditableListViewItemModel[] = [];
-  presetList: {
-    id: string;
-    name: string;
-    stand_time: number;
-    moving_time: number;
-    patrol_id: number;
-    index: number;
-  }[] = [];
+  presetList: Preset[] = [];
+  patrolManagementList: PatrolManagementRowItem[] = [];
+  selectedPatrol: EditableListViewItemModel | undefined;
 
   ngOnInit(): void {
     this._navigationService.level3 = Level3Menu.PATROL_SETTINGS;
@@ -46,19 +55,31 @@ export class PatrolSettingsComponent implements OnInit {
         switchMap(({ nodeId, cameraId }) => {
           this._nodeId = nodeId;
           this._cameraId = cameraId;
-
-          return this._patrolService.findAll(nodeId, cameraId);
-        })
-      )
-      .subscribe({
-        next: (response) => {
+          return this._presetService.findAll(this._nodeId, this._cameraId);
+        }),
+        switchMap((response) => {
           if (!response.success) {
             throw Error(
-              'Fetch patrol data failed with error: ' + response.message
+              `Fetch preset list failed with error: ${response.message}`
             );
           }
 
-          this.patrols = (response.data ?? []).map((e) => ({
+          this.presetList = response.data;
+          return this._patrolService.findAll(this._nodeId, this._cameraId);
+        }),
+        switchMap((response) => {
+          if (!response.success) {
+            throw Error(
+              `Fetch patrol list failed with error: ${response.message}`
+            );
+          }
+
+          return of(response.data);
+        })
+      )
+      .subscribe({
+        next: (patrols) => {
+          this.patrols = (patrols ?? []).map((e) => ({
             id: e.id.toString(),
             label: e.name,
           }));
@@ -71,16 +92,24 @@ export class PatrolSettingsComponent implements OnInit {
     return item.value;
   }
 
-  selectedPatrol: EditableListViewItemModel | undefined;
+  trackById(_: any, item: any) {
+    return item.id;
+  }
+
   onPatrolSelected(patrol: EditableListViewItemModel) {
     this.selectedPatrol = patrol;
-    this._patrolService
-      .getPatrolManagement(this._nodeId, this._cameraId, this.selectedPatrol.id)
+
+    // Clear the patrol management list of the previous patrol
+    this.patrolManagementList = [];
+
+    // Load the patrol management list of the current patrol from the backend
+    this._patrolManagementService
+      .findAll(this._nodeId, this._cameraId, this.selectedPatrol.id)
       .pipe(
         switchMap((response) => {
           if (!response.success) {
             throw Error(
-              `Load preset list failed with error ${response.message}`
+              `Load the patrol management list failed with error ${response.message}`
             );
           }
 
@@ -89,22 +118,12 @@ export class PatrolSettingsComponent implements OnInit {
       )
       .subscribe({
         next: (data) => {
-          const keys = [
-            'id',
-            'index',
-            'moving_time',
-            'patrol_id',
-            'preset_id',
-            'stand_time',
-          ];
-          this.presetList = data.map(
-            (e: any) =>
-              keys.reduce((data, key) =>
-                Object.assign(data, {
-                  [key]: e[key],
-                })
-              ),
-            {}
+          this.patrolManagementList = data.map((patrolManagement) =>
+            Object.assign({}, patrolManagement, {
+              presetName: this.presetList.find(
+                (preset) => preset.id === patrolManagement.preset_id
+              )?.name,
+            })
           );
         },
         error: ({ message }) => this._toastService.showError(message),
@@ -181,24 +200,83 @@ export class PatrolSettingsComponent implements OnInit {
     this.presetList = this.presetList.filter((e) => e.id !== item.id);
   }
 
-  addPreset() {
+  addPatrolManagement() {
+    if (!this.selectedPatrol) {
+      this._toastService.showError('No patrol selected');
+      return;
+    }
+
     const modalRef = this._modalService.open(PresetSelectDialogComponent);
     const component = modalRef.componentInstance as PresetSelectDialogComponent;
-    component.nodeId = this._nodeId;
-    component.deviceId = this._cameraId;
+    component.presets = this.presetList
+      .filter(
+        (preset) =>
+          !this.patrolManagementList.some(
+            (patrolManagement) => patrolManagement.preset_id === preset.id
+          )
+      )
+      .map((e) => ({
+        value: e.id,
+        label: e.name,
+      }));
     modalRef.result
-      .then(({ presets }) => {
-        this.presetList = presets.map((e: any) => ({
-          id: e.value,
-          name: e.label,
-          stand_time: 1,
-          moving_time: 1,
-        }));
+      .then(({ preset, standTime, movingTime }) => {
+        const { value, label } = preset;
+        const index =
+          this.patrolManagementList.length === 0
+            ? 0
+            : this.patrolManagementList[this.patrolManagementList.length - 1]
+                .index + 1;
+
+        this.patrolManagementList.push({
+          id: v4(),
+          preset_id: value,
+          presetName: label,
+          isNew: true,
+          patrol_id: parseInt(this.selectedPatrol!.id),
+          moving_time: movingTime,
+          stand_time: standTime,
+          index,
+        });
       })
       .catch(() => {});
   }
 
-  updatePresetList() {
+  detetePatrolManagement(item: PatrolManagementRowItem) {
+    const func = (id: string) => {
+      this._toastService.showSuccess(
+        'Delete the patrol management successfully'
+      );
+      this.patrolManagementList = this.patrolManagementList.filter(
+        (e) => e.id !== id
+      );
+    };
+
+    if (item.isNew) {
+      func(item.id);
+      return;
+    }
+
+    this._patrolManagementService
+      .delete(this._nodeId, this._cameraId, this.selectedPatrol!.id, item.id)
+      .pipe(
+        switchMap((response) => {
+          if (!response.success) {
+            throw Error(
+              `Delete the patrol management failed with error ${response.message}`
+            );
+          }
+
+          return of(true);
+        })
+      )
+      .subscribe({
+        error: ({ message }) => this._toastService.showError(message),
+        complete: () => func(item.id),
+      });
+  }
+
+  updatePatrolManagementList() {
     if (!this.selectedPatrol) {
       this._toastService.showError('No patrol selected!!!');
       return;
@@ -209,29 +287,21 @@ export class PatrolSettingsComponent implements OnInit {
       return;
     }
 
-    const data: {
-      preset_id: number;
-      stand_time: number;
-      moving_time: number;
-      index: number;
-    }[] = this.presetList.map((e, index) => ({
-      preset_id: parseInt(e.id),
-      stand_time: 1,
-      moving_time: 1,
-      index: index,
-    }));
-    this._patrolService
-      .createPatrolManagement(
-        this._nodeId,
-        this._cameraId,
-        this.selectedPatrol.id,
-        data
-      )
+    const data: CreatePatrolManagementDto[] = this.patrolManagementList
+      .filter((e) => e.isNew)
+      .map((e) => ({
+        preset_id: e.patrol_id,
+        stand_time: e.stand_time,
+        moving_time: e.moving_time,
+        index: e.index,
+      }));
+    this._patrolManagementService
+      .create(this._nodeId, this._cameraId, this.selectedPatrol.id, data)
       .pipe(
         switchMap((response) => {
           if (!response.success) {
             throw Error(
-              `Update preset list failed with error ${response.message}`
+              `Update the patrol management list failed with error ${response.message}`
             );
           }
 

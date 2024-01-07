@@ -42,26 +42,6 @@ export abstract class PatrolService {
     deviceId: string,
     patrolId: string
   ): Observable<ResponseBase>;
-  abstract getPatrolManagement(
-    nodeId: string,
-    deviceId: string,
-    patrolId: string
-  ): Observable<ResponseBase & { data: any }>;
-  abstract createPatrolManagement(
-    nodeId: string,
-    deviceId: string,
-    patrolId: string,
-    data: {
-      preset_id: number;
-      stand_time: number;
-      moving_time: number;
-      index: number;
-    }[]
-  ): Observable<
-    ResponseBase & {
-      data: any;
-    }
-  >;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -136,41 +116,5 @@ export class PatrolServiceImpl extends PatrolService {
   ): Observable<ResponseBase> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/patrol/${patrolId}`;
     return this.httpClient.delete<ResponseBase>(url);
-  }
-
-  override getPatrolManagement(
-    nodeId: string,
-    deviceId: string,
-    patrolId: string
-  ): Observable<ResponseBase & { data: any }> {
-    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/patrol/${patrolId}/patrol_management`;
-    return this.httpClient.get<
-      ResponseBase & {
-        data: any;
-      }
-    >(url);
-  }
-
-  override createPatrolManagement(
-    nodeId: string,
-    deviceId: string,
-    patrolId: string,
-    data: {
-      preset_id: number;
-      stand_time: number;
-      moving_time: number;
-      index: number;
-    }[]
-  ): Observable<
-    ResponseBase & {
-      data: any;
-    }
-  > {
-    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/patrol/${patrolId}/patrol_management`;
-    return this.httpClient.post<
-      ResponseBase & {
-        data: any;
-      }
-    >(url, data);
   }
 }

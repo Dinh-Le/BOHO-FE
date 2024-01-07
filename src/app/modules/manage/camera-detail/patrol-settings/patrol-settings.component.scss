@@ -21,6 +21,81 @@
   grid-area: preview;
 }
 
-.preset {
+button {
+  background: #5285b6ff;
+  border: 1px solid #31538f;
+  border-radius: 5px;
+  color: #ffffff;
+  padding: 0.25rem 0.5rem;
+}
+
+button:disabled {
+  background: gray;
+}
+
+.preset-management {
   grid-area: preset;
+  display: flex;
+  gap: 30px;
+
+  .left {
+    flex: 1;
+
+    .table-wrapper {
+      width: 100%;
+      overflow-y: auto;
+      border: 2px solid black;
+      background: #515151ff;
+
+      table {
+        width: 100%;
+
+        thead,
+        th {
+          background: #29282aff;
+          padding: 0.5rem 0.5rem;
+        }
+
+        tr,
+        td {
+          background: #515151ff;
+          color: white;
+          padding: 0.5rem 0.5rem;
+
+          input {
+            border: none;
+            outline: none;
+            width: 100%;
+            background: inherit;
+          }
+
+          .func-button {
+            display: none;
+            cursor: pointer;
+          }
+        }
+
+        tr:hover {
+          background: #5285b6ff;
+          td {
+            background: #5285b6ff;
+          }
+          .func-button {
+            display: block;
+          }
+        }
+      }
+    }
+  }
+
+  .right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    button {
+      width: 120px;
+    }
+  }
 }

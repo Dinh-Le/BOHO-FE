@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -7,14 +7,10 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { ToastService } from '@app/services/toast.service';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormDialogComponent } from '@shared/components/form-dialog/form-dialog.component';
 import { SelectItemModel } from '@shared/models/select-item-model';
 import { SharedModule } from '@shared/shared.module';
-import { of, switchMap } from 'rxjs';
-import { PresetService } from 'src/app/data/service/preset.service';
 
 @Component({
   selector: 'app-preset-select-dialog',
@@ -28,40 +24,16 @@ import { PresetService } from 'src/app/data/service/preset.service';
     SharedModule,
   ],
 })
-export class PresetSelectDialogComponent implements OnInit {
+export class PresetSelectDialogComponent {
   presets: SelectItemModel[] = [];
   activeModal = inject(NgbActiveModal);
-  presetService = inject(PresetService);
-  toastService = inject(ToastService);
-  activatedRoute = inject(ActivatedRoute);
   form = new FormGroup({
-    presets: new FormControl<SelectItemModel[]>([], [Validators.required]),
+    preset: new FormControl<SelectItemModel | null>(null, [
+      Validators.required,
+    ]),
+    standTime: new FormControl<number>(1, [Validators.required]),
+    movingTime: new FormControl<number>(1, [Validators.required]),
   });
-  nodeId: string = '';
-  deviceId: string = '';
-
-  ngOnInit(): void {
-    this.presetService
-      .findAll(this.nodeId, this.deviceId)
-      .pipe(
-        switchMap((response) => {
-          if (!response.success) {
-            throw Error(`Fetch presets failed with error: ${response.message}`);
-          }
-
-          return of(response.data);
-        })
-      )
-      .subscribe({
-        next: (presets) => {
-          this.presets = presets.map((e) => ({
-            value: e.id,
-            label: e.name,
-          }));
-        },
-        error: ({ message }) => this.toastService.showError(message),
-      });
-  }
 
   cancel() {
     this.activeModal.dismiss();

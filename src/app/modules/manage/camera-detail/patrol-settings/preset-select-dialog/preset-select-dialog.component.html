@@ -1,27 +1,32 @@
 <app-form-dialog
   [formGroup]="form"
-  title="Preset"
-  [canSubmit]="!form.invalid"
+  title="Add preset management"
+  [canSubmit]="form.valid"
   (cancel)="cancel()"
   (submit)="submit()"
 >
-  <app-select-2
-    [multiple]="true"
-    [items]="presets"
-    formControlName="presets"
-    [contentTemplateRef]="templateRef"
-  ></app-select-2>
-  <ng-template #templateRef let-model="model">
-    <span
-      style="
-        padding: 0.25rem 0.5rem;
-        color: white;
-        border: 1px solid lightskyblue;
-        border-radius: 5px;
-        margin-right: 0.25rem;
-      "
-      *ngFor="let item of model"
-      >{{ item.label }}</span
-    >
-  </ng-template>
+  <div class="form-group">
+    <label>Preset</label>
+    <app-select-2 [items]="presets" formControlName="preset"></app-select-2>
+  </div>
+  <div class="form-group mt-2">
+    <label>Thời gian dừng (s)</label>
+    <input
+      type="number"
+      min="1"
+      formControlName="standTime"
+      class="form-control form-control-sm bg-transparent border-light border-1"
+      required
+    />
+  </div>
+  <div class="form-group mt-2">
+    <label>Thời gian chuyển (s)</label>
+    <input
+      type="number"
+      min="1"
+      formControlName="movingTime"
+      class="form-control form-control-sm bg-transparent border-light border-1"
+      required
+    />
+  </div>
 </app-form-dialog>
