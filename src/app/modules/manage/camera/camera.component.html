@@ -109,7 +109,7 @@
                     <input
                       [id]="data.id + '-rtsp-url'"
                       formControlName="rtspUrl"
-                      class="form-control bg-transparent border-light form-control-sm"
+                      class="form-control bg-transparent border-light"
                       required
                     />
                   </div>
@@ -124,7 +124,7 @@
                     <input
                       [id]="data.id + '-rtsp-user-id'"
                       formControlName="userId"
-                      class="form-control bg-transparent border-light form-control-sm"
+                      class="form-control bg-transparent border-light"
                     />
                   </div>
                 </div>
@@ -135,11 +135,11 @@
                     >
                   </div>
                   <div class="col-8">
-                    <input
+                    <password-input
                       [id]="data.id + '-rtsp-user-password'"
                       formControlName="password"
-                      class="form-control bg-transparent border-light form-control-sm"
-                    />
+                      class="w-100"
+                    ></password-input>
                   </div>
                 </div>
               </form>
@@ -154,7 +154,7 @@
                     <input
                       [id]="data.id + '-onvif-ip'"
                       formControlName="ip"
-                      class="form-control bg-transparent border-light form-control-sm"
+                      class="form-control bg-transparent border-light"
                       required
                     />
                   </div>
@@ -170,7 +170,7 @@
                       min="1"
                       max="65535"
                       formControlName="httpPort"
-                      class="form-control bg-transparent border-light form-control-sm"
+                      class="form-control bg-transparent border-light"
                       required
                     />
                   </div>
@@ -185,7 +185,7 @@
                     <input
                       [id]="data.id + '-onvif-user-id'"
                       formControlName="userId"
-                      class="form-control bg-transparent border-light form-control-sm"
+                      class="form-control bg-transparent border-light"
                       required
                     />
                   </div>
@@ -197,12 +197,11 @@
                     >
                   </div>
                   <div class="col-8">
-                    <input
+                    <password-input
                       [id]="data.id + '-onvif-password'"
                       formControlName="password"
-                      class="form-control bg-transparent border-light form-control-sm"
-                      required
-                    />
+                      class="w-100"
+                    ></password-input>
                   </div>
                 </div>
                 <div class="row mt-2">
@@ -239,7 +238,7 @@
                     <input
                       [id]="data.id + '-onvif-rtsp-url'"
                       formControlName="rtspUrl"
-                      class="form-control bg-transparent border-light form-control-sm"
+                      class="form-control bg-transparent border-light"
                       required
                     />
                   </div>
@@ -286,7 +285,7 @@
                     <input
                       [id]="data.id + '-milestone-rtsp-url'"
                       formControlName="rtspUrl"
-                      class="form-control bg-transparent border-light form-control-sm"
+                      class="form-control bg-transparent border-light"
                       required
                     />
                   </div>

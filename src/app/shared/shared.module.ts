@@ -22,6 +22,7 @@ import { NumericInputComponent } from './components/numeric-input/numeric-input.
 import { EventImage } from './components/event-image/event-image.component';
 import { DateTimeFormatPipe } from './pipes/datetime.pipe';
 import { TranslatePipe } from './pipes/translate-vi.pipe';
+import { PasswordInputComponent } from './components/password-input/password-input.component';
 
 @NgModule({
   declarations: [
@@ -44,6 +45,7 @@ import { TranslatePipe } from './pipes/translate-vi.pipe';
     PaginationComponent,
     NumericInputComponent,
     EventImage,
+    PasswordInputComponent,
   ],
   imports: [CommonModule, FormsModule, NgbModule, FontAwesomeModule],
   exports: [
@@ -64,6 +66,7 @@ import { TranslatePipe } from './pipes/translate-vi.pipe';
     PaginationComponent,
     NumericInputComponent,
     EventImage,
+    PasswordInputComponent,
   ],
 })
 export class SharedModule {}
