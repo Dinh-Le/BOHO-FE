@@ -199,19 +199,20 @@ export class SidebarComponent implements OnInit, AfterViewInit {
       }
 
       if (!(child.data.node_id in this._navigationService.selectedDeviceIds)) {
-        this._navigationService.selectedDeviceIds[child.data.node_id] =
-          new Set();
+        this._navigationService.selectedDeviceIds[child.data.node_id] = {};
       }
 
       if (item.checked) {
         if (child.data.node_id in this._navigationService.selectedDeviceIds)
-          this._navigationService.selectedDeviceIds[child.data.node_id].add(
+          this._navigationService.selectedDeviceIds[child.data.node_id][
             child.data.id
-          );
+          ] = child.data;
+        this._navigationService.selectedDeviceChange$.next(0);
       } else {
-        this._navigationService.selectedDeviceIds[child.data.node_id].delete(
+        delete this._navigationService.selectedDeviceIds[child.data.node_id][
           child.data.id
-        );
+        ];
+        this._navigationService.selectedDeviceChange$.next(0);
       }
     });
   }

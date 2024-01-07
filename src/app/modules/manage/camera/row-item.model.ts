@@ -1,6 +1,6 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ExpandableTableRowItemModelBase } from '../expandable-table/expandable-table.component';
-import { Device, Node } from 'src/app/data/schema/boho-v2';
+import { Device } from 'src/app/data/schema/boho-v2';
 import { SelectItemModel } from '@shared/models/select-item-model';
 import {
   CameraDriver_RTSP,
@@ -13,25 +13,26 @@ import {
 
 export class RowItemModel extends ExpandableTableRowItemModelBase {
   id: string;
-  node: Node;
   status?: string;
   form: FormGroup<any>;
+  onvifProfiles: SelectItemModel[] = [];
 
-  constructor(device: Device, node: Node) {
+  constructor(device: Device) {
     super();
 
     this.id = device.id;
-    this.node = node;
 
     this.form = new FormGroup<any>({
       name: new FormControl(device.name, [Validators.required]),
       is_active: new FormControl(device.is_active, [Validators.required]),
       type: new FormControl(device.camera?.type, [Validators.required]),
-      driver: new FormControl(device.camera?.driver ? {
-        label: device.camera?.driver,
-        value: device.camera?.driver
-      } as SelectItemModel : null
-        ,
+      driver: new FormControl(
+        device.camera?.driver
+          ? ({
+              label: device.camera?.driver,
+              value: device.camera?.driver,
+            } as SelectItemModel)
+          : null,
         [Validators.required]
       ),
     });
@@ -41,10 +42,6 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
 
   get name() {
     return this.form.get('name')?.value;
-  }
-
-  get nodeName() {
-    return this.node.name;
   }
 
   get isActive() {
@@ -66,13 +63,25 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
   get driver() {
     return this.form.get('driver')?.value?.value;
   }
-  
+
+  get ip() {
+    return this.form.get('camera')?.get('ip')?.value;
+  }
+
+  get httpPort() {
+    return this.form.get('camera')?.get('httpPort')?.value;
+  }
+
   get userId() {
     return this.form.get('camera')?.get('userId')?.value;
   }
 
   get password() {
     return this.form.get('camera')?.get('password')?.value;
+  }
+
+  get onvifProfileName() {
+    return this.form.get('camera')?.get('profile')?.value?.label;
   }
 
   get isRtsp() {
@@ -100,7 +109,6 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
   }
 
   updateCameraForm(device?: Device): void {
-    console.log('Update camera form', this.driver);
     switch (this.driver) {
       case CameraDriver_RTSP:
         this.form.setControl(
@@ -123,14 +131,30 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
         this.form.setControl(
           'camera',
           new FormGroup<any>({
-            ip: new FormControl(null, [Validators.required]),
-            port: new FormControl(null, [Validators.required]),
-            userId: new FormControl(null, [Validators.required]),
-            password: new FormControl(null, [Validators.required]),
-            profile: new FormControl(null, [Validators.required]),
-            rtspUrl: new FormControl(null, [Validators.required]),
+            ip: new FormControl<string>('192.168.100.165', [
+              Validators.required,
+            ]),
+            httpPort: new FormControl<number>(80, [Validators.required]),
+            userId: new FormControl<string>('root', [Validators.required]),
+            password: new FormControl<string>('root', [Validators.required]),
+            profile: new FormControl<SelectItemModel | null>(null, [
+              Validators.required,
+            ]),
+            rtspUrl: new FormControl<string>(
+              {
+                value: '',
+                disabled: true,
+              },
+              [Validators.required]
+            ),
           })
         );
+        this.form
+          .get('camera')
+          ?.get('profile')
+          ?.valueChanges.subscribe((value: SelectItemModel) => {
+            this.form.get('camera')?.get('rtspUrl')?.setValue(value.value);
+          });
         break;
       case CameraDriver_Milestone:
         this.form.setControl(

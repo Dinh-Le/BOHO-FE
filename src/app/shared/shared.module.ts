@@ -17,9 +17,12 @@ import { SvgIconComponent } from './components/svg-icon/svg-icon.component';
 import { MaskPipe } from './pipes/mask.pipe';
 import { NumberToStringPipe } from './pipes/number-to-string.pipe';
 import { BoundingBoxEditorComponent } from '@shared/components/bounding-box-editor/bounding-box-editor.component';
-import { FormDialogComponent } from './components/form-dialog/form-dialog.component';
 import { PaginationComponent } from './components/pagination/pagination.component';
 import { NumericInputComponent } from './components/numeric-input/numeric-input.component';
+import { EventImage } from './components/event-image/event-image.component';
+import { DateTimeFormatPipe } from './pipes/datetime.pipe';
+import { TranslatePipe } from './pipes/translate-vi.pipe';
+import { PasswordInputComponent } from './components/password-input/password-input.component';
 
 @NgModule({
   declarations: [
@@ -35,10 +38,14 @@ import { NumericInputComponent } from './components/numeric-input/numeric-input.
     ObjectEntries,
     MaskPipe,
     NumberToStringPipe,
+    DateTimeFormatPipe,
+    TranslatePipe,
     SvgIconComponent,
     BoundingBoxEditorComponent,
     PaginationComponent,
     NumericInputComponent,
+    EventImage,
+    PasswordInputComponent,
   ],
   imports: [CommonModule, FormsModule, NgbModule, FontAwesomeModule],
   exports: [
@@ -52,10 +59,14 @@ import { NumericInputComponent } from './components/numeric-input/numeric-input.
     ObjectEntries,
     MaskPipe,
     NumberToStringPipe,
+    DateTimeFormatPipe,
+    TranslatePipe,
     SvgIconComponent,
     BoundingBoxEditorComponent,
     PaginationComponent,
     NumericInputComponent,
+    EventImage,
+    PasswordInputComponent,
   ],
 })
 export class SharedModule {}

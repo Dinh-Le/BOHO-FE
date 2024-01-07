@@ -1,39 +1,46 @@
-<div class="event-image">
-  <img [src]="selectedEvent?.imgUrl" />
+<div class="top">
+  <div class="event-image">
+    <app-event-image [event]="selectedEvent"></app-event-image>
+  </div>
+  <div class="event-detail">
+    <div class="event-prop">
+      <label class="prop-label">Đối tượng:</label>
+      <ng-container [ngSwitch]="selectedEvent?.images_info[0].event_type">
+        <app-svg-icon icon="side-car" *ngSwitchCase="'car'"></app-svg-icon>
+      </ng-container>
+    </div>
+    <div class="event-prop">
+      <label class="prop-label">Biển số:</label>
+      <p>{{ selectedEvent?.images_info[0].recognize_result.lisence_plate }}</p>
+    </div>
+    <div class="event-prop">
+      <label class="prop-label">NSX, Model, Màu:</label>
+      <p>
+        {{ selectedEvent?.images_info[0].recognize_result.model }}
+        {{ selectedEvent?.images_info[0].recognize_result.color }}
+      </p>
+    </div>
+    <div class="event-prop">
+      <label class="prop-label">Nội dung:</label>
+      <p>{{ selectedEvent?.alarm_type }}</p>
+    </div>
+    <div class="event-prop">
+      <label class="prop-label">Thời gian:</label>
+      <p>{{ selectedEvent?.images_info[0].detection_time }}</p>
+    </div>
+    <div class="event-prop">
+      <label class="prop-label">Địa điểm:</label>
+      <p>
+        {{
+          selectedEvent?.device_location.lat +
+            "," +
+            selectedEvent?.device_location.long
+        }}
+      </p>
+    </div>
+  </div>
 </div>
-<div class="event-detail">
-  <div class="event-prop">
-    <label class="prop-label">Đối tượng:</label>
-    <app-svg-icon
-      [icon]="selectedEvent?.object"
-      *ngIf="selectedEvent"
-    ></app-svg-icon>
-  </div>
-  <div class="event-prop">
-    <label class="prop-label">Biển số:</label>
-    <p>{{ selectedEvent?.licencePlate }}</p>
-  </div>
-  <div class="event-prop">
-    <label class="prop-label">NSX, Model, Màu:</label>
-    <p>
-      {{ selectedEvent?.manufacturer }} {{ selectedEvent?.model }}
-      {{ selectedEvent?.color }}
-    </p>
-  </div>
-  <div class="event-prop">
-    <label class="prop-label">Nội dung:</label>
-    <p>{{ selectedEvent?.ruleType }}</p>
-  </div>
-  <div class="event-prop">
-    <label class="prop-label">Thời gian:</label>
-    <p>{{ selectedEvent?.datetime }}</p>
-  </div>
-  <div class="event-prop">
-    <label class="prop-label">Địa điểm:</label>
-    <p>{{ selectedEvent?.address }}</p>
-  </div>
-</div>
-<div class="event-list">
+<div class="bottom event-list">
   <table>
     <thead>
       <th></th>
@@ -48,18 +55,36 @@
       <tr
         *ngFor="let item of events"
         (click)="selectedEvent = item"
-        [class.active]="selectedEvent?.id === item.id"
+        [class.active]="selectedEvent?.event_id === item.event_id"
       >
-        <td><input type="checkbox" [(ngModel)]="item.seen" /></td>
-        <td><img [src]="item.imgUrl" class="cropped-image" /></td>
-        <td>{{ item.licencePlate }}</td>
-        <td><app-svg-icon [icon]="item.object"></app-svg-icon></td>
         <td>
-          {{ item.manufacturer }} {{ item.model }}
-          {{ item.color }}
+          <label class="custom-checkbox"
+            ><input type="checkbox" [(ngModel)]="item.is_watch"
+          /></label>
         </td>
-        <td>{{ item.ruleType }}</td>
-        <td>{{ item.address }}</td>
+        <td>
+          <app-event-image
+            class="crop-image"
+            [event]="item"
+            type="crop"
+          ></app-event-image>
+        </td>
+        <td>{{ item.images_info[0].recognize_result.lisence_plate }}</td>
+        <td>
+          {{ item.images_info[0].event_type }}
+        </td>
+        <td>
+          {{ item.images_info[0].recognize_result.model }}
+          {{ item.images_info[0].recognize_result.color }}
+        </td>
+        <td>{{ item.alarm_type }}</td>
+        <td>
+          {{
+            selectedEvent?.device_location.lat +
+              "," +
+              selectedEvent?.device_location.long
+          }}
+        </td>
       </tr>
     </tbody>
   </table>

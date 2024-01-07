@@ -1,6 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { EventService } from 'src/app/data/service/event.service';
 import {
   ObjectItemModel,
   SelectObjectDialogComponent,
@@ -13,8 +12,9 @@ import {
   SearchQuery,
   SearchService,
 } from 'src/app/data/service/search.service';
-import { finalize, from, map, mergeAll, of, tap } from 'rxjs';
+import { finalize, tap } from 'rxjs';
 import { EventInfo } from 'src/app/data/schema/boho-v2/event';
+import { KeyValue } from '@angular/common';
 
 @Component({
   selector: 'app-search',
@@ -22,31 +22,28 @@ import { EventInfo } from 'src/app/data/schema/boho-v2/event';
   styleUrls: ['./search.component.scss'],
 })
 export class SearchComponent implements OnInit {
-  private eventService = inject(EventService);
-  private modelService = inject(NgbModal);
+  private _modalService = inject(NgbModal);
   private _navigationService = inject(NavigationService);
   private _toastService = inject(ToastService);
   private _searchService = inject(SearchService);
 
   viewMode: string = 'grid-view';
-  gridColumn: string = '3';
-  pageLengthList = [25, 50, 100];
+  gridColumn: number = 3;
 
   paginationInfo: {
-    currentPage: number;
+    pageIndex: number;
     pageLength: number;
-    totalItems: number;
   } = {
-    currentPage: 1,
+    pageIndex: 1,
     pageLength: 50,
-    totalItems: 0,
   };
-  events: EventInfo[] = [];
+  totalEvents: number = 0;
+  events: any[] = [];
 
   form = new FormGroup({
     startTime: new FormControl(null, [Validators.required]),
     endTime: new FormControl(null, [Validators.required]),
-    objects: new FormControl(),
+    objects: new FormControl<ObjectItemModel[]>([]),
     rule: new FormControl(),
     resolutionMinute: new FormControl(0, [Validators.required]),
     resolutionSecond: new FormControl(0, [Validators.required]),
@@ -63,20 +60,15 @@ export class SearchComponent implements OnInit {
     label: name,
   }));
 
-  ngOnInit(): void {
-    // this.eventService.findAll().subscribe((events) => {
-    //   this.events = events;
-    //   this.paginationInfo.totalItems = this.events.length;
-    // });
-  }
+  ngOnInit(): void {}
 
   get canSubmit() {
-    return this.form.valid;
+    return this.form.valid || true;
   }
 
   get currentEvents(): (EventInfo | null)[] {
     let startIndex =
-      (this.paginationInfo.currentPage - 1) * this.paginationInfo.pageLength;
+      (this.paginationInfo.pageIndex - 1) * this.paginationInfo.pageLength;
     let endIndex = startIndex + this.paginationInfo.pageLength;
 
     let currentEvents: (EventInfo | null)[] = this.events.slice(
@@ -95,7 +87,7 @@ export class SearchComponent implements OnInit {
     return currentEvents;
   }
 
-  setGridColumn(value: string) {
+  setGridColumn(value: number) {
     this.gridColumn = value;
     this.viewMode = 'grid-view';
   }
@@ -104,62 +96,75 @@ export class SearchComponent implements OnInit {
     return item.id;
   }
 
+  submit() {
+    this.paginationInfo.pageIndex = 1;
+    this.search();
+  }
+
   search() {
     this.events = [];
-    from(
-      Object.entries(this._navigationService.selectedDeviceIds).filter(
-        ([k, v]) => v.size > 0
-      )
-    )
+    const nodes = Object.entries(
+      this._navigationService.selectedDeviceIds
+    ).filter(([k, v]) => Object.keys(v).length > 0);
+    if (nodes.length == 0) {
+      return;
+    }
+
+    const [nodeId, devices] = nodes[0];
+    const objectIdMap: {
+      [key: string]: number;
+    } = {
+      bike: 0,
+      car: 1,
+      bus: 2,
+      truck: 3,
+      ambulance: 4,
+      firetruck: 5,
+      people: 6,
+    };
+    const query: SearchQuery = {
+      dis: Object.keys(devices),
+      tq: 'week',
+      p: this.paginationInfo.pageIndex,
+      pl: this.paginationInfo.pageLength,
+      eit: this.form.get('rule')?.value?.value,
+      ot: this.form
+        .get('objects')
+        ?.value?.map((e) => objectIdMap[e.id])
+        .filter((e) => e !== undefined),
+    };
+
+    this._searchService
+      .search(nodeId, query)
       .pipe(
         tap(() => this.form.disable()),
-        map(([nodeId, deviceIds]) => {
-          const query: SearchQuery = {
-            dis: [...deviceIds],
-            oit: [],
-            tq: '',
-            eit: [],
-            limit: 100,
-            start: '',
-            end: '',
-          };
-          return this._searchService.search(nodeId, query);
-        }),
-        mergeAll(),
-        map((response) => {
-          if (!response.success) {
-            throw Error(
-              `Fetch event data failed with error: ${response.message}`
-            );
-          }
-
-          return response.data;
-        }),
         finalize(() => this.form.enable())
       )
       .subscribe({
-        next: (events: EventInfo[]) => {
-          this.events.push(...events);
+        next: (response) => {
+          this.totalEvents = response.data.total;
+          this.events = response.data.events.map((e) =>
+            Object.assign(e, {
+              node_id: nodeId,
+            })
+          );
         },
         error: ({ message }) => this._toastService.showError(message),
       });
   }
 
-  onPageChanged(value: number) {
-    this.paginationInfo.currentPage = value;
-  }
-
-  objectItems: ObjectItemModel[] = [];
-
   addObject() {
-    const modalRef = this.modelService.open(SelectObjectDialogComponent, {});
-
+    const modalRef = this._modalService.open(SelectObjectDialogComponent, {});
     (modalRef.componentInstance as SelectObjectDialogComponent).data =
-      this.objectItems;
+      this.form.get('objects')!.value!;
 
     modalRef.result.then(
-      ({ data }) => (this.objectItems = data),
+      ({ data }) => this.form.get('objects')?.setValue(data),
       () => {}
     );
+  }
+
+  get selectedObjects(): ObjectItemModel[] {
+    return this.form.get('objects')!.value!;
   }
 }

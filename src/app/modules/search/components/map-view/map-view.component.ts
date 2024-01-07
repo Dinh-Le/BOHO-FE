@@ -1,52 +1,28 @@
 import {
   Component,
   Input,
+  OnChanges,
   OnDestroy,
   OnInit,
+  SimpleChanges,
   TemplateRef,
   ViewChild,
-  ViewContainerRef,
   inject,
 } from '@angular/core';
 import * as Leaflet from 'leaflet';
-import { Store } from '@ngrx/store';
-import { SidebarState } from 'src/app/state/sidebar.state';
-import { Subscription } from 'rxjs';
 import { LatLng } from 'leaflet';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventDetailComponent } from '../event-detail/event-detail.component';
-
-class ExtendedMarker extends Leaflet.Marker {
-  private _camera: CameraInfo;
-
-  constructor(
-    latLng: L.LatLngExpression,
-    camera: CameraInfo,
-    options?: L.MarkerOptions
-  ) {
-    super(latLng, options);
-    this._camera = camera;
-  }
-
-  get camera() {
-    return this._camera;
-  }
-}
+import { CustomMarker } from '@shared/models/custom-marker';
+import { NavigationService } from 'src/app/data/service/navigation.service';
+import { Subscription } from 'rxjs';
+import { EventService } from 'src/app/data/service/event.service';
+import { ToastService } from '@app/services/toast.service';
 
 declare class CameraInfo {
   latlng: LatLng;
   type: 'ptz' | 'static';
-  numOfEvent: number;
-  events: MyEventInfo[];
-}
-
-declare class MyEventInfo {
-  seen: boolean;
-  boundingBoxes: number[][];
-  date: string;
-  time: string;
-  imgUrl: string;
-  checkboxVisible?: boolean;
+  events: any[];
 }
 
 @Component({
@@ -54,17 +30,16 @@ declare class MyEventInfo {
   templateUrl: './map-view.component.html',
   styleUrls: ['./map-view.component.scss'],
 })
-export class MapViewComponent implements OnInit, OnDestroy {
-  private viewContainerRef: ViewContainerRef = inject(ViewContainerRef);
-  private store = inject(Store<{ sidebar: SidebarState }>);
-  private devicesSubscription: Subscription | undefined;
+export class MapViewComponent implements OnInit, OnChanges, OnDestroy {
   private _modalService = inject(NgbModal);
+  private _navigationService = inject(NavigationService);
+  private _eventService = inject(EventService);
+  private _toastService = inject(ToastService);
 
   @ViewChild('eventListDialogTemplate')
   eventListDialogTemplateRef!: TemplateRef<any>;
 
   map: Leaflet.Map | undefined;
-  markers: ExtendedMarker[] = [];
   options: Leaflet.MapOptions = {
     layers: [
       Leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -76,196 +51,74 @@ export class MapViewComponent implements OnInit, OnDestroy {
     center: { lat: 28.626137, lng: 79.821603 },
   };
 
-  @Input()
-  events: any[] = [];
+  _selectedMarker: CustomMarker | undefined;
 
-  cameraList: CameraInfo[] = [
-    {
-      latlng: new LatLng(10.769906, 106.775626),
-      numOfEvent: 20,
-      type: 'ptz',
-      events: Array(20)
-        .fill(0)
-        .map((e, index) =>
-          Object.assign(
-            {},
-            {
-              seen: false,
-              boundingBoxes: [],
-              date: '12-20-2023',
-              time: '11:11:11',
-              imgUrl: '/assets/images/car.png',
-            }
-          )
-        ),
-    },
-    {
-      latlng: new LatLng(10.780198, 106.762805),
-      numOfEvent: 10,
-      type: 'static',
-      events: Array(20)
-        .fill(0)
-        .map((e, index) =>
-          Object.assign(
-            {},
-            {
-              seen: false,
-              boundingBoxes: [],
-              date: '12-20-2023',
-              time: '11:11:11',
-              imgUrl: '/assets/images/car.png',
-            }
-          )
-        ),
-    },
-    {
-      latlng: new LatLng(10.774633, 106.781173),
-      numOfEvent: 1,
-      type: 'static',
-      events: Array(20)
-        .fill(0)
-        .map((e, index) =>
-          Object.assign(
-            {},
-            {
-              seen: false,
-              boundingBoxes: [],
-              date: '12-20-2023',
-              time: '11:11:11',
-              imgUrl: '/assets/images/car.png',
-            }
-          )
-        ),
-    },
-  ];
+  @Input() events: any[] = [];
 
-  ngOnInit(): void {
-    // this.devicesSubscription = this.store
-    //   .pipe(map(({ sidebar }) => sidebar.devices))
-    //   .subscribe((devices: Device[]) => {
-    //     this.updateDevices(devices);
-    //   });
+  get cameraList(): CameraInfo[] {
+    const devices = Object.entries(this._navigationService.selectedDeviceIds)
+      .filter(([k, v]) => Object.keys(v).length > 0)
+      .flatMap(([k, v]) => Object.values(v));
+    return devices.map((device) => {
+      const lat = parseFloat(device.location.lat);
+      const lng = parseFloat(device.location.long);
+      return {
+        events: this.events.filter((e) => e.device_id === device.id),
+        latlng: new LatLng(lat, lng),
+        type: 'ptz',
+      };
+    });
   }
 
-  ngOnDestroy(): void {
-    this.devicesSubscription?.unsubscribe();
-  }
-
-  _selectedMarker: ExtendedMarker | undefined;
-
-  get eventList(): MyEventInfo[] {
-    return this._selectedMarker?.camera.events || [];
-  }
-
-  onMapReady(map: Leaflet.Map) {
-    this.map = map;
-    this.markers = this.cameraList.map((e) => {
-      const marker = new ExtendedMarker(e.latlng, e, {
-        icon: this.createMarkerIcon(e.type, true),
+  get markers(): CustomMarker[] {
+    return this.cameraList.map((e) => {
+      const marker = new CustomMarker(e.latlng, e, {
+        icon: this.createMarkerIcon(e.type, true, e.events.length),
       });
 
       marker.on('click', (ev) => {
-        this._selectedMarker = ev.sourceTarget as ExtendedMarker;
+        this._selectedMarker = ev.sourceTarget as CustomMarker;
         this._modalService
           .open(this.eventListDialogTemplateRef, {})
           .closed.subscribe(() => (this._selectedMarker = undefined));
       });
 
-      // marker.on('mouseover', (event: Leaflet.LeafletMouseEvent) => {
-      //   const eventComponentRef: ComponentRef<EventComponent> =
-      //     this.viewContainerRef.createComponent(EventComponent);
-
-      //   // set data and call detectChanges() to re-render
-      //   eventComponentRef.instance.data = this.events[0]!;
-      //   eventComponentRef.hostView.detectChanges();
-
-      //   const marker = event.target as Leaflet.Marker;
-      //   marker.bindPopup(eventComponentRef.location.nativeElement, {
-      //     maxWidth: 500,
-      //     minWidth: 500,
-      //     closeButton: false,
-      //     className: 'event-popup',
-      //   });
-
-      //   marker.openPopup();
-      // });
-
       marker.addTo(this.map!);
       return marker;
     });
-
-    let group = Leaflet.featureGroup(this.markers);
-    this.map.fitBounds(group.getBounds());
   }
 
-  mapClicked($event: any) {}
+  get eventList(): any[] {
+    return this._selectedMarker?.data.events || [];
+  }
 
-  // updateDevices(devices: Device[]) {
-  //   const deviceIds: Set<string> = new Set(devices.map((e) => e.id));
-  //   console.log('deviceIds', deviceIds);
+  selectedDeviceChange$: Subscription | undefined;
+  ngOnInit(): void {
+    this.selectedDeviceChange$ =
+      this._navigationService.selectedDeviceChange$.subscribe(() =>
+        this.refresh()
+      );
+  }
 
-  //   this.markers = this.markers.reduce((markers: ExtendedMarker[], marker) => {
-  //     if (deviceIds.has(marker.device.id)) {
-  //       markers.push(marker);
-  //     } else {
-  //       marker.remove();
-  //     }
+  ngOnChanges(changes: SimpleChanges): void {
+    this.refresh();
+  }
 
-  //     return markers;
-  //   }, []);
+  ngOnDestroy(): void {
+    this.selectedDeviceChange$?.unsubscribe();
+  }
 
-  //   const existingDeviceIds: Set<string> = new Set(
-  //     this.markers.map((marker) => marker.device.id)
-  //   );
+  onMapReady(map: Leaflet.Map) {
+    this.map = map;
+    this.refresh();
+  }
 
-  //   this.markers = devices
-  //     .filter((device) => !existingDeviceIds.has(device.id))
-  //     .map((device) => {
-  //       const marker = new ExtendedMarker(
-  //         {
-  //           lat: parseFloat(device.location.lat),
-  //           lng: parseFloat(device.location.long),
-  //         },
-  //         device,
-  //         {
-  //           icon: this.createMarkerIcon('PTZ', false),
-  //         }
-  //       );
-
-  //       marker.on('mouseover', (event: Leaflet.LeafletMouseEvent) => {
-  //         const eventComponentRef: ComponentRef<EventComponent> =
-  //           this.viewContainerRef.createComponent(EventComponent);
-
-  //         // set data and call detectChanges() to re-render
-  //         eventComponentRef.instance.data = this.events[0]!;
-  //         eventComponentRef.hostView.detectChanges();
-
-  //         const marker = event.target as Leaflet.Marker;
-  //         marker.bindPopup(eventComponentRef.location.nativeElement, {
-  //           maxWidth: 500,
-  //           minWidth: 500,
-  //           closeButton: false,
-  //           className: 'event-popup',
-  //         });
-
-  //         marker.openPopup();
-  //       });
-
-  //       if (this.map) {
-  //         marker.addTo(this.map!);
-  //       }
-
-  //       return marker;
-  //     })
-  //     .concat(this.markers);
-
-  //   if (this.markers.length === 0 || !this.map) {
-  //     return;
-  //   }
-
-  //   let group = Leaflet.featureGroup(this.markers);
-  //   this.map.fitBounds(group.getBounds());
-  // }
+  refresh() {
+    if (this.map && this.markers.length > 0) {
+      let group = Leaflet.featureGroup(this.markers);
+      this.map!.fitBounds(group.getBounds());
+    }
+  }
 
   generateMarker(data: any, index: number) {
     return Leaflet.marker(data.position);
@@ -304,11 +157,29 @@ export class MapViewComponent implements OnInit, OnDestroy {
     this._modalService.dismissAll();
   }
 
-  onSeenCheckboxChanged(event: MyEventInfo) {}
+  onSeenCheckboxChanged(event: any) {
+    this._eventService
+      .verify(
+        event.node_id,
+        event.device_id,
+        event.images_info[0].detection_id,
+        {
+          is_watch: event.is_watch,
+        }
+      )
+      .subscribe({
+        error: ({ message }) => this._toastService.showError(message),
+        complete: () => {
+          this._toastService.showSuccess('Update event successfully');
+        },
+      });
+  }
 
-  showEventDetail() {
-    this._modalService.open(EventDetailComponent, {
+  showEventDetail(event: any) {
+    const modalRef = this._modalService.open(EventDetailComponent, {
       size: 'xl',
     });
+    const component = modalRef.componentInstance as EventDetailComponent;
+    component.event = event;
   }
 }

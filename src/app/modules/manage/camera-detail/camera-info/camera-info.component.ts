@@ -6,7 +6,6 @@ import { ToastService } from '@app/services/toast.service';
 import { LocationPickerComponent } from './location-picker/location-picker.component';
 import { Device } from 'src/app/data/schema/boho-v2/device';
 import { LatLng } from 'src/app/data/schema/boho-v2/latlng';
-import { Observable, of, switchMap } from 'rxjs';
 import {
   Level3Menu,
   NavigationService,
@@ -28,7 +27,6 @@ interface CameraInfo {
 export class CameraInfoComponent implements OnInit {
   modalService = inject(NgbModal);
   private _navigationService = inject(NavigationService);
-  id$: Observable<any> | undefined;
   device: Device | undefined;
   data: CameraInfo = {
     name: '',
@@ -39,18 +37,16 @@ export class CameraInfoComponent implements OnInit {
   };
 
   constructor(
-    activatedRoute: ActivatedRoute,
+    private activatedRoute: ActivatedRoute,
     private deviceService: DeviceService,
     private toastService: ToastService
-  ) {
-    this.id$ = activatedRoute.parent?.params.pipe(
-      switchMap(({ nodeId, cameraId }) => of({ nodeId, cameraId }))
-    );
-  }
+  ) {}
 
   ngOnInit(): void {
     this._navigationService.level3 = Level3Menu.DEVICE_INFO;
-    this.id$?.subscribe(({ nodeId, cameraId }) => {
+    this.activatedRoute.parent?.params.subscribe((params) => {
+      const { nodeId, cameraId } = params;
+
       this.deviceService.find(nodeId, cameraId).subscribe((response) => {
         if (!response.success) {
           this.toastService.showError('Fetch camera data failed.');

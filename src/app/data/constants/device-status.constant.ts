@@ -1,3 +1,3 @@
-export const DeviceStatus_Good = 'TỐT';
-export const DeviceStatus_Disconnected = 'MẤT KẾT NỐI';
-export const DeviceStatus_Failure = 'CÓ LỖI';
+export const DeviceStatus_Good = 'ONLINE';
+export const DeviceStatus_Disconnected = 'OFFLINE';
+export const DeviceStatus_Failure = 'ERROR';

@@ -37,12 +37,34 @@ export abstract class DeviceService extends RestfullApiService {
     nodeId: string,
     deviceId: string,
     data: CreateOrUpdateDeviceRequestDto
-  ): Observable<ResponseBase>;
+  ): Observable<
+    ResponseBase & {
+      data: {
+        status: string;
+      };
+    }
+  >;
 
   public abstract delete(
     nodeId: string,
     deviceId: string
   ): Observable<ResponseBase>;
+
+  public abstract findAllOnvifProfiles(
+    nodeId: string,
+    data: {
+      ip: string;
+      port: number;
+      user: string;
+      password: string;
+    }
+  ): Observable<
+    ResponseBase & {
+      data: {
+        [key: string]: string;
+      };
+    }
+  >;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -83,9 +105,21 @@ export class DeviceServiceImpl extends DeviceService {
     nodeId: string,
     deviceId: string,
     { name, is_active, type, camera }: CreateOrUpdateDeviceRequestDto
-  ): Observable<ResponseBase> {
+  ): Observable<
+    ResponseBase & {
+      data: {
+        status: string;
+      };
+    }
+  > {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}`;
-    return this.httpClient.patch<ResponseBase>(
+    return this.httpClient.patch<
+      ResponseBase & {
+        data: {
+          status: string;
+        };
+      }
+    >(
       url,
       Object.assign(
         {},
@@ -103,5 +137,25 @@ export class DeviceServiceImpl extends DeviceService {
   ): Observable<ResponseBase> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}`;
     return this.httpClient.delete<ResponseBase>(url);
+  }
+
+  public override findAllOnvifProfiles(
+    nodeId: string,
+    data: { ip: string; port: number; user: string; password: string }
+  ): Observable<
+    ResponseBase & {
+      data: {
+        [key: string]: string;
+      };
+    }
+  > {
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/scan_profile`;
+    return this.httpClient.post<
+      ResponseBase & {
+        data: {
+          [key: string]: string;
+        };
+      }
+    >(url, data);
   }
 }

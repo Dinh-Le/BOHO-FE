@@ -4,6 +4,10 @@ import { PresetService } from 'src/app/data/service/preset.service';
 import { ActivatedRoute } from '@angular/router';
 import { of, switchMap } from 'rxjs';
 import { ToastService } from '@app/services/toast.service';
+import {
+  Level3Menu,
+  NavigationService,
+} from 'src/app/data/service/navigation.service';
 
 @Component({
   selector: 'app-preset-settings',
@@ -12,6 +16,7 @@ import { ToastService } from '@app/services/toast.service';
 })
 export class PresetSettingsComponent implements OnInit {
   private _activatedRoute = inject(ActivatedRoute);
+  private _navigationService = inject(NavigationService);
   private _presetService = inject(PresetService);
   private _toastService = inject(ToastService);
   presetList: EditableListViewItemModel[] = [];
@@ -20,12 +25,12 @@ export class PresetSettingsComponent implements OnInit {
   cameraId = '';
 
   ngOnInit(): void {
+    this._navigationService.level3 = Level3Menu.PRESET_SETTINGS;
     this._activatedRoute.parent?.params
       .pipe(
         switchMap(({ nodeId, cameraId }) => {
           this.nodeId = nodeId;
           this.cameraId = cameraId;
-          console.log({ nodeId, cameraId });
           return this._presetService.findAll(nodeId, cameraId);
         })
       )

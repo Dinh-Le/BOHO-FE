@@ -7,8 +7,8 @@ export interface DeviceMetadata {
 
 export interface OnvifConnectionMetadata {
   ip: string;
-  http_port: string;
-  rtsp_port: string;
+  http_port: number;
+  rtsp_port: number;
   profile: string;
   user: string;
   password: string;

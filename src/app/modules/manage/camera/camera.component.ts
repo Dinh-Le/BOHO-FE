@@ -22,11 +22,10 @@ import {
   CameraDriver_RTSP,
   CameraType_Static,
   HoChiMinhCoord,
-  InvalidId,
   DeviceType_Camera,
   DeviceStatus_Good,
 } from 'src/app/data/constants';
-import { catchError, switchMap } from 'rxjs/operators';
+import { catchError, finalize, switchMap } from 'rxjs/operators';
 import { NodeService } from 'src/app/data/service/node.service';
 import { of } from 'rxjs';
 import { RowItemModel } from './row-item.model';
@@ -56,7 +55,7 @@ export class CameraComponent implements OnInit, AfterViewInit {
     value: e,
     label: e,
   }));
-  node: Node | undefined;
+  nodeId: string = '';
   data: RowItemModel[] = [];
   columns: ColumnConfig[] = [];
   milestoneServers: SelectItemModel[] = ['1', '2', '3'].map((e) => ({
@@ -102,14 +101,9 @@ export class CameraComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this._activatedRoute.params
       .pipe(
-        switchMap((params) => this._nodeService.find(params['nodeId'])),
-        switchMap((response) => {
-          if (!response.success) {
-            throw new Error(response.message);
-          }
-
-          this.node = response.data;
-          return this._deviceService.findAll(this.node.id);
+        switchMap(({ nodeId }) => {
+          this.nodeId = nodeId;
+          return this._deviceService.findAll(this.nodeId);
         }),
         catchError(({ message }) => {
           return of({
@@ -119,19 +113,22 @@ export class CameraComponent implements OnInit, AfterViewInit {
           });
         })
       )
-      .subscribe((response) => {
-        if (!response.success) {
-          this._toastService.showError(
-            'Fetch device data failed with error: ' + response.message
-          );
-          return;
-        }
+      .subscribe({
+        next: (response) => {
+          if (!response.success) {
+            this._toastService.showError(
+              'Fetch device data failed with error: ' + response.message
+            );
+            return;
+          }
 
-        this.data = response.data.map((device) => {
-          const row = new RowItemModel(device, this.node!);
-          row.status = DeviceStatus_Good;
-          return row;
-        });
+          this.data = response.data.map((device) => {
+            const row = new RowItemModel(device);
+            row.status = DeviceStatus_Good;
+            return row;
+          });
+        },
+        error: ({ message }) => this._toastService.showError(message),
       });
   }
 
@@ -159,7 +156,7 @@ export class CameraComponent implements OnInit, AfterViewInit {
         },
       },
     };
-    const newItem = new RowItemModel(device, this.node!);
+    const newItem = new RowItemModel(device);
 
     newItem.isNew = true;
     newItem.isEditable = true;
@@ -184,17 +181,33 @@ export class CameraComponent implements OnInit, AfterViewInit {
       },
     };
 
-    if (item.driver === CameraDriver_RTSP) {
+    if (item.isRtsp) {
       data.camera.connection_metadata.rtsp = {
         rtsp_url: item.rtspUrl,
         user: item.userId || '',
         password: item.password || '',
       };
+    } else if (item.isOnvif) {
+      const { camera } = item.form.value;
+      const { ip, httpPort, userId, password, profile } = camera;
+      data.camera.connection_metadata.onvif = {
+        http_port: httpPort,
+        ip: ip,
+        password: password,
+        user: userId,
+        profile: profile.label,
+        rtsp_port: 554,
+      };
+    } else {
+      this._toastService.showWarning(
+        'The Milestone driver is not supported yet'
+      );
+      return;
     }
 
     if (item.isNew) {
       this._deviceService
-        .create(this.node!.id, data)
+        .create(this.nodeId, data)
         .pipe(
           switchMap((response) => {
             if (!response.success) {
@@ -208,6 +221,7 @@ export class CameraComponent implements OnInit, AfterViewInit {
         )
         .subscribe({
           next: ({ id, status }) => {
+            item.status = status;
             this._toastService.showSuccess('Create camera successfully');
             item.id = id.toString();
             item.isNew = false;
@@ -217,7 +231,7 @@ export class CameraComponent implements OnInit, AfterViewInit {
               action: 'create',
               data: Object.assign({}, data, {
                 id,
-                node_id: this.node!.id,
+                node_id: this.nodeId,
               }),
             });
           },
@@ -225,7 +239,7 @@ export class CameraComponent implements OnInit, AfterViewInit {
         });
     } else {
       this._deviceService
-        .update(this.node!.id, item.id, data)
+        .update(this.nodeId, item.id, data)
         .pipe(
           switchMap((response) => {
             if (!response.success) {
@@ -234,11 +248,12 @@ export class CameraComponent implements OnInit, AfterViewInit {
               );
             }
 
-            return of();
+            return of(response.data);
           })
         )
         .subscribe({
-          next: () => {
+          next: ({ status }) => {
+            item.status = status;
             this._toastService.showSuccess('Update camera successfully');
             item.isEditable = false;
             this._navigationService.treeItemChange$.next({
@@ -263,7 +278,7 @@ export class CameraComponent implements OnInit, AfterViewInit {
 
   remove(item: RowItemModel) {
     this._deviceService
-      .delete(this.node!.id, item.id)
+      .delete(this.nodeId, item.id)
       .pipe(
         switchMap((response) => {
           if (!response.success) {
@@ -284,6 +299,43 @@ export class CameraComponent implements OnInit, AfterViewInit {
               id: item.id,
             },
           });
+        },
+        error: ({ message }) => this._toastService.showError(message),
+      });
+  }
+
+  getOnvifProfiles(ev: Event, item: RowItemModel) {
+    const button = ev.target as HTMLButtonElement;
+    button.disabled = true;
+
+    const { camera } = item.form.value;
+    const { ip, httpPort, userId, password } = camera;
+
+    this._deviceService
+      .findAllOnvifProfiles(this.nodeId, {
+        ip,
+        port: httpPort,
+        user: userId,
+        password,
+      })
+      .pipe(
+        switchMap((response) => {
+          if (!response.success) {
+            throw Error(
+              `Connect to camera failed with error: ${response.message}`
+            );
+          }
+
+          return of(response.data);
+        }),
+        finalize(() => (button.disabled = false))
+      )
+      .subscribe({
+        next: (profiles) => {
+          item.onvifProfiles = Object.entries(profiles).map(([k, v]) => ({
+            value: v,
+            label: k,
+          }));
         },
         error: ({ message }) => this._toastService.showError(message),
       });

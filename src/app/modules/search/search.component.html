@@ -5,28 +5,28 @@
     height="24px"
     width="24px"
     color="#FFFFFF"
-    (click)="setGridColumn('2')"
+    (click)="setGridColumn(2)"
   ></app-svg-icon>
   <app-svg-icon
     icon="grid-3"
     class="grid-size"
     width="24px"
     height="24px"
-    (click)="setGridColumn('3')"
+    (click)="setGridColumn(3)"
   ></app-svg-icon>
   <app-svg-icon
     icon="grid-4"
     class="grid-size"
     width="24px"
     height="24px"
-    (click)="setGridColumn('4')"
+    (click)="setGridColumn(4)"
   ></app-svg-icon>
   <app-svg-icon
     icon="grid-5"
     class="grid-size"
     width="24px"
     height="24px"
-    (click)="setGridColumn('5')"
+    (click)="setGridColumn(5)"
   ></app-svg-icon>
   <button
     type="button"
@@ -59,16 +59,18 @@
   <app-grid-view
     *ngSwitchCase="'grid-view'"
     [cols]="gridColumn"
+    [pageLength]="paginationInfo.pageLength"
+    [events]="events"
   ></app-grid-view>
-  <app-map-view
-    *ngSwitchCase="'map-view'"
-    [events]="currentEvents"
-  ></app-map-view>
-  <app-list-view-search *ngSwitchCase="'list-view'"></app-list-view-search>
+  <app-map-view *ngSwitchCase="'map-view'" [events]="events"></app-map-view>
+  <app-list-view-search
+    *ngSwitchCase="'list-view'"
+    [events]="events"
+  ></app-list-view-search>
   <div *ngSwitchDefault>Unsupported view mode</div>
 </div>
 
-<form class="search-form" [formGroup]="form" (submit)="search()">
+<form class="search-form" [formGroup]="form" (submit)="submit()">
   <div class="form-item">
     <label for="startTime" class="label">Thời gian bắt đầu</label>
     <input
@@ -102,7 +104,7 @@
       class="control"
     >
       <li
-        *ngFor="let item of objectItems; trackBy: trackById"
+        *ngFor="let item of selectedObjects; trackBy: trackById"
         class="d-flex align-items-center"
       >
         <app-svg-icon class="mx-1" [icon]="item.icon"></app-svg-icon>
@@ -196,19 +198,9 @@
   </div>
 </form>
 
-<div class="pagination-bar">
-  <div class="page-length button-group">
-    <button
-      *ngFor="let item of pageLengthList"
-      (click)="paginationInfo.pageLength = item"
-      [class.active]="paginationInfo.pageLength === item"
-    >
-      {{ item }}
-    </button>
-  </div>
-  <app-pagination
-    [pageLength]="paginationInfo.pageLength"
-    [totalItems]="paginationInfo.totalItems"
-    [(ngModel)]="paginationInfo.currentPage"
-  ></app-pagination>
-</div>
+<app-pagination
+  class="pagination-bar"
+  [totalItems]="totalEvents"
+  [(ngModel)]="paginationInfo"
+  (ngModelChange)="search()"
+></app-pagination>

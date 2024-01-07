@@ -1,44 +1,43 @@
 :host {
   background: #28282aff;
-  display: grid;
-  grid-template-areas:
-    "event-image event-detail"
-    "event-list event-list";
-  grid-template-columns: auto 1fr;
-  grid-template-rows: 0.75fr 1fr;
-  height: 100%;
-  overflow-y: hidden;
-}
-
-.event-image {
-  grid-area: event-image;
-  min-width: 480px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  height: 100%;
 }
 
-.event-detail {
-  grid-area: event-detail;
-  padding: 1.5rem;
+.top {
+  display: flex;
+  flex: 0.75;
 
-  .event-prop {
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
+  .event-image {
+    flex: 1;
+    display: block;
+  }
 
-    .prop-label {
-      width: 150px;
-    }
+  .event-detail {
+    flex: 1;
+    padding: 1.5rem;
 
-    p {
-      margin: 0;
-      padding: 0;
+    .event-prop {
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+
+      .prop-label {
+        width: 150px;
+      }
+
+      p {
+        margin: 0;
+        padding: 0;
+      }
     }
   }
 }
-
+.bottom {
+  flex: 1.25;
+}
 .event-list {
-  grid-area: event-list;
   overflow: auto;
   border-top: 1px solid #d8d8d8;
   padding: 0px 10px;
@@ -70,7 +69,7 @@
       color: #ededed;
     }
 
-    img.cropped-image {
+    .crop-image {
       width: 50px;
       height: 50px;
     }
