@@ -14,6 +14,7 @@ import {
 } from 'src/app/data/service/search.service';
 import { finalize, tap } from 'rxjs';
 import { EventInfo } from 'src/app/data/schema/boho-v2/event';
+import { KeyValue } from '@angular/common';
 
 @Component({
   selector: 'app-search',
@@ -42,7 +43,7 @@ export class SearchComponent implements OnInit {
   form = new FormGroup({
     startTime: new FormControl(null, [Validators.required]),
     endTime: new FormControl(null, [Validators.required]),
-    objects: new FormControl(),
+    objects: new FormControl<ObjectItemModel[]>([]),
     rule: new FormControl(),
     resolutionMinute: new FormControl(0, [Validators.required]),
     resolutionSecond: new FormControl(0, [Validators.required]),
@@ -110,11 +111,27 @@ export class SearchComponent implements OnInit {
     }
 
     const [nodeId, devices] = nodes[0];
+    const objectIdMap: {
+      [key: string]: number;
+    } = {
+      bike: 0,
+      car: 1,
+      bus: 2,
+      truck: 3,
+      ambulance: 4,
+      firetruck: 5,
+      people: 6,
+    };
     const query: SearchQuery = {
       dis: Object.keys(devices),
       tq: 'week',
       p: this.paginationInfo.pageIndex,
       pl: this.paginationInfo.pageLength,
+      eit: this.form.get('rule')?.value?.value,
+      ot: this.form
+        .get('objects')
+        ?.value?.map((e) => objectIdMap[e.id])
+        .filter((e) => e !== undefined),
     };
 
     this._searchService
@@ -136,17 +153,18 @@ export class SearchComponent implements OnInit {
       });
   }
 
-  objectItems: ObjectItemModel[] = [];
-
   addObject() {
     const modalRef = this._modalService.open(SelectObjectDialogComponent, {});
-
     (modalRef.componentInstance as SelectObjectDialogComponent).data =
-      this.objectItems;
+      this.form.get('objects')!.value!;
 
     modalRef.result.then(
-      ({ data }) => (this.objectItems = data),
+      ({ data }) => this.form.get('objects')?.setValue(data),
       () => {}
     );
+  }
+
+  get selectedObjects(): ObjectItemModel[] {
+    return this.form.get('objects')!.value!;
   }
 }

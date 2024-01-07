@@ -11,9 +11,12 @@
   <p>Chi tiết đối tượng</p>
   <p>Camera: {{ event?.device_name }}</p>
   <p>Điểm giám sát:</p>
-  <p>Thời gian: {{ event?.images_info[0].detection_time }}</p>
-  <p>ID đối tượng: {{ event?.images_info[0].recognize_result.detection_id }}</p>
-  <p>Loại: {{ event?.images_info[0].recognize_result.event_type }}</p>
+  <p>
+    Thời gian:
+    {{ event?.images_info[0].detection_time | datetime : " DD/MM/YYYY HH:mm" }}
+  </p>
+  <p>ID đối tượng: {{ event?.images_info[0].detection_id }}</p>
+  <p>Loại: {{ event?.images_info[0].event_type }}</p>
   <p>Màu sắc: {{ event?.images_info[0].recognize_result.color }}</p>
   <p>Biển số: {{ event?.images_info[0].recognize_result.lisence_plate }}</p>
 </div>

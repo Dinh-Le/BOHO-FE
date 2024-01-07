@@ -7,7 +7,7 @@ import { HttpParams } from '@angular/common/http';
 
 export interface SearchQuery {
   dis?: string[];
-  ot?: string[];
+  ot?: number[];
   tq:
     | 'custom'
     | 'day'
@@ -18,7 +18,7 @@ export interface SearchQuery {
     | 'week'
     | 'month'
     | 'year';
-  eit?: string[];
+  eit?: string;
   start?: string;
   end?: string;
   p: number;
@@ -88,10 +88,13 @@ export class SearchServiceImpl extends SearchService {
     query: SearchQuery
   ): Observable<SearchResultResponse> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/events`;
-    const params: HttpParams = Object.entries(query).reduce(
-      (params, [k, v]) => params.append(k, v),
-      new HttpParams()
-    );
+    const params: HttpParams = Object.entries(query)
+      .filter(
+        ([k, v]) =>
+          (!Array.isArray(v) && v !== undefined) ||
+          (Array.isArray(v) && v.length > 0)
+      )
+      .reduce((params, [k, v]) => params.append(k, v), new HttpParams());
     return this.httpClient.get<SearchResultResponse>(url, {
       params,
     });
