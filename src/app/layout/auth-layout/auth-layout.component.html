@@ -18,7 +18,13 @@
       </div>
       <div class="form-item">
         <fa-icon icon="lock"></fa-icon>
-        <input
+        <password-input
+          formControlName="password"
+          placeholder="Password"
+          required
+          class="form-input"
+        ></password-input>
+        <!-- <input
           [type]="passwordVisible ? 'text' : 'password'"
           class="form-input"
           autocomplete="off"
@@ -29,7 +35,7 @@
         <fa-icon
           [icon]="passwordVisible ? 'eye-slash' : 'eye'"
           (click)="passwordVisible = !passwordVisible"
-        ></fa-icon>
+        ></fa-icon> -->
       </div>
       <div class="form-item">
         <button type="submit" class="submit-button">Sign in</button>

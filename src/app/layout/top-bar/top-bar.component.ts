@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
+import { JWTTokenService } from '@app/services/jwt-token.service';
 import { Store } from '@ngrx/store';
 import { filter } from 'rxjs';
 import { SidebarActions } from 'src/app/state/sidebar.action';
@@ -41,7 +42,11 @@ export class TopBarComponent {
     },
   ];
 
-  constructor(router: Router, private store: Store<{ sidebar: SidebarState }>) {
+  constructor(
+    private router: Router,
+    private store: Store<{ sidebar: SidebarState }>,
+    private tokenService: JWTTokenService
+  ) {
     router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event) => {
@@ -55,5 +60,10 @@ export class TopBarComponent {
   toggleSidebar(event: Event) {
     this.store.dispatch(SidebarActions.toggle());
     event.stopPropagation();
+  }
+
+  logout() {
+    this.tokenService.reset();
+    this.router.navigateByUrl('/login');
   }
 }

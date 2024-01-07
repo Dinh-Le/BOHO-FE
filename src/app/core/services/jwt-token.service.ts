@@ -44,4 +44,11 @@ export class JWTTokenService {
     const current = moment().unix();
     return this._expiresIn <= current;
   }
+
+  reset() {
+    this._expiresIn = Number.MIN_SAFE_INTEGER;
+    this._token = '';
+    this._userId = '';
+    this._role = '';
+  }
 }
