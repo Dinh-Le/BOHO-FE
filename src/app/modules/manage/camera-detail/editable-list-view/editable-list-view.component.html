@@ -1,5 +1,5 @@
 <div class="listview-header px-2 fs-16">{{ title }}</div>
-<ul class="listview-body" [style.height]="height">
+<ul class="listview-body">
   <li
     *ngFor="let item of items; trackBy: trackById"
     (click)="onItemClick(item)"

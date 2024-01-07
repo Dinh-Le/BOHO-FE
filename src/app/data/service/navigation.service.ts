@@ -103,13 +103,13 @@ export class NavigationService {
           this.level2 = Level2Menu.NODE;
 
           if (segments.length > 5) {
-            if (segments[4] === 'info') {
+            if (segments[6] === 'info') {
               this.level3 = Level3Menu.DEVICE_INFO;
-            } else if (segments[4] === 'preset-settings') {
+            } else if (segments[6] === 'preset-settings') {
               this.level3 = Level3Menu.PRESET_SETTINGS;
-            } else if (segments[4] === 'patrol-settings') {
+            } else if (segments[6] === 'patrol-settings') {
               this.level3 = Level3Menu.PATROL_SETTINGS;
-            } else if (segments[4] === 'tour-settings') {
+            } else if (segments[6] === 'tour-settings') {
               this.level3 = Level3Menu.TOUR_SETTINGS;
             } else {
               this.level3 = Level3Menu.NONE;

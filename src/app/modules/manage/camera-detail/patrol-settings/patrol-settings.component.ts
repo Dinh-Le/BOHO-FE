@@ -1,10 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  HostListener,
-  inject,
-} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { SelectItemModel } from '@shared/models/select-item-model';
 import { EditableListViewItemModel } from '../editable-list-view/editable-list-view-item.model';
 import { ActivatedRoute } from '@angular/router';
@@ -22,7 +16,7 @@ import {
   templateUrl: 'patrol-settings.component.html',
   styleUrls: ['patrol-settings.component.scss', '../../shared/my-input.scss'],
 })
-export class PatrolSettingsComponent {
+export class PatrolSettingsComponent implements OnInit {
   private _activatedRoute = inject(ActivatedRoute);
   private _toastService = inject(ToastService);
   private _patrolService = inject(PatrolService);
@@ -40,6 +34,7 @@ export class PatrolSettingsComponent {
         switchMap(({ nodeId, cameraId }) => {
           this._nodeId = nodeId;
           this._cameraId = cameraId;
+
           return this._patrolService.findAll(nodeId, cameraId);
         })
       )
