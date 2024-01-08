@@ -10,6 +10,7 @@ import {
   NavigationService,
 } from 'src/app/data/service/navigation.service';
 import { PatrolService } from 'src/app/data/service/patrol.service';
+import { PresetService } from 'src/app/data/service/preset.service';
 import {
   CreateOrUpdateTouringScheduleRequest,
   TouringService,
@@ -38,6 +39,7 @@ interface PtzSchedule {
 })
 export class TourSettingsComponent implements OnInit {
   private _patrolService = inject(PatrolService);
+  private _presetService = inject(PresetService);
   private _tourService = inject(TouringService);
   private _activatedRoute = inject(ActivatedRoute);
   private _toastService = inject(ToastService);
@@ -47,6 +49,7 @@ export class TourSettingsComponent implements OnInit {
   private _touringId: number = -1;
 
   patrols: SelectItemModel[] = [];
+  presets: SelectItemModel[] = [];
   colors: SelectItemModel[] = [
     {
       value: 'green',
@@ -86,7 +89,7 @@ export class TourSettingsComponent implements OnInit {
       Validators.required,
     ]),
     type: new FormControl<'patrol' | 'preset'>('patrol', [Validators.required]),
-    patrol: new FormControl<SelectItemModel | undefined>(undefined, [
+    journey: new FormControl<SelectItemModel | undefined>(undefined, [
       Validators.required,
     ]),
     color: new FormControl<SelectItemModel | undefined>(undefined, [
@@ -95,8 +98,19 @@ export class TourSettingsComponent implements OnInit {
   });
   selectedSchedule: PtzSchedule | undefined;
 
+  get journeyList(): SelectItemModel[] {
+    return this.form.get('type')?.value === 'patrol'
+      ? this.patrols
+      : this.presets;
+  }
+
   ngOnInit(): void {
     this._navigationService.level3 = Level3Menu.TOUR_SETTINGS;
+    this.form.get('type')?.valueChanges.subscribe(() => {
+      this.form.get('journey')?.reset({
+        value: undefined,
+      });
+    });
 
     this._activatedRoute.parent?.params
       .pipe(
@@ -107,28 +121,21 @@ export class TourSettingsComponent implements OnInit {
 
           this.patrols = [];
           this.data = this.data.map(() => []);
-          this.form.reset(
-            {
-              startTime: 0,
-              endTime: 0,
-              day: null,
-              type: 'patrol',
-              patrol: undefined,
-              color: null,
-            },
-            {
-              emitEvent: true,
-            }
-          );
+          this.resetForm();
           return zip(
             this._patrolService.findAll(this._nodeId, this._cameraId),
-            this._tourService.findAll(this._nodeId, this._cameraId)
+            this._tourService.findAll(this._nodeId, this._cameraId),
+            this._presetService.findAll(this._nodeId, this._cameraId)
           );
         })
       )
       .subscribe({
         next: (responses) => {
-          const [findAllPatrolResponse, findAllTourResponse] = responses;
+          const [
+            findAllPatrolResponse,
+            findAllTourResponse,
+            findAllPresetReponse,
+          ] = responses;
 
           if (!findAllPatrolResponse.success) {
             throw Error(
@@ -143,6 +150,18 @@ export class TourSettingsComponent implements OnInit {
                 findAllTourResponse.message
             );
           }
+
+          if (!findAllPresetReponse.success) {
+            throw Error(
+              'Fetch preset data failed with error: ' +
+                findAllPresetReponse.message
+            );
+          }
+
+          this.presets = findAllPresetReponse.data.map((e) => ({
+            value: e.id,
+            label: e.name,
+          }));
 
           if ('data' in findAllPatrolResponse) {
             this.patrols = findAllPatrolResponse.data.map((e) => ({
@@ -213,7 +232,7 @@ export class TourSettingsComponent implements OnInit {
   }
 
   add() {
-    const { startTime, endTime, color, day, patrol, type } = this.form.value;
+    const { startTime, endTime, color, day, journey, type } = this.form.value;
     if (startTime >= endTime) {
       this._toastService.showError(
         'The end time must be greater than the start time'
@@ -221,19 +240,34 @@ export class TourSettingsComponent implements OnInit {
       return;
     }
 
-    const data: CreateOrUpdateTouringScheduleRequest = {
-      patrol_setting: {
-        color: (color as SelectItemModel).value,
-        patrol_id: (patrol as SelectItemModel).value,
-        schedule: [
-          {
-            start_time: this.toTimeString(startTime),
-            end_time: this.toTimeString(endTime),
-            day: (day as SelectItemModel).value,
-          },
-        ],
-      },
-    };
+    const data: CreateOrUpdateTouringScheduleRequest =
+      type === 'patrol'
+        ? {
+            patrol_setting: {
+              color: (color as SelectItemModel).value,
+              patrol_id: (journey as SelectItemModel).value,
+              schedule: [
+                {
+                  start_time: this.toTimeString(startTime),
+                  end_time: this.toTimeString(endTime),
+                  day: (day as SelectItemModel).value,
+                },
+              ],
+            },
+          }
+        : {
+            preset_setting: {
+              color: (color as SelectItemModel).value,
+              preset_id: (journey as SelectItemModel).value,
+              schedule: [
+                {
+                  start_time: this.toTimeString(startTime),
+                  end_time: this.toTimeString(endTime),
+                  day: (day as SelectItemModel).value,
+                },
+              ],
+            },
+          };
     this._tourService
       .createOrUpdateTouringSchedule(
         this._nodeId,
@@ -262,7 +296,7 @@ export class TourSettingsComponent implements OnInit {
           const schedule: PtzSchedule = {
             id: v4(),
             type,
-            patrolId: (patrol as SelectItemModel).value,
+            patrolId: (journey as SelectItemModel).value,
             scheduleId: response.data.id,
             startTime,
             endTime,
@@ -291,7 +325,9 @@ export class TourSettingsComponent implements OnInit {
       endTime: schedule.endTime,
       day: this.daysInWeek.find((e) => e.value === schedule.day),
       type: schedule.type,
-      patrol: this.patrols.find((e) => e.value === schedule.patrolId),
+      journey: (schedule.type === 'patrol' ? this.patrols : this.presets).find(
+        (e) => e.value === schedule.patrolId
+      ),
       color: this.colors.find((e) => e.value === schedule.color),
     });
   }
@@ -318,7 +354,7 @@ export class TourSettingsComponent implements OnInit {
           start_time: this.toTimeString(e.startTime),
           end_time: this.toTimeString(e.endTime),
           day: e.day,
-        })),
+        })), 
     };
 
     const response$ =
@@ -523,7 +559,7 @@ export class TourSettingsComponent implements OnInit {
         endTime: 0,
         day: undefined,
         type: 'patrol',
-        patrol: undefined,
+        journey: undefined,
         color: undefined,
       },
       {
