@@ -3,7 +3,7 @@ import { SelectItemModel } from '@shared/models/select-item-model';
 import { EditableListViewItemModel } from '../editable-list-view/editable-list-view-item.model';
 import { ActivatedRoute } from '@angular/router';
 import { PatrolService } from 'src/app/data/service/patrol.service';
-import { of, switchMap, zip } from 'rxjs';
+import { of, switchMap } from 'rxjs';
 import { ToastService } from '@app/services/toast.service';
 import { v4 } from 'uuid';
 import {
@@ -19,7 +19,6 @@ import {
 } from 'src/app/data/service/patrol-management.service';
 import { PatrolManagement } from 'src/app/data/schema/boho-v2/patrol-management';
 import { Preset } from 'src/app/data/schema/boho-v2/preset';
-import { CreateDeviceResponeDto } from 'src/app/data/service/device.service';
 
 type PatrolManagementRowItem = PatrolManagement &
   Partial<{
@@ -102,6 +101,10 @@ export class PatrolSettingsComponent implements OnInit {
     // Clear the patrol management list of the previous patrol
     this.patrolManagementList = [];
 
+    if (!this.selectedPatrol.id) {
+      return;
+    }
+
     // Load the patrol management list of the current patrol from the backend
     this._patrolManagementService
       .findAll(this._nodeId, this._cameraId, this.selectedPatrol.id)
@@ -113,7 +116,7 @@ export class PatrolSettingsComponent implements OnInit {
             );
           }
 
-          return of(response.data);
+          return of(response.data || []);
         })
       )
       .subscribe({
@@ -229,7 +232,7 @@ export class PatrolSettingsComponent implements OnInit {
                 .index + 1;
 
         this.patrolManagementList.push({
-          id: v4(),
+          id: index,
           preset_id: value,
           presetName: label,
           isNew: true,
@@ -243,7 +246,7 @@ export class PatrolSettingsComponent implements OnInit {
   }
 
   detetePatrolManagement(item: PatrolManagementRowItem) {
-    const func = (id: string) => {
+    const func = (id: number) => {
       this._toastService.showSuccess(
         'Delete the patrol management successfully'
       );
@@ -290,7 +293,7 @@ export class PatrolSettingsComponent implements OnInit {
     const data: CreatePatrolManagementDto[] = this.patrolManagementList
       .filter((e) => e.isNew)
       .map((e) => ({
-        preset_id: e.patrol_id,
+        preset_id: e.preset_id,
         stand_time: e.stand_time,
         moving_time: e.moving_time,
         index: e.index,
@@ -309,8 +312,21 @@ export class PatrolSettingsComponent implements OnInit {
         })
       )
       .subscribe({
-        next: (data) => {
-          console.log(data);
+        next: (idList) => {
+          this._toastService.showSuccess(
+            'Update patrol management list successfully'
+          );
+
+          const i = 0;
+          this.patrolManagementList = this.patrolManagementList.map((e) => {
+            if (!e.isNew) {
+              return e;
+            }
+
+            e.id = idList[i];
+            e.isNew = false;
+            return e;
+          });
         },
         error: ({ message }) => this._toastService.showError(message),
       });

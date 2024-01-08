@@ -18,7 +18,7 @@ export abstract class PatrolManagementService extends RestfullApiService {
     data: CreatePatrolManagementDto[]
   ): Observable<
     ResponseBase & {
-      data: Pick<PatrolManagement, 'id'>;
+      data: number[];
     }
   >;
   public abstract findAll(
@@ -44,7 +44,7 @@ export abstract class PatrolManagementService extends RestfullApiService {
     nodeId: string,
     deviceId: string,
     patrolId: string,
-    patrolManagementId: string
+    patrolManagementId: number
   ): Observable<ResponseBase>;
 }
 
@@ -55,11 +55,9 @@ export class PatrolManagementServiceImpl extends PatrolManagementService {
     deviceId: string,
     patrolId: string,
     data: CreatePatrolManagementDto[]
-  ): Observable<ResponseBase & { data: Pick<PatrolManagement, 'id'> }> {
+  ): Observable<ResponseBase & { data: number[] }> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/patrol/${patrolId}/patrol_management`;
-    return this.httpClient.post<
-      ResponseBase & { data: Pick<PatrolManagement, 'id'> }
-    >(url, data);
+    return this.httpClient.post<ResponseBase & { data: number[] }>(url, data);
   }
 
   override findAll(
@@ -87,7 +85,7 @@ export class PatrolManagementServiceImpl extends PatrolManagementService {
     nodeId: string,
     deviceId: string,
     patrolId: string,
-    patrolManagementId: string
+    patrolManagementId: number
   ): Observable<ResponseBase> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/patrol/${patrolId}/patrol_management/${patrolManagementId}`;
     return this.httpClient.delete<ResponseBase>(url);

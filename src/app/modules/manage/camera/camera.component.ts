@@ -343,7 +343,7 @@ export class CameraComponent implements OnInit, AfterViewInit {
       });
   }
 
-  takeSnapshot(item: RowItemModel) {
+  takeSnapshot(item: RowItemModel, img: HTMLImageElement) {
     this._deviceService
       .snapshot(this.nodeId, item.id)
       .pipe(
@@ -356,8 +356,11 @@ export class CameraComponent implements OnInit, AfterViewInit {
         })
       )
       .subscribe({
-        next: (data) => {
-          console.log(data);
+        next: (snapshot) => {
+          img.src = `data:image/${snapshot.format};charset=utf-8;base64,${snapshot.img}`;
+          img.style.aspectRatio = (
+            snapshot.size[0] / snapshot.size[1]
+          ).toString();
         },
         error: ({ message }) => this._toastService.showError(message),
       });

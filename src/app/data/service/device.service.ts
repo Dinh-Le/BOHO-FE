@@ -18,6 +18,12 @@ export type CreateDeviceResponeDto = ResponseBase & {
   };
 };
 
+export type Snapshot = {
+  format: string;
+  img: string;
+  size: number[];
+};
+
 export abstract class DeviceService extends RestfullApiService {
   public abstract create(
     nodeId: string,
@@ -71,7 +77,7 @@ export abstract class DeviceService extends RestfullApiService {
     deviceId: string
   ): Observable<
     ResponseBase & {
-      data: any;
+      data: Snapshot;
     }
   >;
 }
@@ -173,13 +179,13 @@ export class DeviceServiceImpl extends DeviceService {
     deviceId: string
   ): Observable<
     ResponseBase & {
-      data: any;
+      data: Snapshot;
     }
   > {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/snapshot`;
     return this.httpClient.get<
       ResponseBase & {
-        data: any;
+        data: Snapshot;
       }
     >(url);
   }

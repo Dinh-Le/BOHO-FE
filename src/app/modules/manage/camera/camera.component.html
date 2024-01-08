@@ -434,14 +434,15 @@
           </div>
         </ng-template>
       </div>
-      <div class="col-4 media">
+      <div class="col-4">
         <div style="position: relative">
-          <img #snapshot />
-          <i
-            class="bi bi-arrow-clockwise"
-            style="cursor: pointer; position: absolute"
-            (click)="takeSnapshot(data)"
-          ></i>
+          <img #snapshot class="w-100" />
+          <button
+            style="cursor: pointer; position: absolute; top: 5px; left: 5px"
+            (click)="takeSnapshot(data, snapshot)"
+          >
+            <i class="bi bi-arrow-clockwise"></i>
+          </button>
         </div>
       </div>
     </div>
