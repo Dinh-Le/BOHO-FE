@@ -65,6 +65,15 @@ export abstract class DeviceService extends RestfullApiService {
       };
     }
   >;
+
+  public abstract snapshot(
+    nodeId: string,
+    deviceId: string
+  ): Observable<
+    ResponseBase & {
+      data: any;
+    }
+  >;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -157,5 +166,21 @@ export class DeviceServiceImpl extends DeviceService {
         };
       }
     >(url, data);
+  }
+
+  public override snapshot(
+    nodeId: string,
+    deviceId: string
+  ): Observable<
+    ResponseBase & {
+      data: any;
+    }
+  > {
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/snapshot`;
+    return this.httpClient.get<
+      ResponseBase & {
+        data: any;
+      }
+    >(url);
   }
 }

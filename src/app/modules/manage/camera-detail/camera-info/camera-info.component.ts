@@ -10,6 +10,7 @@ import {
   Level3Menu,
   NavigationService,
 } from 'src/app/data/service/navigation.service';
+import { CameraDriver_Onvif, CameraDriver_RTSP } from 'src/app/data/constants';
 
 interface CameraInfo {
   name: string;
@@ -54,13 +55,25 @@ export class CameraInfoComponent implements OnInit {
         }
 
         this.device = response.data;
+        let rtspUrl = '';
+        switch (response.data.camera.driver) {
+          case CameraDriver_RTSP:
+            rtspUrl =
+              response.data.camera.connection_metadata.rtsp?.rtsp_url || '';
+            break;
+          case CameraDriver_Onvif:
+            rtspUrl =
+              response.data.camera.connection_metadata.onvif?.rtsp_url || '';
+            break;
+          default:
+            break;
+        }
         this.data = {
           name: response.data.name,
           address: this.geodecode(response.data.location),
           driverName: response.data.camera.driver,
           typeName: response.data.camera.type,
-          rtspUrl:
-            response.data.camera.connection_metadata.rtsp?.rtsp_url || '',
+          rtspUrl,
         };
       });
     });
