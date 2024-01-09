@@ -3,4 +3,5 @@ export interface EditableListViewItemModel {
   label: string;
   isSelected?: boolean;
   isEditable?: boolean;
+  isNew?: boolean;
 }

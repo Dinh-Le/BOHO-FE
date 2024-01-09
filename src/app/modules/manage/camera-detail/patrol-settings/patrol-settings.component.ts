@@ -101,7 +101,7 @@ export class PatrolSettingsComponent implements OnInit {
     // Clear the patrol management list of the previous patrol
     this.patrolManagementList = [];
 
-    if (!this.selectedPatrol.id) {
+    if (this.selectedPatrol.isNew) {
       return;
     }
 
@@ -134,43 +134,58 @@ export class PatrolSettingsComponent implements OnInit {
   }
 
   add() {
-    this.patrols.push({
-      id: `new_${v4()}`,
-      label: 'Patrol',
-      isEditable: true,
-      isSelected: true,
-    });
+    const item: EditableListViewItemModel = {
+      id: v4(),
+      label: `Patrol ${this.patrols.length + 1}`,
+      isNew: true,
+    };
+    console.log('add: ', item);
+    this.patrols.push(item);
   }
 
-  save({ id, label }: EditableListViewItemModel) {
-    if (id.startsWith('new_')) {
+  save(item: EditableListViewItemModel) {
+    if (item.isNew) {
       this._patrolService
-        .create(this._nodeId, this._cameraId, { name: label })
-        .subscribe({
-          next: (response) => {
+        .create(this._nodeId, this._cameraId, { name: item.label })
+        .pipe(
+          switchMap((response) => {
             if (!response.success) {
               throw Error(
                 'Create patrol failed with error: ' + response.message
               );
             }
-
-            this.patrols.find((e) => e.id === id)!.id = response.data;
+            return of(response.data);
+          })
+        )
+        .subscribe({
+          next: (id) => {
+            this._toastService.showSuccess('Create patrol successfully');
+            item.id = id;
+            item.isNew = false;
+            this.selectedPatrol = item;
+            this.patrolManagementList = [];
           },
           error: ({ message }) => this._toastService.showError(message),
         });
     } else {
       this._patrolService
         .update(this._nodeId, this._cameraId, {
-          id: parseInt(id),
-          name: label,
+          id: parseInt(item.id),
+          name: item.label,
         })
-        .subscribe({
-          next: (response) => {
+        .pipe(
+          switchMap((response) => {
             if (!response.success) {
               throw Error(
                 'Update patrol failed with error: ' + response.message
               );
             }
+            return of(true);
+          })
+        )
+        .subscribe({
+          next: () => {
+            this._toastService.showSuccess('Update patrol successfully');
           },
           error: ({ message }) => this._toastService.showError(message),
         });
@@ -180,27 +195,31 @@ export class PatrolSettingsComponent implements OnInit {
   play() {}
 
   remove(item: EditableListViewItemModel) {
-    if (item.id.startsWith('new_')) {
-      this.patrols = this.patrols.filter((e) => e.id !== item.id);
+    const func = (id: string) => {
+      this._toastService.showSuccess('Delete patrol successfully');
+      this.patrols = this.patrols.filter((e) => e.id !== id);
+    };
+
+    if (item.isNew) {
+      func(item.id);
       return;
     }
 
     this._patrolService
       .delete(this._nodeId, this._cameraId, item.id)
-      .subscribe({
-        next: (response) => {
+      .pipe(
+        switchMap((response) => {
           if (!response.success) {
-            throw Error('Delete patrol failed with error: ' + response.message);
+            throw Error(`Delete patrol failed with error ${response.message}`);
           }
 
-          this.patrols = this.patrols.filter((e) => e.id !== item.id);
-        },
+          return of(true);
+        })
+      )
+      .subscribe({
+        next: () => func(item.id),
         error: ({ message }) => this._toastService.showError(message),
       });
-  }
-
-  removePreset(item: any) {
-    this.presetList = this.presetList.filter((e) => e.id !== item.id);
   }
 
   addPatrolManagement() {

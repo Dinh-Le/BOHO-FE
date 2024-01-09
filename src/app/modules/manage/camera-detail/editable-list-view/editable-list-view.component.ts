@@ -26,9 +26,10 @@ export class EditableListViewComponent {
     return item.id;
   }
 
-  onItemClick(item: EditableListViewItemModel) {
-    const selectedItem = this.items.find((e) => e.isSelected);
+  onItemClick(ev: Event, item: EditableListViewItemModel) {
+    ev.stopPropagation();
 
+    const selectedItem = this.items.find((e) => e.isSelected);
     if (selectedItem?.id === item.id) {
       return;
     }
@@ -37,7 +38,7 @@ export class EditableListViewComponent {
       selectedItem.isSelected = false;
 
       if (selectedItem.isEditable) {
-        this.onSaveClick(selectedItem);
+        this.onSaveClick(ev, selectedItem);
       }
     }
 
@@ -45,12 +46,19 @@ export class EditableListViewComponent {
     this.change.emit(item);
   }
 
-  onSaveClick(item: EditableListViewItemModel) {
+  onEditClick(ev: Event, item: EditableListViewItemModel) {
+    ev.stopPropagation();
+    item.isEditable = true;
+  }
+
+  onSaveClick(ev: Event, item: EditableListViewItemModel) {
+    ev.stopPropagation();
     this.save.emit(item);
     item.isEditable = false;
   }
 
-  onRemoveClick(item: EditableListViewItemModel) {
+  onRemoveClick(ev: Event, item: EditableListViewItemModel) {
+    ev.stopPropagation();
     this.remove.emit(item);
   }
 }
