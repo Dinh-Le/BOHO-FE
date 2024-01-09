@@ -201,8 +201,8 @@ export class RuleComponent implements OnInit, AfterViewInit {
   @ViewChild('objectColumnTemplate', { static: true })
   objectColumnTemplate!: TemplateRef<any>;
 
-  _cameraId = '';
-  _nodeId = '';
+  cameraId = '';
+  nodeId = '';
   _activatedRoute = inject(ActivatedRoute);
   _navigationService = inject(NavigationService);
   _presetService = inject(PresetService);
@@ -240,11 +240,11 @@ export class RuleComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this._navigationService.level3 = Level3Menu.RULE;
     this._activatedRoute.params.subscribe(({ nodeId, cameraId }) => {
-      this._cameraId = cameraId;
-      this._nodeId = nodeId;
+      this.cameraId = cameraId;
+      this.nodeId = nodeId;
 
       this._presetService
-        .findAll(this._nodeId, this._cameraId)
+        .findAll(this.nodeId, this.cameraId)
         .pipe(
           concatMap((response) => {
             if (!response.success) {
@@ -258,7 +258,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
               value: e.id,
             }));
 
-            return this._scheduleService.findAll(this._nodeId, this._cameraId);
+            return this._scheduleService.findAll(this.nodeId, this.cameraId);
           }),
           concatMap((response) => {
             if (!response.success) {
@@ -272,7 +272,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
               value: e.id,
             }));
 
-            return this._ruleService.findAll(this._nodeId, this._cameraId);
+            return this._ruleService.findAll(this.nodeId, this.cameraId);
           })
         )
         .subscribe({
@@ -335,7 +335,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
     });
     if (item.isNew) {
       this._ruleService
-        .create(this._nodeId, this._cameraId, data)
+        .create(this.nodeId, this.cameraId, data)
         .pipe(
           switchMap((response) => {
             if (!response.success) {
@@ -357,7 +357,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
         });
     } else {
       this._ruleService
-        .update(this._nodeId, this._cameraId, parseInt(item.id), data)
+        .update(this.nodeId, this.cameraId, parseInt(item.id), data)
         .pipe(
           switchMap((response) => {
             if (!response.success) {
@@ -390,7 +390,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
     }
 
     this._ruleService
-      .find(this._nodeId, this._cameraId, item.id)
+      .find(this.nodeId, this.cameraId, item.id)
       .pipe(
         switchMap((response) => {
           if (!response.success) {
@@ -420,7 +420,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
     }
 
     this._ruleService
-      .delete(this._nodeId, this._cameraId, item.id)
+      .delete(this.nodeId, this.cameraId, item.id)
       .pipe(
         switchMap((response) => {
           if (!response.success) {
@@ -440,6 +440,6 @@ export class RuleComponent implements OnInit, AfterViewInit {
   }
 
   get scheduleUrl() {
-    return `/manage/device-rule/node/${this._nodeId}/camera/${this._cameraId}/schedule`;
+    return `/manage/device-rule/node/${this.nodeId}/camera/${this.cameraId}/schedule`;
   }
 }

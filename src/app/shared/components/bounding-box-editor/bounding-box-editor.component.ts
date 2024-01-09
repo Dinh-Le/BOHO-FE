@@ -13,6 +13,8 @@ import {
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ControlValueAccessorImpl } from '@shared/helpers/control-value-accessor-impl';
+import { of, switchMap } from 'rxjs';
+import { DeviceService } from 'src/app/data/service/device.service';
 import { v4 } from 'uuid';
 
 export declare interface Point {
@@ -36,18 +38,24 @@ export class BoundingBoxEditorComponent
   extends ControlValueAccessorImpl<Point[]>
   implements OnInit, AfterViewInit, OnChanges
 {
+  private _deviceService = inject(DeviceService);
+
   @ViewChild('canvas', { static: false })
   canvas?: ElementRef<HTMLCanvasElement>;
   tabIndex: string = v4();
 
-  @Input() width: number = 800;
-  @Input() height: number = 600;
-  @Input() src?: string;
   @Input() type: string = 'line';
+  @Input() src: {
+    nodeId: string;
+    deviceId: string;
+  } = {
+    nodeId: '',
+    deviceId: '',
+  };
 
   private _elRef = inject(ElementRef);
-  private _scaleX = 1 / 4;
-  private _scaleY = 1 / 4;
+  private _scaleX = 1;
+  private _scaleY = 1;
   private _image: any;
   private _isDrawing: boolean = false;
 
@@ -61,21 +69,41 @@ export class BoundingBoxEditorComponent
       this._isDrawing = false;
       this.update();
     }
+
+    if ('src' in changes && this.src.nodeId && this.src.deviceId) {
+      this._deviceService
+        .snapshot(this.src.nodeId, this.src.deviceId)
+        .pipe(
+          switchMap((response) => {
+            if (!response.success) {
+              throw Error(
+                `Take snapshot failed with error ${response.message}`
+              );
+            }
+
+            return of(response.data);
+          })
+        )
+        .subscribe({
+          next: (data) => {
+            this._image = new Image(data.size[0], data.size[1]);
+            this._image.src = `data:image/${data.format};charset=utf-8;base64,${data.img}`;
+            this._image.onload = (_: any) => this.update();
+          },
+          error: ({ message }) => console.error(message),
+        });
+    }
   }
 
   @HostListener('')
   ngAfterViewInit(): void {
-    if (this.src && this.canvas) {
-      this._image = new Image(this.width, this.height);
-      this._image.src = this.src;
-      this._image.onload = (_: any) => this.update();
-
-      const { width } = this._elRef.nativeElement.getBoundingClientRect();
+    if (this.canvas) {
+      const { width, height } =
+        this._elRef.nativeElement.getBoundingClientRect();
       this.canvas.nativeElement.width = width;
-      this.canvas.nativeElement.height = (width * 3) / 4;
-      this._scaleX = this._scaleY =
-        this.canvas.nativeElement.width / this.width;
+      this.canvas.nativeElement.height = height;
     }
+    this.update();
   }
 
   onMouseMove(ev: MouseEvent): void {
@@ -153,13 +181,18 @@ export class BoundingBoxEditorComponent
   }
 
   private update(): void {
-    if (!this.canvas) {
+    if (!this.canvas || !this._image) {
       return;
     }
 
-    const context = this.canvas.nativeElement.getContext('2d')!;
+    const { width, height } = this.canvas.nativeElement;
+
+    this._scaleX = width / this._image.width;
+    this._scaleY = height / this._image.height;
+
+    const context = this.canvas!.nativeElement.getContext('2d')!;
     context.setTransform(1, 0, 0, 1, 0, 0);
-    context.clearRect(0, 0, 800, 600);
+    context.clearRect(0, 0, width, height);
 
     context.scale(this._scaleX, this._scaleY);
     context.drawImage(this._image, 0, 0);
@@ -180,7 +213,7 @@ export class BoundingBoxEditorComponent
 
         context.stroke();
       } else {
-        context.fillStyle = '#FF007F';
+        context.fillStyle = '#FF007F3F';
         context.beginPath();
         context.moveTo(this.model[0].x, this.model[0].y);
         for (let i = 1; i < this.model.length; i++) {
