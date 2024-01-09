@@ -75,7 +75,7 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
       const startTime = this.fromTimeString(start_time);
       const endTime = this.fromTimeString(end_time);
 
-      for (let i = startTime; i <= endTime; i++) {
+      for (let i = startTime; i < endTime; i++) {
         this.scheduleData[day][i] = true;
       }
     }
@@ -89,7 +89,7 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
 
   fromTimeString(s: string): number {
     const parts = s.split(':').map((e) => parseInt(e));
-    return Math.min(47, parts[0] * 2 + Math.ceil(parts[1] / 30));
+    return Math.min(48, parts[0] * 2 + Math.ceil(parts[1] / 30));
   }
 }
 
