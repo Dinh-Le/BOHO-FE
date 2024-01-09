@@ -190,13 +190,15 @@ export class CameraComponent implements OnInit, AfterViewInit {
     } else if (item.isOnvif) {
       const { camera } = item.form.value;
       const { ip, httpPort, userId, password, profile } = camera;
+
       data.camera.connection_metadata.onvif = {
         http_port: httpPort,
         ip: ip,
         password: password,
         user: userId,
         profile: profile.label,
-        rtsp_port: 554,
+        rtsp_port: parseInt(profile.value.match(/:(\d+)\//)[1]),
+        rtsp_url: profile.value,
       };
     } else {
       this._toastService.showWarning(
@@ -336,6 +338,29 @@ export class CameraComponent implements OnInit, AfterViewInit {
             value: v,
             label: k,
           }));
+        },
+        error: ({ message }) => this._toastService.showError(message),
+      });
+  }
+
+  takeSnapshot(item: RowItemModel, img: HTMLImageElement) {
+    this._deviceService
+      .snapshot(this.nodeId, item.id)
+      .pipe(
+        switchMap((response) => {
+          if (!response.success) {
+            throw Error(`Take snapshot failed with error: ${response.message}`);
+          }
+
+          return of(response.data);
+        })
+      )
+      .subscribe({
+        next: (snapshot) => {
+          img.src = `data:image/${snapshot.format};charset=utf-8;base64,${snapshot.img}`;
+          img.style.aspectRatio = (
+            snapshot.size[0] / snapshot.size[1]
+          ).toString();
         },
         error: ({ message }) => this._toastService.showError(message),
       });

@@ -128,21 +128,26 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
         );
         break;
       case CameraDriver_Onvif:
+        const onvif = device?.camera.connection_metadata.onvif;
         this.form.setControl(
           'camera',
           new FormGroup<any>({
-            ip: new FormControl<string>('192.168.100.165', [
+            ip: new FormControl<string>(onvif?.ip || '', [Validators.required]),
+            httpPort: new FormControl<number>(onvif?.http_port || 80, [
               Validators.required,
             ]),
-            httpPort: new FormControl<number>(80, [Validators.required]),
-            userId: new FormControl<string>('root', [Validators.required]),
-            password: new FormControl<string>('root', [Validators.required]),
+            userId: new FormControl<string>(onvif?.user || '', [
+              Validators.required,
+            ]),
+            password: new FormControl<string>(onvif?.password || '', [
+              Validators.required,
+            ]),
             profile: new FormControl<SelectItemModel | null>(null, [
               Validators.required,
             ]),
             rtspUrl: new FormControl<string>(
               {
-                value: '',
+                value: onvif?.rtsp_url || '',
                 disabled: true,
               },
               [Validators.required]

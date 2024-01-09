@@ -2,34 +2,42 @@
 <ul class="listview-body">
   <li
     *ngFor="let item of items; trackBy: trackById"
-    (click)="onItemClick(item)"
+    (click)="onItemClick($event, item)"
     [ngClass]="{ active: item.isSelected }"
     class="listview-item"
   >
     <input
       [(ngModel)]="item.label"
-      class="inline-input ms-2"
+      class="inline-input"
       *ngIf="item.isEditable; else span"
     />
     <ng-template #span>
       <span class="ps-2">{{ item.label }}</span>
     </ng-template>
-    <div class="d-flex align-items-center">
-      <i
-        class="bi bi-save px-3"
+    <div class="op-buttons">
+      <button
+        type="button"
         *ngIf="item.isSelected && item.isEditable"
-        (click)="onSaveClick(item)"
-      ></i>
-      <i
-        class="bi bi-pencil-square px-3"
+        (click)="onSaveClick($event, item)"
+        title="Save"
+      >
+        <i class="bi bi-floppy-fill"></i>
+      </button>
+      <button
+        type="button"
         *ngIf="item.isSelected && !item.isEditable"
-        (click)="$event.stopPropagation(); item.isEditable = true"
-      ></i>
-      <i
-        class="bi bi-trash-fill pe-2"
+        (click)="onEditClick($event, item)"
+        title="Edit"
+      >
+        <i class="bi bi-pencil-square"></i>
+      </button>
+      <button
         *ngIf="item.isSelected"
-        (click)="onRemoveClick(item)"
-      ></i>
+        (click)="onRemoveClick($event, item)"
+        title="Delete"
+      >
+        <i class="bi bi-trash-fill"></i>
+      </button>
     </div>
   </li>
 </ul>

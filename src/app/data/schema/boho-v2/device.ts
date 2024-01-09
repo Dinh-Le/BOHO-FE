@@ -9,6 +9,7 @@ export interface OnvifConnectionMetadata {
   ip: string;
   http_port: number;
   rtsp_port: number;
+  rtsp_url: string;
   profile: string;
   user: string;
   password: string;
