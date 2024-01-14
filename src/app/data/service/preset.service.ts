@@ -21,10 +21,15 @@ export abstract class PresetService extends RestfullApiService {
     deviceId: string,
     presetId: number
   ): Observable<ResponseBase>;
-  public abstract loadFromCamera(
+  public abstract sync(
     nodeId: string,
     deviceId: string
   ): Observable<ResponseBase & { data: any[] }>;
+  public abstract control(
+    nodeId: string,
+    deviceId: string,
+    presetId: number
+  ): Observable<ResponseBase>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -53,11 +58,19 @@ export class PresetServiceImpl extends PresetService {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/preset/${presetId}`;
     return this.httpClient.delete<ResponseBase>(url);
   }
-  public override loadFromCamera(
+  public override sync(
     nodeId: string,
     deviceId: string
   ): Observable<ResponseBase & { data: any[] }> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/preset/sync`;
     return this.httpClient.get<ResponseBase & { data: any[] }>(url);
+  }
+  public override control(
+    nodeId: string,
+    deviceId: string,
+    presetId: number
+  ): Observable<ResponseBase> {
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/preset/${presetId}/control`;
+    return this.httpClient.get<ResponseBase>(url);
   }
 }

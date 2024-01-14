@@ -2,12 +2,15 @@ import { Component, OnInit, inject } from '@angular/core';
 import { EditableListViewItemModel } from '../editable-list-view/editable-list-view-item.model';
 import { PresetService } from 'src/app/data/service/preset.service';
 import { ActivatedRoute } from '@angular/router';
-import { of, switchMap } from 'rxjs';
+import { catchError, of, switchMap } from 'rxjs';
 import { ToastService } from '@app/services/toast.service';
 import {
   Level3Menu,
   NavigationService,
 } from 'src/app/data/service/navigation.service';
+import { DeviceService } from 'src/app/data/service/device.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ResponseBase } from 'src/app/data/schema/boho-v2/response-base';
 
 @Component({
   selector: 'app-preset-settings',
@@ -18,6 +21,7 @@ export class PresetSettingsComponent implements OnInit {
   private _activatedRoute = inject(ActivatedRoute);
   private _navigationService = inject(NavigationService);
   private _presetService = inject(PresetService);
+  private _deviceService = inject(DeviceService);
   private _toastService = inject(ToastService);
   presetList: EditableListViewItemModel[] = [];
   selectedItem: EditableListViewItemModel | undefined;
@@ -47,7 +51,7 @@ export class PresetSettingsComponent implements OnInit {
 
   load() {
     this._presetService
-      .loadFromCamera(this.nodeId, this.cameraId)
+      .sync(this.nodeId, this.cameraId)
       .pipe(
         switchMap((response) => {
           if (!response.success) {
@@ -58,17 +62,66 @@ export class PresetSettingsComponent implements OnInit {
         })
       )
       .subscribe({
-        error: ({ message }) => this._toastService.showError(message),
         next: (presets) => {
           this.presetList = presets.map((e) => ({
             id: e.id.toString(),
             label: e.name,
           }));
         },
+        error: ({ message }) => this._toastService.showError(message),
       });
   }
 
-  play() {}
+  play(img: HTMLImageElement) {
+    if (!this.selectedItem) {
+      return;
+    }
+
+    const presetId = parseInt(this.selectedItem.id);
+    this._presetService
+      .control(this.nodeId, this.cameraId, presetId)
+      .pipe(
+        catchError((err: HttpErrorResponse) => {
+          if (err.status > 0) {
+            return of(err.error);
+          }
+
+          throw Error(err.message);
+        })
+      )
+      .pipe(
+        switchMap((response) => {
+          if (!response.success) {
+            // throw Error(
+            //   `Move PTZ at direct preset failed with error ${response.message}`
+            // );
+            this._toastService.showError(
+              `Move PTZ at direct preset failed with error ${response.message}`
+            );
+          }
+
+          return this._deviceService.snapshot(this.nodeId, this.cameraId);
+        }),
+        switchMap((response) => {
+          if (!response.success) {
+            throw Error(
+              `Get snapshot from camera failed with error ${response.message}`
+            );
+          }
+
+          return of(response.data);
+        })
+      )
+      .subscribe({
+        next: (snapshot) => {
+          img.src = `data:image/${snapshot.format};charset=utf-8;base64,${snapshot.img}`;
+          img.style.aspectRatio = (
+            snapshot.size[0] / snapshot.size[1]
+          ).toString();
+        },
+        error: ({ message }) => this._toastService.showError(message),
+      });
+  }
 
   remove(item: EditableListViewItemModel) {
     this._presetService
