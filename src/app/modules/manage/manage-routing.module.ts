@@ -25,6 +25,10 @@ import { IntegrationComponent } from './integration/integration.component';
         component: ManageComponent,
         children: [
           {
+            path: 'integration/node/:nodeId/camera/:cameraId',
+            component: IntegrationComponent,
+          },
+          {
             path: 'integration',
             component: IntegrationComponent,
           },

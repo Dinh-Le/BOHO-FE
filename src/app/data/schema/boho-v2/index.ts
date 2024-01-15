@@ -4,3 +4,4 @@ export * from './group';
 export * from './latlng';
 export * from './node-operator';
 export * from './node';
+export * from './integration';

@@ -146,8 +146,16 @@ export class NavigationService {
             }
           }
           break;
-        case 'integrate':
+        case 'integration':
           this.level2 = Level2Menu.INTEGRATION;
+          if (segments.length === 7) {
+            this.sideMenu.id = segments[6];
+            this.sideMenu.type = SideMenuItemType.DEVICE;
+            this.sideMenu.data = {
+              id: segments[6],
+              node_id: segments[4],
+            };
+          }
           break;
       }
     }
@@ -229,6 +237,10 @@ export class NavigationService {
         break;
       case Level2Menu.INTEGRATION:
         targetUrl += '/integration';
+        if (this.sideMenu?.type === SideMenuItemType.DEVICE) {
+          const nodeId = this.sideMenu.data?.node_id;
+          targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}`;
+        }
         break;
     }
 
