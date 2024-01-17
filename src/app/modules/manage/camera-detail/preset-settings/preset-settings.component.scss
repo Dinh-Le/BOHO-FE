@@ -1,21 +1,15 @@
 .preset-container {
-  display: grid;
-  grid-template-areas:
-    "preset preview"
-    "none none";
+  display: flex;
   grid-template-rows: 3fr 1fr;
-  padding: 20px;
-  row-gap: 30px;
-  column-gap: 30px;
   background: #4a494b;
+  gap: 2rem;
+  padding: 1.5rem;
 }
 
 .preset {
-  grid-area: preset;
-  display: grid;
-  grid-template-rows: 1fr auto;
+  flex: 2;
 }
 
 .preview {
-  grid-area: preview;
+  flex: 1;
 }
