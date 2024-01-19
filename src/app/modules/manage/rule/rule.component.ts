@@ -28,6 +28,7 @@ import { Objects, RuleTypes, Severities } from 'src/app/data/constants';
 import { Point } from '@shared/components/bounding-box-editor/bounding-box-editor.component';
 import { Rule } from 'src/app/data/schema/boho-v2/rule';
 import { RuleService } from 'src/app/data/service/rule.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 declare interface CustomSelectItemModel extends SelectItemModel {
   data: any;
@@ -389,27 +390,18 @@ export class RuleComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    this._ruleService
-      .find(this.nodeId, this.cameraId, item.id)
-      .pipe(
-        switchMap((response) => {
-          if (!response.success) {
-            throw Error(`Fetch rule failed with error: ${response.message}`);
-          }
-
-          return of(response.data);
-        })
-      )
-      .subscribe({
-        next: (rule) => {
-          item.setData(rule, this.schedules, this.presets);
-        },
-        error: ({ message }) => this._toastService.showError(message),
-        complete: () => {
-          item.isEditable = false;
-          item.form.disable();
-        },
-      });
+    this._ruleService.find(this.nodeId, this.cameraId, item.id).subscribe({
+      next: ({ data }) => {
+        item.setData(data, this.schedules, this.presets);
+      },
+      error: (err: HttpErrorResponse) => {
+        this._toastService.showError(err.error.message ?? err.message);
+      },
+      complete: () => {
+        item.isEditable = false;
+        item.form.disable();
+      },
+    });
   }
 
   remove(item: RowItemModel) {

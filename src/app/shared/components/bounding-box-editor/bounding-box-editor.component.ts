@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   Component,
   Input,
@@ -12,9 +13,11 @@ import {
   HostListener,
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ToastService } from '@app/services/toast.service';
 import { ControlValueAccessorImpl } from '@shared/helpers/control-value-accessor-impl';
-import { of, switchMap } from 'rxjs';
+import { switchMap } from 'rxjs';
 import { DeviceService } from 'src/app/data/service/device.service';
+import { PresetService } from 'src/app/data/service/preset.service';
 import { v4 } from 'uuid';
 
 export declare interface Point {
@@ -39,6 +42,8 @@ export class BoundingBoxEditorComponent
   implements OnInit, AfterViewInit, OnChanges
 {
   private _deviceService = inject(DeviceService);
+  private _presetService = inject(PresetService);
+  private _toastService = inject(ToastService);
 
   @ViewChild('canvas', { static: false })
   canvas?: ElementRef<HTMLCanvasElement>;
@@ -48,9 +53,11 @@ export class BoundingBoxEditorComponent
   @Input() src: {
     nodeId: string;
     deviceId: string;
+    presetId: number;
   } = {
     nodeId: '',
     deviceId: '',
+    presetId: 0,
   };
 
   private _elRef = inject(ElementRef);
@@ -70,27 +77,27 @@ export class BoundingBoxEditorComponent
       this.update();
     }
 
-    if ('src' in changes && this.src.nodeId && this.src.deviceId) {
-      this._deviceService
-        .snapshot(this.src.nodeId, this.src.deviceId)
+    if (
+      'src' in changes &&
+      this.src.nodeId &&
+      this.src.deviceId &&
+      this.src.presetId
+    ) {
+      this._presetService
+        .control(this.src.nodeId, this.src.deviceId, this.src.presetId)
         .pipe(
-          switchMap((response) => {
-            if (!response.success) {
-              throw Error(
-                `Take snapshot failed with error ${response.message}`
-              );
-            }
-
-            return of(response.data);
-          })
+          switchMap((_) =>
+            this._deviceService.snapshot(this.src.nodeId, this.src.deviceId)
+          )
         )
         .subscribe({
-          next: (data) => {
+          next: ({ data }) => {
             this._image = new Image(data.size[0], data.size[1]);
             this._image.src = `data:image/${data.format};charset=utf-8;base64,${data.img}`;
             this._image.onload = (_: any) => this.update();
           },
-          error: ({ message }) => console.error(message),
+          error: (err: HttpErrorResponse) =>
+            this._toastService.showError(err.error.message ?? err.message),
         });
     }
   }
