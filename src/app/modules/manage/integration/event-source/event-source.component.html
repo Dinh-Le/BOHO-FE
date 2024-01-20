@@ -15,44 +15,23 @@
       </tr>
     </thead>
     <tbody>
-      <tr>
+      <tr *ngFor="let item of data">
         <td>
-          <input
-            type="checkbox"
-            class="my-input"
-          />
+          <label class="custom-checkbox">
+            <input type="checkbox" [(ngModel)]="item.isSelected" />
+          </label>
         </td>
-        <td>Vượt rào từ ngoài vào</td>
-        <td>Điểm giám sát 1</td>
-        <td>Vượt đường từ trái sang phải</td>
-        <td><i class="bi bi bi-person-walking"></i></td>
-        <td>Lịch trình 1</td>
-      </tr>
-      <tr>
+        <td>{{ item.rule.name }}</td>
+        <td>{{ item.presetName }}</td>
+        <td>{{ item.rule.alarm_type }}</td>
         <td>
-          <input
-            type="checkbox"
-            class="my-input"
-          />
+          <app-svg-icon
+            *ngFor="let icon of item.icons"
+            [icon]="icon"
+            class="me-2"
+          ></app-svg-icon>
         </td>
-        <td>Vượt rào từ ngoài vào</td>
-        <td>Điểm giám sát 1</td>
-        <td>Vượt đường từ trái sang phải</td>
-        <td><i class="bi bi bi-person-walking"></i></td>
-        <td>Lịch trình 1</td>
-      </tr>
-      <tr>
-        <td>
-          <input
-            type="checkbox"
-            class="my-input"
-          />
-        </td>
-        <td>Vượt rào từ ngoài vào</td>
-        <td>Điểm giám sát 1</td>
-        <td>Vượt đường từ trái sang phải</td>
-        <td><i class="bi bi bi-person-walking"></i></td>
-        <td>Lịch trình 1</td>
+        <td>{{ item.scheduleName }}</td>
       </tr>
     </tbody>
   </table>

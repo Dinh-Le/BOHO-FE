@@ -28,3 +28,38 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iL
   "user": "root",
   "password": "root"
 }
+
+###
+GET https://6641-2001-ee0-d741-1470-590f-bb52-18a8-2639.ngrok-free.app/api/rest/v1/node/dca94874-0d3c-49d5-9b81-7fc48732b811/device/37/intergrate
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJ1c2VyX2lkIjoiYjQzMGY1NDUtOTdjMS00NGU2LTkyNjktMWRkM2M3YjczMTViIiwiZXhwIjoxNzA1MzQ4NTQyfQ.O6tvq4bmfqjFNEdQDQCpCXw96v5nuhdB3cyS43o7rOs
+
+###
+
+POST https://6641-2001-ee0-d741-1470-590f-bb52-18a8-2639.ngrok-free.app/api/rest/v1/node/dca94874-0d3c-49d5-9b81-7fc48732b811/device/37/intergrate
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJ1c2VyX2lkIjoiYjQzMGY1NDUtOTdjMS00NGU2LTkyNjktMWRkM2M3YjczMTViIiwiZXhwIjoxNzA1MzQ4NTQyfQ.O6tvq4bmfqjFNEdQDQCpCXw96v5nuhdB3cyS43o7rOs
+
+{
+  "rule_ids" : [13, 16],
+  "milestone_id": 6,
+  "guid": "",
+  "service_name": "Analytic Event Milestone",
+  "is_send_snapshot": true
+}
+###
+PATCH  https://6641-2001-ee0-d741-1470-590f-bb52-18a8-2639.ngrok-free.app/api/rest/v1/node/dca94874-0d3c-49d5-9b81-7fc48732b811/device/37/intergrate/24
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJ1c2VyX2lkIjoiYjQzMGY1NDUtOTdjMS00NGU2LTkyNjktMWRkM2M3YjczMTViIiwiZXhwIjoxNzA1MzQ4NTQyfQ.O6tvq4bmfqjFNEdQDQCpCXw96v5nuhdB3cyS43o7rOs
+
+{
+  "rule_ids" : [13],
+  "milestone_id": 6,
+  "guid": "abd",
+  "service_name": "Analytic Event Milestone",
+  "is_send_snapshot": false
+}
+###
+DELETE   https://6641-2001-ee0-d741-1470-590f-bb52-18a8-2639.ngrok-free.app/api/rest/v1/node/dca94874-0d3c-49d5-9b81-7fc48732b811/device/37/intergrate/24
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJ1c2VyX2lkIjoiYjQzMGY1NDUtOTdjMS00NGU2LTkyNjktMWRkM2M3YjczMTViIiwiZXhwIjoxNzA1MzQ4NTQyfQ.O6tvq4bmfqjFNEdQDQCpCXw96v5nuhdB3cyS43o7rOs

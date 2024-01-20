@@ -329,7 +329,8 @@
             formControlName="points"
             [src]="{
             nodeId,
-            deviceId: cameraId
+            deviceId: cameraId,
+            presetId: data.preset?.value
           }"
           ></app-bounding-box-editor>
         </div>

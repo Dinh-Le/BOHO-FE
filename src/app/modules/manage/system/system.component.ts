@@ -16,7 +16,6 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Milestone } from 'src/app/data/schema/boho-v2/milestone';
 import { MilestoneService } from 'src/app/data/service/milestone.service';
 import { ToastService } from '@app/services/toast.service';
-import { text } from '@fortawesome/fontawesome-svg-core';
 import { of, switchMap } from 'rxjs';
 
 class RowItemModel extends ExpandableTableRowItemModelBase {

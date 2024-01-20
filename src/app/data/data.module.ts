@@ -36,6 +36,10 @@ import {
 import { PresetService, PresetServiceImpl } from './service/preset.service';
 import { SearchService, SearchServiceImpl } from './service/search.service';
 import { EventService, EventServiceImpl } from './service/event.service';
+import {
+  IntegrationService,
+  IntegrationServiceImpl,
+} from './service/integration.service';
 
 const providers = [
   { provide: UserService, useClass: UserServiceImpl },
@@ -55,6 +59,7 @@ const providers = [
   { provide: PresetService, useClass: PresetServiceImpl },
   { provide: SearchService, useClass: SearchServiceImpl },
   { provide: EventService, useClass: EventServiceImpl },
+  { provide: IntegrationService, useClass: IntegrationServiceImpl },
 ];
 
 @NgModule({

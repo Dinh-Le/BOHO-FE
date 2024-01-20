@@ -10,123 +10,157 @@
   [collapseContentTemplateRef]="contentTemplate"
 ></app-expandable-table>
 <ng-template #contentTemplate let-row="data">
-  <div class="row mt-2">
-    <div class="col-6">
-      <input
-        class="inline-input w-100 fs-16 bg-transparent"
-        [disabled]="!row.isEditable"
-        [(ngModel)]="row.name"
-      />
-    </div>
-  </div>
-  <ng-container *ngIf="row.isEditable; else readonlyForm">
-    <div class="row mt-3 align-items-center">
-      <div class="col-2">
-        <label>Loại</label>
-      </div>
-      <div class="col-4">
-        <app-select-2
-          [items]="types"
-          [(ngModel)]="row.type"
-          placeHolder="Loại tích hợp"
-          theme="light"
-        ></app-select-2>
-      </div>
-    </div>
-    <div class="row mt-3 align-items-center" *ngIf="row.type">
-      <div class="col-2">
-        <label>Đích</label>
-      </div>
-      <div class="col-4">
-        <app-select-2
-          [items]="sources"
-          [(ngModel)]="row.source"
-          placeHolder="Đích tích hợp"
-          theme="light"
-        ></app-select-2>
-      </div>
-    </div>
-    <div class="row mt-3 align-items-center" *ngIf="row.type">
-      <div class="col-2">
-        <label [htmlFor]="'camera-guid' + row.id">Camera GUID</label>
-      </div>
-      <div class="col-4">
+  <form [formGroup]="row.form">
+    <div class="row mt-2">
+      <div class="col-6">
         <input
-          [id]="'camera-guid' + row.id"
-          class="my-input"
-          autocomplete="off"
-          [(ngModel)]="row.cameraGuid"
+          class="inline-input w-100 fs-16 bg-transparent"
+          formControlName="name"
         />
       </div>
     </div>
-    <div class="row mt-3 align-items-center" *ngIf="row.type">
-      <div class="col-2">
-        <label [htmlFor]="'is-send-snapshot' + row.id">Gửi snapshot:</label>
-      </div>
-      <div class="col-4">
-        <input
-          [id]="'is-send-snapshot' + row.id"
-          type="checkbox"
-          class="my-input"
-          [(ngModel)]="row.isSendSnapshot"
-          style="width: 1.5em; height: 1.5em; background-color: whitesmoke"
-        />
-      </div>
-    </div>
-    <div class="row mt-3 align-items-center" *ngIf="row.type">
-      <div class="offset-2 col-4">
-        <button class="my-button submit" (click)="onEventSourceClick(row)">Nguồn sự kiện</button>
-      </div>
-    </div>
-    <div class="row mt-5">
-      <div class="offset-2 col-4">
-        <div class="d-flex align-items-center justify-content-center">
-          <button class="my-button cancel mx-1" (click)="row.isEditable = false">Hủy</button>
-          <button class="my-button submit mx-1" (click)="row.isEditable = false">Lưu</button>
+    <ng-container *ngIf="row.isEditable; else readonlyForm">
+      <div class="row mt-3 align-items-center">
+        <div class="col-2">
+          <label>Loại</label>
+        </div>
+        <div class="col-4">
+          <app-select-2
+            [items]="types"
+            formControlName="type"
+            placeHolder="Loại tích hợp"
+            theme="light"
+          ></app-select-2>
         </div>
       </div>
-    </div>
-  </ng-container>
-  <ng-template #readonlyForm>
-    <div class="row mt-3">
-      <div class="col-2">
-        <label>Loại</label>
-      </div>
-      <div class="col-4">
-        {{ row.type?.label }}
-      </div>
-    </div>
-    <div class="row mt-3" *ngIf="row.type">
-      <div class="col-2">
-        <label>Đích</label>
-      </div>
-      <div class="col-4">
-        {{ row.source?.label }}
-      </div>
-    </div>
-    <div class="row mt-3" *ngIf="row.type">
-      <div class="col-2">
-        <label [htmlFor]="'camera-guid' + row.id">Camera GUID</label>
-      </div>
-      <div class="col-4">
-        {{ row.cameraGuid }}
-      </div>
-    </div>
-    <div class="row mt-3" *ngIf="row.type">
-      <div class="col-2">
-        <label [htmlFor]="'is-send-snapshot' + row.id">Gửi snapshot:</label>
-      </div>
-      <div class="col-4">
-        <i class="bi" [ngClass]="row.isSendSnapshot ? 'bi-check-lg' : 'bi-x-lg'"></i>
-      </div>
-    </div>    
-    <div class="row mt-5">
-      <div class="offset-2 col-4">
-        <div class="d-flex align-items-center justify-content-center">
-          <button class="my-button cancel mx-1" (click)="remove(row)">Xóa</button>
-          <button class="my-button submit mx-1" (click)="row.isEditable = true">Chỉnh sửa</button>
+      <div class="row mt-3 align-items-center" *ngIf="row.type">
+        <div class="col-2">
+          <label>Đích</label>
+        </div>
+        <div class="col-4">
+          <app-select-2
+            [items]="sources"
+            formControlName="source"
+            placeHolder="Đích tích hợp"
+            theme="light"
+          ></app-select-2>
         </div>
       </div>
-    </div>
-  </ng-template>
+      <div class="row mt-3 align-items-center" *ngIf="row.type">
+        <div class="col-2">
+          <label [htmlFor]="'camera-guid' + row.id">Camera GUID</label>
+        </div>
+        <div class="col-4">
+          <input
+            [id]="'camera-guid' + row.id"
+            class="my-input"
+            formControlName="guid"
+          />
+        </div>
+      </div>
+      <div class="row mt-3 align-items-center" *ngIf="row.type">
+        <div class="col-2">
+          <label [htmlFor]="'is-send-snapshot' + row.id">Gửi snapshot:</label>
+        </div>
+        <div class="col-4">
+          <label class="custom-checkbox">
+            <input
+              [id]="'is-send-snapshot' + row.id"
+              type="checkbox"
+              formControlName="isSendSnapshot"
+            />
+          </label>
+        </div>
+      </div>
+      <div class="row mt-3 align-items-center" *ngIf="row.type">
+        <div class="offset-2 col-4">
+          <button
+            type="button"
+            class="my-button submit"
+            (click)="onEventSourceClick(row)"
+          >
+            Nguồn sự kiện
+          </button>
+        </div>
+      </div>
+      <div class="row mt-5">
+        <div class="offset-2 col-4">
+          <div class="d-flex align-items-center justify-content-center">
+            <button
+              type="button"
+              class="my-button cancel mx-1"
+              (click)="cancel(row)"
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              (click)="save(row)"
+              [disabled]="row.invalid"
+              class="my-button submit mx-1"
+            >
+              Lưu
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+    <ng-template #readonlyForm>
+      <div class="row mt-3">
+        <div class="col-2">
+          <label>Loại</label>
+        </div>
+        <div class="col-4">
+          {{ row.type?.label }}
+        </div>
+      </div>
+      <div class="row mt-3" *ngIf="row.type">
+        <div class="col-2">
+          <label>Đích</label>
+        </div>
+        <div class="col-4">
+          {{ row.source?.label }}
+        </div>
+      </div>
+      <div class="row mt-3" *ngIf="row.type">
+        <div class="col-2">
+          <label [htmlFor]="'camera-guid' + row.id">Camera GUID</label>
+        </div>
+        <div class="col-4">
+          {{ row.guid }}
+        </div>
+      </div>
+      <div class="row mt-3" *ngIf="row.type">
+        <div class="col-2">
+          <label [htmlFor]="'is-send-snapshot' + row.id">Gửi snapshot:</label>
+        </div>
+        <div class="col-4">
+          <i
+            class="bi"
+            [ngClass]="row.isSendSnapshot ? 'bi-check-lg' : 'bi-x-lg'"
+          ></i>
+        </div>
+      </div>
+      <div class="row mt-5">
+        <div class="offset-2 col-4">
+          <div class="d-flex align-items-center justify-content-center">
+            <button
+              type="button"
+              class="my-button cancel mx-1"
+              (click)="remove(row)"
+            >
+              Xóa
+            </button>
+            <button
+              type="button"
+              class="my-button submit mx-1"
+              (click)="edit(row)"
+            >
+              Chỉnh sửa
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </form>
 </ng-template>
