@@ -9,3 +9,23 @@ export const Colors = [
   '#000000ff',
   '#ffffffff',
 ];
+
+export const ColorNames = [
+  'pink',
+  'indido',
+  'red',
+  'orange',
+  'yellow',
+  'green',
+  'cyan',
+  'blue',
+  'brown',
+  'white',
+  'lavender',
+  'purple',
+  'salmon',
+  'darkkhaki',
+  'navy',
+  'rosybrown',
+  'azure',
+];

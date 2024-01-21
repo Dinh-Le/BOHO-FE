@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -5,6 +6,8 @@ import { ToastService } from '@app/services/toast.service';
 import { SelectItemModel } from '@shared/models/select-item-model';
 import { from, map, mergeAll, of, switchMap, zip, zipAll } from 'rxjs';
 import { DaysInWeek } from 'src/app/data/constants';
+import { Patrol } from 'src/app/data/schema/boho-v2/patrol';
+import { Preset } from 'src/app/data/schema/boho-v2/preset';
 import {
   Level3Menu,
   NavigationService,
@@ -48,30 +51,8 @@ export class TourSettingsComponent implements OnInit {
   private _cameraId: string = '';
   private _touringId: number = -1;
 
-  patrols: SelectItemModel[] = [];
-  presets: SelectItemModel[] = [];
-  colors: SelectItemModel[] = [
-    {
-      value: 'green',
-      label: 'Xanh lá',
-    },
-    {
-      value: 'magenta',
-      label: 'Cánh xen',
-    },
-    {
-      value: 'cyan',
-      label: 'Xanh lơ',
-    },
-    {
-      value: 'purple',
-      label: 'Tím',
-    },
-    {
-      value: 'orange',
-      label: 'Cam',
-    },
-  ];
+  patrols: Patrol[] = [];
+  presets: Preset[] = [];
   daysInWeek: SelectItemModel[] = DaysInWeek.map((e, index) => ({
     value: index,
     label: e,
@@ -92,16 +73,16 @@ export class TourSettingsComponent implements OnInit {
     journey: new FormControl<SelectItemModel | undefined>(undefined, [
       Validators.required,
     ]),
-    color: new FormControl<SelectItemModel | undefined>(undefined, [
-      Validators.required,
-    ]),
   });
   selectedSchedule: PtzSchedule | undefined;
 
   get journeyList(): SelectItemModel[] {
-    return this.form.get('type')?.value === 'patrol'
-      ? this.patrols
-      : this.presets;
+    const items =
+      this.form.get('type')!.value === 'patrol' ? this.patrols : this.presets;
+    return items.map((e) => ({
+      value: e.id,
+      label: e.name,
+    }));
   }
 
   ngOnInit(): void {
@@ -122,108 +103,72 @@ export class TourSettingsComponent implements OnInit {
           this.patrols = [];
           this.data = this.data.map(() => []);
           this.resetForm();
-          return zip(
-            this._patrolService.findAll(this._nodeId, this._cameraId),
-            this._tourService.findAll(this._nodeId, this._cameraId),
-            this._presetService.findAll(this._nodeId, this._cameraId)
-          );
+          return this._patrolService.findAll(this._nodeId, this._cameraId);
+        }),
+        switchMap(({ data: patrols }) => {
+          this.patrols = patrols;
+          return this._presetService.findAll(this._nodeId, this._cameraId);
+        }),
+        switchMap(({ data: presets }) => {
+          this.presets = presets;
+          return this._tourService.findAll(this._nodeId, this._cameraId);
         })
       )
       .subscribe({
-        next: (responses) => {
-          const [
-            findAllPatrolResponse,
-            findAllTourResponse,
-            findAllPresetReponse,
-          ] = responses;
-
-          if (!findAllPatrolResponse.success) {
-            throw Error(
-              'Fetch patrol data failed with error: ' +
-                findAllPatrolResponse.message
-            );
-          }
-
-          if (!findAllTourResponse.success) {
-            throw Error(
-              'Fetch tour data failed with error: ' +
-                findAllTourResponse.message
-            );
-          }
-
-          if (!findAllPresetReponse.success) {
-            throw Error(
-              'Fetch preset data failed with error: ' +
-                findAllPresetReponse.message
-            );
-          }
-
-          this.presets = findAllPresetReponse.data.map((e) => ({
-            value: e.id,
-            label: e.name,
-          }));
-
-          if ('data' in findAllPatrolResponse) {
-            this.patrols = findAllPatrolResponse.data.map((e) => ({
-              value: e.id,
-              label: e.name,
-            }));
-          }
-
-          if ('data' in findAllTourResponse) {
-            findAllTourResponse.data.forEach((e) => {
-              this._touringId = e.id;
-              e.patrol_setting.forEach((setting) => {
-                const { patrol_id, patrol_schedule_id, color } = setting;
-                setting.schedule.forEach((schedule) => {
-                  const startTime = this.fromTimeString(schedule.start_time);
-                  const endTime = this.fromTimeString(schedule.end_time);
-                  const left = (startTime * 100) / 1440;
-                  const width = ((endTime - startTime) * 100) / 1440;
-                  const day = schedule.day;
-                  const ptzSchedule: PtzSchedule = {
-                    id: v4(),
-                    type: 'patrol',
-                    patrolId: patrol_id,
-                    scheduleId: patrol_schedule_id,
-                    startTime,
-                    endTime,
-                    day,
-                    color,
-                    left: left,
-                    width: width,
-                  };
-                  this.data[day].push(ptzSchedule);
-                });
-              });
-
-              e.preset_setting.forEach((setting) => {
-                const { preset_id, color, preset_schedule_id } = setting;
-                setting.schedule.forEach((schedule) => {
-                  const startTime = this.fromTimeString(schedule.start_time);
-                  const endTime = this.fromTimeString(schedule.end_time);
-                  const left = (startTime * 100) / 1440;
-                  const width = ((endTime - startTime) * 100) / 1440;
-                  const day = schedule.day;
-                  const ptzSchedule: PtzSchedule = {
-                    id: v4(),
-                    type: 'preset',
-                    patrolId: preset_id,
-                    scheduleId: preset_schedule_id,
-                    startTime,
-                    endTime,
-                    day,
-                    color,
-                    left: left,
-                    width: width,
-                  };
-                  this.data[day].push(ptzSchedule);
-                });
+        next: ({ data: tours }) => {
+          tours.forEach((e) => {
+            this._touringId = e.id;
+            e.patrol_setting.forEach((setting) => {
+              const { patrol_id, patrol_schedule_id, color } = setting;
+              setting.schedule.forEach((schedule) => {
+                const startTime = this.fromTimeString(schedule.start_time);
+                const endTime = this.fromTimeString(schedule.end_time);
+                const left = (startTime * 100) / 1440;
+                const width = ((endTime - startTime) * 100) / 1440;
+                const day = schedule.day;
+                const ptzSchedule: PtzSchedule = {
+                  id: v4(),
+                  type: 'patrol',
+                  patrolId: patrol_id,
+                  scheduleId: patrol_schedule_id,
+                  startTime,
+                  endTime,
+                  day,
+                  color,
+                  left: left,
+                  width: width,
+                };
+                this.data[day].push(ptzSchedule);
               });
             });
-          }
+
+            e.preset_setting.forEach((setting) => {
+              const { preset_id, color, preset_schedule_id } = setting;
+              setting.schedule.forEach((schedule) => {
+                const startTime = this.fromTimeString(schedule.start_time);
+                const endTime = this.fromTimeString(schedule.end_time);
+                const left = (startTime * 100) / 1440;
+                const width = ((endTime - startTime) * 100) / 1440;
+                const day = schedule.day;
+                const ptzSchedule: PtzSchedule = {
+                  id: v4(),
+                  type: 'preset',
+                  patrolId: preset_id,
+                  scheduleId: preset_schedule_id,
+                  startTime,
+                  endTime,
+                  day,
+                  color,
+                  left: left,
+                  width: width,
+                };
+                this.data[day].push(ptzSchedule);
+              });
+            });
+          });
         },
-        error: ({ message }) => this._toastService.showError(message),
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(err.error.message ?? err.message),
       });
   }
 
@@ -325,10 +270,9 @@ export class TourSettingsComponent implements OnInit {
       endTime: schedule.endTime,
       day: this.daysInWeek.find((e) => e.value === schedule.day),
       type: schedule.type,
-      journey: (schedule.type === 'patrol' ? this.patrols : this.presets).find(
-        (e) => e.value === schedule.patrolId
-      ),
-      color: this.colors.find((e) => e.value === schedule.color),
+      journey: {
+        value: schedule.patrolId,
+      },
     });
   }
 
@@ -354,7 +298,7 @@ export class TourSettingsComponent implements OnInit {
           start_time: this.toTimeString(e.startTime),
           end_time: this.toTimeString(e.endTime),
           day: e.day,
-        })), 
+        })),
     };
 
     const response$ =
