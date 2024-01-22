@@ -4,8 +4,9 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ToastService } from '@app/services/toast.service';
 import { SelectItemModel } from '@shared/models/select-item-model';
-import { from, map, mergeAll, of, switchMap, zip, zipAll } from 'rxjs';
+import { from, map, mergeAll, of, switchMap, zipAll } from 'rxjs';
 import { DaysInWeek } from 'src/app/data/constants';
+import { ColorNames } from 'src/app/data/constants/colors.constant';
 import { Patrol } from 'src/app/data/schema/boho-v2/patrol';
 import { Preset } from 'src/app/data/schema/boho-v2/preset';
 import {
@@ -77,11 +78,13 @@ export class TourSettingsComponent implements OnInit {
   selectedSchedule: PtzSchedule | undefined;
 
   get journeyList(): SelectItemModel[] {
-    const items =
-      this.form.get('type')!.value === 'patrol' ? this.patrols : this.presets;
-    return items.map((e) => ({
+    const isPatrolType = this.form.get('type')!.value === 'patrol';
+    const items = isPatrolType ? this.patrols : this.presets;
+    const offset = isPatrolType ? 0 : this.presets.length;
+    return items.map((e, index) => ({
       value: e.id,
       label: e.name,
+      color: ColorNames[offset + index],
     }));
   }
 
@@ -399,7 +402,38 @@ export class TourSettingsComponent implements OnInit {
   }
 
   save() {
-    const { startTime, endTime, color, day, patrol, type } = this.form.value;
+    const { startTime, endTime, day, type, journey } = this.form.value;
+
+    const left = (startTime * 100) / 1440;
+    const width = ((endTime - startTime) * 100) / 1440;
+    const { color, id } = journey;
+    const modifiedSchedule = Object.assign(
+      {} as PtzSchedule,
+      this.selectedSchedule,
+      {
+        startTime,
+        endTime,
+        type,
+        day: day.value,
+        patrolId: id,
+        left,
+        width,
+        color,
+      }
+    );
+
+    if (day.value !== this.selectedSchedule!.day) {
+      this.data[this.selectedSchedule!.day] = this.data[
+        this.selectedSchedule!.day
+      ].filter((e) => e.id !== this.selectedSchedule?.id);
+      this.data[day.value].push(modifiedSchedule);
+    } else {
+      this.data[day.value] = this.data[day.value].map((e) =>
+        e.id === modifiedSchedule.id ? modifiedSchedule : e
+      );
+    }
+
+    this.selectedSchedule = modifiedSchedule;
 
     // const schedulesGroupByTypeAndPatrolId: {
     //   [key: string]: PtzSchedule[];
