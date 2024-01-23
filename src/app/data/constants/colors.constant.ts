@@ -12,7 +12,7 @@ export const Colors = [
 
 export const ColorNames = [
   'pink',
-  'indido',
+  'indigo',
   'red',
   'orange',
   'yellow',
