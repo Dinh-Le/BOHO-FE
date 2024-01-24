@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { Observable, of, switchMap } from 'rxjs';
 import { RestfullApiService } from './restful-api.service';
 import {
   CreateResponse,
@@ -48,6 +48,11 @@ export class ScheduleServiceImpl extends ScheduleService {
     data: CreateOrUpdateScheduleRequest
   ): Observable<CreateResponse<number>> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/schedule`;
+    data.time_info = data.time_info.map((period) =>
+      Object.assign(period, {
+        end_time: period.end_time === '24:00:00' ? '23:59:59' : period.end_time,
+      })
+    );
     return this.httpClient.post<CreateResponse<number>>(url, data);
   }
   public override findAll(
@@ -55,7 +60,21 @@ export class ScheduleServiceImpl extends ScheduleService {
     deviceId: string
   ): Observable<FindAllResponse<Schedule>> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/schedule`;
-    return this.httpClient.get<FindAllResponse<Schedule>>(url);
+    return this.httpClient.get<FindAllResponse<Schedule>>(url).pipe(
+      switchMap((response) => {
+        response.data.map((schedule) =>
+          Object.assign(schedule, {
+            time_info: schedule.time_info.map((period) =>
+              Object.assign(period, {
+                end_time:
+                  period.end_time === '23:59:59' ? '24:00:00' : period.end_time,
+              })
+            ),
+          })
+        );
+        return of(response);
+      })
+    );
   }
   public override find(
     nodeId: string,
@@ -63,7 +82,17 @@ export class ScheduleServiceImpl extends ScheduleService {
     scheduleId: string
   ): Observable<FindResponse<Schedule>> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/schedule/${scheduleId}`;
-    return this.httpClient.get<FindResponse<Schedule>>(url);
+    return this.httpClient.get<FindResponse<Schedule>>(url).pipe(
+      switchMap((response) => {
+        response.data.time_info = response.data.time_info.map((period) =>
+          Object.assign(period, {
+            end_time:
+              period.end_time === '23:59:59' ? '24:00:00' : period.end_time,
+          })
+        );
+        return of(response);
+      })
+    );
   }
   public override update(
     nodeId: string,
@@ -72,6 +101,11 @@ export class ScheduleServiceImpl extends ScheduleService {
     data: CreateOrUpdateScheduleRequest
   ): Observable<ResponseBase> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/schedule/${scheduleId}`;
+    data.time_info = data.time_info.map((period) =>
+      Object.assign(period, {
+        end_time: period.end_time === '24:00:00' ? '23:59:59' : period.end_time,
+      })
+    );
     return this.httpClient.patch<ResponseBase>(url, data);
   }
   public override delete(

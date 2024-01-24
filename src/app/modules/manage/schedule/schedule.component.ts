@@ -39,7 +39,7 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
               i === schedule.length - 1 &&
               acc[acc.length - 1].end_time === ''
             ) {
-              acc[acc.length - 1].end_time = '24:00';
+              acc[acc.length - 1].end_time = '24:00:00';
             } else {
               // Do nothing
             }
@@ -131,6 +131,8 @@ export class ScheduleComponent implements OnInit, OnDestroy {
               `Fetch schedule data failed with error: ${response.message}`
             );
           }
+
+          console.log(response);
 
           return of(response);
         })
