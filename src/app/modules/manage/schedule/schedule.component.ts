@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import {
   ColumnConfig,
   ExpandableTableRowItemModelBase,
@@ -13,7 +13,7 @@ import {
   CreateOrUpdateScheduleRequest,
   ScheduleService,
 } from 'src/app/data/service/schedule.service';
-import { of, switchMap } from 'rxjs';
+import { Subscription, of, switchMap } from 'rxjs';
 import { ToastService } from '@app/services/toast.service';
 import { Schedule } from 'src/app/data/schema/boho-v2/shedule';
 
@@ -39,7 +39,7 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
               i === schedule.length - 1 &&
               acc[acc.length - 1].end_time === ''
             ) {
-              acc[acc.length - 1].end_time = '24:00';
+              acc[acc.length - 1].end_time = '24:00:00';
             } else {
               // Do nothing
             }
@@ -98,13 +98,14 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
   templateUrl: 'schedule.component.html',
   styleUrls: ['../shared/my-input.scss'],
 })
-export class ScheduleComponent implements OnInit {
+export class ScheduleComponent implements OnInit, OnDestroy {
   _activatedRoute = inject(ActivatedRoute);
   _scheduleService = inject(ScheduleService);
   _toastService = inject(ToastService);
   _navigationService = inject(NavigationService);
   _nodeId: string | undefined;
   _cameraId: string | undefined;
+  private _subscriptions: Subscription[] = [];
   daysInWeek: string[] = ['H', 'B', 'T', 'N', 'S', 'B', 'C'];
   data: RowItemModel[] = [];
   columns: ColumnConfig[] = [
@@ -116,7 +117,7 @@ export class ScheduleComponent implements OnInit {
 
   ngOnInit(): void {
     this._navigationService.level3 = Level3Menu.SCHEDULE;
-    this._activatedRoute.params
+    const activatedRouteSubscription = this._activatedRoute.params
       .pipe(
         switchMap(({ nodeId, cameraId }) => {
           this._cameraId = cameraId;
@@ -131,6 +132,8 @@ export class ScheduleComponent implements OnInit {
             );
           }
 
+          console.log(response);
+
           return of(response);
         })
       )
@@ -144,6 +147,11 @@ export class ScheduleComponent implements OnInit {
         },
         error: ({ message }) => this._toastService.showError(message),
       });
+    this._subscriptions.push(activatedRouteSubscription);
+  }
+
+  ngOnDestroy(): void {
+    this._subscriptions.forEach((e) => e.unsubscribe());
   }
 
   add() {

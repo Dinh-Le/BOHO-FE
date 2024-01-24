@@ -16,6 +16,7 @@ import { GroupCameraComponent } from './group-camera/group-camera.component';
 import { VehicleListComponent } from './vehical-list/vehicle-list.component';
 import { VehicleListDetailComponent } from './vehicle-list-detail/vehicle-list-detail.component';
 import { IntegrationComponent } from './integration/integration.component';
+import { CameraSettingsComponent } from './camera-detail/camera-settings/camera-settings.component';
 
 @NgModule({
   imports: [
@@ -64,6 +65,10 @@ import { IntegrationComponent } from './integration/integration.component';
               {
                 path: 'info',
                 component: CameraInfoComponent,
+              },
+              {
+                path: 'settings',
+                component: CameraSettingsComponent,
               },
               {
                 path: 'preset-settings',

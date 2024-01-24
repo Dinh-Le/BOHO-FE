@@ -6,6 +6,7 @@ import {
   AfterViewInit,
   inject,
   ChangeDetectorRef,
+  OnDestroy,
 } from '@angular/core';
 
 import { v4 } from 'uuid';
@@ -26,10 +27,9 @@ import {
   DeviceStatus_Good,
 } from 'src/app/data/constants';
 import { catchError, finalize, switchMap } from 'rxjs/operators';
-import { NodeService } from 'src/app/data/service/node.service';
-import { of } from 'rxjs';
+import { Subscription, of } from 'rxjs';
 import { RowItemModel } from './row-item.model';
-import { Device, Node } from 'src/app/data/schema/boho-v2';
+import { Device } from 'src/app/data/schema/boho-v2';
 import {
   NavigationService,
   SideMenuItemType,
@@ -40,16 +40,16 @@ import {
   templateUrl: './camera.component.html',
   styleUrls: ['./camera.component.scss', '../shared/my-input.scss'],
 })
-export class CameraComponent implements OnInit, AfterViewInit {
+export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('statusColumnTemplate')
   statusColumnTemplate!: TemplateRef<any>;
 
   private _activatedRoute = inject(ActivatedRoute);
-  private _nodeService = inject(NodeService);
   private _deviceService = inject(DeviceService);
   private _toastService = inject(ToastService);
   private _changeDetectorRef = inject(ChangeDetectorRef);
   private _navigationService = inject(NavigationService);
+  private _subscription: Subscription[] = [];
 
   cameraDrivers: SelectItemModel[] = CameraDrivers.map((e) => ({
     value: e,
@@ -99,7 +99,7 @@ export class CameraComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this._activatedRoute.params
+    const activatedRouteSubscription = this._activatedRoute.params
       .pipe(
         switchMap(({ nodeId }) => {
           this.nodeId = nodeId;
@@ -130,6 +130,11 @@ export class CameraComponent implements OnInit, AfterViewInit {
         },
         error: ({ message }) => this._toastService.showError(message),
       });
+    this._subscription.push(activatedRouteSubscription);
+  }
+
+  ngOnDestroy(): void {
+    this._subscription.forEach((e) => e.unsubscribe());
   }
 
   trackById(_: number, item: any) {

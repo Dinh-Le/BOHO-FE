@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ActivatedRoute } from '@angular/router';
 import { DeviceService } from 'src/app/data/service/device.service';
@@ -11,6 +11,7 @@ import {
   NavigationService,
 } from 'src/app/data/service/navigation.service';
 import { CameraDriver_Onvif, CameraDriver_RTSP } from 'src/app/data/constants';
+import { Subscription } from 'rxjs';
 
 interface CameraInfo {
   name: string;
@@ -25,7 +26,7 @@ interface CameraInfo {
   templateUrl: 'camera-info.component.html',
   styleUrls: ['camera-info.component.scss', '../../shared/my-input.scss'],
 })
-export class CameraInfoComponent implements OnInit {
+export class CameraInfoComponent implements OnInit, OnDestroy {
   modalService = inject(NgbModal);
   private _navigationService = inject(NavigationService);
   device: Device | undefined;
@@ -36,6 +37,7 @@ export class CameraInfoComponent implements OnInit {
     typeName: '',
     rtspUrl: '',
   };
+  private _activatedRouteSubscription: Subscription | undefined;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -45,38 +47,43 @@ export class CameraInfoComponent implements OnInit {
 
   ngOnInit(): void {
     this._navigationService.level3 = Level3Menu.DEVICE_INFO;
-    this.activatedRoute.parent?.params.subscribe((params) => {
-      const { nodeId, cameraId } = params;
+    this._activatedRouteSubscription =
+      this.activatedRoute.parent?.params.subscribe((params) => {
+        const { nodeId, cameraId } = params;
 
-      this.deviceService.find(nodeId, cameraId).subscribe((response) => {
-        if (!response.success) {
-          this.toastService.showError('Fetch camera data failed.');
-          return;
-        }
+        this.deviceService.find(nodeId, cameraId).subscribe((response) => {
+          if (!response.success) {
+            this.toastService.showError('Fetch camera data failed.');
+            return;
+          }
 
-        this.device = response.data;
-        let rtspUrl = '';
-        switch (response.data.camera.driver) {
-          case CameraDriver_RTSP:
-            rtspUrl =
-              response.data.camera.connection_metadata.rtsp?.rtsp_url || '';
-            break;
-          case CameraDriver_Onvif:
-            rtspUrl =
-              response.data.camera.connection_metadata.onvif?.rtsp_url || '';
-            break;
-          default:
-            break;
-        }
-        this.data = {
-          name: response.data.name,
-          address: this.geodecode(response.data.location),
-          driverName: response.data.camera.driver,
-          typeName: response.data.camera.type,
-          rtspUrl,
-        };
+          this.device = response.data;
+          let rtspUrl = '';
+          switch (response.data.camera.driver) {
+            case CameraDriver_RTSP:
+              rtspUrl =
+                response.data.camera.connection_metadata.rtsp?.rtsp_url || '';
+              break;
+            case CameraDriver_Onvif:
+              rtspUrl =
+                response.data.camera.connection_metadata.onvif?.rtsp_url || '';
+              break;
+            default:
+              break;
+          }
+          this.data = {
+            name: response.data.name,
+            address: this.geodecode(response.data.location),
+            driverName: response.data.camera.driver,
+            typeName: response.data.camera.type,
+            rtspUrl,
+          };
+        });
       });
-    });
+  }
+
+  ngOnDestroy(): void {
+    this._activatedRouteSubscription?.unsubscribe();
   }
 
   async changeAddress() {

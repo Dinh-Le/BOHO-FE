@@ -1,8 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { EditableListViewItemModel } from '../editable-list-view/editable-list-view-item.model';
 import { PresetService } from 'src/app/data/service/preset.service';
 import { ActivatedRoute } from '@angular/router';
-import { catchError, of, switchMap } from 'rxjs';
+import { Subscription, catchError, of, switchMap } from 'rxjs';
 import { ToastService } from '@app/services/toast.service';
 import {
   Level3Menu,
@@ -17,7 +17,7 @@ import { ResponseBase } from 'src/app/data/schema/boho-v2/response-base';
   templateUrl: 'preset-settings.component.html',
   styleUrls: ['preset-settings.component.scss', '../../shared/my-input.scss'],
 })
-export class PresetSettingsComponent implements OnInit {
+export class PresetSettingsComponent implements OnInit, OnDestroy {
   private _activatedRoute = inject(ActivatedRoute);
   private _navigationService = inject(NavigationService);
   private _presetService = inject(PresetService);
@@ -27,11 +27,12 @@ export class PresetSettingsComponent implements OnInit {
   selectedItem: EditableListViewItemModel | undefined;
   nodeId = '';
   cameraId = '';
+  private _subscriptions: Subscription[] = [];
 
   ngOnInit(): void {
     this._navigationService.level3 = Level3Menu.PRESET_SETTINGS;
-    this._activatedRoute.parent?.params
-      .pipe(
+    const activatedRouteSubscription = this._activatedRoute
+      .parent!.params.pipe(
         switchMap(({ nodeId, cameraId }) => {
           this.nodeId = nodeId;
           this.cameraId = cameraId;
@@ -47,6 +48,11 @@ export class PresetSettingsComponent implements OnInit {
         },
         error: ({ message }) => this._toastService.showError(message),
       });
+    this._subscriptions.push(activatedRouteSubscription);
+  }
+
+  ngOnDestroy(): void {
+    this._subscriptions.forEach((e) => e.unsubscribe());
   }
 
   load() {

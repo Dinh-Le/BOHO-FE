@@ -96,22 +96,15 @@
           class="w-100"
           [items]="journeyList"
           formControlName="journey"
+          [menuItemTemplateRef]="journeyItemTemplate"
         ></app-select-2>
-      </div>
-      <div class="col-4 d-flex align-items-center">
-        <span for="color" class="label">Màu sắc:</span>
-        <app-select-2
-          class="w-100"
-          id="color"
-          name="color"
-          [items]="colors"
-          formControlName="color"
-          [menuItemTemplateRef]="colorItemTemplate"
-        ></app-select-2>
-        <ng-template #colorItemTemplate let-item="item">
-          <div class="d-flex">
-            <i class="bi bi-square-fill" [ngStyle]="{ color: item.value }"></i>
-            <label class="ms-2">{{ item.label }}</label>
+        <ng-template #journeyItemTemplate let-item="item">
+          <div style="display: flex; user-select: none; cursor: pointer">
+            <div
+              [style.background]="item.color"
+              style="width: 20px; height: 20px"
+            ></div>
+            <span class="ms-1">{{ item.label }}</span>
           </div>
         </ng-template>
       </div>
@@ -123,7 +116,7 @@
     </div>
   </form>
 
-  <div class="d-flex justify-content-center align-items-center mt-4">
+  <div class="d-flex justify-content-center align-items-center mt-5">
     <button type="button" class="my-button cancel mx-1" (click)="cancel()">
       Hủy
     </button>

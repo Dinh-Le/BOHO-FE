@@ -23,6 +23,7 @@ button.btn {
   position: absolute;
   top: 0;
   bottom: 0;
+  user-select: none;
 }
 
 .tour.active {

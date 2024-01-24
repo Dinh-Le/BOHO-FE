@@ -25,6 +25,8 @@ export abstract class NodeService extends RestfullApiService {
   ): Observable<ResponseBase>;
   abstract delete(id: string): Observable<ResponseBase>;
   abstract sync(nodeId: string): Observable<ResponseBase>;
+  abstract ruleUpdate(nodeId: string): Observable<ResponseBase>;
+  abstract tourUpdate(nodeId: string): Observable<ResponseBase>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -59,7 +61,14 @@ export class NodeServiceImpl extends NodeService {
 
   override update(
     id: string,
-    { name, type, ip, port, node_metadata, node_operator_id }: CreateOrUpdateNodeDto
+    {
+      name,
+      type,
+      ip,
+      port,
+      node_metadata,
+      node_operator_id,
+    }: CreateOrUpdateNodeDto
   ): Observable<ResponseBase> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${id}`;
     return this.httpClient.patch<ResponseBase>(url, {
@@ -83,5 +92,15 @@ export class NodeServiceImpl extends NodeService {
 
   override sync(nodeId: string): Observable<ResponseBase> {
     throw new Error('Method not implemented.');
+  }
+
+  override tourUpdate(nodeId: string): Observable<ResponseBase> {
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/tour_update`;
+    return this.httpClient.get<ResponseBase>(url);
+  }
+
+  override ruleUpdate(nodeId: string): Observable<ResponseBase> {
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/rule_update`;
+    return this.httpClient.get<ResponseBase>(url);
   }
 }

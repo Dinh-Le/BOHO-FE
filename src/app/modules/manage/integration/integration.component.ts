@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import {
   ColumnConfig,
   ExpandableTableRowItemModelBase,
@@ -18,13 +18,14 @@ import { IntegrationService } from 'src/app/data/service/integration.service';
 import { RuleService } from 'src/app/data/service/rule.service';
 import { MilestoneService } from 'src/app/data/service/milestone.service';
 import { ActivatedRoute } from '@angular/router';
-import { switchMap, zip } from 'rxjs';
+import { Subscription, switchMap, zip } from 'rxjs';
 import { Integration } from 'src/app/data/schema/boho-v2';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ToastService } from '@app/services/toast.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { PresetService } from 'src/app/data/service/preset.service';
 import { ScheduleService } from 'src/app/data/service/schedule.service';
+import { Milestone } from 'src/app/data/schema/boho-v2/milestone';
 
 class RowItemModel extends ExpandableTableRowItemModelBase {
   form = new FormGroup({
@@ -81,15 +82,16 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
     this.form.get('ruleIdList')?.setValue(ids);
   }
 
-  setData(data: Integration, type: SelectItemModel): void {
+  setData(
+    data: Integration,
+    type: SelectItemModel,
+    source?: SelectItemModel
+  ): void {
     this.form.reset({
       id: data.id,
-      name: data.name,
+      name: data.service_name,
       type: type,
-      source: {
-        value: data.milestone_id,
-        label: '',
-      },
+      source,
       guid: data.guid,
       isSendSnapshot: data.is_send_snapshot,
       ruleIdList: data.rule_ids,
@@ -102,7 +104,7 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
   templateUrl: 'integration.component.html',
   styleUrls: ['../shared/my-input.scss'],
 })
-export class IntegrationComponent implements OnInit {
+export class IntegrationComponent implements OnInit, OnDestroy {
   private _modalService = inject(NgbModal);
   private _navigationService = inject(NavigationService);
   private _integrationService = inject(IntegrationService);
@@ -115,6 +117,7 @@ export class IntegrationComponent implements OnInit {
 
   private _nodeId: string = '';
   private _deviceId: number = 0;
+  private _subscriptions: Subscription[] = [];
 
   data: RowItemModel[] = [];
   columns: ColumnConfig[] = [
@@ -143,7 +146,7 @@ export class IntegrationComponent implements OnInit {
 
   ngOnInit(): void {
     this._navigationService.level2 = Level2Menu.INTEGRATION;
-    this._activatedRoute.params
+    const activatedRouteSubscription = this._activatedRoute.params
       .pipe(
         switchMap((params) => {
           const { nodeId, cameraId } = params;
@@ -174,7 +177,7 @@ export class IntegrationComponent implements OnInit {
               schedules.find((e) => e.id === rule.schedule_id)?.name || '';
             return new EventSourceRowItem(rule, presetName, scheduleName);
           });
-          console.log(this.rules);
+
           return this._milestoneService.findAll();
         }),
         switchMap(({ data }) => {
@@ -203,18 +206,23 @@ export class IntegrationComponent implements OnInit {
       )
       .subscribe({
         next: ({ data }) => {
-          if (!Array.isArray(data)) {
-            return;
-          }
-
           this.data = data.map((e) => {
             const rowItem = new RowItemModel();
-            rowItem.setData(e, this.types[0]);
+            rowItem.setData(
+              e,
+              this.types[0],
+              this.sources.find((src) => src.value === e.milestone_id)
+            );
             return rowItem;
           });
         },
         error: ({ message }) => this._toastService.showError(message),
       });
+    this._subscriptions.push(activatedRouteSubscription);
+  }
+
+  ngOnDestroy(): void {
+    this._subscriptions.forEach((e) => e.unsubscribe());
   }
 
   add() {
@@ -230,7 +238,7 @@ export class IntegrationComponent implements OnInit {
 
   save(row: RowItemModel) {
     const data: Omit<Integration, 'id'> = {
-      name: row.name,
+      service_name: row.name,
       milestone_id: row.source?.value,
       guid: row.guid,
       is_send_snapshot: row.isSendSnapshot,

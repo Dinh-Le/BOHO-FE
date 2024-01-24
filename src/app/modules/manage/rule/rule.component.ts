@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   Component,
+  OnDestroy,
   OnInit,
   TemplateRef,
   ViewChild,
@@ -22,13 +23,14 @@ import {
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { PresetService } from 'src/app/data/service/preset.service';
 import { ScheduleService } from 'src/app/data/service/schedule.service';
-import { concatMap, finalize, of, switchMap } from 'rxjs';
+import { Subscription, concatMap, finalize, of, switchMap } from 'rxjs';
 import { ToastService } from '@app/services/toast.service';
 import { Objects, RuleTypes, Severities } from 'src/app/data/constants';
 import { Point } from '@shared/components/bounding-box-editor/bounding-box-editor.component';
 import { Rule } from 'src/app/data/schema/boho-v2/rule';
 import { RuleService } from 'src/app/data/service/rule.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { NodeService } from 'src/app/data/service/node.service';
 
 declare interface CustomSelectItemModel extends SelectItemModel {
   data: any;
@@ -198,7 +200,7 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
   templateUrl: './rule.component.html',
   styleUrls: ['./rule.component.scss', '../shared/my-input.scss'],
 })
-export class RuleComponent implements OnInit, AfterViewInit {
+export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('objectColumnTemplate', { static: true })
   objectColumnTemplate!: TemplateRef<any>;
 
@@ -211,6 +213,7 @@ export class RuleComponent implements OnInit, AfterViewInit {
   _toastService = inject(ToastService);
   _changeDetectorRef = inject(ChangeDetectorRef);
   _ruleService = inject(RuleService);
+  _nodeService = inject(NodeService);
 
   menuItems: MenuItem[] = [
     {
@@ -237,56 +240,60 @@ export class RuleComponent implements OnInit, AfterViewInit {
   }));
   schedules: SelectItemModel[] = [];
   columns: ColumnConfig[] = [];
+  private _subscriptions: Subscription[] = [];
 
   ngOnInit(): void {
     this._navigationService.level3 = Level3Menu.RULE;
-    this._activatedRoute.params.subscribe(({ nodeId, cameraId }) => {
-      this.cameraId = cameraId;
-      this.nodeId = nodeId;
+    const activatedRouteSubscription = this._activatedRoute.params.subscribe(
+      ({ nodeId, cameraId }) => {
+        this.cameraId = cameraId;
+        this.nodeId = nodeId;
 
-      this._presetService
-        .findAll(this.nodeId, this.cameraId)
-        .pipe(
-          concatMap((response) => {
-            if (!response.success) {
-              throw Error(
-                `Fetch the preset list failed with error: ${response.message}`
-              );
-            }
+        this._presetService
+          .findAll(this.nodeId, this.cameraId)
+          .pipe(
+            concatMap((response) => {
+              if (!response.success) {
+                throw Error(
+                  `Fetch the preset list failed with error: ${response.message}`
+                );
+              }
 
-            this.presets = response.data.map((e) => ({
-              label: e.name,
-              value: e.id,
-            }));
+              this.presets = response.data.map((e) => ({
+                label: e.name,
+                value: e.id,
+              }));
 
-            return this._scheduleService.findAll(this.nodeId, this.cameraId);
-          }),
-          concatMap((response) => {
-            if (!response.success) {
-              throw Error(
-                `Fetch the schedule list failed with error: ${response.message}`
-              );
-            }
+              return this._scheduleService.findAll(this.nodeId, this.cameraId);
+            }),
+            concatMap((response) => {
+              if (!response.success) {
+                throw Error(
+                  `Fetch the schedule list failed with error: ${response.message}`
+                );
+              }
 
-            this.schedules = response.data.map((e) => ({
-              label: e.name,
-              value: e.id,
-            }));
+              this.schedules = response.data.map((e) => ({
+                label: e.name,
+                value: e.id,
+              }));
 
-            return this._ruleService.findAll(this.nodeId, this.cameraId);
-          })
-        )
-        .subscribe({
-          next: (response) => {
-            this.data = response.data.map((e) => {
-              const item = new RowItemModel();
-              item.setData(e, this.schedules, this.presets);
-              return item;
-            });
-          },
-          error: ({ message }) => this._toastService.showError(message),
-        });
-    });
+              return this._ruleService.findAll(this.nodeId, this.cameraId);
+            })
+          )
+          .subscribe({
+            next: (response) => {
+              this.data = response.data.map((e) => {
+                const item = new RowItemModel();
+                item.setData(e, this.schedules, this.presets);
+                return item;
+              });
+            },
+            error: ({ message }) => this._toastService.showError(message),
+          });
+      }
+    );
+    this._subscriptions.push(activatedRouteSubscription);
   }
 
   ngAfterViewInit(): void {
@@ -321,6 +328,10 @@ export class RuleComponent implements OnInit, AfterViewInit {
     this._changeDetectorRef.detectChanges();
   }
 
+  ngOnDestroy(): void {
+    this._subscriptions.forEach((e) => e.unsubscribe());
+  }
+
   add() {
     const newItem = new RowItemModel();
     newItem.isEditable = true;
@@ -338,43 +349,35 @@ export class RuleComponent implements OnInit, AfterViewInit {
       this._ruleService
         .create(this.nodeId, this.cameraId, data)
         .pipe(
-          switchMap((response) => {
-            if (!response.success) {
-              throw Error(`Create rule failed with error: ${response.message}`);
-            }
-
-            return of(response);
-          })
+          switchMap((response) =>
+            this._nodeService
+              .ruleUpdate(this.nodeId)
+              .pipe(switchMap(() => of(response)))
+          )
         )
         .subscribe({
-          next: (response) => {
+          next: ({ data: id }) => {
             this._toastService.showSuccess('Create rule successfully');
             item.isNew = false;
             item.isEditable = false;
             item.form.disable();
-            item.id = response.data.toString();
+            item.id = id.toString();
           },
-          error: ({ message }) => this._toastService.showError(message),
+          error: (err: HttpErrorResponse) =>
+            this._toastService.showError(err.error?.message ?? err.message),
         });
     } else {
       this._ruleService
         .update(this.nodeId, this.cameraId, parseInt(item.id), data)
-        .pipe(
-          switchMap((response) => {
-            if (!response.success) {
-              throw Error(`Update rule failed with error: ${response.message}`);
-            }
-
-            return of(response);
-          })
-        )
+        .pipe(switchMap(() => this._nodeService.ruleUpdate(this.nodeId)))
         .subscribe({
           next: () => {
             this._toastService.showSuccess('Update rule successfully');
             item.isEditable = false;
             item.form.disable();
           },
-          error: ({ message }) => this._toastService.showError(message),
+          error: (err: HttpErrorResponse) =>
+            this._toastService.showError(err.error?.message ?? err.message),
         });
     }
   }
@@ -413,21 +416,14 @@ export class RuleComponent implements OnInit, AfterViewInit {
 
     this._ruleService
       .delete(this.nodeId, this.cameraId, item.id)
-      .pipe(
-        switchMap((response) => {
-          if (!response.success) {
-            throw Error(`Delete rule failed with error: ${response.message}`);
-          }
-
-          return of(response);
-        })
-      )
+      .pipe(switchMap(() => this._nodeService.ruleUpdate(this.nodeId)))
       .subscribe({
         next: () => {
           this.data = this.data.filter((e) => e.id !== item.id);
           this._toastService.showSuccess('Delete rule successfully');
         },
-        error: ({ message }) => this._toastService.showError(message),
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(err.error?.message ?? err.message),
       });
   }
 

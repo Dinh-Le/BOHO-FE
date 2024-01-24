@@ -1,9 +1,18 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { SelectItemModel } from '@shared/models/select-item-model';
 import { EditableListViewItemModel } from '../editable-list-view/editable-list-view-item.model';
 import { ActivatedRoute } from '@angular/router';
 import { PatrolService } from 'src/app/data/service/patrol.service';
-import { of, switchMap } from 'rxjs';
+import {
+  Subscription,
+  concat,
+  delay,
+  finalize,
+  of,
+  switchMap,
+  tap,
+  toArray,
+} from 'rxjs';
 import { ToastService } from '@app/services/toast.service';
 import { v4 } from 'uuid';
 import {
@@ -19,11 +28,14 @@ import {
 } from 'src/app/data/service/patrol-management.service';
 import { PatrolManagement } from 'src/app/data/schema/boho-v2/patrol-management';
 import { Preset } from 'src/app/data/schema/boho-v2/preset';
+import { DeviceService } from 'src/app/data/service/device.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 type PatrolManagementRowItem = PatrolManagement &
   Partial<{
     presetName: string;
     isNew: boolean;
+    isRunning?: boolean;
   }>;
 
 @Component({
@@ -31,7 +43,7 @@ type PatrolManagementRowItem = PatrolManagement &
   templateUrl: 'patrol-settings.component.html',
   styleUrls: ['patrol-settings.component.scss', '../../shared/my-input.scss'],
 })
-export class PatrolSettingsComponent implements OnInit {
+export class PatrolSettingsComponent implements OnInit, OnDestroy {
   private _activatedRoute = inject(ActivatedRoute);
   private _toastService = inject(ToastService);
   private _patrolService = inject(PatrolService);
@@ -39,6 +51,7 @@ export class PatrolSettingsComponent implements OnInit {
   private _presetService = inject(PresetService);
   private _modalService = inject(NgbModal);
   private _navigationService = inject(NavigationService);
+  private _deviceService = inject(DeviceService);
   private _nodeId: string = '';
   private _cameraId: string = '';
 
@@ -46,10 +59,11 @@ export class PatrolSettingsComponent implements OnInit {
   presetList: Preset[] = [];
   patrolManagementList: PatrolManagementRowItem[] = [];
   selectedPatrol: EditableListViewItemModel | undefined;
+  private _activatedRouteSubscription: Subscription | undefined;
 
   ngOnInit(): void {
     this._navigationService.level3 = Level3Menu.PATROL_SETTINGS;
-    this._activatedRoute.parent?.params
+    this._activatedRouteSubscription = this._activatedRoute.parent?.params
       .pipe(
         switchMap(({ nodeId, cameraId }) => {
           this._nodeId = nodeId;
@@ -85,6 +99,10 @@ export class PatrolSettingsComponent implements OnInit {
         },
         error: ({ message }) => this._toastService.showError(message),
       });
+  }
+
+  ngOnDestroy(): void {
+    this._activatedRouteSubscription?.unsubscribe();
   }
 
   trackByValue(_: any, item: SelectItemModel) {
@@ -192,7 +210,40 @@ export class PatrolSettingsComponent implements OnInit {
     }
   }
 
-  play() {}
+  play(ev: Event, img: HTMLImageElement) {
+    const button = ev.target as HTMLButtonElement;
+    button.disabled = true;
+
+    const observables = this.patrolManagementList.map((pm) =>
+      this._presetService
+        .control(this._nodeId, this._cameraId, pm.preset_id)
+        .pipe(
+          tap(() => (pm.isRunning = true)),
+          switchMap(() =>
+            this._deviceService.snapshot(this._nodeId, this._cameraId)
+          ),
+          switchMap(({ data: snapshot }) => {
+            img.src = `data:image/${snapshot.format};charset=utf-8;base64,${snapshot.img}`;
+            img.style.aspectRatio = (
+              snapshot.size[0] / snapshot.size[1]
+            ).toString();
+            return of(pm);
+          }),
+          delay(Math.min(5, pm.stand_time) * 1000),
+          finalize(() => (pm.isRunning = false))
+        )
+    );
+    concat(...observables)
+      .pipe(toArray())
+      .subscribe({
+        complete: () => {
+          this._toastService.showSuccess('Play the patrol completely');
+          button.disabled = false;
+        },
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(err.error?.message ?? err.message),
+      });
+  }
 
   remove(item: EditableListViewItemModel) {
     const func = (id: string) => {

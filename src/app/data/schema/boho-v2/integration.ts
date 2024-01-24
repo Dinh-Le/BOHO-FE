@@ -1,6 +1,6 @@
 export interface Integration {
   id: number;
-  name: string;
+  service_name: string;
   milestone_id: number;
   guid: string;
   rule_ids: number[];
