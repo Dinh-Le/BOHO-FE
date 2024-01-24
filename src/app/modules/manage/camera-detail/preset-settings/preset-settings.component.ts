@@ -27,12 +27,12 @@ export class PresetSettingsComponent implements OnInit, OnDestroy {
   selectedItem: EditableListViewItemModel | undefined;
   nodeId = '';
   cameraId = '';
-  private _subscription: Subscription | undefined;
+  private _subscriptions: Subscription[] = [];
 
   ngOnInit(): void {
     this._navigationService.level3 = Level3Menu.PRESET_SETTINGS;
-    this._subscription = this._activatedRoute.parent?.params
-      .pipe(
+    const activatedRouteSubscription = this._activatedRoute
+      .parent!.params.pipe(
         switchMap(({ nodeId, cameraId }) => {
           this.nodeId = nodeId;
           this.cameraId = cameraId;
@@ -48,10 +48,11 @@ export class PresetSettingsComponent implements OnInit, OnDestroy {
         },
         error: ({ message }) => this._toastService.showError(message),
       });
+    this._subscriptions.push(activatedRouteSubscription);
   }
 
   ngOnDestroy(): void {
-    this._subscription?.unsubscribe();
+    this._subscriptions.forEach((e) => e.unsubscribe());
   }
 
   load() {

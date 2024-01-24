@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   Component,
+  OnDestroy,
   OnInit,
   TemplateRef,
   ViewChild,
@@ -22,7 +23,7 @@ import {
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { PresetService } from 'src/app/data/service/preset.service';
 import { ScheduleService } from 'src/app/data/service/schedule.service';
-import { concatMap, finalize, of, switchMap } from 'rxjs';
+import { Subscription, concatMap, finalize, of, switchMap } from 'rxjs';
 import { ToastService } from '@app/services/toast.service';
 import { Objects, RuleTypes, Severities } from 'src/app/data/constants';
 import { Point } from '@shared/components/bounding-box-editor/bounding-box-editor.component';
@@ -198,7 +199,7 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
   templateUrl: './rule.component.html',
   styleUrls: ['./rule.component.scss', '../shared/my-input.scss'],
 })
-export class RuleComponent implements OnInit, AfterViewInit {
+export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('objectColumnTemplate', { static: true })
   objectColumnTemplate!: TemplateRef<any>;
 
@@ -237,56 +238,60 @@ export class RuleComponent implements OnInit, AfterViewInit {
   }));
   schedules: SelectItemModel[] = [];
   columns: ColumnConfig[] = [];
+  private _subscriptions: Subscription[] = [];
 
   ngOnInit(): void {
     this._navigationService.level3 = Level3Menu.RULE;
-    this._activatedRoute.params.subscribe(({ nodeId, cameraId }) => {
-      this.cameraId = cameraId;
-      this.nodeId = nodeId;
+    const activatedRouteSubscription = this._activatedRoute.params.subscribe(
+      ({ nodeId, cameraId }) => {
+        this.cameraId = cameraId;
+        this.nodeId = nodeId;
 
-      this._presetService
-        .findAll(this.nodeId, this.cameraId)
-        .pipe(
-          concatMap((response) => {
-            if (!response.success) {
-              throw Error(
-                `Fetch the preset list failed with error: ${response.message}`
-              );
-            }
+        this._presetService
+          .findAll(this.nodeId, this.cameraId)
+          .pipe(
+            concatMap((response) => {
+              if (!response.success) {
+                throw Error(
+                  `Fetch the preset list failed with error: ${response.message}`
+                );
+              }
 
-            this.presets = response.data.map((e) => ({
-              label: e.name,
-              value: e.id,
-            }));
+              this.presets = response.data.map((e) => ({
+                label: e.name,
+                value: e.id,
+              }));
 
-            return this._scheduleService.findAll(this.nodeId, this.cameraId);
-          }),
-          concatMap((response) => {
-            if (!response.success) {
-              throw Error(
-                `Fetch the schedule list failed with error: ${response.message}`
-              );
-            }
+              return this._scheduleService.findAll(this.nodeId, this.cameraId);
+            }),
+            concatMap((response) => {
+              if (!response.success) {
+                throw Error(
+                  `Fetch the schedule list failed with error: ${response.message}`
+                );
+              }
 
-            this.schedules = response.data.map((e) => ({
-              label: e.name,
-              value: e.id,
-            }));
+              this.schedules = response.data.map((e) => ({
+                label: e.name,
+                value: e.id,
+              }));
 
-            return this._ruleService.findAll(this.nodeId, this.cameraId);
-          })
-        )
-        .subscribe({
-          next: (response) => {
-            this.data = response.data.map((e) => {
-              const item = new RowItemModel();
-              item.setData(e, this.schedules, this.presets);
-              return item;
-            });
-          },
-          error: ({ message }) => this._toastService.showError(message),
-        });
-    });
+              return this._ruleService.findAll(this.nodeId, this.cameraId);
+            })
+          )
+          .subscribe({
+            next: (response) => {
+              this.data = response.data.map((e) => {
+                const item = new RowItemModel();
+                item.setData(e, this.schedules, this.presets);
+                return item;
+              });
+            },
+            error: ({ message }) => this._toastService.showError(message),
+          });
+      }
+    );
+    this._subscriptions.push(activatedRouteSubscription);
   }
 
   ngAfterViewInit(): void {
@@ -319,6 +324,10 @@ export class RuleComponent implements OnInit, AfterViewInit {
       },
     ];
     this._changeDetectorRef.detectChanges();
+  }
+
+  ngOnDestroy(): void {
+    this._subscriptions.forEach((e) => e.unsubscribe());
   }
 
   add() {

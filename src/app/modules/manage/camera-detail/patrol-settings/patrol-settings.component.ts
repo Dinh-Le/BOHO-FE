@@ -1,9 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { SelectItemModel } from '@shared/models/select-item-model';
 import { EditableListViewItemModel } from '../editable-list-view/editable-list-view-item.model';
 import { ActivatedRoute } from '@angular/router';
 import { PatrolService } from 'src/app/data/service/patrol.service';
-import { of, switchMap } from 'rxjs';
+import { Subscription, of, switchMap } from 'rxjs';
 import { ToastService } from '@app/services/toast.service';
 import { v4 } from 'uuid';
 import {
@@ -31,7 +31,7 @@ type PatrolManagementRowItem = PatrolManagement &
   templateUrl: 'patrol-settings.component.html',
   styleUrls: ['patrol-settings.component.scss', '../../shared/my-input.scss'],
 })
-export class PatrolSettingsComponent implements OnInit {
+export class PatrolSettingsComponent implements OnInit, OnDestroy {
   private _activatedRoute = inject(ActivatedRoute);
   private _toastService = inject(ToastService);
   private _patrolService = inject(PatrolService);
@@ -46,10 +46,11 @@ export class PatrolSettingsComponent implements OnInit {
   presetList: Preset[] = [];
   patrolManagementList: PatrolManagementRowItem[] = [];
   selectedPatrol: EditableListViewItemModel | undefined;
+  private _activatedRouteSubscription: Subscription | undefined;
 
   ngOnInit(): void {
     this._navigationService.level3 = Level3Menu.PATROL_SETTINGS;
-    this._activatedRoute.parent?.params
+    this._activatedRouteSubscription = this._activatedRoute.parent?.params
       .pipe(
         switchMap(({ nodeId, cameraId }) => {
           this._nodeId = nodeId;
@@ -85,6 +86,10 @@ export class PatrolSettingsComponent implements OnInit {
         },
         error: ({ message }) => this._toastService.showError(message),
       });
+  }
+
+  ngOnDestroy(): void {
+    this._activatedRouteSubscription?.unsubscribe();
   }
 
   trackByValue(_: any, item: SelectItemModel) {

@@ -1,10 +1,10 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ToastService } from '@app/services/toast.service';
 import { SelectItemModel } from '@shared/models/select-item-model';
-import { from, map, mergeAll, of, switchMap, zipAll } from 'rxjs';
+import { Subscription, from, map, mergeAll, of, switchMap, zipAll } from 'rxjs';
 import { DaysInWeek } from 'src/app/data/constants';
 import { ColorNames } from 'src/app/data/constants/colors.constant';
 import { Patrol } from 'src/app/data/schema/boho-v2/patrol';
@@ -41,7 +41,7 @@ interface PtzSchedule {
   templateUrl: 'tour-settings.component.html',
   styleUrls: ['tour-settings.component.scss', '../../shared/my-input.scss'],
 })
-export class TourSettingsComponent implements OnInit {
+export class TourSettingsComponent implements OnInit, OnDestroy {
   private _patrolService = inject(PatrolService);
   private _presetService = inject(PresetService);
   private _tourService = inject(TouringService);
@@ -76,6 +76,7 @@ export class TourSettingsComponent implements OnInit {
     ]),
   });
   selectedSchedule: PtzSchedule | undefined;
+  private _subscriptions: Subscription[] = [];
 
   get journeyList(): SelectItemModel[] {
     const isPatrolType = this.form.get('type')!.value === 'patrol';
@@ -91,14 +92,17 @@ export class TourSettingsComponent implements OnInit {
 
   ngOnInit(): void {
     this._navigationService.level3 = Level3Menu.TOUR_SETTINGS;
-    this.form.get('type')?.valueChanges.subscribe(() => {
-      this.form.get('journey')?.reset({
-        value: undefined,
+    const typeChangedSubscription = this.form
+      .get('type')!
+      .valueChanges.subscribe(() => {
+        this.form.get('journey')?.reset({
+          value: undefined,
+        });
       });
-    });
+    this._subscriptions.push(typeChangedSubscription);
 
-    this._activatedRoute.parent?.params
-      .pipe(
+    const activatedRouteSubscription = this._activatedRoute
+      .parent!.params.pipe(
         switchMap(({ nodeId, cameraId }) => {
           this._nodeId = nodeId;
           this._cameraId = cameraId;
@@ -174,6 +178,11 @@ export class TourSettingsComponent implements OnInit {
         error: (err: HttpErrorResponse) =>
           this._toastService.showError(err.error.message ?? err.message),
       });
+    this._subscriptions.push(activatedRouteSubscription);
+  }
+
+  ngOnDestroy(): void {
+    this._subscriptions.forEach((e) => e.unsubscribe());
   }
 
   canAdd() {

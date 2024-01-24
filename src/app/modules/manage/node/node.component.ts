@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   Component,
+  OnDestroy,
   OnInit,
   TemplateRef,
   ViewChild,
@@ -17,7 +18,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NodeService } from 'src/app/data/service/node.service';
 import { ToastService } from '@app/services/toast.service';
 import { Node } from 'src/app/data/schema/boho-v2/node';
-import { catchError, of, switchMap } from 'rxjs';
+import { Subscription, catchError, of, switchMap } from 'rxjs';
 import { NodeTypes } from 'src/app/data/constants';
 import {
   NavigationService,
@@ -107,7 +108,7 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
   templateUrl: 'node.component.html',
   styleUrls: ['node.component.scss', '../shared/my-input.scss'],
 })
-export class NodeComponent implements OnInit, AfterViewInit {
+export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   private _activatedRoute = inject(ActivatedRoute);
   private _nodeService = inject(NodeService);
   private _toastService = inject(ToastService);
@@ -123,9 +124,10 @@ export class NodeComponent implements OnInit, AfterViewInit {
     label: e,
   }));
   _nodeOperatorId = '';
+  private _subscriptions: Subscription[] = [];
 
   ngOnInit(): void {
-    this._activatedRoute.params
+    const activatedRouteSubscription = this._activatedRoute.params
       .pipe(
         switchMap(({ nodeOperatorId }) => {
           this._nodeOperatorId = nodeOperatorId;
@@ -151,6 +153,7 @@ export class NodeComponent implements OnInit, AfterViewInit {
         },
         error: ({ message }) => this._toastService.showError(message),
       });
+    this._subscriptions.push(activatedRouteSubscription);
   }
 
   ngAfterViewInit(): void {
@@ -184,6 +187,10 @@ export class NodeComponent implements OnInit, AfterViewInit {
       },
     ];
     this._changeDetectorRef.detectChanges();
+  }
+
+  ngOnDestroy(): void {
+    this._subscriptions.forEach((e) => e.unsubscribe());
   }
 
   add() {

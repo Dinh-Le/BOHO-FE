@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import {
   ColumnConfig,
   ExpandableTableRowItemModelBase,
@@ -18,7 +18,7 @@ import { IntegrationService } from 'src/app/data/service/integration.service';
 import { RuleService } from 'src/app/data/service/rule.service';
 import { MilestoneService } from 'src/app/data/service/milestone.service';
 import { ActivatedRoute } from '@angular/router';
-import { switchMap, zip } from 'rxjs';
+import { Subscription, switchMap, zip } from 'rxjs';
 import { Integration } from 'src/app/data/schema/boho-v2';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ToastService } from '@app/services/toast.service';
@@ -102,7 +102,7 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
   templateUrl: 'integration.component.html',
   styleUrls: ['../shared/my-input.scss'],
 })
-export class IntegrationComponent implements OnInit {
+export class IntegrationComponent implements OnInit, OnDestroy {
   private _modalService = inject(NgbModal);
   private _navigationService = inject(NavigationService);
   private _integrationService = inject(IntegrationService);
@@ -115,6 +115,7 @@ export class IntegrationComponent implements OnInit {
 
   private _nodeId: string = '';
   private _deviceId: number = 0;
+  private _subscriptions: Subscription[] = [];
 
   data: RowItemModel[] = [];
   columns: ColumnConfig[] = [
@@ -143,7 +144,7 @@ export class IntegrationComponent implements OnInit {
 
   ngOnInit(): void {
     this._navigationService.level2 = Level2Menu.INTEGRATION;
-    this._activatedRoute.params
+    const activatedRouteSubscription = this._activatedRoute.params
       .pipe(
         switchMap((params) => {
           const { nodeId, cameraId } = params;
@@ -215,6 +216,11 @@ export class IntegrationComponent implements OnInit {
         },
         error: ({ message }) => this._toastService.showError(message),
       });
+    this._subscriptions.push(activatedRouteSubscription);
+  }
+
+  ngOnDestroy(): void {
+    this._subscriptions.forEach((e) => e.unsubscribe());
   }
 
   add() {
