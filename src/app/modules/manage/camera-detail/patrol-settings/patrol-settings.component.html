@@ -11,7 +11,7 @@
       <button class="my-button submit mx-2" (click)="add()">Thêm</button>
       <button
         class="my-button submit mx-2"
-        (click)="play(snapshot)"
+        (click)="play($event, snapshot)"
         [disabled]="patrolManagementList.length === 0"
       >
         Chạy

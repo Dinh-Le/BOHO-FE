@@ -210,7 +210,10 @@ export class PatrolSettingsComponent implements OnInit, OnDestroy {
     }
   }
 
-  play(img: HTMLImageElement) {
+  play(ev: Event, img: HTMLImageElement) {
+    const button = ev.target as HTMLButtonElement;
+    button.disabled = true;
+
     const observables = this.patrolManagementList.map((pm) =>
       this._presetService
         .control(this._nodeId, this._cameraId, pm.preset_id)
@@ -233,8 +236,10 @@ export class PatrolSettingsComponent implements OnInit, OnDestroy {
     concat(...observables)
       .pipe(toArray())
       .subscribe({
-        complete: () =>
-          this._toastService.showSuccess('Play the patrol completely'),
+        complete: () => {
+          this._toastService.showSuccess('Play the patrol completely');
+          button.disabled = false;
+        },
         error: (err: HttpErrorResponse) =>
           this._toastService.showError(err.error?.message ?? err.message),
       });
