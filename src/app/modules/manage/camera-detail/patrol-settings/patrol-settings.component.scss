@@ -75,7 +75,8 @@ button:disabled {
           }
         }
 
-        tr:hover {
+        tr:hover,
+        tr.active {
           background: #5285b6ff;
           td {
             background: #5285b6ff;
