@@ -25,6 +25,7 @@ import { ToastService } from '@app/services/toast.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { PresetService } from 'src/app/data/service/preset.service';
 import { ScheduleService } from 'src/app/data/service/schedule.service';
+import { Milestone } from 'src/app/data/schema/boho-v2/milestone';
 
 class RowItemModel extends ExpandableTableRowItemModelBase {
   form = new FormGroup({
@@ -81,15 +82,16 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
     this.form.get('ruleIdList')?.setValue(ids);
   }
 
-  setData(data: Integration, type: SelectItemModel): void {
+  setData(
+    data: Integration,
+    type: SelectItemModel,
+    source?: SelectItemModel
+  ): void {
     this.form.reset({
       id: data.id,
-      name: data.name,
+      name: data.service_name,
       type: type,
-      source: {
-        value: data.milestone_id,
-        label: '',
-      },
+      source,
       guid: data.guid,
       isSendSnapshot: data.is_send_snapshot,
       ruleIdList: data.rule_ids,
@@ -175,7 +177,7 @@ export class IntegrationComponent implements OnInit, OnDestroy {
               schedules.find((e) => e.id === rule.schedule_id)?.name || '';
             return new EventSourceRowItem(rule, presetName, scheduleName);
           });
-          console.log(this.rules);
+
           return this._milestoneService.findAll();
         }),
         switchMap(({ data }) => {
@@ -204,13 +206,13 @@ export class IntegrationComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: ({ data }) => {
-          if (!Array.isArray(data)) {
-            return;
-          }
-
           this.data = data.map((e) => {
             const rowItem = new RowItemModel();
-            rowItem.setData(e, this.types[0]);
+            rowItem.setData(
+              e,
+              this.types[0],
+              this.sources.find((src) => src.value === e.milestone_id)
+            );
             return rowItem;
           });
         },
@@ -236,7 +238,7 @@ export class IntegrationComponent implements OnInit, OnDestroy {
 
   save(row: RowItemModel) {
     const data: Omit<Integration, 'id'> = {
-      name: row.name,
+      service_name: row.name,
       milestone_id: row.source?.value,
       guid: row.guid,
       is_send_snapshot: row.isSendSnapshot,

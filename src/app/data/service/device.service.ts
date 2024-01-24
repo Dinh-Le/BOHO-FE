@@ -80,6 +80,16 @@ export abstract class DeviceService extends RestfullApiService {
       data: Snapshot;
     }
   >;
+
+  public abstract pauseDevice(
+    nodeId: string,
+    deviceId: string
+  ): Observable<ResponseBase>;
+
+  public abstract resumeDevice(
+    nodeId: string,
+    deviceId: string
+  ): Observable<ResponseBase>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -188,5 +198,21 @@ export class DeviceServiceImpl extends DeviceService {
         data: Snapshot;
       }
     >(url);
+  }
+
+  public override pauseDevice(
+    nodeId: string,
+    deviceId: string
+  ): Observable<ResponseBase> {
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/pause_device`;
+    return this.httpClient.get<ResponseBase>(url);
+  }
+
+  public override resumeDevice(
+    nodeId: string,
+    deviceId: string
+  ): Observable<ResponseBase> {
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/resume_device`;
+    return this.httpClient.get<ResponseBase>(url);
   }
 }

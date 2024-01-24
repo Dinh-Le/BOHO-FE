@@ -30,6 +30,7 @@ import { Point } from '@shared/components/bounding-box-editor/bounding-box-edito
 import { Rule } from 'src/app/data/schema/boho-v2/rule';
 import { RuleService } from 'src/app/data/service/rule.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { NodeService } from 'src/app/data/service/node.service';
 
 declare interface CustomSelectItemModel extends SelectItemModel {
   data: any;
@@ -212,6 +213,7 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
   _toastService = inject(ToastService);
   _changeDetectorRef = inject(ChangeDetectorRef);
   _ruleService = inject(RuleService);
+  _nodeService = inject(NodeService);
 
   menuItems: MenuItem[] = [
     {
@@ -347,43 +349,35 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
       this._ruleService
         .create(this.nodeId, this.cameraId, data)
         .pipe(
-          switchMap((response) => {
-            if (!response.success) {
-              throw Error(`Create rule failed with error: ${response.message}`);
-            }
-
-            return of(response);
-          })
+          switchMap((response) =>
+            this._nodeService
+              .ruleUpdate(this.nodeId)
+              .pipe(switchMap(() => of(response)))
+          )
         )
         .subscribe({
-          next: (response) => {
+          next: ({ data: id }) => {
             this._toastService.showSuccess('Create rule successfully');
             item.isNew = false;
             item.isEditable = false;
             item.form.disable();
-            item.id = response.data.toString();
+            item.id = id.toString();
           },
-          error: ({ message }) => this._toastService.showError(message),
+          error: (err: HttpErrorResponse) =>
+            this._toastService.showError(err.error?.message ?? err.message),
         });
     } else {
       this._ruleService
         .update(this.nodeId, this.cameraId, parseInt(item.id), data)
-        .pipe(
-          switchMap((response) => {
-            if (!response.success) {
-              throw Error(`Update rule failed with error: ${response.message}`);
-            }
-
-            return of(response);
-          })
-        )
+        .pipe(switchMap(() => this._nodeService.ruleUpdate(this.nodeId)))
         .subscribe({
           next: () => {
             this._toastService.showSuccess('Update rule successfully');
             item.isEditable = false;
             item.form.disable();
           },
-          error: ({ message }) => this._toastService.showError(message),
+          error: (err: HttpErrorResponse) =>
+            this._toastService.showError(err.error?.message ?? err.message),
         });
     }
   }
@@ -422,21 +416,14 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this._ruleService
       .delete(this.nodeId, this.cameraId, item.id)
-      .pipe(
-        switchMap((response) => {
-          if (!response.success) {
-            throw Error(`Delete rule failed with error: ${response.message}`);
-          }
-
-          return of(response);
-        })
-      )
+      .pipe(switchMap(() => this._nodeService.ruleUpdate(this.nodeId)))
       .subscribe({
         next: () => {
           this.data = this.data.filter((e) => e.id !== item.id);
           this._toastService.showSuccess('Delete rule successfully');
         },
-        error: ({ message }) => this._toastService.showError(message),
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(err.error?.message ?? err.message),
       });
   }
 

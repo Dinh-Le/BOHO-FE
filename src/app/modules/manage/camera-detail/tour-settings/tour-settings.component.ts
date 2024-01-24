@@ -4,7 +4,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ToastService } from '@app/services/toast.service';
 import { SelectItemModel } from '@shared/models/select-item-model';
-import { Subscription, from, map, mergeAll, of, switchMap, zipAll } from 'rxjs';
+import { Subscription, concat, of, switchMap, toArray } from 'rxjs';
 import { DaysInWeek } from 'src/app/data/constants';
 import { ColorNames } from 'src/app/data/constants/colors.constant';
 import { Patrol } from 'src/app/data/schema/boho-v2/patrol';
@@ -13,6 +13,7 @@ import {
   Level3Menu,
   NavigationService,
 } from 'src/app/data/service/navigation.service';
+import { NodeService } from 'src/app/data/service/node.service';
 import { PatrolService } from 'src/app/data/service/patrol.service';
 import { PresetService } from 'src/app/data/service/preset.service';
 import {
@@ -48,6 +49,7 @@ export class TourSettingsComponent implements OnInit, OnDestroy {
   private _activatedRoute = inject(ActivatedRoute);
   private _toastService = inject(ToastService);
   private _navigationService = inject(NavigationService);
+  private _nodeService = inject(NodeService);
   private _nodeId: string = '';
   private _cameraId: string = '';
   private _touringId: number = -1;
@@ -234,18 +236,14 @@ export class TourSettingsComponent implements OnInit, OnDestroy {
         data
       )
       .pipe(
-        switchMap((response) => {
-          if (!response.success) {
-            throw Error(
-              'Add tour schedule for patrol or preset failed with error: ' +
-                response.message
-            );
-          }
-          return of(response);
-        })
+        switchMap((response) =>
+          this._nodeService
+            .tourUpdate(this._nodeId)
+            .pipe(switchMap(() => of(response)))
+        )
       )
       .subscribe({
-        next: (response) => {
+        next: ({ data: { id: scheduleId } }) => {
           this._toastService.showSuccess(
             'Create touring schedule successfully'
           );
@@ -255,7 +253,7 @@ export class TourSettingsComponent implements OnInit, OnDestroy {
             id: v4(),
             type,
             patrolId: journey.value,
-            scheduleId: response.data.id,
+            scheduleId,
             startTime,
             endTime,
             day: day.value,
@@ -331,17 +329,7 @@ export class TourSettingsComponent implements OnInit, OnDestroy {
             type
           );
     response$
-      .pipe(
-        switchMap((response) => {
-          if (!response.success) {
-            throw Error(
-              'Delete a touring schedule for patrol or preset failed with error: ' +
-                response.message
-            );
-          }
-          return of(response);
-        })
-      )
+      .pipe(switchMap(() => this._nodeService.tourUpdate(this._nodeId)))
       .subscribe({
         next: () => {
           this._toastService.showSuccess(
@@ -351,7 +339,8 @@ export class TourSettingsComponent implements OnInit, OnDestroy {
           this.resetForm();
           this.selectedSchedule = undefined;
         },
-        error: ({ message }) => this._toastService.showError(message),
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(err.error?.message ?? err.message),
       });
   }
 
@@ -365,28 +354,21 @@ export class TourSettingsComponent implements OnInit, OnDestroy {
         [key: string]: 'preset' | 'patrol';
       }
     );
-    from(Object.entries(patrolSchedules))
-      .pipe(
-        map(([scheduleId, type]) =>
-          this._tourService.deleteTouringSchedule(
-            this._nodeId,
-            this._cameraId,
-            this._touringId,
-            parseInt(scheduleId),
-            type
-          )
-        ),
-        mergeAll(),
-        map((response) => {
-          if (!response.success) {
-            throw Error(
-              `Delete touring schedule failed with error: ${response.message}`
-            );
-          }
+    const subscriptions = Object.entries(patrolSchedules).map(
+      ([scheduleId, type]) =>
+        this._tourService.deleteTouringSchedule(
+          this._nodeId,
+          this._cameraId,
+          this._touringId,
+          parseInt(scheduleId),
+          type
+        )
+    );
 
-          return of(response);
-        }),
-        zipAll()
+    concat(...subscriptions)
+      .pipe(
+        toArray(),
+        switchMap(() => this._nodeService.tourUpdate(this._nodeId))
       )
       .subscribe({
         next: () => {
@@ -394,7 +376,8 @@ export class TourSettingsComponent implements OnInit, OnDestroy {
           this.selectedSchedule = undefined;
           this.data = this.data.map(() => []);
         },
-        error: ({ message }) => this._toastService.showError(message),
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(err.error?.message ?? err.message),
       });
   }
 
@@ -501,35 +484,32 @@ export class TourSettingsComponent implements OnInit, OnDestroy {
                   e.scheduleId === this.selectedSchedule?.scheduleId
               );
             if (schedules.length == 0) {
-              return this._tourService
-                .deleteTouringSchedule(
-                  this._nodeId,
-                  this._cameraId,
-                  this._touringId,
-                  this.selectedSchedule!.scheduleId,
-                  this.selectedSchedule!.type
-                )
-                .pipe(switchMap(() => of(true)));
+              return this._tourService.deleteTouringSchedule(
+                this._nodeId,
+                this._cameraId,
+                this._touringId,
+                this.selectedSchedule!.scheduleId,
+                this.selectedSchedule!.type
+              );
             } else {
-              return this._tourService
-                .updateTouringSchedule(
-                  this._nodeId,
-                  this._cameraId,
-                  this._touringId,
-                  this.selectedSchedule!.scheduleId,
-                  {
-                    schedule_type: this.selectedSchedule!.type,
-                    color: this.selectedSchedule!.color,
-                    schedule: schedules.map((e) => ({
-                      start_time: this.toTimeString(e.startTime),
-                      end_time: this.toTimeString(e.endTime),
-                      day: e.day,
-                    })),
-                  }
-                )
-                .pipe(switchMap(() => of(true)));
+              return this._tourService.updateTouringSchedule(
+                this._nodeId,
+                this._cameraId,
+                this._touringId,
+                this.selectedSchedule!.scheduleId,
+                {
+                  schedule_type: this.selectedSchedule!.type,
+                  color: this.selectedSchedule!.color,
+                  schedule: schedules.map((e) => ({
+                    start_time: this.toTimeString(e.startTime),
+                    end_time: this.toTimeString(e.endTime),
+                    day: e.day,
+                  })),
+                }
+              );
             }
-          })
+          }),
+          switchMap(() => this._nodeService.tourUpdate(this._nodeId))
         )
         .subscribe({
           error: (err: HttpErrorResponse) =>
@@ -555,12 +535,13 @@ export class TourSettingsComponent implements OnInit, OnDestroy {
               )
               .concat(modifiedSchedule)
               .map((e) => ({
-                start_time: this.toTimeString(startTime),
-                end_time: this.toTimeString(endTime),
+                start_time: this.toTimeString(e.startTime),
+                end_time: this.toTimeString(e.endTime),
                 day: e.day,
               })),
           }
         )
+        .pipe(switchMap(() => this._nodeService.tourUpdate(this._nodeId)))
         .subscribe({
           error: (err: HttpErrorResponse) =>
             this._toastService.showError(err.error?.message ?? err.message),
