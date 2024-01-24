@@ -1,0 +1,41 @@
+<form [formGroup]="form" class="form full-height" (submit)="submit()">
+  <div class="form-title">Phát hiện can thiệp</div>
+  <div class="form-body">
+    <div class="form-item">
+      <label class="label" for="enabled">Bật:</label>
+      <label class="custom-checkbox">
+        <input id="enabled" type="checkbox" formControlName="enabled" />
+      </label>
+    </div>
+    <div class="form-item">
+      <label for="duration" class="label">Thời gian:</label>
+      <input
+        id="duration"
+        class="control"
+        type="number"
+        formControlName="duration"
+        min="5"
+        max="30"
+        required
+      />
+      <span>(5 ~ 180 s)</span>
+    </div>
+    <div class="form-item">
+      <label for="threshold" class="label">Ngưỡng</label>
+      <input
+        id="threshold"
+        class="control"
+        type="number"
+        formControlName="threshold"
+        min="0"
+        max="100"
+        required
+      />
+      <span>(0 ~ 100 %)</span>
+    </div>
+  </div>
+  <div class="form-footer">
+    <button type="button" (click)="reset()" class="cancel">Hủy</button>
+    <button type="submit" class="submit" [disabled]="form.invalid">Lưu</button>
+  </div>
+</form>

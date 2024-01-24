@@ -31,6 +31,12 @@ export class CameraDetailComponent implements OnInit {
       visible: true,
     },
     {
+      icon: 'bi-gear-fill',
+      title: 'Cài đặt',
+      path: '/settings',
+      visible: true,
+    },
+    {
       icon: 'bi-arrows-move',
       title: 'Điểm giám sát',
       path: '/preset-settings',
@@ -61,7 +67,7 @@ export class CameraDetailComponent implements OnInit {
         next: ({ data }) => {
           this._camera = data;
 
-          for (let i = 1; i < this.menuItems.length; i++) {
+          for (let i = 2; i < this.menuItems.length; i++) {
             this.menuItems[i].visible = data.camera.type === 'PTZ';
           }
         },

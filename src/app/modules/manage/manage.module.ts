@@ -28,6 +28,7 @@ import { VehicleListDetailComponent } from './vehicle-list-detail/vehicle-list-d
 import { TimeInputComponent } from './camera-detail/tour-settings/time-input/time-input.component';
 import { EditableListViewComponent } from './camera-detail/editable-list-view/editable-list-view.component';
 import { IntegrationComponent } from './integration/integration.component';
+import { CameraSettingsComponent } from './camera-detail/camera-settings/camera-settings.component';
 
 @NgModule({
   declarations: [
@@ -51,6 +52,7 @@ import { IntegrationComponent } from './integration/integration.component';
     TimeInputComponent,
     EditableListViewComponent,
     IntegrationComponent,
+    CameraSettingsComponent,
   ],
   imports: [
     CommonModule,
