@@ -9,6 +9,7 @@ import { ManageCameraComponent } from './manage-camera/manage-camera.component';
 import { catchError, of } from 'rxjs';
 import { InvalidId } from 'src/app/data/constants';
 import { ViewMode } from '@shared/components/tree-view/view-mode.enum';
+import { HttpErrorResponse } from '@angular/common/http';
 
 interface RowData {
   id: string;
@@ -31,30 +32,16 @@ export class GroupCameraComponent implements OnInit {
   viewMode = ViewMode.Geolocation;
 
   ngOnInit(): void {
-    this._groupService
-      .findAll()
-      .pipe(
-        catchError(({ message }) =>
-          of({
-            message,
-            success: false,
-            data: [],
-          })
-        )
-      )
-      .subscribe((response) => {
-        if (!response.success) {
-          this._toastService.showError(
-            'Fetch group device failed. Reason: ' + response.message
-          );
-          return;
-        }
-        this.data = response.data.map(({ id, name }) => ({
+    this._groupService.findAll().subscribe({
+      next: ({ data: groups }) =>
+        (this.data = groups.map(({ id, name }) => ({
           id,
           name,
           cameraCount: 0,
-        }));
-      });
+        }))),
+      error: (err: HttpErrorResponse) =>
+        this._toastService.showError(err.error?.message ?? err.message),
+    });
   }
 
   trackById(_: any, item: RowData) {
@@ -69,29 +56,19 @@ export class GroupCameraComponent implements OnInit {
 
       this._groupService
         .create({ name, describle: '' })
-        .pipe(
-          catchError(({ message }) =>
-            of({
-              message,
-              success: false,
-              data: InvalidId,
-            })
-          )
-        )
-        .subscribe((response) => {
-          if (!response.success) {
-            this._toastService.showError(
-              'Create group failed. Reason: ' + response.message
-            );
-            return;
-          }
 
-          this.data.push({
-            id: response.data,
-            name,
-            cameraCount: 0,
-            isEditable: false,
-          });
+        .subscribe({
+          next: ({ data: id }) => {
+            this._toastService.showSuccess('Create group successfully');
+            this.data.push({
+              id,
+              name,
+              cameraCount: 0,
+              isEditable: false,
+            });
+          },
+          error: (err: HttpErrorResponse) =>
+            this._toastService.showError(err.error?.message ?? err.message),
         });
     } catch {
       // No action required.
@@ -99,13 +76,13 @@ export class GroupCameraComponent implements OnInit {
   }
 
   remove(item: RowData) {
-    this._groupService.delete(item.id).subscribe((response) => {
-      if (!response.success) {
-        this._toastService.showError('Delete group failed');
-        return;
-      }
-
-      this.data = this.data.filter((e) => e.id !== item.id);
+    this._groupService.delete(item.id).subscribe({
+      complete: () => {
+        this._toastService.showSuccess('Delete group successfully');
+        this.data = this.data.filter((e) => e.id !== item.id);
+      },
+      error: (err: HttpErrorResponse) =>
+        this._toastService.showError(err.error?.message ?? err.message),
     });
   }
 
@@ -115,24 +92,13 @@ export class GroupCameraComponent implements OnInit {
         name: item.name,
         describle: '',
       })
-      .pipe(
-        catchError(({ message }) =>
-          of({
-            message,
-            success: false,
-            data: InvalidId,
-          })
-        )
-      )
-      .subscribe((response) => {
-        if (!response.success) {
-          this._toastService.showError(
-            'Update group failed. Reason: ' + response.message
-          );
-          return;
-        }
-
-        item.isEditable = false;
+      .subscribe({
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(err.error?.message ?? err.message),
+        complete: () => {
+          this._toastService.showSuccess('Update group successfully');
+          item.isEditable = false;
+        },
       });
   }
 
