@@ -9,9 +9,11 @@ import { LatLng } from 'src/app/data/schema/boho-v2/latlng';
 import {
   Level3Menu,
   NavigationService,
+  SideMenuItemType,
 } from 'src/app/data/service/navigation.service';
 import { CameraDriver_Onvif, CameraDriver_RTSP } from 'src/app/data/constants';
 import { Subscription } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 interface CameraInfo {
   name: string;
@@ -50,6 +52,13 @@ export class CameraInfoComponent implements OnInit, OnDestroy {
     this._activatedRouteSubscription =
       this.activatedRoute.parent?.params.subscribe((params) => {
         const { nodeId, cameraId } = params;
+        this.data = {
+          name: '',
+          address: '',
+          driverName: '',
+          typeName: '',
+          rtspUrl: '',
+        };
 
         this.deviceService.find(nodeId, cameraId).subscribe((response) => {
           if (!response.success) {
@@ -102,14 +111,29 @@ export class CameraInfoComponent implements OnInit, OnDestroy {
         lat,
         long: lng,
       };
+
       this.data.address = this.geodecode(this.device?.location);
+      this.device!.name = this.data.name;
+      this.device!.camera = Object.assign(this.device!.camera, {
+        created_at: undefined,
+        deleted_at: undefined,
+        updated_at: undefined,
+        device_id: undefined,
+        id: undefined,
+      });
       this.deviceService
         .update(this.device!.node_id!, this.device!.id, this.device!)
-        .subscribe((response) => {
-          if (!response.success) {
-            this.toastService.showError('Change address failed.');
-            return;
-          }
+        .subscribe({
+          error: (err: HttpErrorResponse) =>
+            this.toastService.showError(err.error?.message ?? err.message),
+          complete: () => {
+            this.toastService.showSuccess('Update the camera successfully');
+            this._navigationService.treeItemChange$.next({
+              type: SideMenuItemType.DEVICE,
+              action: 'update',
+              data: Object.assign({}, this.device),
+            });
+          },
         });
     } catch {
       // No action required.
