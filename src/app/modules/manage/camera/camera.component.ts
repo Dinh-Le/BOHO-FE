@@ -24,16 +24,17 @@ import {
   CameraType_Static,
   HoChiMinhCoord,
   DeviceType_Camera,
-  DeviceStatus_Good,
+  DeviceStatus_Disconnected,
 } from 'src/app/data/constants';
-import { catchError, finalize, switchMap } from 'rxjs/operators';
-import { Subscription, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { RowItemModel } from './row-item.model';
 import { Device } from 'src/app/data/schema/boho-v2';
 import {
   NavigationService,
   SideMenuItemType,
 } from 'src/app/data/service/navigation.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-camera',
@@ -104,31 +105,18 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
         switchMap(({ nodeId }) => {
           this.nodeId = nodeId;
           return this._deviceService.findAll(this.nodeId);
-        }),
-        catchError(({ message }) => {
-          return of({
-            success: false,
-            message,
-            data: [],
-          });
         })
       )
       .subscribe({
-        next: (response) => {
-          if (!response.success) {
-            this._toastService.showError(
-              'Fetch device data failed with error: ' + response.message
-            );
-            return;
-          }
-
-          this.data = response.data.map((device) => {
+        next: ({ data: devices }) => {
+          this.data = devices.map((device) => {
             const row = new RowItemModel(device);
-            row.status = DeviceStatus_Good;
+            row.status = device.status ?? DeviceStatus_Disconnected;
             return row;
           });
         },
-        error: ({ message }) => this._toastService.showError(message),
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(err.error?.message ?? err.message),
       });
     this._subscription.push(activatedRouteSubscription);
   }
@@ -162,7 +150,6 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
       },
     };
     const newItem = new RowItemModel(device);
-
     newItem.isNew = true;
     newItem.isEditable = true;
     newItem.isExpanded = true;
@@ -213,64 +200,40 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     if (item.isNew) {
-      this._deviceService
-        .create(this.nodeId, data)
-        .pipe(
-          switchMap((response) => {
-            if (!response.success) {
-              throw Error(
-                `Create camera failed with error: ${response.message}`
-              );
-            }
-
-            return of(response.data);
-          })
-        )
-        .subscribe({
-          next: ({ id, status }) => {
-            item.status = status;
-            this._toastService.showSuccess('Create camera successfully');
-            item.id = id.toString();
-            item.isNew = false;
-            item.isEditable = false;
-            this._navigationService.treeItemChange$.next({
-              type: SideMenuItemType.DEVICE,
-              action: 'create',
-              data: Object.assign({}, data, {
-                id,
-                node_id: this.nodeId,
-              }),
-            });
-          },
-          error: ({ message }) => this._toastService.showError(message),
-        });
+      this._deviceService.create(this.nodeId, data).subscribe({
+        next: ({ data: { id, status } }) => {
+          item.status = status;
+          this._toastService.showSuccess('Create camera successfully');
+          item.id = id.toString();
+          item.isNew = false;
+          item.isEditable = false;
+          this._navigationService.treeItemChange$.next({
+            type: SideMenuItemType.DEVICE,
+            action: 'create',
+            data: Object.assign({}, data, {
+              id,
+              node_id: this.nodeId,
+            }),
+          });
+        },
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(err.error?.message ?? err.message),
+      });
     } else {
-      this._deviceService
-        .update(this.nodeId, item.id, data)
-        .pipe(
-          switchMap((response) => {
-            if (!response.success) {
-              throw Error(
-                `Update camera failed with error: ${response.message}`
-              );
-            }
-
-            return of(response.data);
-          })
-        )
-        .subscribe({
-          next: ({ status }) => {
-            item.status = status;
-            this._toastService.showSuccess('Update camera successfully');
-            item.isEditable = false;
-            this._navigationService.treeItemChange$.next({
-              type: SideMenuItemType.DEVICE,
-              action: 'update',
-              data: Object.assign({}, data),
-            });
-          },
-          error: ({ message }) => this._toastService.showError(message),
-        });
+      this._deviceService.update(this.nodeId, item.id, data).subscribe({
+        next: ({ data: { status } }) => {
+          item.status = status;
+          this._toastService.showSuccess('Update camera successfully');
+          item.isEditable = false;
+          this._navigationService.treeItemChange$.next({
+            type: SideMenuItemType.DEVICE,
+            action: 'update',
+            data: Object.assign({}, data),
+          });
+        },
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(err.error?.message ?? err.message),
+      });
     }
   }
 
@@ -280,35 +243,32 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    item.isEditable = false;
+    this._deviceService.find(this.nodeId, item.id).subscribe({
+      next: ({ data }) => {
+        item.update(data);
+        item.isEditable = false;
+      },
+      error: (err: HttpErrorResponse) =>
+        this._toastService.showError(err.error?.message ?? err.message),
+    });
   }
 
   remove(item: RowItemModel) {
-    this._deviceService
-      .delete(this.nodeId, item.id)
-      .pipe(
-        switchMap((response) => {
-          if (!response.success) {
-            throw Error('Delete camera failed. Reason: ' + response.message);
-          }
-
-          return of(response);
-        })
-      )
-      .subscribe({
-        next: () => {
-          this._toastService.showSuccess('Delete camera successfully');
-          this.data = this.data.filter((e) => e.id !== item.id);
-          this._navigationService.treeItemChange$.next({
-            type: SideMenuItemType.DEVICE,
-            action: 'delete',
-            data: {
-              id: item.id,
-            },
-          });
-        },
-        error: ({ message }) => this._toastService.showError(message),
-      });
+    this._deviceService.delete(this.nodeId, item.id).subscribe({
+      next: () => {
+        this._toastService.showSuccess('Delete camera successfully');
+        this.data = this.data.filter((e) => e.id !== item.id);
+        this._navigationService.treeItemChange$.next({
+          type: SideMenuItemType.DEVICE,
+          action: 'delete',
+          data: {
+            id: item.id,
+          },
+        });
+      },
+      error: (err: HttpErrorResponse) =>
+        this._toastService.showError(err.error?.message ?? err.message),
+    });
   }
 
   getOnvifProfiles(ev: Event, item: RowItemModel) {
@@ -325,50 +285,30 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
         user: userId,
         password,
       })
-      .pipe(
-        switchMap((response) => {
-          if (!response.success) {
-            throw Error(
-              `Connect to camera failed with error: ${response.message}`
-            );
-          }
-
-          return of(response.data);
-        }),
-        finalize(() => (button.disabled = false))
-      )
       .subscribe({
-        next: (profiles) => {
+        next: ({ data: profiles }) => {
           item.onvifProfiles = Object.entries(profiles).map(([k, v]) => ({
             value: v,
             label: k,
           }));
         },
-        error: ({ message }) => this._toastService.showError(message),
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(err.error?.message ?? err.message),
+        complete: () => (button.disabled = false),
       });
   }
 
   takeSnapshot(item: RowItemModel, img: HTMLImageElement) {
-    this._deviceService
-      .snapshot(this.nodeId, item.id)
-      .pipe(
-        switchMap((response) => {
-          if (!response.success) {
-            throw Error(`Take snapshot failed with error: ${response.message}`);
-          }
-
-          return of(response.data);
-        })
-      )
-      .subscribe({
-        next: (snapshot) => {
-          img.src = `data:image/${snapshot.format};charset=utf-8;base64,${snapshot.img}`;
-          img.style.aspectRatio = (
-            snapshot.size[0] / snapshot.size[1]
-          ).toString();
-        },
-        error: ({ message }) => this._toastService.showError(message),
-      });
+    this._deviceService.snapshot(this.nodeId, item.id).subscribe({
+      next: ({ data: snapshot }) => {
+        img.src = `data:image/${snapshot.format};charset=utf-8;base64,${snapshot.img}`;
+        img.style.aspectRatio = (
+          snapshot.size[0] / snapshot.size[1]
+        ).toString();
+      },
+      error: (err: HttpErrorResponse) =>
+        this._toastService.showError(err.error?.message ?? err.message),
+    });
   }
 
   //#endregion

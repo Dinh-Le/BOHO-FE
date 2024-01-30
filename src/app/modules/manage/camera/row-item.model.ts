@@ -12,31 +12,44 @@ import {
 } from 'src/app/data/constants';
 
 export class RowItemModel extends ExpandableTableRowItemModelBase {
-  id: string;
-  status?: string;
+  id = '';
+  status = DeviceStatus_Disconnected;
   form: FormGroup<any>;
   onvifProfiles: SelectItemModel[] = [];
 
   constructor(device: Device) {
     super();
-
-    this.id = device.id;
-
     this.form = new FormGroup<any>({
-      name: new FormControl(device.name, [Validators.required]),
-      is_active: new FormControl(device.is_active, [Validators.required]),
-      type: new FormControl(device.camera?.type, [Validators.required]),
-      driver: new FormControl(
+      name: new FormControl<string>('', [Validators.required]),
+      is_active: new FormControl<boolean>(true, [Validators.required]),
+      type: new FormControl<string>('', [Validators.required]),
+      driver: new FormControl<SelectItemModel | undefined>(
         device.camera?.driver
           ? ({
               label: device.camera?.driver,
               value: device.camera?.driver,
             } as SelectItemModel)
-          : null,
+          : undefined,
         [Validators.required]
       ),
     });
+    this.update(device);
+  }
 
+  update(device: Device) {
+    this.id = device.id;
+
+    this.form.reset({
+      name: device.name,
+      is_active: device.is_active,
+      type: device.camera?.type,
+      driver: device.camera?.driver
+        ? ({
+            label: device.camera?.driver,
+            value: device.camera?.driver,
+          } as SelectItemModel)
+        : undefined,
+    });
     this.updateCameraForm(device);
   }
 
