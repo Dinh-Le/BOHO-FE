@@ -1,13 +1,9 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ToastService } from '@app/services/toast.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Group } from 'src/app/data/schema/boho-v2/group';
 import { GroupService } from 'src/app/data/service/group.service';
-import { v4 } from 'uuid';
 import { AddGroupCameraComponent } from './add-group-camera/add-group-camera.component';
 import { ManageCameraComponent } from './manage-camera/manage-camera.component';
-import { catchError, of } from 'rxjs';
-import { InvalidId } from 'src/app/data/constants';
 import { ViewMode } from '@shared/components/tree-view/view-mode.enum';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -34,10 +30,10 @@ export class GroupCameraComponent implements OnInit {
   ngOnInit(): void {
     this._groupService.findAll().subscribe({
       next: ({ data: groups }) =>
-        (this.data = groups.map(({ id, name }) => ({
+        (this.data = groups.map(({ id, name, camera_count }) => ({
           id,
           name,
-          cameraCount: 0,
+          cameraCount: camera_count ?? 0,
         }))),
       error: (err: HttpErrorResponse) =>
         this._toastService.showError(err.error?.message ?? err.message),
@@ -54,22 +50,19 @@ export class GroupCameraComponent implements OnInit {
       const { name } = await this._modalService.open(AddGroupCameraComponent)
         .result;
 
-      this._groupService
-        .create({ name, describle: '' })
-
-        .subscribe({
-          next: ({ data: id }) => {
-            this._toastService.showSuccess('Create group successfully');
-            this.data.push({
-              id,
-              name,
-              cameraCount: 0,
-              isEditable: false,
-            });
-          },
-          error: (err: HttpErrorResponse) =>
-            this._toastService.showError(err.error?.message ?? err.message),
-        });
+      this._groupService.create({ name, describle: '' }).subscribe({
+        next: ({ data: id }) => {
+          this._toastService.showSuccess('Create group successfully');
+          this.data.push({
+            id,
+            name,
+            cameraCount: 0,
+            isEditable: false,
+          });
+        },
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(err.error?.message ?? err.message),
+      });
     } catch {
       // No action required.
     }

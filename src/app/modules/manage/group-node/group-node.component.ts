@@ -1,15 +1,13 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ToastService } from '@app/services/toast.service';
-import { NodeOperator } from 'src/app/data/schema/boho-v2/node-operator';
 import { NodeOperatorService } from 'src/app/data/service/node-operator.service';
-import { v4 } from 'uuid';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AddGroupNodeComponent } from './add-group-node/add-group-node.component';
 import {
   NavigationService,
   SideMenuItemType,
 } from 'src/app/data/service/navigation.service';
-import { of, switchMap } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 interface RowData {
   id: string;
@@ -31,17 +29,16 @@ export class GroupNodeComponent implements OnInit {
   data: RowData[] = [];
 
   ngOnInit(): void {
-    this.nodeOperatorService.findAll().subscribe((response) => {
-      if (!response.success) {
-        this._toastService.showError('Fetch node operator failed');
-        return;
-      }
-
-      this.data = response.data.map((e) => ({
-        id: e.id,
-        name: e.name,
-        nodeCount: 0,
-      }));
+    this.nodeOperatorService.findAll().subscribe({
+      next: ({ data: nodeOperators }) => {
+        this.data = nodeOperators.map((e) => ({
+          id: e.id,
+          name: e.name,
+          nodeCount: e.node_count ?? 0,
+        }));
+      },
+      error: (err: HttpErrorResponse) =>
+        this._toastService.showError(err.error?.message ?? err.message),
     });
   }
 
@@ -50,43 +47,27 @@ export class GroupNodeComponent implements OnInit {
       const { name } = await this.modalService.open(AddGroupNodeComponent)
         .result;
 
-      const newNodeOperator: NodeOperator = {
-        id: v4(),
-        name,
-      };
-      this.nodeOperatorService
-        .create(newNodeOperator)
-        .pipe(
-          switchMap((response) => {
-            if (!response.success) {
-              throw Error(
-                `Create node operator failed with error: ${response.message}`
-              );
-            }
-
-            return of(response);
-          })
-        )
-        .subscribe({
-          next: (response) => {
-            this._toastService.showSuccess('Create node operator successfully');
-            this.data.push({
-              id: response.data,
-              name: newNodeOperator.name,
-              nodeCount: 0,
-              editable: false,
-            });
-            this._navigationService.treeItemChange$.next({
-              type: SideMenuItemType.NODE_OPERATOR,
-              action: 'create',
-              data: {
-                id: response.data,
-                name: newNodeOperator.name,
-              },
-            });
-          },
-          error: ({ message }) => this._toastService.showError(message),
-        });
+      this.nodeOperatorService.create({ name }).subscribe({
+        next: ({ data: nodeOperatorId }) => {
+          this._toastService.showSuccess('Create node operator successfully');
+          this.data.push({
+            id: nodeOperatorId,
+            name,
+            nodeCount: 0,
+            editable: false,
+          });
+          this._navigationService.treeItemChange$.next({
+            type: SideMenuItemType.NODE_OPERATOR,
+            action: 'create',
+            data: {
+              id: nodeOperatorId,
+              name,
+            },
+          });
+        },
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(err.error?.message ?? err.message),
+      });
     } catch {
       // Do nothing
     }
@@ -97,20 +78,8 @@ export class GroupNodeComponent implements OnInit {
   }
 
   remove(item: RowData) {
-    this.nodeOperatorService
-      .delete(item.id)
-      .pipe(
-        switchMap((response) => {
-          if (!response.success) {
-            throw Error(
-              `Delete node operator failed with error: ${response.message}`
-            );
-          }
-
-          return of(response);
-        })
-      )
-      .subscribe(() => {
+    this.nodeOperatorService.delete(item.id).subscribe({
+      complete: () => {
         this._toastService.showSuccess('Delete node operator successfully');
         this.data = this.data.filter((e) => e.id !== item.id);
         this._navigationService.treeItemChange$.next({
@@ -120,7 +89,10 @@ export class GroupNodeComponent implements OnInit {
             id: item.id,
           },
         });
-      });
+      },
+      error: (err: HttpErrorResponse) =>
+        this._toastService.showError(err.error?.message ?? err.message),
+    });
   }
 
   update(item: RowData) {
@@ -129,17 +101,6 @@ export class GroupNodeComponent implements OnInit {
         id: item.id,
         name: item.name,
       })
-      .pipe(
-        switchMap((response) => {
-          if (!response.success) {
-            throw Error(
-              `Update node operator failed with error: ${response.message}`
-            );
-          }
-
-          return of(response);
-        })
-      )
       .subscribe({
         next: () => {
           this._toastService.showSuccess('Update node operator successfully');
@@ -153,7 +114,8 @@ export class GroupNodeComponent implements OnInit {
             },
           });
         },
-        error: ({ message }) => this._toastService.showError(message),
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(err.error?.message ?? err.message),
       });
   }
 }
