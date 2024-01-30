@@ -18,7 +18,16 @@ import { IntegrationService } from 'src/app/data/service/integration.service';
 import { RuleService } from 'src/app/data/service/rule.service';
 import { MilestoneService } from 'src/app/data/service/milestone.service';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription, switchMap, zip } from 'rxjs';
+import {
+  EMPTY,
+  Subscription,
+  catchError,
+  concat,
+  filter,
+  of,
+  switchMap,
+  toArray,
+} from 'rxjs';
 import { Integration } from 'src/app/data/schema/boho-v2';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ToastService } from '@app/services/toast.service';
@@ -26,6 +35,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { PresetService } from 'src/app/data/service/preset.service';
 import { ScheduleService } from 'src/app/data/service/schedule.service';
 import { Milestone } from 'src/app/data/schema/boho-v2/milestone';
+import { Rule } from 'src/app/data/schema/boho-v2/rule';
 
 class RowItemModel extends ExpandableTableRowItemModelBase {
   form = new FormGroup({
@@ -148,6 +158,7 @@ export class IntegrationComponent implements OnInit, OnDestroy {
     this._navigationService.level2 = Level2Menu.INTEGRATION;
     const activatedRouteSubscription = this._activatedRoute.params
       .pipe(
+        filter(({ nodeId, cameraId }) => nodeId && cameraId),
         switchMap((params) => {
           const { nodeId, cameraId } = params;
           this._nodeId = nodeId;
@@ -155,69 +166,75 @@ export class IntegrationComponent implements OnInit, OnDestroy {
           this.data = [];
           this.sources = [];
           this.rules = [];
-          return zip([
-            this._ruleService.findAll(this._nodeId, cameraId),
-            this._presetService.findAll(this._nodeId, cameraId),
-            this._scheduleService.findAll(this._nodeId, cameraId),
-          ]);
-        }),
-        switchMap((responses) => {
-          const [
-            findAllRuleResponse,
-            findAllPresetResponse,
-            findAllScheduleResponse,
-          ] = responses;
 
-          const presets = findAllPresetResponse.data;
-          const schedules = findAllScheduleResponse.data;
-          this.rules = findAllRuleResponse.data.map((rule) => {
-            const presetName =
-              presets.find((e) => e.id === rule.preset_id)?.name || '';
-            const scheduleName =
-              schedules.find((e) => e.id === rule.schedule_id)?.name || '';
-            return new EventSourceRowItem(rule, presetName, scheduleName);
-          });
-
-          return this._milestoneService.findAll();
-        }),
-        switchMap(({ data }) => {
-          // if (!response.success) {
-          //   throw Error(
-          //     `Fetch milestone server list failed with error ${response.message}`
-          //   );
-          // }
-
-          this.sources = data.map((e) => ({
-            value: e.id,
-            label: e.name,
-          }));
-
-          return this._integrationService.findAll(this._nodeId, this._deviceId);
+          const observables = [
+            this._presetService
+              .findAll(this._nodeId, cameraId)
+              .pipe(
+                switchMap(({ data: presets }) =>
+                  of(
+                    presets.reduce(
+                      (dict, p) => dict.set(p.id, p.name),
+                      new Map<number, string>()
+                    )
+                  )
+                )
+              ),
+            this._scheduleService
+              .findAll(this._nodeId, cameraId)
+              .pipe(
+                switchMap(({ data: schedules }) =>
+                  of(
+                    schedules.reduce(
+                      (dict, s) => dict.set(s.id, s.name),
+                      new Map<number, string>()
+                    )
+                  )
+                )
+              ),
+            this._ruleService
+              .findAll(this._nodeId, cameraId)
+              .pipe(switchMap((response) => of(response.data))),
+            this._milestoneService
+              .findAll()
+              .pipe(switchMap((response) => of(response.data))),
+            this._integrationService
+              .findAll(this._nodeId, this._deviceId)
+              .pipe(switchMap((response) => of(response.data))),
+          ];
+          return concat(...observables).pipe(
+            toArray(),
+            switchMap((responses) => {
+              const presets = responses[0] as Map<number, string>;
+              const schedules = responses[1] as Map<number, string>;
+              this.rules = (responses[2] as Rule[]).map((rule) => {
+                const presetName = presets.get(rule.preset_id) ?? '';
+                const scheduleName = schedules.get(rule.schedule_id) ?? '';
+                return new EventSourceRowItem(rule, presetName, scheduleName);
+              });
+              this.sources = (responses[3] as Milestone[]).map((e) => ({
+                value: e.id,
+                label: e.name,
+              }));
+              this.data = (responses[4] as Integration[]).map((e) => {
+                const rowItem = new RowItemModel();
+                rowItem.setData(
+                  e,
+                  this.types[0],
+                  this.sources.find((src) => src.value === e.milestone_id)
+                );
+                return rowItem;
+              });
+              return EMPTY;
+            }),
+            catchError((err: HttpErrorResponse) => {
+              this._toastService.showError(err.error?.message ?? err.message);
+              return EMPTY;
+            })
+          );
         })
-        // switchMap((response) => {
-        // if (!response.success) {
-        //   throw Error(
-        //     `Fetch integration list failed with error ${response.message}`
-        //   );
-        // }
-
-        //   return of(response.data);
-        // })
       )
-      .subscribe({
-        next: ({ data }) => {
-          this.data = data.map((e) => {
-            const rowItem = new RowItemModel();
-            rowItem.setData(
-              e,
-              this.types[0],
-              this.sources.find((src) => src.value === e.milestone_id)
-            );
-            return rowItem;
-          });
-        },
-        error: ({ message }) => this._toastService.showError(message),
-      });
+      .subscribe();
     this._subscriptions.push(activatedRouteSubscription);
   }
 

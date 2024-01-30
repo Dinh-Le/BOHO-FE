@@ -15,7 +15,7 @@ import {
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ToastService } from '@app/services/toast.service';
 import { ControlValueAccessorImpl } from '@shared/helpers/control-value-accessor-impl';
-import { switchMap } from 'rxjs';
+import { EMPTY, switchMap } from 'rxjs';
 import { DeviceService } from 'src/app/data/service/device.service';
 import { PresetService } from 'src/app/data/service/preset.service';
 import { v4 } from 'uuid';
@@ -83,19 +83,31 @@ export class BoundingBoxEditorComponent
       this.src.deviceId &&
       this.src.presetId
     ) {
-      this._presetService
-        .control(this.src.nodeId, this.src.deviceId, this.src.presetId)
+      this._deviceService
+        .pauseDevice(this.src.nodeId, this.src.deviceId)
         .pipe(
-          switchMap((_) =>
+          switchMap(() =>
+            this._presetService.control(
+              this.src.nodeId,
+              this.src.deviceId,
+              this.src.presetId
+            )
+          ),
+          switchMap(() =>
             this._deviceService.snapshot(this.src.nodeId, this.src.deviceId)
-          )
-        )
-        .subscribe({
-          next: ({ data }) => {
+          ),
+          switchMap(({ data }) => {
             this._image = new Image(data.size[0], data.size[1]);
             this._image.src = `data:image/${data.format};charset=utf-8;base64,${data.img}`;
             this._image.onload = (_: any) => this.update();
-          },
+
+            return this._deviceService.resumeDevice(
+              this.src.nodeId,
+              this.src.deviceId
+            );
+          })
+        )
+        .subscribe({
           error: (err: HttpErrorResponse) =>
             this._toastService.showError(err.error.message ?? err.message),
         });

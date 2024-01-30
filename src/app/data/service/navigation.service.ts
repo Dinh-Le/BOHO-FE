@@ -218,7 +218,9 @@ export class NavigationService {
         if (this.sideMenu?.type === SideMenuItemType.GROUP) {
           targetUrl += '/group-camera';
         } else if (this.sideMenu?.type === SideMenuItemType.DEVICE) {
-          targetUrl += `/camera/${this.sideMenu.id}/info`;
+          targetUrl += `/node/${this.sideMenu.data?.node_id}/camera/${this.sideMenu.id}/info`;
+        } else {
+          targetUrl += '/group-camera';
         }
         break;
       case Level2Menu.RULE:

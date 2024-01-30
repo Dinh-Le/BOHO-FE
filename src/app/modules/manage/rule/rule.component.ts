@@ -23,7 +23,17 @@ import {
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { PresetService } from 'src/app/data/service/preset.service';
 import { ScheduleService } from 'src/app/data/service/schedule.service';
-import { Subscription, concatMap, finalize, of, switchMap } from 'rxjs';
+import {
+  EMPTY,
+  Subscription,
+  catchError,
+  concatMap,
+  filter,
+  finalize,
+  of,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { ToastService } from '@app/services/toast.service';
 import { Objects, RuleTypes, Severities } from 'src/app/data/constants';
 import { Point } from '@shared/components/bounding-box-editor/bounding-box-editor.component';
@@ -31,6 +41,7 @@ import { Rule } from 'src/app/data/schema/boho-v2/rule';
 import { RuleService } from 'src/app/data/service/rule.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { NodeService } from 'src/app/data/service/node.service';
+import { DeviceService } from 'src/app/data/service/device.service';
 
 declare interface CustomSelectItemModel extends SelectItemModel {
   data: any;
@@ -244,55 +255,42 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this._navigationService.level3 = Level3Menu.RULE;
-    const activatedRouteSubscription = this._activatedRoute.params.subscribe(
-      ({ nodeId, cameraId }) => {
-        this.cameraId = cameraId;
-        this.nodeId = nodeId;
+    const activatedRouteSubscription = this._activatedRoute.params
+      .pipe(
+        filter(({ nodeId, cameraId }) => nodeId && cameraId),
+        switchMap(({ nodeId, cameraId }) => {
+          this.cameraId = cameraId;
+          this.nodeId = nodeId;
+          return this._presetService.findAll(this.nodeId, this.cameraId);
+        }),
+        switchMap((response) => {
+          this.presets = response.data.map((e) => ({
+            label: e.name,
+            value: e.id,
+          }));
 
-        this._presetService
-          .findAll(this.nodeId, this.cameraId)
-          .pipe(
-            concatMap((response) => {
-              if (!response.success) {
-                throw Error(
-                  `Fetch the preset list failed with error: ${response.message}`
-                );
-              }
+          return this._scheduleService.findAll(this.nodeId, this.cameraId);
+        }),
+        switchMap((response) => {
+          this.schedules = response.data.map((e) => ({
+            label: e.name,
+            value: e.id,
+          }));
 
-              this.presets = response.data.map((e) => ({
-                label: e.name,
-                value: e.id,
-              }));
-
-              return this._scheduleService.findAll(this.nodeId, this.cameraId);
-            }),
-            concatMap((response) => {
-              if (!response.success) {
-                throw Error(
-                  `Fetch the schedule list failed with error: ${response.message}`
-                );
-              }
-
-              this.schedules = response.data.map((e) => ({
-                label: e.name,
-                value: e.id,
-              }));
-
-              return this._ruleService.findAll(this.nodeId, this.cameraId);
-            })
-          )
-          .subscribe({
-            next: (response) => {
-              this.data = response.data.map((e) => {
-                const item = new RowItemModel();
-                item.setData(e, this.schedules, this.presets);
-                return item;
-              });
-            },
-            error: ({ message }) => this._toastService.showError(message),
+          return this._ruleService.findAll(this.nodeId, this.cameraId);
+        })
+      )
+      .subscribe({
+        next: ({ data: rules }) => {
+          this.data = rules.map((e) => {
+            const item = new RowItemModel();
+            item.setData(e, this.schedules, this.presets);
+            return item;
           });
-      }
-    );
+        },
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(err.error?.message ?? err.message),
+      });
     this._subscriptions.push(activatedRouteSubscription);
   }
 
