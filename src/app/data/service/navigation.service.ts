@@ -1,6 +1,7 @@
 import { NavigationEnd, Router } from '@angular/router';
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { ViewMode } from '@shared/components/tree-view/view-mode.enum';
 
 export enum Level1Menu {
   SEARCH = 'SEARCH',
@@ -37,16 +38,14 @@ export enum SideMenuItemType {
   DEVICE = 'DEVICE',
 }
 
+export type SideMenuConfig = {
+  id?: string;
+  type?: SideMenuItemType;
+  data?: any;
+};
+
 @Injectable({ providedIn: 'root' })
 export class NavigationService {
-  level1: Level1Menu = Level1Menu.MANAGE;
-  level2: Level2Menu = Level2Menu.DASHBOARD;
-  level3: Level3Menu = Level3Menu.NONE;
-  sideMenu: {
-    id?: string;
-    type?: SideMenuItemType;
-    data?: any;
-  } = {};
   selectedDeviceIds: {
     [key: string]: {
       [key: string]: any;
@@ -58,107 +57,97 @@ export class NavigationService {
     action: 'create' | 'update' | 'delete';
     data: any;
   }>();
+  viewModeChange$ = new Subject<ViewMode>();
 
-  constructor(private router: Router) {
-    this.onUrlChange();
+  private _level1: Level1Menu = Level1Menu.MANAGE;
+  private _level2: Level2Menu = Level2Menu.NODE;
+  private _level3: Level3Menu = Level3Menu.NONE;
+  private _viewMode: ViewMode = ViewMode.None;
+  private _autoHide: boolean = false;
+  private _sideMenu: SideMenuConfig = {};
 
-    this.router.events.subscribe((event) => {
-      if (event instanceof NavigationEnd) {
-        this.onUrlChange();
-      }
-    });
+  //#region getter/setter
+  get level1(): Level1Menu {
+    return this._level1;
   }
 
-  private onUrlChange() {
-    const url = this.router.url;
-    const segments = url.split('/');
+  set level1(value: Level1Menu) {
+    this._level1 = value;
+    localStorage.setItem('menu_level_1', value);
+  }
 
-    switch (segments[1]) {
-      case 'search':
-        this.level1 = Level1Menu.SEARCH;
-        this.selectedDeviceIds = {};
-        break;
-      case 'alert':
-        this.level1 = Level1Menu.ALERT;
-        break;
-      case 'report':
-        this.level1 = Level1Menu.REPORT;
-        break;
-      case 'manage':
-        this.level1 = Level1Menu.MANAGE;
-        break;
-    }
+  get level2(): Level2Menu {
+    return this._level2;
+  }
 
-    if (this.level1 === Level1Menu.MANAGE && segments.length > 2) {
-      switch (segments[2]) {
-        case 'system':
-          this.level2 = Level2Menu.SYSTEM;
-          break;
-        case 'group-node':
-          this.level2 = Level2Menu.NODE;
-          this.sideMenu.type = SideMenuItemType.NODE_OPERATOR;
-          this.sideMenu.id = segments[3];
-          break;
-        case 'node':
-          this.level2 = Level2Menu.NODE;
+  set level2(value: Level2Menu) {
+    this._level2 = value;
+    localStorage.setItem('menu_level_2', value);
+  }
 
-          if (segments.length > 5) {
-            if (segments[6] === 'info') {
-              this.level3 = Level3Menu.DEVICE_INFO;
-            } else if (segments[6] === 'preset-settings') {
-              this.level3 = Level3Menu.PRESET_SETTINGS;
-            } else if (segments[6] === 'patrol-settings') {
-              this.level3 = Level3Menu.PATROL_SETTINGS;
-            } else if (segments[6] === 'tour-settings') {
-              this.level3 = Level3Menu.TOUR_SETTINGS;
-            } else {
-              this.level3 = Level3Menu.NONE;
-            }
+  get level3(): Level3Menu {
+    return this._level3;
+  }
 
-            this.sideMenu.id = segments[5];
-            this.sideMenu.type = SideMenuItemType.DEVICE;
-            this.sideMenu.data = {
-              id: segments[5],
-              node_id: segments[3],
-            };
-          } else {
-            this.sideMenu.type = SideMenuItemType.NODE;
-            this.sideMenu.id = segments[3];
-          }
-          break;
-        case 'group-camera':
-          this.level2 = Level2Menu.CAMERA;
-          break;
-        case 'device-rule':
-          this.level2 = Level2Menu.RULE;
+  set level3(value: Level3Menu) {
+    this._level3 = value;
+    localStorage.setItem('menu_level_3', value);
+  }
 
-          if (segments.length === 6) {
-            this.sideMenu.id = segments[6];
-            this.sideMenu.type = SideMenuItemType.DEVICE;
-            this.sideMenu.data = {
-              id: segments[6],
-              node_id: segments[4],
-            };
-            if (segments[8] === 'rule') {
-              this.level3 = Level3Menu.RULE;
-            } else if (segments[8] === 'schedule') {
-              this.level3 = Level3Menu.SCHEDULE;
-            }
-          }
-          break;
-        case 'integration':
-          this.level2 = Level2Menu.INTEGRATION;
-          if (segments.length === 7) {
-            this.sideMenu.id = segments[6];
-            this.sideMenu.type = SideMenuItemType.DEVICE;
-            this.sideMenu.data = {
-              id: segments[6],
-              node_id: segments[4],
-            };
-          }
-          break;
-      }
-    }
+  get viewMode(): ViewMode {
+    return this._viewMode;
+  }
+
+  set viewMode(value: ViewMode) {
+    this._viewMode = value;
+    localStorage.setItem('menu_view_mode', value);
+    this.viewModeChange$.next(value);
+  }
+
+  get autoHide(): boolean {
+    return this._autoHide;
+  }
+
+  set autoHide(value: boolean) {
+    this._autoHide = value;
+    localStorage.setItem('menu_auto_hide', String(value));
+  }
+
+  get sideMenu(): SideMenuConfig {
+    return this._sideMenu;
+  }
+
+  set sideMenu(value: SideMenuConfig) {
+    this._sideMenu = value;
+    localStorage.setItem('side_menu_selected_item', JSON.stringify(value));
+  }
+  //#endregion
+
+  constructor(private router: Router) {
+    this._level1 =
+      Level1Menu[
+        (localStorage.getItem('menu_level_1') as keyof typeof Level1Menu) ??
+          'MANAGE'
+      ];
+    this._level2 =
+      Level2Menu[
+        (localStorage.getItem('menu_level_2') as keyof typeof Level2Menu) ??
+          'DASHBOARD'
+      ];
+    this._level3 =
+      Level3Menu[
+        (localStorage.getItem('menu_level_3') as keyof typeof Level3Menu) ??
+          'NONE'
+      ];
+    this._viewMode =
+      ViewMode[
+        (localStorage.getItem('menu_view_mode') as keyof typeof ViewMode) ??
+          'Logical'
+      ];
+    this._autoHide = Boolean(localStorage.getItem('menu_auto_hide') ?? 'true');
+    this._sideMenu = JSON.parse(
+      localStorage.getItem('side_menu_selected_item') ?? '{}'
+    );
   }
 
   navigate() {
@@ -179,7 +168,7 @@ export class NavigationService {
         break;
     }
 
-    // console.log('Target url: ', targetUrl);
+    console.log('Target url: ', targetUrl);
     this.router.navigateByUrl(targetUrl);
   }
 

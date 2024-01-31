@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-interface ToastInfo {
+export interface ToastInfo {
   className: string;
   message: string;
   delay?: number;

@@ -3,14 +3,35 @@ import {
   Component,
   ElementRef,
   HostListener,
+  OnDestroy,
   OnInit,
   ViewChild,
   inject,
 } from '@angular/core';
 import { ToastService } from '@app/services/toast.service';
 import { Store, select } from '@ngrx/store';
-import { catchError, debounceTime, fromEvent, of, switchMap, zip } from 'rxjs';
-import { Device } from 'src/app/data/schema/boho-v2/device';
+import {
+  EMPTY,
+  Observable,
+  Subscription,
+  catchError,
+  concat,
+  debounceTime,
+  finalize,
+  fromEvent,
+  of,
+  switchMap,
+  tap,
+  toArray,
+  zip,
+} from 'rxjs';
+import {
+  Device,
+  Group,
+  GroupManagement,
+  Node,
+  NodeOperator,
+} from 'src/app/data/schema/boho-v2';
 import { DeviceService } from 'src/app/data/service/device.service';
 import { NodeOperatorService } from 'src/app/data/service/node-operator.service';
 import { NodeService } from 'src/app/data/service/node.service';
@@ -26,13 +47,14 @@ import {
   NavigationService,
   SideMenuItemType,
 } from 'src/app/data/service/navigation.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
 })
-export class SidebarComponent implements OnInit, AfterViewInit {
+export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
   private _nodeOperatorService = inject(NodeOperatorService);
   private _nodeService = inject(NodeService);
   private _deviceService = inject(DeviceService);
@@ -49,126 +71,169 @@ export class SidebarComponent implements OnInit, AfterViewInit {
   @ViewChild('menu') menu!: ElementRef;
   @ViewChild('searchDeviceInput') searchDeviceInput!: ElementRef;
 
-  mode: string = '';
   autoHideEnabled: boolean = false;
   root?: TreeViewItemModel;
   isLoading: boolean = true;
   selectedItems: TreeViewItemModel[] = [];
   searchText: string = '';
+  private _subscriptions: Subscription[] = [];
 
   get showCheckbox() {
     return this._navigationService.level1 === Level1Menu.SEARCH;
   }
 
+  get viewMode(): keyof typeof ViewMode {
+    return this._navigationService.viewMode;
+  }
+
+  set viewMode(value: keyof typeof ViewMode) {
+    this._navigationService.viewMode = ViewMode[value];
+  }
+
   ngOnInit(): void {
-    this.store
-      .pipe(select('sidebar'), select('viewMode'))
-      .subscribe((viewMode) => {
-        switch (viewMode) {
-          case ViewMode.Logical:
-            this.setViewMode('by-node');
-            break;
-          case ViewMode.Geolocation:
-            this.setViewMode('by-group');
-            break;
-        }
-      });
+    const treeItemChangeSubscription =
+      this._navigationService.treeItemChange$.subscribe(
+        ({ type, action, data }) => {
+          if (type === SideMenuItemType.NODE) {
+            const id = DeviceTreeBuilder.NodeIDPrefix + data.id;
 
-    this.store.dispatch(
-      SidebarActions.setViewMode({ viewMode: ViewMode.Logical })
-    );
-
-    this._navigationService.treeItemChange$.subscribe(
-      ({ type, action, data }) => {
-        if (type === SideMenuItemType.NODE) {
-          const id = DeviceTreeBuilder.NodeIDPrefix + data.id;
-
-          if (action === 'create') {
-            const nodeOperatorId =
-              DeviceTreeBuilder.NodeOperatorIDPrefix + data.node_operator_id;
-            const parent = this.root?.find(nodeOperatorId);
-            if (!parent) {
-              console.log(
-                `The parent with id ${nodeOperatorId} does not exists`
+            if (action === 'create') {
+              const nodeOperatorId =
+                DeviceTreeBuilder.NodeOperatorIDPrefix + data.node_operator_id;
+              const parent = this.root?.find(nodeOperatorId);
+              if (!parent) {
+                console.log(
+                  `The parent with id ${nodeOperatorId} does not exists`
+                );
+                return;
+              }
+              const item = new TreeViewItemModel(
+                id,
+                data.name,
+                DeviceTreeBuilder.NodeIcon
               );
-              return;
-            }
-            const item = new TreeViewItemModel(
-              id,
-              data.name,
-              DeviceTreeBuilder.NodeIcon
-            );
-            item.data = data;
-            parent.add(item);
-          } else if (action === 'update') {
-            const item = this.root?.find(id);
-            if (!item) {
-              console.log(`The node with id ${id} does not exits`);
-              return;
-            }
+              item.data = data;
+              parent.add(item);
+            } else if (action === 'update') {
+              const item = this.root?.find(id);
+              if (!item) {
+                console.log(`The node with id ${id} does not exits`);
+                return;
+              }
 
-            item.label = data.name;
-          } else if (action === 'delete') {
-            this.root?.remove(id);
-          } else {
-            // Do nothing
-          }
-        } else if (type === SideMenuItemType.DEVICE) {
-          const id = DeviceTreeBuilder.DeviceIDPrefix + data.id;
-
-          if (action === 'create') {
-            const nodeId = DeviceTreeBuilder.NodeIDPrefix + data.node_id;
-            const parent = this.root?.find(nodeId);
-            if (!parent) {
-              console.log(`The parent with id ${nodeId} does not exists`);
-              return;
+              item.label = data.name;
+            } else if (action === 'delete') {
+              this.root?.remove(id);
+            } else {
+              // Do nothing
             }
-            const item = new TreeViewItemModel(
-              id,
-              data.name,
-              DeviceTreeBuilder.DeviceIcon
-            );
-            item.data = data;
-            parent.add(item);
-          } else if (action === 'update') {
-            const item = this.root?.find(id);
-            if (!item) {
-              console.log(`The node with id ${id} does not exits`);
-              return;
-            }
+          } else if (type === SideMenuItemType.DEVICE) {
+            const id = DeviceTreeBuilder.DeviceIDPrefix + data.id;
 
-            item.label = data.name;
-          } else if (action === 'delete') {
-            this.root?.remove(id);
-          } else {
-            // Do nothing
-          }
-        } else if (type === SideMenuItemType.NODE_OPERATOR) {
-          const id = DeviceTreeBuilder.NodeOperatorIDPrefix + data.id;
-          if (action === 'create') {
-            const item = new TreeViewItemModel(
-              id,
-              data.name,
-              DeviceTreeBuilder.NodeOperatorIcon
-            );
-            item.data = data;
-            this.root?.add(item);
-          } else if (action === 'update') {
-            const item = this.root?.find(id);
-            if (!item) {
-              console.log(`The node with id ${id} does not exits`);
-              return;
-            }
+            if (action === 'create') {
+              const nodeId = DeviceTreeBuilder.NodeIDPrefix + data.node_id;
+              const parent = this.root?.find(nodeId);
+              if (!parent) {
+                console.log(`The parent with id ${nodeId} does not exists`);
+                return;
+              }
+              const item = new TreeViewItemModel(
+                id,
+                data.name,
+                DeviceTreeBuilder.DeviceIcon
+              );
+              item.data = data;
+              parent.add(item);
+            } else if (action === 'update') {
+              const item = this.root?.find(id);
+              if (!item) {
+                console.log(`The node with id ${id} does not exits`);
+                return;
+              }
 
-            item.label = data.name;
-          } else if (action === 'delete') {
-            this.root?.remove(id);
-          } else {
-            // Do nothing
+              item.label = data.name;
+            } else if (action === 'delete') {
+              this.root?.remove(id);
+            } else {
+              // Do nothing
+            }
+          } else if (type === SideMenuItemType.NODE_OPERATOR) {
+            const id = DeviceTreeBuilder.NodeOperatorIDPrefix + data.id;
+            if (action === 'create') {
+              const item = new TreeViewItemModel(
+                id,
+                data.name,
+                DeviceTreeBuilder.NodeOperatorIcon
+              );
+              item.data = data;
+              this.root?.add(item);
+            } else if (action === 'update') {
+              const item = this.root?.find(id);
+              if (!item) {
+                console.log(`The node with id ${id} does not exits`);
+                return;
+              }
+
+              item.label = data.name;
+            } else if (action === 'delete') {
+              this.root?.remove(id);
+            } else {
+              // Do nothing
+            }
           }
         }
-      }
-    );
+      );
+    this._subscriptions.push(treeItemChangeSubscription);
+
+    const viewModeChangeSubscription = this._navigationService.viewModeChange$
+      .pipe(
+        tap(() => (this.isLoading = true)),
+        switchMap((viewMode) =>
+          viewMode === ViewMode.Logical
+            ? this.loadLogical()
+            : this.loadGeolocation()
+        ),
+        tap(() => (this.isLoading = false))
+      )
+      .subscribe({
+        next: (root) => {
+          let nodeId: string = '';
+          switch (this._navigationService.sideMenu.type) {
+            case SideMenuItemType.GROUP:
+              nodeId =
+                DeviceTreeBuilder.GroupIDPrefix +
+                this._navigationService.sideMenu.id;
+              break;
+            case SideMenuItemType.NODE_OPERATOR:
+              nodeId =
+                DeviceTreeBuilder.NodeOperatorIDPrefix +
+                this._navigationService.sideMenu.id;
+              break;
+            case SideMenuItemType.NODE:
+              nodeId =
+                DeviceTreeBuilder.NodeIDPrefix +
+                this._navigationService.sideMenu.id;
+              break;
+            case SideMenuItemType.DEVICE:
+              nodeId =
+                DeviceTreeBuilder.DeviceIDPrefix +
+                this._navigationService.sideMenu.id;
+              break;
+            default:
+              nodeId = 'user-0';
+              break;
+          }
+
+          const item = root.find(nodeId);
+          this.selectedItems = [item ?? root];
+          this.root = root;
+        },
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(err.error?.message ?? err.message),
+      });
+    this._subscriptions.push(viewModeChangeSubscription);
+
+    this._navigationService.viewMode = this._navigationService.viewMode;
   }
 
   ngAfterViewInit(): void {
@@ -178,6 +243,10 @@ export class SidebarComponent implements OnInit, AfterViewInit {
         const el = ev.target as HTMLInputElement;
         this.searchText = el.value;
       });
+  }
+
+  ngOnDestroy(): void {
+    this._subscriptions.forEach((s) => s.unsubscribe());
   }
 
   @HostListener('document:click', ['$event'])
@@ -245,143 +314,71 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     this._navigationService.navigate();
   }
 
-  setViewMode(value: string) {
-    if (this.mode === value) {
-      return;
-    }
-
-    this.mode = value;
-
-    if (this.mode === 'by-node') {
-      this.loadLogical();
-    } else if (this.mode === 'by-group') {
-      this.loadGeolocation();
-    }
-  }
-
-  private loadGeolocation(): void {
+  private loadGeolocation(): Observable<TreeViewItemModel> {
     const builder = new DeviceTreeBuilder();
     builder.setViewMode(ViewMode.Geolocation);
 
-    this.isLoading = true;
-
-    zip(
+    return concat(
       this._groupService.findAll(),
       this._groupManagementService.findAll(),
       this._nodeService.findAll()
-    )
-      .pipe(
-        switchMap((responses) => {
-          const [
-            findAllGroupResponse,
-            findAllGroupManagementResponse,
-            findAllNodeResponse,
-          ] = responses;
+    ).pipe(
+      toArray(),
+      switchMap((responses) => {
+        const groups = responses[0].data as Group[];
+        const groupManagements = responses[1].data as GroupManagement[];
+        const nodes = responses[2].data as Node[];
 
-          if (!findAllGroupResponse.success) {
-            throw Error(
-              'Fetch group data failed with error: ' +
-                findAllGroupResponse.message
-            );
-          }
+        builder.setGroups(groups ?? []);
+        builder.setGroupManagements(groupManagements ?? []);
+        builder.setNodes(nodes ?? []);
 
-          if (!findAllGroupManagementResponse.success) {
-            throw Error(
-              'Fetch group management data failed with error: ' +
-                findAllGroupManagementResponse.message
-            );
-          }
-
-          if (!findAllNodeResponse.success) {
-            throw Error(
-              'Fetch node data failed with error: ' +
-                findAllNodeResponse.message
-            );
-          }
-
-          builder.setGroups(findAllGroupResponse.data);
-          builder.setGroupManagements(findAllGroupManagementResponse.data);
-          builder.setNodes(findAllNodeResponse.data);
-
-          return zip(
-            findAllNodeResponse.data.map((node) =>
-              this._deviceService.findAll(node.id)
-            )
-          );
-        }),
-        switchMap((responses) => {
-          const devices = responses
-            .filter((e) => e.success)
-            .reduce<Device[]>((acc, e) => [...acc, ...e.data], []);
-          builder.setDevices(devices);
-          return of(builder.build());
-        })
-      )
-      .subscribe({
-        next: (root) => {
-          this.root = root;
-        },
-        error: ({ message }) => this._toastService.showError(message),
-        complete: () => (this.isLoading = false),
-      });
+        return concat(
+          ...nodes.map((node) => this._deviceService.findAll(node.id))
+        );
+      }),
+      toArray(),
+      switchMap((responses) => {
+        const devices = responses.reduce<Device[]>(
+          (acc, r) => [...acc, ...(r.data ?? [])],
+          []
+        );
+        builder.setDevices(devices);
+        return of(builder.build());
+      })
+    );
   }
 
-  private loadLogical(): void {
+  private loadLogical(): Observable<TreeViewItemModel> {
     const builder = new DeviceTreeBuilder();
-    builder.setViewMode(ViewMode.Logical);
 
-    this.isLoading = true;
+    return concat(
+      this._nodeOperatorService.findAll(),
+      this._nodeService.findAll()
+    ).pipe(
+      toArray(),
+      switchMap((responses) => {
+        const nodeOperators = responses[0].data as NodeOperator[];
+        const nodes = responses[1].data as Node[];
 
-    zip(this._nodeOperatorService.findAll(), this._nodeService.findAll())
-      .pipe(
-        switchMap((responses) => {
-          const [findAllNodeOperatorResponse, findAllNodeResponse] = responses;
+        builder.setNodeOperators(nodeOperators ?? []);
+        builder.setNodes(nodes ?? []);
 
-          if (!findAllNodeOperatorResponse.success) {
-            throw Error(
-              'Fetch node operator data failed with error: ' +
-                findAllNodeOperatorResponse.message
-            );
-          }
+        return concat(
+          ...nodes.map((node) => this._deviceService.findAll(node.id))
+        );
+      }),
+      toArray(),
+      switchMap((responses) => {
+        const devices = responses.reduce<Device[]>(
+          (acc, r) => [...acc, ...(r.data ?? [])],
+          []
+        );
 
-          if (!findAllNodeResponse.success) {
-            throw Error(
-              'Fetch node data failed with error: ' +
-                findAllNodeResponse.message
-            );
-          }
-
-          builder.setNodeOperators(findAllNodeOperatorResponse.data);
-          builder.setNodes(findAllNodeResponse.data);
-
-          return zip(
-            findAllNodeResponse.data.map((node) =>
-              this._deviceService.findAll(node.id).pipe(
-                catchError(({ message }) =>
-                  of({
-                    success: false,
-                    message,
-                    data: [],
-                  })
-                )
-              )
-            )
-          );
-        }),
-        switchMap((responses) => {
-          const devices = responses
-            .filter((e) => e.success)
-            .reduce<Device[]>((acc, e) => [...acc, ...e.data], []);
-          builder.setDevices(devices);
-          return of(builder.build());
-        })
-      )
-      .subscribe({
-        next: (root) => {
-          this.root = root;
-        },
-        error: ({ message }) => this._toastService.showError(message),
-        complete: () => (this.isLoading = false),
-      });
+        builder.setViewMode(ViewMode.Logical);
+        builder.setDevices(devices);
+        return of(builder.build());
+      })
+    );
   }
 }

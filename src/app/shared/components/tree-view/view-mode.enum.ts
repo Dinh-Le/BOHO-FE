@@ -1,5 +1,5 @@
 export enum ViewMode {
-  None,
-  Logical,
-  Geolocation,
+  None = 'None',
+  Logical = 'Logical',
+  Geolocation = 'Geolocation',
 }
