@@ -15,14 +15,14 @@
   <div class="border-bottom d-flex justify-content-around pb-1 mt-4">
     <a
       class="view-mode"
-      [ngClass]="{ active: mode === 'by-group' }"
-      (click)="setViewMode('by-group')"
+      [ngClass]="{ active: viewMode === 'Geolocation' }"
+      (click)="viewMode = 'Geolocation'"
       >Xem nhóm</a
     >
     <a
       class="view-mode"
-      [ngClass]="{ active: mode === 'by-node' }"
-      (click)="setViewMode('by-node')"
+      [ngClass]="{ active: viewMode === 'Logical' }"
+      (click)="viewMode = 'Logical'"
       >Xem node</a
     >
   </div>

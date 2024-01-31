@@ -6,8 +6,6 @@ import {
   Level2Menu,
   NavigationService,
 } from 'src/app/data/service/navigation.service';
-import { SidebarActions } from 'src/app/state/sidebar.action';
-import { SidebarState } from 'src/app/state/sidebar.state';
 
 @Component({
   selector: 'app-manage',
@@ -16,7 +14,6 @@ import { SidebarState } from 'src/app/state/sidebar.state';
 })
 export class ManageComponent implements OnInit {
   router = inject(Router);
-  store = inject(Store<{ sidebar: SidebarState }>);
   activatedRoute = inject(ActivatedRoute);
   private _navigationService = inject(NavigationService);
 
@@ -68,6 +65,26 @@ export class ManageComponent implements OnInit {
     if (this._navigationService.level2 in this.menuLevel2) {
       this.menuLevel2[this._navigationService.level2].isActive = true;
     }
+
+    this._navigationService.viewModeChange$.subscribe((viewMode) => {
+      if (
+        this._navigationService.level2 === Level2Menu.NODE &&
+        viewMode === ViewMode.Geolocation
+      ) {
+        this.menuLevel2[Level2Menu.NODE].isActive = false;
+        this.menuLevel2[Level2Menu.CAMERA].isActive = true;
+        this._navigationService.level2 = Level2Menu.CAMERA;
+        this._navigationService.navigate();
+      } else if (
+        this._navigationService.level2 === Level2Menu.CAMERA &&
+        viewMode === ViewMode.Logical
+      ) {
+        this.menuLevel2[Level2Menu.NODE].isActive = true;
+        this.menuLevel2[Level2Menu.CAMERA].isActive = false;
+        this._navigationService.level2 = Level2Menu.CAMERA;
+        this._navigationService.navigate();
+      }
+    });
   }
 
   onMenuItemClick(menuId: Level2Menu): void {
@@ -81,13 +98,9 @@ export class ManageComponent implements OnInit {
     this._navigationService.navigate();
 
     if (menuId === Level2Menu.NODE) {
-      this.store.dispatch(
-        SidebarActions.setViewMode({ viewMode: ViewMode.Logical })
-      );
+      this._navigationService.viewMode = ViewMode.Logical;
     } else if (menuId === Level2Menu.CAMERA) {
-      this.store.dispatch(
-        SidebarActions.setViewMode({ viewMode: ViewMode.Geolocation })
-      );
+      this._navigationService.viewMode = ViewMode.Geolocation;
     }
   }
 }

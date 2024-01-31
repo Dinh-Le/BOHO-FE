@@ -1,11 +1,11 @@
 <router-outlet></router-outlet>
 <div class="toast-container">
   <ngb-toast
-    *ngFor="let toast of toastService.toasts"
+    *ngFor="let toast of toasts"
     [class]="toast.className"
     [autohide]="true"
     [delay]="toast.delay || 3000"
-    (hidden)="toastService.remove(toast)"
+    (hidden)="removeToast(toast)"
   >
     {{ toast.message }}
   </ngb-toast>

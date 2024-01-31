@@ -1,14 +1,22 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { ToastService } from '@app/services/toast.service';
+import { Component, OnInit } from '@angular/core';
+import { ToastInfo, ToastService } from '@app/services/toast.service';
+import { NavigationService } from './data/service/navigation.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'BOHO';
-  toastService = inject(ToastService);
 
-  ngOnInit(): void {}
+  constructor(private toastService: ToastService) {}
+
+  get toasts(): ToastInfo[] {
+    return this.toastService.toasts;
+  }
+
+  removeToast(toast: ToastInfo) {
+    this.toastService.remove(toast);
+  }
 }
