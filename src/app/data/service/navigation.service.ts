@@ -99,6 +99,10 @@ export class NavigationService {
   }
 
   set viewMode(value: ViewMode) {
+    if (value === this._viewMode) {
+      return;
+    }
+
     this._viewMode = value;
     localStorage.setItem('menu_view_mode', value);
     this.viewModeChange$.next(value);

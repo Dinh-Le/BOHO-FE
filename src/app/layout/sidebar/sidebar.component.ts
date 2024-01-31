@@ -233,7 +233,9 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     this._subscriptions.push(viewModeChangeSubscription);
 
-    this._navigationService.viewMode = this._navigationService.viewMode;
+    this._navigationService.viewModeChange$.next(
+      this._navigationService.viewMode
+    );
   }
 
   ngAfterViewInit(): void {
