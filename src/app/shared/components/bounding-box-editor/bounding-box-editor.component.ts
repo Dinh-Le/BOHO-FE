@@ -49,7 +49,7 @@ export class BoundingBoxEditorComponent
   canvas?: ElementRef<HTMLCanvasElement>;
   tabIndex: string = v4();
 
-  @Input() type: string = 'line';
+  @Input() type: 'line' | 'polygon' = 'line';
   @Input() src: {
     nodeId: string;
     deviceId: string;
@@ -83,6 +83,11 @@ export class BoundingBoxEditorComponent
       this.src.deviceId &&
       this.src.presetId
     ) {
+      // this._image = new Image();
+      // this._image.src =
+      //   'https://img.freepik.com/free-photo/forest-landscape_71767-127.jpg?w=996&t=st=1706722112~exp=1706722712~hmac=d601b4c15712b81042c6a9c42e09584fc7f091923db6fd15d1f8bd5b355c68b3';
+      // this._image.onload = (_: any) => this.update();
+
       this._deviceService
         .pauseDevice(this.src.nodeId, this.src.deviceId)
         .pipe(
@@ -130,8 +135,8 @@ export class BoundingBoxEditorComponent
       return;
     }
 
-    if (this.model.length >= 2) {
-      this.removeLastPoint();
+    if (this.model.length > 1) {
+      this.model.pop();
     }
 
     const { x, y } = this.getMousePosition(ev);
@@ -144,30 +149,35 @@ export class BoundingBoxEditorComponent
       return;
     }
 
-    const { x, y } = this.getMousePosition(ev);
-
     if (!this._isDrawing && this.model.length === 0) {
       this._isDrawing = true;
     }
 
-    if (this._isDrawing) {
-      this.model.push({ x, y });
-      this.update();
-    }
-
-    if (this.type === 'line') {
-      this._isDrawing = this.model.length < 2;
-    }
-  }
-
-  onDblClick(ev: Event): void {
-    if (this._isDisabled) {
+    if (!this._isDrawing) {
       return;
     }
 
-    this._isDrawing = false;
-    this.removeLastPoint();
+    const { x, y } = this.getMousePosition(ev);
+    if (this.model.length > 1) {
+      this.model.pop();
+    }
+
+    this.model.push({ x, y });
+
+    if (this.type === 'line' && this.model.length == 2) {
+      this._isDrawing = false;
+    }
+
+    if (this._isDrawing) {
+      this.model.push({ x, y });
+    }
+
     this.update();
+  }
+
+  onDblClick(ev: Event): void {
+    const canvas = ev.target as HTMLCanvasElement;
+    canvas.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
   }
 
   onKeyDown(ev: KeyboardEvent): boolean {
@@ -184,18 +194,20 @@ export class BoundingBoxEditorComponent
 
     if (ev.key === 'Escape') {
       this._isDrawing = false;
-      this.removeLastPoint();
+
+      if (this.type === 'polygon') {
+        if (this.model.length > 3) {
+          this.model.pop();
+        } else {
+          this.model = [];
+        }
+      }
+
       this.update();
       return true;
     }
 
     return false;
-  }
-
-  private removeLastPoint() {
-    const path = this.model;
-    path.pop();      
-    this.model = path;
   }
 
   private getMousePosition(ev: MouseEvent | PointerEvent): Point {
@@ -224,26 +236,25 @@ export class BoundingBoxEditorComponent
 
     if (this.model.length) {
       if (this._isDrawing || this.type === 'line') {
-        context.strokeStyle = 'red';
+        context.strokeStyle = 'blue';
         context.lineWidth = 2;
-        context.beginPath();
-        context.moveTo(this.model[0].x, this.model[0].y);
-        for (let i = 1; i < this.model.length - 1; i++) {
-          context.lineTo(this.model[i].x, this.model[i].y);
-        }
-        context.lineTo(
-          this.model[this.model.length - 1].x,
-          this.model[this.model.length - 1].y
-        );
-
-        context.stroke();
-      } else {
-        context.fillStyle = '#FF007F3F';
         context.beginPath();
         context.moveTo(this.model[0].x, this.model[0].y);
         for (let i = 1; i < this.model.length; i++) {
           context.lineTo(this.model[i].x, this.model[i].y);
         }
+
+        context.stroke();
+      } else {
+        context.fillStyle = '#FFFF7F3F';
+        context.beginPath();
+
+        context.moveTo(this.model[0].x, this.model[0].y);
+
+        for (let i = 1; i < this.model.length; i++) {
+          context.lineTo(this.model[i].x, this.model[i].y);
+        }
+
         context.closePath();
         context.fill();
       }
