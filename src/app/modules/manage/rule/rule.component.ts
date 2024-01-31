@@ -24,15 +24,10 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { PresetService } from 'src/app/data/service/preset.service';
 import { ScheduleService } from 'src/app/data/service/schedule.service';
 import {
-  EMPTY,
   Subscription,
-  catchError,
-  concatMap,
   filter,
-  finalize,
   of,
   switchMap,
-  tap,
 } from 'rxjs';
 import { ToastService } from '@app/services/toast.service';
 import { Objects, RuleTypes, Severities } from 'src/app/data/constants';
@@ -41,7 +36,6 @@ import { Rule } from 'src/app/data/schema/boho-v2/rule';
 import { RuleService } from 'src/app/data/service/rule.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { NodeService } from 'src/app/data/service/node.service';
-import { DeviceService } from 'src/app/data/service/device.service';
 
 declare interface CustomSelectItemModel extends SelectItemModel {
   data: any;
@@ -217,14 +211,14 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
 
   cameraId = '';
   nodeId = '';
-  _activatedRoute = inject(ActivatedRoute);
-  _navigationService = inject(NavigationService);
-  _presetService = inject(PresetService);
-  _scheduleService = inject(ScheduleService);
-  _toastService = inject(ToastService);
-  _changeDetectorRef = inject(ChangeDetectorRef);
-  _ruleService = inject(RuleService);
-  _nodeService = inject(NodeService);
+  private _activatedRoute = inject(ActivatedRoute);
+  private _navigationService = inject(NavigationService);
+  private _presetService = inject(PresetService);
+  private _scheduleService = inject(ScheduleService);
+  private _toastService = inject(ToastService);
+  private _changeDetectorRef = inject(ChangeDetectorRef);
+  private _ruleService = inject(RuleService);
+  private _nodeService = inject(NodeService);
 
   menuItems: MenuItem[] = [
     {

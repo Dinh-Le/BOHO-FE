@@ -131,7 +131,7 @@ export class BoundingBoxEditorComponent
     }
 
     if (this.model.length >= 2) {
-      this.model.pop();
+      this.removeLastPoint();
     }
 
     const { x, y } = this.getMousePosition(ev);
@@ -166,7 +166,7 @@ export class BoundingBoxEditorComponent
     }
 
     this._isDrawing = false;
-    this.model.pop();
+    this.removeLastPoint();
     this.update();
   }
 
@@ -184,12 +184,18 @@ export class BoundingBoxEditorComponent
 
     if (ev.key === 'Escape') {
       this._isDrawing = false;
-      this.model.pop();
+      this.removeLastPoint();
       this.update();
       return true;
     }
 
     return false;
+  }
+
+  private removeLastPoint() {
+    const path = this.model;
+    path.pop();      
+    this.model = path;
   }
 
   private getMousePosition(ev: MouseEvent | PointerEvent): Point {
