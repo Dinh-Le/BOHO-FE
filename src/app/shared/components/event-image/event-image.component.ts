@@ -81,8 +81,8 @@ export class EventImage implements AfterViewInit, OnChanges {
             const height =
               this.image!.height *
               (this.type === 'full' ? 1 : bottomrighty - toplefty);
-            const sx = this.type === 'full' ? 0 : topleftx * width;
-            const sy = this.type === 'full' ? 0 : toplefty * height;
+            const sx = this.type === 'full' ? 0 : topleftx * this.image!.width;
+            const sy = this.type === 'full' ? 0 : toplefty * this.image!.height;
 
             const scaleFactor = Math.min(
               canvas.width / width,
@@ -105,6 +105,8 @@ export class EventImage implements AfterViewInit, OnChanges {
               dh
             );
 
+            console.log({ sx, sy, width, height, dx, dy, dw, dh });
+
             // Render the bounding box if full image
             if (this.type === 'full') {
               context.beginPath();
@@ -115,6 +117,7 @@ export class EventImage implements AfterViewInit, OnChanges {
               context.strokeStyle = 'red';
               context.rect(bx, by, bw, bh);
               context.stroke();
+              console.log({ bx, by, bw, bh });
             }
           };
           this.image.src = URL.createObjectURL(blod);
