@@ -9,8 +9,8 @@
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark px-2 py-2">
   <ul class="navbar-nav">
     <li *ngFor="let item of navItems" class="nav-item">
-      <div [ngClass]="{ active: item.isActive }">
-        <a class="nav-link" [routerLink]="item.path">
+      <div [ngClass]="{ active: item.isActive }" style="cursor: pointer; user-select: none;">
+        <a class="nav-link" (click)="onMenuItemClick(item)">
           <app-svg-icon [icon]="item.icon"></app-svg-icon> {{ item.title }}</a
         >
       </div>
