@@ -1,8 +1,8 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { ToastService } from '@app/services/toast.service';
 import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from '@shared/shared.module';
-import { finalize } from 'rxjs';
 import { EventService } from 'src/app/data/service/event.service';
 
 @Component({
@@ -14,6 +14,7 @@ import { EventService } from 'src/app/data/service/event.service';
 })
 export class EventDetailComponent {
   event: any;
+  index: number = 0;
 
   constructor(
     private activeModal: NgbActiveModal,
@@ -21,8 +22,48 @@ export class EventDetailComponent {
     private toastService: ToastService
   ) {}
 
+  get length() {
+    return this.event?.images_info?.length ?? 0;
+  }
+
+  get image() {
+    if (this.length === 0) {
+      return null;
+    }
+
+    return this.event?.images_info[this.index];
+  }
+
+  get percentage() {
+    if (this.length === 0) {
+      return '100%';
+    }
+
+    return (100 * (this.index + 1)) / this.length + '%';
+  }
+
   close() {
     this.activeModal.dismiss();
+  }
+
+  next() {
+    if (this.index < this.length - 1) {
+      this.index += 1;
+    }
+  }
+
+  previous() {
+    if (this.index > 0) {
+      this.index -= 1;
+    }
+  }
+
+  first() {
+    this.index = 0;
+  }
+
+  last() {
+    this.index = this.length - 1;
   }
 
   verify(ev: Event, value: boolean) {
@@ -42,12 +83,13 @@ export class EventDetailComponent {
           is_verify: value,
         }
       )
-      .pipe(finalize(() => (button.disabled = false)))
       .subscribe({
-        error: ({ message }) => this.toastService.showError(message),
+        error: (err: HttpErrorResponse) =>
+          this.toastService.showError(err.error?.message ?? err.message),
         complete: () => {
           this.toastService.showSuccess('Successfully');
           this.activeModal.close();
+          button.disabled = false;
         },
       });
   }
