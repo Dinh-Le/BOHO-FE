@@ -13,34 +13,36 @@
   <p>Điểm giám sát:</p>
   <p>
     Thời gian:
-    {{ event?.images_info[0].detection_time | datetime : " DD/MM/YYYY HH:mm" }}
+    {{ image?.detection_time | datetime : " DD/MM/YYYY HH:mm" }}
   </p>
-  <p>ID đối tượng: {{ event?.images_info[0].detection_id }}</p>
-  <p>Loại: {{ event?.images_info[0].event_type }}</p>
-  <p>Màu sắc: {{ event?.images_info[0].recognize_result.color }}</p>
-  <p>Biển số: {{ event?.images_info[0].recognize_result.lisence_plate }}</p>
+  <p>ID đối tượng: {{ image?.detection_id }}</p>
+  <p>Loại: {{ image?.event_type }}</p>
+  <p>Màu sắc: {{ image?.recognize_result.color }}</p>
+  <p>Biển số: {{ image?.recognize_result.lisence_plate }}</p>
 </div>
 <div class="progress-bar">
-  <div class="progress"></div>
+  <div class="progress" [style.width]="percentage"></div>
 </div>
 <div class="toolbar">
-  <app-svg-icon
-    width="1.5em"
-    height="1.5em"
-    rotate="180"
-    icon="next"
-  ></app-svg-icon>
-  <app-svg-icon width="1.5em" height="1.5em" icon="next"></app-svg-icon>
-  <app-svg-icon width="1.5em" height="1.5em" icon="rewind"></app-svg-icon>
-  <app-svg-icon width="1.5em" height="1.5em" icon="previous"></app-svg-icon>
-  <span>hh:mm:ss</span>
-  <app-svg-icon
-    width="1.5em"
-    height="1.5em"
-    [rotate]="180"
-    icon="previous"
-  ></app-svg-icon>
-  <app-svg-icon width="1.5em" height="1.5em" icon="fast-forward"></app-svg-icon>
+  <button class="border-0">
+    <app-svg-icon width="1.5em" height="1.5em" rotate="180" icon="next"></app-svg-icon>
+  </button>
+  <button class="border-0">
+    <app-svg-icon width="1.5em" height="1.5em" icon="next"></app-svg-icon>
+  </button>
+  <button (click)="first()" class="border-0">
+    <app-svg-icon width="1.5em" height="1.5em" icon="rewind"></app-svg-icon>
+  </button>
+  <button (click)="previous()" class="border-0">
+    <app-svg-icon width="1.5em" height="1.5em" icon="previous"></app-svg-icon>
+  </button>
+  <span>{{ image?.detection_time | datetime : "HH:mm:ss" }}</span>
+  <button (click)="next()" class="border-0">
+    <app-svg-icon width="1.5em" height="1.5em" [rotate]="180" icon="previous"></app-svg-icon>
+  </button>
+  <button (click)="last()" class="border-0">
+    <app-svg-icon width="1.5em" height="1.5em" icon="fast-forward"></app-svg-icon>
+  </button>
 </div>
 <div class="footer">
   <button class="reject" type="button" (click)="verify($event, false)">
