@@ -1,8 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { ToastService } from '@app/services/toast.service';
 import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from '@shared/shared.module';
+import { finalize, tap } from 'rxjs';
 import { EventService } from 'src/app/data/service/event.service';
 
 @Component({
@@ -66,30 +67,22 @@ export class EventDetailComponent {
     this.index = this.length - 1;
   }
 
-  verify(ev: Event, value: boolean) {
-    if (this.event.is_verify === value) {
-      return;
-    }
-
-    const button = ev.target as HTMLButtonElement;
-    button.disabled = true;
-
+  verify(button: HTMLButtonElement, value: boolean) {
     this.eventService
-      .verify(
-        this.event.node_id,
-        this.event.device_id,
-        this.event.images_info[0].detection_id,
-        {
-          is_verify: value,
-        }
+      .verify(this.event.node_id, this.event.device_id, this.event.event_id, {
+        is_verify: value,
+      })
+      .pipe(
+        tap(() => (button.disabled = true)),
+        finalize(() => (button.disabled = false))
       )
       .subscribe({
         error: (err: HttpErrorResponse) =>
           this.toastService.showError(err.error?.message ?? err.message),
         complete: () => {
           this.toastService.showSuccess('Successfully');
+          this.event.is_verify = value;
           this.activeModal.close();
-          button.disabled = false;
         },
       });
   }

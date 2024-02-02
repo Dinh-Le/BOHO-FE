@@ -25,7 +25,12 @@
 </div>
 <div class="toolbar">
   <button class="border-0">
-    <app-svg-icon width="1.5em" height="1.5em" rotate="180" icon="next"></app-svg-icon>
+    <app-svg-icon
+      width="1.5em"
+      height="1.5em"
+      rotate="180"
+      icon="next"
+    ></app-svg-icon>
   </button>
   <button class="border-0">
     <app-svg-icon width="1.5em" height="1.5em" icon="next"></app-svg-icon>
@@ -38,17 +43,38 @@
   </button>
   <span>{{ image?.detection_time | datetime : "HH:mm:ss" }}</span>
   <button (click)="next()" class="border-0">
-    <app-svg-icon width="1.5em" height="1.5em" [rotate]="180" icon="previous"></app-svg-icon>
+    <app-svg-icon
+      width="1.5em"
+      height="1.5em"
+      [rotate]="180"
+      icon="previous"
+    ></app-svg-icon>
   </button>
   <button (click)="last()" class="border-0">
-    <app-svg-icon width="1.5em" height="1.5em" icon="fast-forward"></app-svg-icon>
+    <app-svg-icon
+      width="1.5em"
+      height="1.5em"
+      icon="fast-forward"
+    ></app-svg-icon>
   </button>
 </div>
 <div class="footer">
-  <button class="reject" type="button" (click)="verify($event, false)">
+  <button
+    #rejectButton
+    class="reject"
+    type="button"
+    [disabled]="!event.is_verify"
+    (click)="verify(rejectButton, false)"
+  >
     Công nhận giả
   </button>
-  <button class="accept" type="button" (click)="verify($event, true)">
+  <button
+    #acceptButton
+    class="accept"
+    type="button"
+    [disabled]="event.is_verify"
+    (click)="verify(acceptButton, true)"
+  >
     Công nhận thật
   </button>
 </div>

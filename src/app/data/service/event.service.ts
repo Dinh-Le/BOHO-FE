@@ -75,7 +75,7 @@ export class EventServiceImpl extends EventService {
     eventId: number,
     data: Partial<{ is_verify: boolean; is_watch: boolean }>
   ): Observable<ResponseBase> {
-    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/event/${eventId}/verify`;
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/event/${eventId}/verify_event`;
     return this.httpClient.patch<ResponseBase>(url, data);
   }
 }
