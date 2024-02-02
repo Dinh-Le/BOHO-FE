@@ -35,13 +35,13 @@
         <div class="event-time">
           {{ item.images_info[0].detection_time | datetime : "HH:mm" }}
         </div>
-        <label class="custom-input">
+        <label class="custom-input" (click)="$event.stopPropagation()">
           <input
+            #watchCheckbox
             class="seen-checkbox"
             type="checkbox"
-            (click)="$event.stopPropagation()"
             [(ngModel)]="item.is_watch"
-            (ngModelChange)="onSeenCheckboxChanged(item)"
+            (ngModelChange)="onSeenCheckboxChanged(watchCheckbox, item)"
             [style.display]="item.checkboxVisible ? 'block' : 'none'"
           />
         </label>

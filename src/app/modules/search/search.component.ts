@@ -14,7 +14,7 @@ import {
 } from 'src/app/data/service/search.service';
 import { finalize, tap } from 'rxjs';
 import { EventInfo } from 'src/app/data/schema/boho-v2/event';
-import { KeyValue } from '@angular/common';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-search',
@@ -41,14 +41,19 @@ export class SearchComponent implements OnInit {
   events: any[] = [];
 
   form = new FormGroup({
-    startTime: new FormControl(null, [Validators.required]),
-    endTime: new FormControl(null, [Validators.required]),
+    startTime: new FormControl<string>(
+      moment().subtract(1, 'days').format('yyyy-MM-DDTHH:mm'),
+      [Validators.required]
+    ),
+    endTime: new FormControl<string>(moment().format('yyyy-MM-DDTHH:mm'), [
+      Validators.required,
+    ]),
     objects: new FormControl<ObjectItemModel[]>([]),
     rule: new FormControl(),
-    resolutionMinute: new FormControl(0, [Validators.required]),
-    resolutionSecond: new FormControl(0, [Validators.required]),
-    licensePlate: new FormControl(''),
-    showVehileOnly: new FormControl(false, [Validators.required]),
+    resolutionMinute: new FormControl<number>(0, [Validators.required]),
+    resolutionSecond: new FormControl<number>(0, [Validators.required]),
+    licensePlate: new FormControl<string>(''),
+    showVehileOnly: new FormControl<boolean>(false, [Validators.required]),
   });
   ruleItems: SelectItemModel[] = [
     'Vượt đường kẻ',
@@ -124,7 +129,7 @@ export class SearchComponent implements OnInit {
     };
     const query: SearchQuery = {
       dis: Object.keys(devices),
-      tq: 'week',
+      tq: 'custom',
       p: this.paginationInfo.pageIndex,
       pl: this.paginationInfo.pageLength,
       eit: this.form.get('rule')?.value?.value,
@@ -132,6 +137,8 @@ export class SearchComponent implements OnInit {
         .get('objects')
         ?.value?.map((e) => objectIdMap[e.id])
         .filter((e) => e !== undefined),
+      start: moment(this.form.get('startTime')!.value).format('Y-M-D H:m:s'),
+      end: moment(this.form.get('endTime')!.value).format('Y-M-D H:m:s'),
     };
 
     this._searchService

@@ -15,9 +15,10 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventDetailComponent } from '../event-detail/event-detail.component';
 import { CustomMarker } from '@shared/models/custom-marker';
 import { NavigationService } from 'src/app/data/service/navigation.service';
-import { Subscription } from 'rxjs';
+import { Subscription, finalize, tap } from 'rxjs';
 import { EventService } from 'src/app/data/service/event.service';
 import { ToastService } from '@app/services/toast.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 declare class CameraInfo {
   latlng: LatLng;
@@ -157,18 +158,20 @@ export class MapViewComponent implements OnInit, OnChanges, OnDestroy {
     this._modalService.dismissAll();
   }
 
-  onSeenCheckboxChanged(event: any) {
+  onSeenCheckboxChanged(checkbox: HTMLInputElement, event: any) {
     this._eventService
-      .verify(
-        event.node_id,
-        event.device_id,
-        event.images_info[0].detection_id,
-        {
-          is_watch: event.is_watch,
-        }
+      .verify(event.node_id, event.device_id, event.event_id, {
+        is_watch: event.is_watch,
+      })
+      .pipe(
+        tap(() => (checkbox.disabled = true)),
+        finalize(() => (checkbox.disabled = false))
       )
       .subscribe({
-        error: ({ message }) => this._toastService.showError(message),
+        error: (err: HttpErrorResponse) => {
+          this._toastService.showError(err.error?.message ?? err.message);
+          event.is_watch = !event.is_watch;
+        },
         complete: () => {
           this._toastService.showSuccess('Update event successfully');
         },
