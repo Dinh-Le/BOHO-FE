@@ -107,6 +107,10 @@ export class MapViewComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if ('events' in changes) {
+      this.refresh();
+    }
+
     if (
       'selectedEvents' in changes &&
       changes['selectedEvents'].currentValue.length === 0
