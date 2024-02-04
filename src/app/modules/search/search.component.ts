@@ -108,16 +108,22 @@ export class SearchComponent implements OnInit {
 
   search() {
     this.events = [];
-    const nodes = Object.entries(
-      this._navigationService.selectedDeviceIds
-    ).filter(([k, v]) => Object.keys(v).length > 0);
 
-    if (nodes.length == 0) {
+    const devices = Object.entries(this._navigationService.selectedDeviceIds)
+      .flatMap(([_, v]) => Object.values(v))
+      .reduce(
+        (prev, curr) =>
+          Object.assign(prev, {
+            [curr.id]: curr,
+          }),
+        {}
+      );
+
+    if (Object.keys(devices).length === 0) {
       this._toastService.showError('No device selected');
       return;
     }
 
-    const [nodeId, devices] = nodes[0];
     const objectIdMap: {
       [key: string]: number;
     } = {
@@ -144,17 +150,17 @@ export class SearchComponent implements OnInit {
     };
 
     this._searchService
-      .search(nodeId, query)
+      .search(query)
       .pipe(
         tap(() => this.form.disable()),
         finalize(() => this.form.enable())
       )
       .subscribe({
-        next: (response) => {
-          this.totalEvents = response.data.total;
-          this.events = response.data.events.map((e) =>
+        next: ({ data }) => {
+          this.totalEvents = data.total;
+          this.events = data.events.map((e) =>
             Object.assign(e, {
-              node_id: nodeId,
+              node_id: devices[e.device_id].node_id,
             })
           );
         },
