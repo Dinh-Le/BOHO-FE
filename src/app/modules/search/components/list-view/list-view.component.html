@@ -31,11 +31,7 @@
     <div class="event-prop">
       <label class="prop-label">Địa điểm:</label>
       <p>
-        {{
-          selectedEvent?.device_location.lat +
-            "," +
-            selectedEvent?.device_location.long
-        }}
+        {{ address }}
       </p>
     </div>
   </div>
@@ -52,22 +48,13 @@
       <th>Địa điểm</th>
     </thead>
     <tbody>
-      <tr
-        *ngFor="let item of events"
-        (click)="selectedEvent = item"
-        [class.active]="selectedEvent?.event_id === item.event_id"
-      >
+      <tr *ngFor="let item of events" (click)="selectedEvent = item"
+        [class.active]="selectedEvent?.event_id === item.event_id">
         <td>
-          <label class="custom-checkbox"
-            ><input type="checkbox" [(ngModel)]="item.is_watch"
-          /></label>
+          <label class="custom-checkbox"><input type="checkbox" [(ngModel)]="item.is_watch" /></label>
         </td>
         <td>
-          <app-event-image
-            class="crop-image"
-            [event]="item"
-            type="crop"
-          ></app-event-image>
+          <app-event-image class="crop-image" [event]="item" type="crop"></app-event-image>
         </td>
         <td>{{ item.images_info[0].recognize_result.lisence_plate }}</td>
         <td>
@@ -80,9 +67,9 @@
         <td>{{ item.alarm_type }}</td>
         <td>
           {{
-            selectedEvent?.device_location.lat +
-              "," +
-              selectedEvent?.device_location.long
+          selectedEvent?.device_location.lat +
+          "," +
+          selectedEvent?.device_location.long
           }}
         </td>
       </tr>

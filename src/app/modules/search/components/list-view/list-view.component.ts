@@ -10,6 +10,12 @@ export class ListViewComponent {
 
   selectedEvent: any;
 
+  get address() {
+    return this.selectedEvent
+      ? `${this.selectedEvent.device_location.lat}, ${this.selectedEvent.device_location.long}`
+      : '';
+  }
+
   public getEventInfoBackgroundClass(level?: string): string {
     if (level === 'medium') {
       return 'bg-primary';
