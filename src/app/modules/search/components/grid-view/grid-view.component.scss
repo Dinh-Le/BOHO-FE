@@ -1,3 +1,26 @@
 .events-container {
-    display: grid;    
+  display: grid;
+}
+
+.event-container {
+  position: relative;
+  background: #28282a;
+  padding: 5px;
+}
+
+.event-container:hover {
+  .checkbox-container {
+    display: block;
+  }
+}
+
+.checkbox-container {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  display: none;
+}
+
+.checkbox-container:has(input[type="checkbox"]:checked) {
+  display: block;
 }

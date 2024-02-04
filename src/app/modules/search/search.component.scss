@@ -44,16 +44,28 @@ button:disabled {
   grid-area: toolbar;
   background: #4a494b;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
 
-  .grid-size {
-    cursor: pointer;
-    align-self: center;
-    margin-right: 4px;
+  .left {
   }
-  .grid-size.active {
-    pointer-events: none;
-    cursor: none;
+
+  .right {
+    .grid-size {
+      cursor: pointer;
+      align-self: center;
+      margin-right: 4px;
+    }
+    .grid-size.active {
+      pointer-events: none;
+      cursor: none;
+    }
+    button:last-child {
+      margin-right: 20px;
+    }
+    button.active {
+      pointer-events: none;
+      cursor: none;
+    }
   }
 
   button {
@@ -62,13 +74,6 @@ button:disabled {
     margin-left: 2px;
     padding-top: 3px;
     padding-bottom: 3px;
-  }
-  button:last-child {
-    margin-right: 20px;
-  }
-  button.active {
-    pointer-events: none;
-    cursor: none;
   }
 }
 

@@ -39,6 +39,7 @@ export class SearchComponent implements OnInit {
   };
   totalEvents: number = 0;
   events: any[] = [];
+  selectedEvents: any[] = [];
 
   form = new FormGroup({
     startTime: new FormControl<string>(
@@ -90,6 +91,10 @@ export class SearchComponent implements OnInit {
     }
 
     return currentEvents;
+  }
+
+  get selectedObjects(): ObjectItemModel[] {
+    return this.form.get('objects')!.value!;
   }
 
   setGridColumn(value: number) {
@@ -179,7 +184,7 @@ export class SearchComponent implements OnInit {
     );
   }
 
-  get selectedObjects(): ObjectItemModel[] {
-    return this.form.get('objects')!.value!;
+  export(ev: Event) {
+    this.selectedEvents = [];
   }
 }

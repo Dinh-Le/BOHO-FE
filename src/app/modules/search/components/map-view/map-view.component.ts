@@ -1,9 +1,11 @@
 import {
   Component,
+  EventEmitter,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
+  Output,
   SimpleChanges,
   TemplateRef,
   ViewChild,
@@ -53,22 +55,25 @@ export class MapViewComponent implements OnInit, OnChanges, OnDestroy {
   };
 
   _selectedMarker: CustomMarker | undefined;
+  subscriptions: Subscription[] = [];
 
   @Input() events: any[] = [];
 
+  @Input() selectedEvents: any[] = [];
+  @Output() selectedEventsChange = new EventEmitter<any[]>();
+
   get cameraList(): CameraInfo[] {
-    const devices = Object.entries(this._navigationService.selectedDeviceIds)
-      .filter(([k, v]) => Object.keys(v).length > 0)
-      .flatMap(([k, v]) => Object.values(v));
-    return devices.map((device) => {
-      const lat = parseFloat(device.location.lat);
-      const lng = parseFloat(device.location.long);
-      return {
-        events: this.events.filter((e) => e.device_id === device.id),
-        latlng: new LatLng(lat, lng),
-        type: 'ptz',
-      };
-    });
+    return Object.entries(this._navigationService.selectedDeviceIds)
+      .flatMap(([_, v]) => Object.values(v))
+      .map((device) => {
+        const lat = parseFloat(device.location.lat);
+        const lng = parseFloat(device.location.long);
+        return {
+          events: this.events.filter((e) => e.device_id === device.id),
+          latlng: new LatLng(lat, lng),
+          type: 'ptz',
+        };
+      });
   }
 
   get markers(): CustomMarker[] {
@@ -93,20 +98,27 @@ export class MapViewComponent implements OnInit, OnChanges, OnDestroy {
     return this._selectedMarker?.data.events || [];
   }
 
-  selectedDeviceChange$: Subscription | undefined;
   ngOnInit(): void {
-    this.selectedDeviceChange$ =
+    this.subscriptions.push(
       this._navigationService.selectedDeviceChange$.subscribe(() =>
         this.refresh()
-      );
+      )
+    );
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.refresh();
+    if (
+      'selectedEvents' in changes &&
+      changes['selectedEvents'].currentValue.length === 0
+    ) {
+      this.events = this.events.map((e) =>
+        Object.assign(e, { checked: false })
+      );
+    }
   }
 
   ngOnDestroy(): void {
-    this.selectedDeviceChange$?.unsubscribe();
+    this.subscriptions.forEach((s) => s.unsubscribe());
   }
 
   onMapReady(map: Leaflet.Map) {
@@ -158,24 +170,9 @@ export class MapViewComponent implements OnInit, OnChanges, OnDestroy {
     this._modalService.dismissAll();
   }
 
-  onSeenCheckboxChanged(checkbox: HTMLInputElement, event: any) {
-    this._eventService
-      .verify(event.node_id, event.device_id, event.event_id, {
-        is_watch: event.is_watch,
-      })
-      .pipe(
-        tap(() => (checkbox.disabled = true)),
-        finalize(() => (checkbox.disabled = false))
-      )
-      .subscribe({
-        error: (err: HttpErrorResponse) => {
-          this._toastService.showError(err.error?.message ?? err.message);
-          event.is_watch = !event.is_watch;
-        },
-        complete: () => {
-          this._toastService.showSuccess('Update event successfully');
-        },
-      });
+  onEventSelectionChanged() {
+    this.selectedEvents = this.events.filter((e) => e.checked);
+    this.selectedEventsChange.emit(this.selectedEvents);
   }
 
   showEventDetail(event: any) {

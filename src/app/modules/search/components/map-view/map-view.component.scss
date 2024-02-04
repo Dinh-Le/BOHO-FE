@@ -65,6 +65,7 @@
 ::ng-deep .event-seen {
   background: #3c3b3e;
 }
+
 .events-container {
   height: 80vh;
   overflow-y: auto;
@@ -124,4 +125,21 @@
   .event-container:last-child {
     border-bottom: 1px solid white;
   }
+}
+
+.event-container:hover {
+  .checkbox-container {
+    display: block;
+  }
+}
+
+.checkbox-container {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  display: none;
+}
+
+.checkbox-container:has(input[type="checkbox"]:checked) {
+  display: block;
 }

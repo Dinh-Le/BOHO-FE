@@ -1,54 +1,69 @@
 <div class="toolbar">
-  <app-svg-icon
-    icon="grid-2"
-    class="grid-size"
-    height="24px"
-    width="24px"
-    color="#FFFFFF"
-    (click)="setGridColumn(2)"
-  ></app-svg-icon>
-  <app-svg-icon
-    icon="grid-3"
-    class="grid-size"
-    width="24px"
-    height="24px"
-    (click)="setGridColumn(3)"
-  ></app-svg-icon>
-  <app-svg-icon
-    icon="grid-4"
-    class="grid-size"
-    width="24px"
-    height="24px"
-    (click)="setGridColumn(4)"
-  ></app-svg-icon>
-  <app-svg-icon
-    icon="grid-5"
-    class="grid-size"
-    width="24px"
-    height="24px"
-    (click)="setGridColumn(5)"
-  ></app-svg-icon>
-  <button
-    type="button"
-    [class.active]="viewMode === 'grid-view'"
-    (click)="viewMode = 'grid-view'"
-  >
-    Ô lưới
-  </button>
-  <button
-    type="button"
-    [class.active]="viewMode === 'map-view'"
-    (click)="viewMode = 'map-view'"
-  >
-    Bản đồ
-  </button>
-  <button
-    type="button"
-    [class.active]="viewMode === 'list-view'"
-    (click)="viewMode = 'list-view'"
-  >
-    Danh sách
-  </button>
+  <div class="ms-1 left align-items-center d-flex">
+    <app-svg-icon
+      width="24px"
+      height="24px"
+      icon="arrow-back-arrow"
+      class="cursor-pointer"
+      *ngIf="selectedEvents.length"
+      (click)="selectedEvents = []"
+    ></app-svg-icon>
+    <button *ngIf="selectedEvents.length" (click)="export($event)">
+      Xuất dữ liệu
+    </button>
+  </div>
+  <div class="right align-items-center d-flex">
+    <app-svg-icon
+      icon="grid-2"
+      class="grid-size"
+      height="24px"
+      width="24px"
+      color="#FFFFFF"
+      (click)="setGridColumn(2)"
+    ></app-svg-icon>
+    <app-svg-icon
+      icon="grid-3"
+      class="grid-size"
+      width="24px"
+      height="24px"
+      (click)="setGridColumn(3)"
+    ></app-svg-icon>
+    <app-svg-icon
+      icon="grid-4"
+      class="grid-size"
+      width="24px"
+      height="24px"
+      (click)="setGridColumn(4)"
+    ></app-svg-icon>
+    <app-svg-icon
+      icon="grid-5"
+      class="grid-size"
+      width="24px"
+      height="24px"
+      (click)="setGridColumn(5)"
+    ></app-svg-icon>
+    <button
+      type="button"
+      [class.active]="viewMode === 'grid-view'"
+      (click)="viewMode = 'grid-view'"
+    >
+      Ô lưới
+    </button>
+    <button
+      type="button"
+      [class.active]="viewMode === 'map-view'"
+      (click)="viewMode = 'map-view'"
+    >
+      Bản đồ
+    </button>
+    <button
+      type="button"
+      [class.active]="viewMode === 'list-view'"
+      (click)="viewMode = 'list-view'"
+    >
+      Danh sách
+    </button>
+  </div>
 </div>
 
 <div
@@ -61,11 +76,17 @@
     [cols]="gridColumn"
     [pageLength]="paginationInfo.pageLength"
     [events]="events"
+    [(selectedEvents)]="selectedEvents"
   ></app-grid-view>
-  <app-map-view *ngSwitchCase="'map-view'" [events]="events"></app-map-view>
+  <app-map-view
+    *ngSwitchCase="'map-view'"
+    [events]="events"
+    [(selectedEvents)]="selectedEvents"
+  ></app-map-view>
   <app-list-view-search
     *ngSwitchCase="'list-view'"
     [events]="events"
+    [(selectedEvents)]="selectedEvents"
   ></app-list-view-search>
   <div *ngSwitchDefault>Unsupported view mode</div>
 </div>

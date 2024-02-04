@@ -22,8 +22,6 @@
     </div>
     <div class="events-container">
       <div
-        (mouseenter)="item.checkboxVisible = true"
-        (mouseleave)="item.checkboxVisible = false"
         class="event-container"
         (click)="showEventDetail(item)"
         *ngFor="let item of eventList"
@@ -35,16 +33,15 @@
         <div class="event-time">
           {{ item.images_info[0].detection_time | datetime : "HH:mm" }}
         </div>
-        <label class="custom-input" (click)="$event.stopPropagation()">
-          <input
-            #watchCheckbox
-            class="seen-checkbox"
-            type="checkbox"
-            [(ngModel)]="item.is_watch"
-            (ngModelChange)="onSeenCheckboxChanged(watchCheckbox, item)"
-            [style.display]="item.checkboxVisible ? 'block' : 'none'"
-          />
-        </label>
+        <div class="checkbox-container">
+          <label class="custom-checkbox" (click)="$event.stopPropagation()">
+            <input
+              type="checkbox"
+              [(ngModel)]="item.checked"
+              (ngModelChange)="onEventSelectionChanged()"
+            />
+          </label>
+        </div>
       </div>
     </div>
   </div>
