@@ -42,7 +42,7 @@ export class SearchComponent implements OnInit {
 
   form = new FormGroup({
     startTime: new FormControl<string>(
-      moment().subtract(1, 'days').format('yyyy-MM-DDTHH:mm'),
+      moment().subtract(1, 'week').format('yyyy-MM-DDTHH:mm'),
       [Validators.required]
     ),
     endTime: new FormControl<string>(moment().format('yyyy-MM-DDTHH:mm'), [
@@ -50,10 +50,10 @@ export class SearchComponent implements OnInit {
     ]),
     objects: new FormControl<ObjectItemModel[]>([]),
     rule: new FormControl(),
-    resolutionMinute: new FormControl<number>(0, [Validators.required]),
-    resolutionSecond: new FormControl<number>(0, [Validators.required]),
+    resolutionMinute: new FormControl<number>(0),
+    resolutionSecond: new FormControl<number>(0),
     licensePlate: new FormControl<string>(''),
-    showVehileOnly: new FormControl<boolean>(false, [Validators.required]),
+    showVehileOnly: new FormControl<boolean>(false),
   });
   ruleItems: SelectItemModel[] = [
     'Vượt đường kẻ',
@@ -68,7 +68,7 @@ export class SearchComponent implements OnInit {
   ngOnInit(): void {}
 
   get canSubmit() {
-    return this.form.valid || true;
+    return this.form.valid;
   }
 
   get currentEvents(): (EventInfo | null)[] {
@@ -111,7 +111,9 @@ export class SearchComponent implements OnInit {
     const nodes = Object.entries(
       this._navigationService.selectedDeviceIds
     ).filter(([k, v]) => Object.keys(v).length > 0);
+
     if (nodes.length == 0) {
+      this._toastService.showError('No device selected');
       return;
     }
 
