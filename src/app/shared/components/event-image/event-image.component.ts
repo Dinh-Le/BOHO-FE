@@ -105,8 +105,6 @@ export class EventImage implements AfterViewInit, OnChanges {
               dh
             );
 
-            console.log({ sx, sy, width, height, dx, dy, dw, dh });
-
             // Render the bounding box if full image
             if (this.type === 'full') {
               context.beginPath();
@@ -114,10 +112,25 @@ export class EventImage implements AfterViewInit, OnChanges {
               const by = dy + this.image!.height * scaleFactor * toplefty;
               const bw = (bottomrightx - topleftx) * width * scaleFactor;
               const bh = (bottomrighty - toplefty) * height * scaleFactor;
-              context.strokeStyle = 'red';
+
+              const { alarm_level } = this.event;
+              switch (alarm_level) {
+                case 1:
+                  context.strokeStyle = 'green';
+                  break;
+                case 2:
+                  context.strokeStyle = 'yellow';
+                  break;
+                case 3:
+                  context.strokeStyle = 'red';
+                  break;
+                default:
+                  context.strokeStyle = 'black';
+                  break;
+              }
+
               context.rect(bx, by, bw, bh);
               context.stroke();
-              console.log({ bx, by, bw, bh });
             }
           };
           this.image.src = URL.createObjectURL(blod);

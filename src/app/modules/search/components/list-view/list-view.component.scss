@@ -75,3 +75,17 @@
     }
   }
 }
+
+.event-container:hover {
+  .checkbox-container {
+    display: block;
+  }
+}
+
+.checkbox-container {
+  display: none;
+}
+
+.checkbox-container:has(input[type="checkbox"]:checked) {
+  display: block;
+}

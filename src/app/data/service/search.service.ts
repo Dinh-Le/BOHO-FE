@@ -75,19 +75,13 @@ export type SearchResultResponse = ResponseBase & {
 };
 
 export abstract class SearchService extends RestfullApiService {
-  public abstract search(
-    nodeId: string,
-    query: SearchQuery
-  ): Observable<SearchResultResponse>;
+  public abstract search(query: SearchQuery): Observable<SearchResultResponse>;
 }
 
 @Injectable({ providedIn: 'root' })
 export class SearchServiceImpl extends SearchService {
-  public override search(
-    nodeId: string,
-    query: SearchQuery
-  ): Observable<SearchResultResponse> {
-    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/events`;
+  public override search(query: SearchQuery): Observable<SearchResultResponse> {
+    const url = `${environment.baseUrl}/api/rest/v1/node/search_events`;
     const params: HttpParams = Object.entries(query)
       .filter(
         ([k, v]) =>

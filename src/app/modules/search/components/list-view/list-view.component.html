@@ -1,47 +1,46 @@
 <div class="top">
-  <div class="event-image">
-    <app-event-image [event]="selectedEvent"></app-event-image>
+  <div class="event-image" (click)="showEventDetail()">
+    <app-event-image [event]="currentEvent"></app-event-image>
   </div>
   <div class="event-detail">
     <div class="event-prop">
       <label class="prop-label">Đối tượng:</label>
-      <ng-container [ngSwitch]="selectedEvent?.images_info[0].event_type">
+      <ng-container [ngSwitch]="currentEvent?.images_info[0].event_type">
         <app-svg-icon icon="side-car" *ngSwitchCase="'car'"></app-svg-icon>
       </ng-container>
     </div>
     <div class="event-prop">
       <label class="prop-label">Biển số:</label>
-      <p>{{ selectedEvent?.images_info[0].recognize_result.lisence_plate }}</p>
+      <p>{{ currentEvent?.images_info[0].recognize_result.lisence_plate }}</p>
     </div>
     <div class="event-prop">
       <label class="prop-label">NSX, Model, Màu:</label>
       <p>
-        {{ selectedEvent?.images_info[0].recognize_result.model }}
-        {{ selectedEvent?.images_info[0].recognize_result.color }}
+        {{ currentEvent?.images_info[0].recognize_result.model }}
+        {{ currentEvent?.images_info[0].recognize_result.color }}
       </p>
     </div>
     <div class="event-prop">
       <label class="prop-label">Nội dung:</label>
-      <p>{{ selectedEvent?.alarm_type }}</p>
+      <p>{{ currentEvent?.alarm_type }}</p>
     </div>
     <div class="event-prop">
       <label class="prop-label">Thời gian:</label>
-      <p>{{ selectedEvent?.images_info[0].detection_time }}</p>
+      <p>{{ currentEvent?.images_info[0].detection_time }}</p>
     </div>
     <div class="event-prop">
       <label class="prop-label">Địa điểm:</label>
       <p>
-        {{
-          selectedEvent?.device_location.lat +
-            "," +
-            selectedEvent?.device_location.long
-        }}
+        {{ address }}
       </p>
     </div>
   </div>
 </div>
 <div class="bottom event-list">
   <table>
+    <colgroup>
+      <col width="32" />
+    </colgroup>
     <thead>
       <th></th>
       <th>Hình ảnh</th>
@@ -54,13 +53,19 @@
     <tbody>
       <tr
         *ngFor="let item of events"
-        (click)="selectedEvent = item"
-        [class.active]="selectedEvent?.event_id === item.event_id"
+        (click)="currentEvent = item"
+        [class.active]="currentEvent?.event_id === item.event_id"
+        class="event-container"
       >
         <td>
-          <label class="custom-checkbox"
-            ><input type="checkbox" [(ngModel)]="item.is_watch"
-          /></label>
+          <div class="checkbox-container">
+            <label class="custom-checkbox" (click)="$event.stopPropagation()"
+              ><input
+                type="checkbox"
+                [(ngModel)]="item.checked"
+                (ngModelChange)="onEventSelectionChange()"
+            /></label>
+          </div>
         </td>
         <td>
           <app-event-image
@@ -80,9 +85,9 @@
         <td>{{ item.alarm_type }}</td>
         <td>
           {{
-            selectedEvent?.device_location.lat +
+            currentEvent?.device_location.lat +
               "," +
-              selectedEvent?.device_location.long
+              currentEvent?.device_location.long
           }}
         </td>
       </tr>

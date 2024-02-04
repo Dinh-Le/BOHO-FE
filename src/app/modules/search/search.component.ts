@@ -39,10 +39,11 @@ export class SearchComponent implements OnInit {
   };
   totalEvents: number = 0;
   events: any[] = [];
+  selectedEvents: any[] = [];
 
   form = new FormGroup({
     startTime: new FormControl<string>(
-      moment().subtract(1, 'days').format('yyyy-MM-DDTHH:mm'),
+      moment().subtract(1, 'week').format('yyyy-MM-DDTHH:mm'),
       [Validators.required]
     ),
     endTime: new FormControl<string>(moment().format('yyyy-MM-DDTHH:mm'), [
@@ -50,10 +51,10 @@ export class SearchComponent implements OnInit {
     ]),
     objects: new FormControl<ObjectItemModel[]>([]),
     rule: new FormControl(),
-    resolutionMinute: new FormControl<number>(0, [Validators.required]),
-    resolutionSecond: new FormControl<number>(0, [Validators.required]),
+    resolutionMinute: new FormControl<number>(0),
+    resolutionSecond: new FormControl<number>(0),
     licensePlate: new FormControl<string>(''),
-    showVehileOnly: new FormControl<boolean>(false, [Validators.required]),
+    showVehileOnly: new FormControl<boolean>(false),
   });
   ruleItems: SelectItemModel[] = [
     'Vượt đường kẻ',
@@ -68,7 +69,7 @@ export class SearchComponent implements OnInit {
   ngOnInit(): void {}
 
   get canSubmit() {
-    return this.form.valid || true;
+    return this.form.valid;
   }
 
   get currentEvents(): (EventInfo | null)[] {
@@ -92,6 +93,10 @@ export class SearchComponent implements OnInit {
     return currentEvents;
   }
 
+  get selectedObjects(): ObjectItemModel[] {
+    return this.form.get('objects')!.value!;
+  }
+
   setGridColumn(value: number) {
     this.gridColumn = value;
     this.viewMode = 'grid-view';
@@ -108,14 +113,22 @@ export class SearchComponent implements OnInit {
 
   search() {
     this.events = [];
-    const nodes = Object.entries(
-      this._navigationService.selectedDeviceIds
-    ).filter(([k, v]) => Object.keys(v).length > 0);
-    if (nodes.length == 0) {
+
+    const devices = Object.entries(this._navigationService.selectedDeviceIds)
+      .flatMap(([_, v]) => Object.values(v))
+      .reduce(
+        (prev, curr) =>
+          Object.assign(prev, {
+            [curr.id]: curr,
+          }),
+        {}
+      );
+
+    if (Object.keys(devices).length === 0) {
+      this._toastService.showError('No device selected');
       return;
     }
 
-    const [nodeId, devices] = nodes[0];
     const objectIdMap: {
       [key: string]: number;
     } = {
@@ -142,17 +155,17 @@ export class SearchComponent implements OnInit {
     };
 
     this._searchService
-      .search(nodeId, query)
+      .search(query)
       .pipe(
         tap(() => this.form.disable()),
         finalize(() => this.form.enable())
       )
       .subscribe({
-        next: (response) => {
-          this.totalEvents = response.data.total;
-          this.events = response.data.events.map((e) =>
+        next: ({ data }) => {
+          this.totalEvents = data.total;
+          this.events = data.events.map((e) =>
             Object.assign(e, {
-              node_id: nodeId,
+              node_id: devices[e.device_id].node_id,
             })
           );
         },
@@ -171,7 +184,7 @@ export class SearchComponent implements OnInit {
     );
   }
 
-  get selectedObjects(): ObjectItemModel[] {
-    return this.form.get('objects')!.value!;
+  export(ev: Event) {
+    this.selectedEvents = [];
   }
 }

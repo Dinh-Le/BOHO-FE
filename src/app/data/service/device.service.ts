@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Optional } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ResponseBase } from '../schema/boho-v2/response-base';
 import { Device } from '../schema/boho-v2/device';
@@ -9,7 +9,9 @@ import { HoChiMinhCoord } from '../constants';
 export type CreateOrUpdateDeviceRequestDto = Pick<
   Device,
   'name' | 'is_active' | 'type' | 'camera'
->;
+> & {
+  location?: any;
+};
 
 export type CreateDeviceResponeDto = ResponseBase & {
   data: {
@@ -96,7 +98,7 @@ export abstract class DeviceService extends RestfullApiService {
 export class DeviceServiceImpl extends DeviceService {
   public override create(
     nodeId: string,
-    { name, is_active, type, camera }: CreateOrUpdateDeviceRequestDto
+    { name, is_active, type, camera, location }: CreateOrUpdateDeviceRequestDto
   ): Observable<CreateDeviceResponeDto> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device`;
     return this.httpClient.post<CreateDeviceResponeDto>(
@@ -105,7 +107,7 @@ export class DeviceServiceImpl extends DeviceService {
         {},
         { name, is_active, type, camera },
         {
-          location: HoChiMinhCoord,
+          location: location ?? HoChiMinhCoord,
         }
       )
     );
@@ -129,7 +131,7 @@ export class DeviceServiceImpl extends DeviceService {
   public override update(
     nodeId: string,
     deviceId: string,
-    { name, is_active, type, camera }: CreateOrUpdateDeviceRequestDto
+    { name, is_active, type, camera, location }: CreateOrUpdateDeviceRequestDto
   ): Observable<
     ResponseBase & {
       data: {
@@ -150,7 +152,7 @@ export class DeviceServiceImpl extends DeviceService {
         {},
         { name, is_active, type, camera },
         {
-          location: HoChiMinhCoord,
+          location: location ?? HoChiMinhCoord,
         }
       )
     );

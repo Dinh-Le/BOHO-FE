@@ -108,8 +108,8 @@ export class CameraInfoComponent implements OnInit, OnDestroy {
     try {
       const { lat, lng } = await modal.result;
       this.device!.location = {
-        lat,
-        long: lng,
+        lat: lat.toString(),
+        long: lng.toString(),
       };
 
       this.data.address = this.geodecode(this.device?.location);
