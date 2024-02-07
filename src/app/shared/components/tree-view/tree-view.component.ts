@@ -1,7 +1,9 @@
 import {
   Component,
+  EventEmitter,
   Input,
   OnChanges,
+  Output,
   SimpleChanges,
   TemplateRef,
   forwardRef,
@@ -39,8 +41,8 @@ export class TreeViewComponent implements OnChanges, ControlValueAccessor {
           multiple: true,
           backgroundColor: 'white',
           activeBackgroundColor: 'lighgray',
-          textColor: 'black',
-          activeTextColor: 'black',
+          textColor: 'white',
+          activeTextColor: 'white',
         },
         value
       ),
@@ -49,9 +51,12 @@ export class TreeViewComponent implements OnChanges, ControlValueAccessor {
     multiple: true,
     backgroundColor: 'white',
     activeBackgroundColor: 'lighgray',
-    textColor: 'black',
-    activeTextColor: 'black',
+    textColor: 'white',
+    activeTextColor: 'white',
   };
+
+  @Input()
+  isSelectableItem: (item: TreeViewItemModel) => boolean = () => true;
 
   ngOnChanges(changes: SimpleChanges): void {
     const { filter } = changes;
@@ -84,6 +89,8 @@ export class TreeViewComponent implements OnChanges, ControlValueAccessor {
 
   //#region Event handlers
   onTreeItemClick(item: TreeViewItemModel) {
+    if (!this.isSelectableItem(item)) return;
+
     if (this.config.multiple) {
       if (this.model.some((e) => e.id === item.id)) {
         this.model = this.model.filter((e) => e != item);

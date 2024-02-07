@@ -54,7 +54,12 @@ export class MilestoneServiceImpl extends MilestoneService {
   }
   public override connect(milestone: Milestone): Observable<ResponseBase> {
     const url = `${environment.baseUrl}/api/rest/v1/milestone/${milestone.id}/connect`;
-    return this.httpClient.post<ResponseBase>(url, milestone.login_info);
+    return this.httpClient.post<ResponseBase>(
+      url,
+      Object.assign({}, milestone.login_info, {
+        authen_type: milestone.authen_type,
+      })
+    );
   }
   public override verify(milestone: Milestone): Observable<ResponseBase> {
     const url = `${environment.baseUrl}/api/rest/v1/milestone/${milestone.id}/verify`;

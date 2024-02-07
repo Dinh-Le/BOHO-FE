@@ -26,6 +26,7 @@ import {
   filter,
   of,
   switchMap,
+  tap,
   toArray,
 } from 'rxjs';
 import { Integration } from 'src/app/data/schema/boho-v2';
@@ -154,18 +155,26 @@ export class IntegrationComponent implements OnInit, OnDestroy {
   sources: SelectItemModel[] = [];
   rules: EventSourceRowItem[] = [];
 
+  get addable() {
+    return this._deviceId && this._nodeId;
+  }
+
   ngOnInit(): void {
     this._navigationService.level2 = Level2Menu.INTEGRATION;
     const activatedRouteSubscription = this._activatedRoute.params
       .pipe(
+        tap(() => {
+          this._nodeId = '';
+          this._deviceId = 0;
+          this.data = [];
+          this.sources = [];
+          this.rules = [];
+        }),
         filter(({ nodeId, cameraId }) => nodeId && cameraId),
         switchMap((params) => {
           const { nodeId, cameraId } = params;
           this._nodeId = nodeId;
           this._deviceId = parseInt(cameraId);
-          this.data = [];
-          this.sources = [];
-          this.rules = [];
 
           const observables = [
             this._presetService
