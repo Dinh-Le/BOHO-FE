@@ -163,20 +163,19 @@ export class SystemComponent implements AfterViewInit, OnInit {
 
   ngOnInit(): void {
     this._milestoneSevice.findAll().subscribe({
-      next: (response) => {
-        if (!response.success) {
-          throw Error(
-            'Fetch all milestone data failed with error: ' + response.message
-          );
-        }
-
-        this.data = response.data.map((e) => {
+      next: ({ data: milestones }) => {
+        this.data = milestones.map((ms) => {
           const item = new RowItemModel();
-          item.data = e;
+          item.data = ms;
           return item;
         });
       },
-      error: ({ message }) => this._toastService.showError(message),
+      error: (err: HttpErrorResponse) =>
+        this._toastService.showError(
+          `Create milestone failed with error: ${
+            err.error?.message ?? err.message
+          }`
+        ),
     });
   }
 
@@ -238,18 +237,18 @@ export class SystemComponent implements AfterViewInit, OnInit {
           })
         )
         .subscribe({
-          next: (response) => {
-            if (!response.success) {
-              throw Error(
-                'Create milestone failed with error: ' + response.message
-              );
-            }
-
-            milestone.id = response.data;
+          next: ({ data: id }) => {
+            this._toastService.showSuccess('Create new Milestone sucessfully');
+            milestone.id = id;
             item.data = milestone;
             item.isEditable = false;
           },
-          error: ({ message }) => this._toastService.showError(message),
+          error: (err: HttpErrorResponse) =>
+            this._toastService.showError(
+              `Create milestone failed with error: ${
+                err.error?.message ?? err.message
+              }`
+            ),
         });
     } else {
       this._milestoneSevice
@@ -260,17 +259,17 @@ export class SystemComponent implements AfterViewInit, OnInit {
           })
         )
         .subscribe({
-          next: (response) => {
-            if (!response.success) {
-              throw Error(
-                'Create milestone failed with error: ' + response.message
-              );
-            }
-
+          next: () => {
+            this._toastService.showSuccess('Update Milestone info sucessfully');
             item.data = milestone;
             item.isEditable = false;
           },
-          error: ({ message }) => this._toastService.showError(message),
+          error: (err: HttpErrorResponse) =>
+            this._toastService.showError(
+              `Create milestone failed with error: ${
+                err.error?.message ?? err.message
+              }`
+            ),
         });
     }
   }
