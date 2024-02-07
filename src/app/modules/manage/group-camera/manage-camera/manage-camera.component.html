@@ -32,6 +32,7 @@
             textColor: '#000000',
             activeTextColor: '#000000'
           }"
+          [isSelectableItem]="checkIfDeviceNode"
         ></app-tree-view>
         <ng-template #treeItemTemplate let-item="item">
           <app-svg-icon

@@ -261,7 +261,6 @@ export class ManageCameraComponent implements OnInit {
         mergeAll()
       )
     ).subscribe((results) => {
-      console.log(results);
       results
         .filter((e) => !e.response.success)
         .forEach((e) =>
@@ -303,5 +302,9 @@ export class ManageCameraComponent implements OnInit {
 
   submit() {
     this._activeModal.close();
+  }
+
+  checkIfDeviceNode(item: TreeViewItemModel): boolean {
+    return item.id.startsWith(DeviceTreeBuilder.DeviceIDPrefix);
   }
 }
