@@ -16,7 +16,8 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Milestone } from 'src/app/data/schema/boho-v2/milestone';
 import { MilestoneService } from 'src/app/data/service/milestone.service';
 import { ToastService } from '@app/services/toast.service';
-import { of, switchMap } from 'rxjs';
+import { EMPTY, switchMap } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 class RowItemModel extends ExpandableTableRowItemModelBase {
   static counter: number = 1;
@@ -33,7 +34,13 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
       name: new FormControl('', [Validators.required]),
       host: new FormControl('', [Validators.required]),
       port: new FormControl(8080, [Validators.required]),
-      authenType: new FormControl('Windows', [Validators.required]),
+      authenType: new FormControl<SelectItemModel>(
+        {
+          value: 'Basic',
+          label: 'Basic',
+        } as SelectItemModel,
+        [Validators.required]
+      ),
       userId: new FormControl('', [Validators.required]),
       password: new FormControl('', [Validators.required]),
       eventPort: new FormControl(8080, [Validators.required]),
@@ -87,7 +94,10 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
         name: value.name,
         host: value.login_info.host,
         port: value.login_info.port,
-        authenType: value.authen_type,
+        authenType: {
+          value: value.authen_type,
+          label: value.authen_type,
+        },
         userId: value.login_info.user,
         password: value.login_info.password,
         eventPort: value.communication_port,
@@ -110,9 +120,13 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
         user: userId,
         password,
       },
-      authen_type: authenType,
+      authen_type: authenType.value,
       communication_port: eventPort,
     };
+  }
+
+  get type() {
+    return 'Milestone';
   }
 }
 
@@ -142,6 +156,10 @@ export class SystemComponent implements AfterViewInit, OnInit {
   selectedSystem: SelectItemModel = this.systems[0];
   columns: ColumnConfig[] = [];
   data: RowItemModel[] = [];
+  authenTypes: SelectItemModel[] = ['Windows', 'Basic'].map((at) => ({
+    value: at,
+    label: at,
+  }));
 
   ngOnInit(): void {
     this._milestoneSevice.findAll().subscribe({
@@ -296,12 +314,10 @@ export class SystemComponent implements AfterViewInit, OnInit {
       .pipe(
         switchMap((response) => {
           if (!response.success) {
-            throw Error(
-              'Test connection failed with error: ' + response.message
-            );
+            throw new Error(response.message);
           }
 
-          return of(response);
+          return EMPTY;
         })
       )
       .subscribe({
@@ -310,7 +326,12 @@ export class SystemComponent implements AfterViewInit, OnInit {
             `Test sending to the ${item.name} successfully`
           );
         },
-        error: ({ message }) => this._toastService.showError(message),
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(
+            `Test sending to the ${item.name} failed with error: ${
+              err.error?.message ?? err.message
+            }`
+          ),
       });
   }
 
@@ -320,12 +341,10 @@ export class SystemComponent implements AfterViewInit, OnInit {
       .pipe(
         switchMap((response) => {
           if (!response.success) {
-            throw Error(
-              'Test connection failed with error: ' + response.message
-            );
+            throw new Error(response.message);
           }
 
-          return of(response);
+          return EMPTY;
         })
       )
       .subscribe({
@@ -334,7 +353,12 @@ export class SystemComponent implements AfterViewInit, OnInit {
             `Test connection to the ${item.name} successfully`
           );
         },
-        error: ({ message }) => this._toastService.showError(message),
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(
+            `Test connection to the ${item.name} failed with error: ${
+              err.error?.message ?? err.message
+            }`
+          ),
       });
   }
 }
