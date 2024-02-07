@@ -1,7 +1,9 @@
 import {
   Component,
+  EventEmitter,
   Input,
   OnChanges,
+  Output,
   SimpleChanges,
   TemplateRef,
   forwardRef,
@@ -39,8 +41,8 @@ export class TreeViewComponent implements OnChanges, ControlValueAccessor {
           multiple: true,
           backgroundColor: 'white',
           activeBackgroundColor: 'lighgray',
-          textColor: 'black',
-          activeTextColor: 'black',
+          textColor: 'white',
+          activeTextColor: 'white',
         },
         value
       ),
@@ -49,8 +51,8 @@ export class TreeViewComponent implements OnChanges, ControlValueAccessor {
     multiple: true,
     backgroundColor: 'white',
     activeBackgroundColor: 'lighgray',
-    textColor: 'black',
-    activeTextColor: 'black',
+    textColor: 'white',
+    activeTextColor: 'white',
   };
 
   ngOnChanges(changes: SimpleChanges): void {

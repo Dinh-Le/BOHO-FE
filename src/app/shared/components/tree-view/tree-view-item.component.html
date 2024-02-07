@@ -12,7 +12,11 @@
     *ngIf="item?.hasChild"
     [icon]="item?.isExpanded ? 'arrow-expand-arrow' : 'arrow-right-arrow'"
     (click)="toggleExpand($event)"
+    [color]="
+      (isSelected ? config.activeTextColor : config.textColor) ?? 'white'
+    "
   ></app-svg-icon>
+  <div *ngIf="!item?.hasChild" style="width: 14px; height: 14px"></div>
   <ng-container
     *ngIf="itemTemplate; else defaultTemplate"
     [ngTemplateOutlet]="itemTemplate"
