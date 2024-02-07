@@ -9,7 +9,6 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { SelectItemModel } from '@shared/models/select-item-model';
-import { SidebarActions } from 'src/app/state/sidebar.action';
 
 @Component({
   selector: 'app-select-2',
@@ -33,7 +32,10 @@ export class Select2Component implements ControlValueAccessor {
   @Input()
   menuItemTemplateRef!: TemplateRef<any>;
 
-  @Input()
+  @Input({
+    transform: (items: SelectItemModel[]) =>
+      items.map((it) => Object.assign({}, it, { selected: false })),
+  })
   items: SelectItemModel[] = [];
 
   @Input()
