@@ -19,6 +19,7 @@ export class EventImage implements AfterViewInit, OnChanges {
   @ViewChild('canvas') canvasRef!: ElementRef;
   @Input() event: any;
   @Input() type: 'full' | 'crop' = 'full';
+  @Input() index: number = 0;
 
   image: HTMLImageElement | undefined;
 
@@ -56,7 +57,7 @@ export class EventImage implements AfterViewInit, OnChanges {
       .getImage(
         this.event.node_id,
         this.event.device_id,
-        this.event.images_info[0].detection_id,
+        this.event.images_info[this.index].detection_id,
         'full'
       )
       .subscribe({
@@ -65,14 +66,18 @@ export class EventImage implements AfterViewInit, OnChanges {
           this.image.onload = () => {
             const canvas = this.canvasRef.nativeElement as HTMLCanvasElement;
             let { bottomrightx, bottomrighty, topleftx, toplefty } =
-              this.event.images_info[0].bounding_box;
+              this.event.images_info[this.index].bounding_box;
             if (bottomrightx < topleftx) {
-              bottomrightx = this.event.images_info[0].bounding_box.topleftx;
-              topleftx = this.event.images_info[0].bounding_box.bottomrightx;
+              bottomrightx =
+                this.event.images_info[this.index].bounding_box.topleftx;
+              topleftx =
+                this.event.images_info[this.index].bounding_box.bottomrightx;
             }
             if (bottomrighty < toplefty) {
-              bottomrighty = this.event.images_info[0].bounding_box.toplefty;
-              toplefty = this.event.images_info[0].bounding_box.bottomrighty;
+              bottomrighty =
+                this.event.images_info[this.index].bounding_box.toplefty;
+              toplefty =
+                this.event.images_info[this.index].bounding_box.bottomrighty;
             }
 
             const width =

@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  baseUrl: 'https://5ca2-2001-ee0-d740-1880-4d86-5733-3cb6-8c7e.ngrok-free.app',
+  baseUrl: 'http://127.0.0.1:5500',
   googleMapApiKey: 'AIzaSyB582CtlnF_kREmV6TP0DjIDoAVKrmbI80',
 };
 
