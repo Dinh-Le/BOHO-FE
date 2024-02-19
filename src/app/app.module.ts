@@ -20,6 +20,7 @@ import {
   FontAwesomeModule,
 } from '@fortawesome/angular-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
+import { NgChartsModule } from 'ng2-charts';
 
 @NgModule({
   imports: [
@@ -31,6 +32,7 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 
     // 3rd party module
     FontAwesomeModule,
+    NgChartsModule,
 
     StoreModule.forRoot({ sidebar: sidebarReducer }),
 
@@ -50,7 +52,7 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
     ContentLayoutComponent,
     AuthLayoutComponent,
     SidebarComponent,
-    TopBarComponent
+    TopBarComponent,
   ],
 })
 export class AppModule {

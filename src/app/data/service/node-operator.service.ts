@@ -5,6 +5,21 @@ import { ResponseBase } from '../schema/boho-v2/response-base';
 import { Injectable } from '@angular/core';
 import { environment } from '@env';
 
+export interface NodeOperatorStatus {
+  node_status: {
+    active: number;
+    not_active: number;
+  };
+  device_status: {
+    active: number;
+    not_active: number;
+  };
+}
+
+export type GetNodeOperatorStatusResponse = ResponseBase & {
+  data: NodeOperatorStatus;
+};
+
 export abstract class NodeOperatorService extends RestfullApiService {
   public abstract create(
     data: Pick<NodeOperator, 'name'>
@@ -21,6 +36,9 @@ export abstract class NodeOperatorService extends RestfullApiService {
   public abstract update(data: NodeOperator): Observable<ResponseBase>;
 
   public abstract delete(id: string): Observable<ResponseBase>;
+  public abstract getNodeStatus(
+    id: string
+  ): Observable<GetNodeOperatorStatusResponse>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -57,5 +75,12 @@ export class NodeOperatorServiceImpl extends NodeOperatorService {
   public override delete(id: string): Observable<ResponseBase> {
     const url = `${environment.baseUrl}/api/rest/v1/node_operator/${id}`;
     return this.httpClient.delete<ResponseBase>(url);
+  }
+
+  public override getNodeStatus(
+    id: string
+  ): Observable<GetNodeOperatorStatusResponse> {
+    const url = `${environment.baseUrl}/api/rest/v1/node_operator/${id}/node_status`;
+    return this.httpClient.get<GetNodeOperatorStatusResponse>(url);
   }
 }

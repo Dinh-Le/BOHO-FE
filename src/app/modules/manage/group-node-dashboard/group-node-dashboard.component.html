@@ -1,0 +1,73 @@
+<div class="menu-container d-flex justify-content-between mb-0">
+  <span class="ms-2">Bảng thông tin nhóm node</span>
+</div>
+<div class="p-4 full-height d-flex flex-column gap-2">
+  <div class="d-flex gap-5" style="height: 300px">
+    <div
+      class="w-50"
+      leaflet
+      [leafletOptions]="mapOptions"
+      (leafletMapReady)="onMapReady($event)"
+    ></div>
+    <div class="flex-grow-1 d-flex flex-column justify-content-around">
+      <div>
+        <div
+          class="node-container border border-1 border-light p-4 rounded-2 position-relative"
+          style="width: 500px"
+        >
+          <span class="position-absolute px-2" style="top: -10px">Node</span>
+          <div class="d-flex gap-3">
+            <div class="bg-success" style="width: 50px"></div>
+            <div class="flex-grow-1">
+              {{ status.node_status.active }}: Hoạt động
+            </div>
+          </div>
+          <div class="d-flex mt-2 gap-3">
+            <div class="bg-danger" style="width: 50px"></div>
+            <div class="flex-grow-1">
+              {{ status.node_status.not_active }}: Không hoạt động
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div
+          class="node-container border border-1 border-light p-4 rounded-2 position-relative"
+          style="width: 500px"
+        >
+          <span class="position-absolute px-2" style="top: -10px">Camera</span>
+          <div class="d-flex gap-3">
+            <div class="bg-success" style="width: 50px"></div>
+            <div class="flex-grow-1">
+              {{ status.device_status.active }}: Hoạt động
+            </div>
+          </div>
+          <div class="d-flex mt-2 gap-3">
+            <div class="bg-danger" style="width: 50px"></div>
+            <div class="flex-grow-1">
+              {{ status.device_status.not_active }}: Không hoạt động
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="flex-grow-1 position-relative">
+    <select
+      class="position-absolute top-0 end-0 px-2 py-1"
+      style="
+        background: #5285b6ff;
+        border: 1px solid #31538f;
+        border-radius: 0.25rem;
+      "
+    >
+      <option selected>24h qua</option>
+    </select>
+    <canvas
+      baseChart
+      type="bar"
+      [data]="barChartData"
+      [options]="barChartOptions"
+    ></canvas>
+  </div>
+</div>

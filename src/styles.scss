@@ -4,6 +4,14 @@
 @import "../node_modules/bootstrap-icons/font/bootstrap-icons.scss";
 @import "~leaflet/dist/leaflet.css";
 
+:root {
+  --bs-black: #000000;
+}
+
+.bg-black {
+  background: var(--bs-black);
+}
+
 * {
   font-family: "Arial";
   font-weight: normal;

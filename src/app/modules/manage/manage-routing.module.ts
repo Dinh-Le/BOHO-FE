@@ -17,6 +17,10 @@ import { VehicleListComponent } from './vehical-list/vehicle-list.component';
 import { VehicleListDetailComponent } from './vehicle-list-detail/vehicle-list-detail.component';
 import { IntegrationComponent } from './integration/integration.component';
 import { CameraSettingsComponent } from './camera-detail/camera-settings/camera-settings.component';
+import { NodeDashboardComponent } from './node-dashboard/node-dashboard.component';
+import { GroupNodeDashboardComponent } from './group-node-dashboard/group-node-dashboard.component';
+import { CameraDashboardComponent } from './camera-dashboard/camera-dashboard.component';
+import { EmptyComponent } from './empty/empty.component';
 
 @NgModule({
   imports: [
@@ -108,6 +112,22 @@ import { CameraSettingsComponent } from './camera-detail/camera-settings/camera-
           {
             path: 'schedule',
             component: ScheduleComponent,
+          },
+          {
+            path: 'dashboard',
+            component: EmptyComponent,
+          },
+          {
+            path: 'dashboard/node/:nodeId',
+            component: NodeDashboardComponent,
+          },
+          {
+            path: 'dashboard/group-node/:nodeOperatorId',
+            component: GroupNodeDashboardComponent,
+          },
+          {
+            path: 'dashboard/node/:nodeId/camera/:cameraId',
+            component: CameraDashboardComponent,
           },
         ],
       },

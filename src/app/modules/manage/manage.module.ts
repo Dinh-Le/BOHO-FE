@@ -29,6 +29,12 @@ import { TimeInputComponent } from './camera-detail/tour-settings/time-input/tim
 import { EditableListViewComponent } from './camera-detail/editable-list-view/editable-list-view.component';
 import { IntegrationComponent } from './integration/integration.component';
 import { CameraSettingsComponent } from './camera-detail/camera-settings/camera-settings.component';
+import { NodeDashboardComponent } from './node-dashboard/node-dashboard.component';
+import { NgChartsModule } from 'ng2-charts';
+import { AutoResizeDirective } from './node-dashboard/auto-resize.directive';
+import { GroupNodeDashboardComponent } from './group-node-dashboard/group-node-dashboard.component';
+import { CameraDashboardComponent } from './camera-dashboard/camera-dashboard.component';
+import { EmptyComponent } from './empty/empty.component';
 
 @NgModule({
   declarations: [
@@ -53,6 +59,11 @@ import { CameraSettingsComponent } from './camera-detail/camera-settings/camera-
     EditableListViewComponent,
     IntegrationComponent,
     CameraSettingsComponent,
+    NodeDashboardComponent,
+    GroupNodeDashboardComponent,
+    CameraDashboardComponent,
+    AutoResizeDirective,
+    EmptyComponent,
   ],
   imports: [
     CommonModule,
@@ -63,6 +74,7 @@ import { CameraSettingsComponent } from './camera-detail/camera-settings/camera-
     NgbCollapseModule,
     NgbDropdownModule,
     LeafletModule,
+    NgChartsModule,
   ],
 })
 export class ManageModule {}

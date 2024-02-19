@@ -172,7 +172,7 @@ export class NavigationService {
         break;
     }
 
-    console.log('Target url: ', targetUrl);
+    // console.log('Target url: ', targetUrl);
     this.router.navigateByUrl(targetUrl);
   }
 
@@ -183,6 +183,15 @@ export class NavigationService {
 
     switch (this.level2) {
       case Level2Menu.DASHBOARD:
+        if (this.sideMenu?.type === SideMenuItemType.NODE) {
+          targetUrl += `/dashboard/node/${this.sideMenu.id}`;
+        } else if (this.sideMenu?.type === SideMenuItemType.NODE_OPERATOR) {
+          targetUrl += `/dashboard/group-node/${this.sideMenu.id}`;
+        } else if (this.sideMenu?.type === SideMenuItemType.DEVICE) {
+          targetUrl += `/dashboard/node/${this.sideMenu.data?.node_id}/camera/${this.sideMenu.id}`;
+        } else {
+          targetUrl += `/dashboard`;
+        }
         break;
       case Level2Menu.SYSTEM:
         targetUrl += '/system';

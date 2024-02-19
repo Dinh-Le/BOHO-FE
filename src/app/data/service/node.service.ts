@@ -11,6 +11,58 @@ export type CreateOrUpdateNodeDto = Pick<
   'name' | 'type' | 'ip' | 'port' | 'node_metadata' | 'node_operator_id'
 >;
 
+export interface NodeHealth {
+  cpu: {
+    memory: {
+      available: number;
+      free: number;
+      total: number;
+      percent: number;
+      used: number;
+    };
+    processor: {
+      logicals: number;
+      physicals: number;
+      usage: number;
+      usages: {
+        [key: string]: number;
+      };
+    };
+    storage: {
+      free: number;
+      total: number;
+      percent: number;
+      used: number;
+    };
+  };
+  gpu: {
+    [key: string]: {
+      driver: string;
+      gpu: {
+        free: number;
+        total: number;
+        percent: number;
+        used: number;
+      };
+    };
+  };
+}
+
+export interface DeviceHealth {
+  online: number;
+  offline: number;
+  error: number;
+}
+
+export interface EventDataPoint {
+  id: string;
+  event_time: string;
+}
+
+export type GetNodeHealthResponse = ResponseBase & { data: NodeHealth };
+export type GetDeviceHeatlhResponse = ResponseBase & { data: DeviceHealth };
+export type GetEventSummaryResponse = ResponseBase & { data: EventDataPoint[] };
+
 export abstract class NodeService extends RestfullApiService {
   abstract findAll(
     nodeOperatorId?: string
@@ -27,6 +79,16 @@ export abstract class NodeService extends RestfullApiService {
   abstract sync(nodeId: string): Observable<ResponseBase>;
   abstract ruleUpdate(nodeId: string): Observable<ResponseBase>;
   abstract tourUpdate(nodeId: string): Observable<ResponseBase>;
+  public abstract getNodeHealth(
+    nodeId: string
+  ): Observable<GetNodeHealthResponse>;
+  public abstract getDeviceHealth(
+    nodeId: string
+  ): Observable<GetDeviceHeatlhResponse>;
+  public abstract getEventSummary(
+    nodeId: string,
+    timeSpan: string
+  ): Observable<GetEventSummaryResponse>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -102,5 +164,28 @@ export class NodeServiceImpl extends NodeService {
   override ruleUpdate(nodeId: string): Observable<ResponseBase> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/rule_update`;
     return this.httpClient.get<ResponseBase>(url);
+  }
+
+  public override getNodeHealth(
+    nodeId: string
+  ): Observable<GetNodeHealthResponse> {
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/node_health`;
+    return this.httpClient.get<GetNodeHealthResponse>(url);
+  }
+
+  public override getDeviceHealth(
+    nodeId: string
+  ): Observable<GetDeviceHeatlhResponse> {
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device_health`;
+    return this.httpClient.get<GetDeviceHeatlhResponse>(url);
+  }
+
+  public override getEventSummary(
+    nodeId: string,
+    timeSpan: string
+  ): Observable<GetEventSummaryResponse> {
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/event_summary`;
+    const params = new HttpParams().append('tq', timeSpan);
+    return this.httpClient.get<GetEventSummaryResponse>(url, { params });
   }
 }
