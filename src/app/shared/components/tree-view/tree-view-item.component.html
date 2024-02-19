@@ -7,6 +7,9 @@
   }"
   *ngIf="item?.isVisible"
   (click)="itemClick.emit(item)"
+  [ngbTooltip]="item?.label"
+  placement="auto"
+  [openDelay]="500"
 >
   <app-svg-icon
     *ngIf="item?.hasChild"

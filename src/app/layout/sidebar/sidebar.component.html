@@ -79,12 +79,10 @@
         (ngModelChange)="onCheckboxChanged(item)"
         *ngIf="showCheckbox"
       />
-      <label
-        [htmlFor]="'ckb-' + item.id"
-        class="d-flex align-items-center user-select-none w-100"
-        ><app-svg-icon [icon]="item.icon" color="green"></app-svg-icon>
-        <div class="mx-1 text-truncate">{{ item.label }}</div></label
-      >
+      <app-svg-icon [icon]="item.icon" color="green"></app-svg-icon>
+      <div class="mx-1 flex-grow-1 text-truncate user-select-none">
+        {{ item.label }}
+      </div>
     </ng-template>
   </div>
 </div>
