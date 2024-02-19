@@ -1,0 +1,49 @@
+<div class="menu-container d-flex justify-content-between mb-0">
+  <span class="ms-2">Bảng thông tin camera</span>
+</div>
+<div class="p-4 full-height d-flex flex-column gap-2">
+  <div class="d-flex gap-5">
+    <div class="w-50 d-flex flex-column">
+      <div class="d-flex gap-2">
+        <i class="bi bi-person-fill fs-5"></i>
+        <div class="flex-grow-1">[Địa điểm camera]</div>
+      </div>
+      <div class="flex-grow-1 d-flex justify-content-start mt-2">
+        <img
+          alt="Hình ảnh camera"
+          class="border border-1 border-light"
+          style="aspect-ratio: 16/9; height: 30vh"
+          #snapshot
+        />
+      </div>
+    </div>
+    <div class="w-50 d-flex justify-content-center">
+      <div>
+        <canvas
+          baseChart
+          type="pie"
+          [options]="pieChartOptions"
+          [data]="pieChartData"
+        ></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="flex-grow-1 position-relative">
+    <select
+      class="position-absolute top-0 end-0 px-2 py-1"
+      style="
+        background: #5285b6ff;
+        border: 1px solid #31538f;
+        border-radius: 0.25rem;
+      "
+    >
+      <option selected>24h qua</option>
+    </select>
+    <canvas
+      baseChart
+      type="bar"
+      [data]="barChartData"
+      [options]="barChartOptions"
+    ></canvas>
+  </div>
+</div>
