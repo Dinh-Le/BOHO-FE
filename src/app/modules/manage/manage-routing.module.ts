@@ -42,6 +42,10 @@ import { EmptyComponent } from './empty/empty.component';
             component: GroupCameraComponent,
           },
           {
+            path: 'group-camera/:userId',
+            component: GroupCameraComponent,
+          },
+          {
             path: 'system',
             component: SystemComponent,
           },

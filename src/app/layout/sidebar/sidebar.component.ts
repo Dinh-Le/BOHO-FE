@@ -44,6 +44,7 @@ import { ViewMode } from '@shared/components/tree-view/view-mode.enum';
 import { TreeViewItemModel } from '@shared/components/tree-view/tree-view-item.model';
 import {
   Level1Menu,
+  Level2Menu,
   NavigationService,
   SideMenuItemType,
 } from 'src/app/data/service/navigation.service';
@@ -87,6 +88,13 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   set viewMode(value: keyof typeof ViewMode) {
+    if (
+      ViewMode[value] == ViewMode.Geolocation &&
+      this._navigationService.level2 == Level2Menu.NODE
+    ) {
+      return;
+    }
+
     this._navigationService.viewMode = ViewMode[value];
   }
 

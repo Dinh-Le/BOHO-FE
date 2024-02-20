@@ -66,25 +66,25 @@ export class ManageComponent implements OnInit {
       this.menuLevel2[this._navigationService.level2].isActive = true;
     }
 
-    this._navigationService.viewModeChange$.subscribe((viewMode) => {
-      if (
-        this._navigationService.level2 === Level2Menu.NODE &&
-        viewMode === ViewMode.Geolocation
-      ) {
-        this.menuLevel2[Level2Menu.NODE].isActive = false;
-        this.menuLevel2[Level2Menu.CAMERA].isActive = true;
-        this._navigationService.level2 = Level2Menu.CAMERA;
-        this._navigationService.navigate();
-      } else if (
-        this._navigationService.level2 === Level2Menu.CAMERA &&
-        viewMode === ViewMode.Logical
-      ) {
-        this.menuLevel2[Level2Menu.NODE].isActive = true;
-        this.menuLevel2[Level2Menu.CAMERA].isActive = false;
-        this._navigationService.level2 = Level2Menu.CAMERA;
-        this._navigationService.navigate();
-      }
-    });
+    // this._navigationService.viewModeChange$.subscribe((viewMode) => {
+    //   if (
+    //     this._navigationService.level2 === Level2Menu.NODE &&
+    //     viewMode === ViewMode.Geolocation
+    //   ) {
+    //     // this.menuLevel2[Level2Menu.NODE].isActive = false;
+    //     // this.menuLevel2[Level2Menu.CAMERA].isActive = true;
+    //     this._navigationService.level2 = Level2Menu.CAMERA;
+    //     this._navigationService.navigate();
+    //   } else if (
+    //     this._navigationService.level2 === Level2Menu.CAMERA &&
+    //     viewMode === ViewMode.Logical
+    //   ) {
+    //     this.menuLevel2[Level2Menu.NODE].isActive = true;
+    //     this.menuLevel2[Level2Menu.CAMERA].isActive = false;
+    //     this._navigationService.level2 = Level2Menu.CAMERA;
+    //     this._navigationService.navigate();
+    //   }
+    // });
   }
 
   onMenuItemClick(menuId: Level2Menu): void {
@@ -99,8 +99,9 @@ export class ManageComponent implements OnInit {
 
     if (menuId === Level2Menu.NODE) {
       this._navigationService.viewMode = ViewMode.Logical;
-    } else if (menuId === Level2Menu.CAMERA) {
-      this._navigationService.viewMode = ViewMode.Geolocation;
     }
+    //  else if (menuId === Level2Menu.CAMERA) {
+    //   this._navigationService.viewMode = ViewMode.Geolocation;
+    // }
   }
 }

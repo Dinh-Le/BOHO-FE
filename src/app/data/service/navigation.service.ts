@@ -217,8 +217,11 @@ export class NavigationService {
         }
         break;
       case Level2Menu.CAMERA:
-        if (this.sideMenu?.type === SideMenuItemType.GROUP) {
-          targetUrl += '/group-camera';
+        if (
+          this.sideMenu?.type === SideMenuItemType.USER &&
+          this.viewMode == ViewMode.Geolocation
+        ) {
+          targetUrl += '/group-camera/0';
         } else if (this.sideMenu?.type === SideMenuItemType.DEVICE) {
           targetUrl += `/node/${this.sideMenu.data?.node_id}/camera/${this.sideMenu.id}/info`;
         } else {
