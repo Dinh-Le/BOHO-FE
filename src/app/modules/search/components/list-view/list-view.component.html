@@ -11,13 +11,13 @@
     </div>
     <div class="event-prop">
       <label class="prop-label">Biển số:</label>
-      <p>{{ currentEvent?.images_info[0].recognize_result.lisence_plate }}</p>
+      <p>{{ currentEvent?.images_info[0].recognize_result?.lisence_plate }}</p>
     </div>
     <div class="event-prop">
       <label class="prop-label">NSX, Model, Màu:</label>
       <p>
-        {{ currentEvent?.images_info[0].recognize_result.model }}
-        {{ currentEvent?.images_info[0].recognize_result.color }}
+        {{ currentEvent?.images_info[0].recognize_result?.model }}
+        {{ currentEvent?.images_info[0].recognize_result?.color }}
       </p>
     </div>
     <div class="event-prop">
@@ -74,13 +74,13 @@
             type="crop"
           ></app-event-image>
         </td>
-        <td>{{ item.images_info[0].recognize_result.lisence_plate }}</td>
+        <td>{{ item.images_info[0].recognize_result?.lisence_plate }}</td>
         <td>
           {{ item.images_info[0].event_type }}
         </td>
         <td>
-          {{ item.images_info[0].recognize_result.model }}
-          {{ item.images_info[0].recognize_result.color }}
+          {{ item.images_info[0].recognize_result?.model }}
+          {{ item.images_info[0].recognize_result?.color }}
         </td>
         <td>{{ item.alarm_type }}</td>
         <td>

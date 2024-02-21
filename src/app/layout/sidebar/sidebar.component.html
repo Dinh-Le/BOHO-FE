@@ -71,18 +71,26 @@
       [filter]="searchText"
     ></app-tree-view>
     <ng-template #menuItemTemplate let-item="item" let-active="active">
-      <input
-        [id]="'ckb-' + item.id"
-        type="checkbox"
-        class="mx-1"
-        [(ngModel)]="item.checked"
-        (ngModelChange)="onCheckboxChanged(item)"
+      <label
+        class="custom-checkbox mx-1 cursor-pointer"
+        style="width: 16px; height: 16px"
         *ngIf="showCheckbox"
-      />
-      <app-svg-icon [icon]="item.icon" color="green"></app-svg-icon>
-      <div class="mx-1 flex-grow-1 text-truncate user-select-none">
+      >
+        <input
+          [id]="'ckb-' + item.id"
+          type="checkbox"
+          [(ngModel)]="item.checked"
+          (ngModelChange)="onCheckboxChanged(item)"
+        />
+      </label>
+
+      <label
+        [htmlFor]="'ckb-' + item.id"
+        class="mx-1 flex-grow-1 text-truncate user-select-none cursor-pointer"
+      >
+        <app-svg-icon [icon]="item.icon" color="green"></app-svg-icon>
         {{ item.label }}
-      </div>
+      </label>
     </ng-template>
   </div>
 </div>

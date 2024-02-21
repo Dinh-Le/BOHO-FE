@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  HostBinding,
   Input,
   OnChanges,
   SimpleChanges,
@@ -12,13 +13,14 @@ import { EventService } from 'src/app/data/service/event.service';
 
 @Component({
   selector: 'app-event-image',
-  template: '<canvas #canvas></canvas>',
-  styles: [':host{display: block; width: 100%; height: 100%}'],
+  template: '<canvas class="w-100 h-100"  #canvas></canvas>',
 })
 export class EventImage implements AfterViewInit, OnChanges {
+  @HostBinding('class') classes = 'w-100 h-100 d-block';
   @ViewChild('canvas') canvasRef!: ElementRef;
   @Input() event: any;
   @Input() type: 'full' | 'crop' = 'full';
+  @Input() showObject: boolean = false;
   @Input() index: number = 0;
 
   image: HTMLImageElement | undefined;
@@ -136,6 +138,25 @@ export class EventImage implements AfterViewInit, OnChanges {
 
               context.rect(bx, by, bw, bh);
               context.stroke();
+
+              if (this.showObject) {
+                const text = this.event.images_info[this.index].event_type;
+
+                context.font = '14px Arial';
+                const { width: textWidth } = context.measureText(text);
+
+                context.fillStyle = context.strokeStyle;
+                context.fillRect(bx, by - 16, Math.max(textWidth, bw), 16);
+
+                context.fillStyle =
+                  context.strokeStyle === '#ffff00' ? 'black' : 'white';
+                console.log(context.strokeStyle, context.fillStyle);
+                context.fillText(
+                  this.event.images_info[this.index].event_type,
+                  bx,
+                  by - 12 * scaleFactor
+                );
+              }
             }
           };
           this.image.src = URL.createObjectURL(blod);

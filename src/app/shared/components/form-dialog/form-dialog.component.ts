@@ -22,6 +22,8 @@ export class FormDialogComponent {
   @Input()
   canSubmit = true;
 
+  @Input() backgroundColor: string = '#595959';
+
   @Output()
   cancel = new EventEmitter();
 

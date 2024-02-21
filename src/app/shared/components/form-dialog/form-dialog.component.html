@@ -1,4 +1,4 @@
-<div class="modal-header">
+<div class="modal-header border-0" [style.background]="backgroundColor">
   <h4 class="modal-title">{{ title }}</h4>
   <button
     type="button"
@@ -7,12 +7,15 @@
     (click)="cancel.emit()"
   ></button>
 </div>
-<div class="modal-body">
+<div class="modal-body" [style.background]="backgroundColor">
   <div class="container">
     <ng-content></ng-content>
   </div>
 </div>
-<div class="modal-footer d-flex justify-content-center">
+<div
+  class="modal-footer border-0 d-flex justify-content-center"
+  [style.background]="backgroundColor"
+>
   <button type="button" class="my-button cancel" (click)="cancel.emit()">
     {{ cancelTitle }}
   </button>
