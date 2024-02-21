@@ -17,8 +17,8 @@
   </p>
   <p>ID đối tượng: {{ image?.detection_id }}</p>
   <p>Loại: {{ image?.event_type }}</p>
-  <p>Màu sắc: {{ image?.recognize_result.color }}</p>
-  <p>Biển số: {{ image?.recognize_result.lisence_plate }}</p>
+  <p>Màu sắc: {{ image?.recognize_result?.color }}</p>
+  <p>Biển số: {{ image?.recognize_result?.lisence_plate }}</p>
 </div>
 <div class="progress-bar">
   <div class="progress" [style.width]="percentage"></div>
