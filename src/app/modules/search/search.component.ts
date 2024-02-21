@@ -43,7 +43,7 @@ export class SearchComponent implements OnInit {
 
   form = new FormGroup({
     startTime: new FormControl<string>(
-      moment().subtract(1, 'week').format('yyyy-MM-DDTHH:mm'),
+      moment().subtract(24, 'hours').format('yyyy-MM-DDTHH:mm'),
       [Validators.required]
     ),
     endTime: new FormControl<string>(moment().format('yyyy-MM-DDTHH:mm'), [
@@ -186,5 +186,17 @@ export class SearchComponent implements OnInit {
 
   export(ev: Event) {
     this.selectedEvents = [];
+  }
+
+  resetForm() {
+    this.form.reset({
+      startTime: moment().subtract(24, 'hours').format('yyyy-MM-DDTHH:mm'),
+      endTime: moment().format('yyyy-MM-DDTHH:mm'),
+      objects: [],
+      resolutionMinute: 0,
+      resolutionSecond: 0,
+      licensePlate: '',
+      showVehileOnly: false,
+    });
   }
 }
