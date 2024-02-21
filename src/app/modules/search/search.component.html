@@ -91,7 +91,11 @@
   <div *ngSwitchDefault>Unsupported view mode</div>
 </div>
 
-<form class="search-form" [formGroup]="form" (submit)="submit()">
+<form
+  class="search-form d-flex flex-column"
+  [formGroup]="form"
+  (submit)="submit()"
+>
   <div class="form-item">
     <label for="startTime" class="label">Thời gian bắt đầu</label>
     <input
@@ -114,16 +118,7 @@
   </div>
   <div class="form-item">
     <label>Đối đối tượng</label>
-    <ul
-      style="
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        height: 50px;
-        overflow-y: auto;
-      "
-      class="control"
-    >
+    <ul class="list-unstyle control" style="min-height: 80px">
       <li
         *ngFor="let item of selectedObjects; trackBy: trackById"
         class="d-flex align-items-center"
@@ -212,7 +207,7 @@
   <div class="form-item">
     <button type="reset">Reset</button>
   </div>
-  <div class="form-item">
+  <div class="form-item mt-auto">
     <button type="submit" class="active w-100" [disabled]="!canSubmit">
       Tìm kiếm
     </button>

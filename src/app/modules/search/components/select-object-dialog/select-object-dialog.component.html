@@ -2,39 +2,48 @@
   title="Đối tượng tìm kiếm"
   (cancel)="cancel()"
   (submit)="submit()"
+  submitTitle="Thêm"
+  backgroundColor="#3d3b3eff"
 >
   <div class="row">
     <div class="col-6">
-      <div style="border: 1px solid #d8d8d8">
-        <app-list-view
-          [itemTemplate]="listItemTemplate"
-          [items]="objectItemModels"
-          backgroundColor="#1c1c19ff"
-          textColor="white"
-          activeBackgroundColor="#5285b6ff"
-          (itemClick)="onObjectSelected($event)"
-          [multiple]="false"
-        ></app-list-view>
+      <div>
+        <div class="d-flex flex-column">
+          <div
+            *ngFor="let item of objectItemModels"
+            class="d-flex align-items-center p-1"
+            (click)="onObjectSelected(item)"
+            [style.background]="
+              selectedItem?.id == item.id ? '#5285b6ff' : '#5e5c5eff'
+            "
+          >
+            <label
+              class="custom-checkbox rounded-1 mx-1"
+              style="width: 14px; height: 14px"
+            >
+              <input
+                type="checkbox"
+                [(ngModel)]="item.isSelected"
+                (click)="$event.stopPropagation()"
+                (ngModelChange)="onSelectionChange(item.isSelected ?? false)"
+              />
+            </label>
+            <label
+              class="flex-grow-1 cursor-pointer user-select-none"
+              style="color: white"
+            >
+              <app-svg-icon
+                [icon]="item.icon"
+                color="white"
+                class="mx-2 cursor-pointer"
+              ></app-svg-icon
+              >{{ item.text }}</label
+            >
+          </div>
+        </div>
       </div>
     </div>
-    <ng-template #listItemTemplate let-item="item">
-      <div class="d-flex align-items-center">
-        <input
-          type="checkbox"
-          class="mx-1"
-          [(ngModel)]="item.isSelected"
-          (ngModelChange)="onSelectionChange($event)"
-        />
-        <label class="w-100 cursor-pointer" style="color: white">
-          <app-svg-icon
-            [icon]="item.icon"
-            color="white"
-            class="mx-1 cursor-pointer"
-          ></app-svg-icon
-          >{{ item.text }}</label
-        >
-      </div>
-    </ng-template>
+
     <div
       *ngIf="this.selectedItem"
       class="col-6"
