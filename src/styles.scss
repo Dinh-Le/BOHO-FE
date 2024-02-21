@@ -6,6 +6,7 @@
 
 :root {
   --bs-black: #000000;
+  --bs-white: #ffffff;
 }
 
 .bg-black {
@@ -22,20 +23,6 @@
   width: 18%;
 }
 
-.car-side-16 {
-  background-image: url("assets/icons/icons8-sedan-16.png");
-  background-size: cover;
-  width: 16px;
-  height: 16px;
-}
-
-.car-side-32 {
-  background-image: url("assets/icons/icons8-sedan-32.png");
-  background-size: cover;
-  width: 32px;
-  height: 32px;
-}
-
 .person-walking-32 {
   background-image: url("assets/icons/icons8-person-walking-32.png");
   background-size: cover;
@@ -48,12 +35,6 @@
   background-size: cover;
   width: 32px;
   height: 32px;
-}
-
-.text-overflow-ellipsis {
-  text-overflow: ellipsis;
-  text-wrap: nowrap;
-  overflow: hidden;
 }
 
 ::-webkit-scrollbar {
@@ -202,4 +183,8 @@
   -webkit-transform: rotate(45deg);
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
+}
+
+button {
+  user-select: none;
 }

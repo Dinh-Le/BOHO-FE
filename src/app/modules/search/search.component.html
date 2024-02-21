@@ -8,7 +8,12 @@
       *ngIf="selectedEvents.length"
       (click)="selectedEvents = []"
     ></app-svg-icon>
-    <button *ngIf="selectedEvents.length" (click)="export($event)">
+    <button
+      *ngIf="selectedEvents.length"
+      (click)="export($event)"
+      class="px-3 w-auto"
+      style="background: #5285b6ff"
+    >
       Xuất dữ liệu
     </button>
   </div>
@@ -195,14 +200,18 @@
     />
   </div>
   <div class="form-item d-flex align-items-center">
-    <label for="showVehileOnly">Chỉ h.thị xe có b.số</label>
-    <input
-      id="displayWithLicensePlateOnly"
-      type="checkbox"
-      class="ms-2"
-      style="width: 18px; height: 18px"
-      formControlName="showVehileOnly"
-    />
+    <label
+      for="displayWithLicensePlateOnly"
+      class="user-select-none cursor-pointer"
+      >Chỉ h.thị xe có b.số</label
+    >
+    <label class="custom-checkbox ms-2 cursor-pointer">
+      <input
+        id="displayWithLicensePlateOnly"
+        type="checkbox"
+        formControlName="showVehileOnly"
+      />
+    </label>
   </div>
   <div class="form-item">
     <button type="reset">Reset</button>
