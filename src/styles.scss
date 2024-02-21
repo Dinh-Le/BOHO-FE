@@ -14,7 +14,7 @@
 }
 
 * {
-  font-family: "Arial";
+  font-family: "Roboto Arial";
   font-weight: normal;
   font-size: 14px;
 }
@@ -61,7 +61,7 @@
 
 @for $size from 14 through 20 {
   .fs-#{$size} {
-    font-size: #{$size}px;
+    font-size: #{$size}px !important;
   }
 }
 

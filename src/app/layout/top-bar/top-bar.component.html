@@ -9,21 +9,24 @@
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark px-2 py-2">
   <ul class="navbar-nav">
     <li *ngFor="let item of navItems" class="nav-item">
-      <div [ngClass]="{ active: item.isActive }" style="cursor: pointer; user-select: none;">
-        <a class="nav-link" (click)="onMenuItemClick(item)">
-          <app-svg-icon [icon]="item.icon"></app-svg-icon> {{ item.title }}</a
+      <div
+        [ngClass]="{ active: item.isActive }"
+        class="user-select-none cursor-pointer"
+      >
+        <a
+          class="fs-18 nav-link d-flex align-items-center"
+          (click)="onMenuItemClick(item)"
+        >
+          <app-svg-icon class="me-1" [icon]="item.icon"></app-svg-icon>
+          {{ item.title }}</a
         >
       </div>
     </li>
   </ul>
 </nav>
 <div class="d-flex align-items-center pe-2" style="z-index: 200">
-  <div>Admin</div>
+  <div class="fs-18">Admin</div>
   <div class="ms-2">
-    <i
-      (click)="logout()"
-      style="cursor: pointer"
-      class="bi bi-person-circle fs-3"
-    ></i>
+    <i (click)="logout()" class="bi bi-person-circle fs-3 cursor-pointer"></i>
   </div>
 </div>
