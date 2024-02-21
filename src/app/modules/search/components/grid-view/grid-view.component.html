@@ -13,10 +13,8 @@
     class="event-container"
     (click)="i < events.length && showEventDetail(i)"
   >
-    <ng-container *ngIf="i < events.length; else elseBlock">
-      <div style="display: block; width: 100%; aspect-ratio: 16/9">
-        <app-event-image [event]="events[i]"></app-event-image>
-      </div>
+    <ng-container *ngIf="i < events.length">
+      <app-event-image [event]="events[i]"></app-event-image>
 
       <div class="checkbox-container">
         <label class="custom-checkbox" (click)="$event.stopPropagation()">
@@ -45,9 +43,5 @@
         }}</span
       >
     </ng-container>
-
-    <ng-template #elseBlock>
-      <div style="display: block; width: 100%; aspect-ratio: 16/9"></div>
-    </ng-template>
   </div>
 </div>

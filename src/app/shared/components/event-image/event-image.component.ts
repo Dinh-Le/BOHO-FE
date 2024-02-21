@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  HostBinding,
   Input,
   OnChanges,
   SimpleChanges,
@@ -12,10 +13,10 @@ import { EventService } from 'src/app/data/service/event.service';
 
 @Component({
   selector: 'app-event-image',
-  template: '<canvas #canvas></canvas>',
-  styles: [':host{display: block; width: 100%; height: 100%}'],
+  template: '<canvas class="w-100 h-100"  #canvas></canvas>',
 })
 export class EventImage implements AfterViewInit, OnChanges {
+  @HostBinding('class') classes = 'w-100 h-100 d-block';
   @ViewChild('canvas') canvasRef!: ElementRef;
   @Input() event: any;
   @Input() type: 'full' | 'crop' = 'full';
