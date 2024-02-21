@@ -41,6 +41,14 @@ export class ListViewComponent implements OnChanges {
         })
       );
     }
+
+    if ('events' in changes) {
+      if (this.events.length > 0) {
+        this.currentEvent = this.events[0];
+      } else {
+        this.currentEvent = null;
+      }
+    }
   }
 
   onEventSelectionChange() {
