@@ -19,7 +19,10 @@
       (isSelected ? config.activeTextColor : config.textColor) ?? 'white'
     "
   ></app-svg-icon>
-  <div *ngIf="!item?.hasChild" style="width: 14px; height: 14px"></div>
+  <div
+    *ngIf="!item?.hasChild"
+    style="width: 14px; height: 14px; flex-shrink: 0"
+  ></div>
   <ng-container
     *ngIf="itemTemplate; else defaultTemplate"
     [ngTemplateOutlet]="itemTemplate"

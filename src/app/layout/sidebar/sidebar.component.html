@@ -74,15 +74,18 @@
       <input
         [id]="'ckb-' + item.id"
         type="checkbox"
-        class="mx-1"
+        class="mx-1 cursor-pointer"
         [(ngModel)]="item.checked"
         (ngModelChange)="onCheckboxChanged(item)"
         *ngIf="showCheckbox"
       />
-      <app-svg-icon [icon]="item.icon" color="green"></app-svg-icon>
-      <div class="mx-1 flex-grow-1 text-truncate user-select-none">
+      <label
+        [htmlFor]="'ckb-' + item.id"
+        class="mx-1 flex-grow-1 text-truncate user-select-none cursor-pointer"
+      >
+        <app-svg-icon [icon]="item.icon" color="green"></app-svg-icon>
         {{ item.label }}
-      </div>
+      </label>
     </ng-template>
   </div>
 </div>
