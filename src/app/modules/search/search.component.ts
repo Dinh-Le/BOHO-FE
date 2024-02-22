@@ -57,9 +57,9 @@ export class SearchComponent implements OnInit {
     showVehileOnly: new FormControl<boolean>(false),
   });
   ruleItems: SelectItemModel[] = [
-    'Vượt đường kẻ',
     'Xâm nhập vùng',
     'Đi luẩn quẩn',
+    'Vượt đường kẻ',
     'Đỗ xe sai nơi quy định',
   ].map((name, index) => ({
     value: index,
