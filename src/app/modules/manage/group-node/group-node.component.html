@@ -1,12 +1,10 @@
-<div class="menu-container d-flex justify-content-between">
-  <span class="ms-2">Nhóm node</span>
-  <div class="me-2">
-    <button class="btn btn-primary text-white px-2" (click)="add()">
-      <i class="bi bi-plus"></i>Thêm
-    </button>
-  </div>
+<div class="menu-container d-flex px-2 align-items-center">
+  <span class="my-text-white">Nhóm node</span>
+  <button class="ms-auto my-btn-primary" (click)="add()">
+    <i class="bi bi-plus"></i>Thêm
+  </button>
 </div>
-<div class="content-wrapper">
+<div class="flex-grow-1 flex-basis-0 overflow-y-auto">
   <table class="w-100">
     <colgroup>
       <col width="30" />
@@ -14,10 +12,10 @@
       <col width="150" />
       <col width="auto" />
     </colgroup>
-    <thead>
+    <thead class="sticky-top">
       <th></th>
-      <th>Tên nhóm nút<i class="bi bi-sort-alpha-down"></i></th>
-      <th>Số lượng nút<i class="bi bi-sort-alpha-down"></i></th>
+      <th>Tên nhóm node<i class="ms-2 bi bi-sort-alpha-down"></i></th>
+      <th>Số lượng node<i class="ms-2 bi bi-sort-alpha-down"></i></th>
       <th></th>
     </thead>
     <tbody>

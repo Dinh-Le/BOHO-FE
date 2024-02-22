@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, HostBinding, OnInit, inject } from '@angular/core';
 import { ToastService } from '@app/services/toast.service';
 import { NodeOperatorService } from 'src/app/data/service/node-operator.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -22,6 +22,8 @@ interface RowData {
   styleUrls: ['group-node.component.scss', '../shared/table.scss'],
 })
 export class GroupNodeComponent implements OnInit {
+  @HostBinding('class') classNames = 'flex-grow-1 d-flex flex-column';
+
   private _navigationService = inject(NavigationService);
   private _toastService = inject(ToastService);
   modalService = inject(NgbModal);
@@ -102,7 +104,7 @@ export class GroupNodeComponent implements OnInit {
         name: item.name,
       })
       .subscribe({
-        next: () => {
+        complete: () => {
           this._toastService.showSuccess('Update node operator successfully');
           item.editable = false;
           this._navigationService.treeItemChange$.next({
