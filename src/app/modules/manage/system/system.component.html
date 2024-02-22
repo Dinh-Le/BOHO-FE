@@ -8,12 +8,19 @@
       {{ item.label }}
     </li>
   </ul>
-  <button class="btn btn-primary text-white me-2 px-2" (click)="add()">
-    <i class="bi bi-plus"></i>Thêm
+</div>
+
+<div class="d-flex align-items-center my-bg-default px-3" style="height: 36px">
+  <div class="my-text-white">Quản lý máy chủ Miletone VMS</div>
+  <button class="ms-auto my-btn-primary" (click)="add()">
+    <i class="bi bi-plus me-1"></i>Thêm
   </button>
 </div>
 
-<div class="content-wrapper full-height">
+<div
+  class="flex-grow-1 overflow-y-auto overflow-x-hidden"
+  style="flex-basis: 0"
+>
   <app-expandable-table
     class="w-100"
     classNames="bg-black"
