@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   Component,
+  HostBinding,
   OnInit,
   TemplateRef,
   ViewChild,
@@ -57,6 +58,10 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
 
   get name() {
     return this._form.get('name')?.value;
+  }
+
+  set name(value: string) {
+    this._form.get('name')?.setValue(value);
   }
 
   get host() {
@@ -136,6 +141,7 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
   styleUrls: ['system.component.scss', './../shared/my-input.scss'],
 })
 export class SystemComponent implements AfterViewInit, OnInit {
+  @HostBinding('class') classNames = 'flex-grow-1 d-flex flex-column';
   private _milestoneSevice = inject(MilestoneService);
   private _toastService = inject(ToastService);
   private _changeDetectorRef = inject(ChangeDetectorRef);
@@ -148,10 +154,10 @@ export class SystemComponent implements AfterViewInit, OnInit {
       label: 'Milestone VMS',
       selected: true,
     },
-    {
-      value: 'smtp-mail',
-      label: 'SMTP mail',
-    },
+    // {
+    //   value: 'smtp-mail',
+    //   label: 'SMTP mail',
+    // },
   ];
   selectedSystem: SelectItemModel = this.systems[0];
   columns: ColumnConfig[] = [];
@@ -220,6 +226,10 @@ export class SystemComponent implements AfterViewInit, OnInit {
 
   add() {
     const row = new RowItemModel();
+    const index =
+      this.data.filter((e) => /Milestone VMS server \d+/.test(e.name)).length +
+      1;
+    row.name = `Milestone VMS server ${index}`;
     row.isEditable = true;
     row.isExpanded = true;
     row.isNew = true;
@@ -285,7 +295,12 @@ export class SystemComponent implements AfterViewInit, OnInit {
           item.data = response.data;
           item.isEditable = false;
         },
-        error: ({ message }) => this._toastService.showError(message),
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(
+            `Test sending to the ${item.name} failed with error: ${
+              err.error?.message ?? err.message
+            }`
+          ),
       });
     } else {
       this.data = this.data.filter(({ id }) => item.id !== id);
@@ -294,16 +309,14 @@ export class SystemComponent implements AfterViewInit, OnInit {
 
   remove(item: RowItemModel) {
     this._milestoneSevice.delete(item.id).subscribe({
-      next: (response) => {
-        if (!response.success) {
-          throw Error(
-            'Delete milestone failed with error: ' + response.message
-          );
-        }
-
-        this.data = this.data.filter(({ id }) => item.id !== id);
-      },
-      error: ({ message }) => this._toastService.showError(message),
+      next: (response) =>
+        (this.data = this.data.filter(({ id }) => item.id !== id)),
+      error: (err: HttpErrorResponse) =>
+        this._toastService.showError(
+          `Test sending to the ${item.name} failed with error: ${
+            err.error?.message ?? err.message
+          }`
+        ),
     });
   }
 
@@ -320,11 +333,10 @@ export class SystemComponent implements AfterViewInit, OnInit {
         })
       )
       .subscribe({
-        next: () => {
+        complete: () =>
           this._toastService.showSuccess(
             `Test sending to the ${item.name} successfully`
-          );
-        },
+          ),
         error: (err: HttpErrorResponse) =>
           this._toastService.showError(
             `Test sending to the ${item.name} failed with error: ${
@@ -347,11 +359,10 @@ export class SystemComponent implements AfterViewInit, OnInit {
         })
       )
       .subscribe({
-        next: () => {
+        complete: () =>
           this._toastService.showSuccess(
             `Test connection to the ${item.name} successfully`
-          );
-        },
+          ),
         error: (err: HttpErrorResponse) =>
           this._toastService.showError(
             `Test connection to the ${item.name} failed with error: ${

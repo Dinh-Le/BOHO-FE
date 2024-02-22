@@ -5,16 +5,45 @@
 @import "~leaflet/dist/leaflet.css";
 
 :root {
-  --bs-black: #000000;
-  --bs-white: #ffffff;
+  --my-black: #000000;
+  --my-white: #ffffff;
+  --my-bg-default: #4a494bff;
+  --my-bg-primary: #5285b6ff;
+  --my-border-primary: #31538f;
+  --my-bg-secondary: #7f7f7fff;
 }
 
-.bg-black {
-  background: var(--bs-black);
+.my-bg-black {
+  background: var(--my-black);
+}
+
+.my-text-white {
+  color: var(--my-white);
+}
+
+.my-bg-default {
+  background: var(--my-bg-default);
+  * {
+    background: inherit;
+  }
+}
+
+.my-btn-primary {
+  background: var(--my-bg-primary);
+  border: 1px solid var(--my-border-primary);
+  color: var(--my-white);
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.my-btn-primary:disabled {
+  background: var(--my-bg-secondary);
 }
 
 * {
-  font-family: "Arial";
+  font-family: "Roboto Arial";
   font-weight: normal;
   font-size: 14px;
 }
@@ -61,7 +90,7 @@
 
 @for $size from 14 through 20 {
   .fs-#{$size} {
-    font-size: #{$size}px;
+    font-size: #{$size}px !important;
   }
 }
 
@@ -187,4 +216,8 @@
 
 button {
   user-select: none;
+}
+
+.flex-basis-0 {
+  flex-basis: 0;
 }

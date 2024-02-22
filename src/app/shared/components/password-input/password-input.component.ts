@@ -1,4 +1,4 @@
-import { Component, forwardRef } from '@angular/core';
+import { Component, Input, forwardRef } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ControlValueAccessorImpl } from '@shared/helpers/control-value-accessor-impl';
 
@@ -16,4 +16,5 @@ import { ControlValueAccessorImpl } from '@shared/helpers/control-value-accessor
 })
 export class PasswordInputComponent extends ControlValueAccessorImpl<string> {
   showPassword: boolean = false;
+  @Input() placeHolder = '';
 }

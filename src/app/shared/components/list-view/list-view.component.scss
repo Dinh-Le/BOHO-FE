@@ -2,8 +2,10 @@ ul.list-view {
   list-style: none;
   padding: 0;
   margin: 0;
+  background: inherit;
 
   li.list-view-item {
     padding: 2px 4px;
+    background: inherit;
   }
 }

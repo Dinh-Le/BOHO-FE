@@ -4,9 +4,17 @@
       *ngFor="let item of menuLevel2 | objectEntries"
       [ngClass]="{ active: item[1].isActive }"
       (click)="onMenuItemClick(item[0])"
+      class="user-select-none cursor-pointer"
     >
-      <app-svg-icon [icon]="item[1].icon" color="white"></app-svg-icon>
-      {{ item[1].text }}
+      <div class="d-flex">
+        <app-svg-icon
+          width="16px"
+          height="16px"
+          [icon]="item[1].icon"
+          color="white"
+        ></app-svg-icon>
+        <div class="ms-1 fs-16">{{ item[1].text }}</div>
+      </div>
     </li>
   </ul>
 </div>

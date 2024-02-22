@@ -1,17 +1,11 @@
-<div class="menu-container d-flex justify-content-between">
-  <span class="ms-2">Camera</span>
-  <div class="me-2">
-    <button
-      type="button"
-      class="btn btn-primary text-white px-2"
-      (click)="add()"
-    >
-      <i class="bi bi-plus"></i>Thêm
-    </button>
-  </div>
+<div class="menu-container d-flex align-items-center px-2">
+  <span class="fs-14 fw-bold my-text-white">Quản lý camera</span>
+  <button type="button" class="ms-auto my-btn-primary" (click)="add()">
+    <i class="bi bi-plus me-1"></i>Thêm
+  </button>
 </div>
 
-<div class="content-wrapper">
+<div class="flex-grow-1 flex-basis-0 overflow-y-auto overflow-x-hidden">
   <app-expandable-table
     rowKey="id"
     [data]="data"
@@ -111,6 +105,7 @@
                       formControlName="rtspUrl"
                       class="form-control bg-transparent border-light"
                       required
+                      placeholder="[RTSP URL]"
                     />
                   </div>
                 </div>
@@ -125,6 +120,7 @@
                       [id]="data.id + '-rtsp-user-id'"
                       formControlName="userId"
                       class="form-control bg-transparent border-light"
+                      placeholder="[ID người dùng]"
                     />
                   </div>
                 </div>
@@ -139,6 +135,7 @@
                       [id]="data.id + '-rtsp-user-password'"
                       formControlName="password"
                       class="w-100"
+                      placeHolder="[********]"
                     ></password-input>
                   </div>
                 </div>
@@ -156,6 +153,7 @@
                       formControlName="ip"
                       class="form-control bg-transparent border-light"
                       required
+                      placeholder="[IP]"
                     />
                   </div>
                 </div>
@@ -172,6 +170,7 @@
                       formControlName="httpPort"
                       class="form-control bg-transparent border-light"
                       required
+                      placeholder="[cổng]"
                     />
                   </div>
                 </div>
@@ -187,6 +186,7 @@
                       formControlName="userId"
                       class="form-control bg-transparent border-light"
                       required
+                      placeholder="[ID người dùng]"
                     />
                   </div>
                 </div>
@@ -201,6 +201,7 @@
                       [id]="data.id + '-onvif-password'"
                       formControlName="password"
                       class="w-100"
+                      placeHolder="[********]"
                     ></password-input>
                   </div>
                 </div>
@@ -225,6 +226,7 @@
                     <app-select-2
                       formControlName="profile"
                       [items]="data.onvifProfiles"
+                      placeHolder="Chọn profile"
                     ></app-select-2>
                   </div>
                 </div>
@@ -240,6 +242,8 @@
                       formControlName="rtspUrl"
                       class="form-control bg-transparent border-light"
                       required
+                      readonly
+                      placeholder="[RTSP URL]"
                     />
                   </div>
                 </div>
@@ -258,6 +262,7 @@
                       [items]="milestoneServers"
                       formControlName="server"
                       required
+                      placeHolder="Chọn máy chủ"
                     ></app-select-2>
                   </div>
                 </div>
@@ -272,6 +277,7 @@
                       [items]="milestoneCameras"
                       formControlName="camera"
                       required
+                      placeHolder="Chọn camera"
                     ></app-select-2>
                   </div>
                 </div>
@@ -287,11 +293,22 @@
                       formControlName="rtspUrl"
                       class="form-control bg-transparent border-light"
                       required
+                      placeholder="[RTSP URL]"
                     />
                   </div>
                 </div>
               </form>
             </ng-container>
+            <div class="row mt-2">
+              <div class="col-4">Nhóm camera:</div>
+              <div class="col-8">
+                <app-select-2
+                  formControlName="group"
+                  [items]="groups"
+                  placeHolder="Chọn nhóm camera"
+                ></app-select-2>
+              </div>
+            </div>
             <div class="row mt-4">
               <div class="d-flex justify-content-end">
                 <button
@@ -413,6 +430,12 @@
                 {{ data.form.get("subForm.rtspUrl").value }}
               </div>
             </div>
+            <div class="row mt-2">
+              <div class="col-4">Nhóm camera:</div>
+              <div class="col-8">
+                {{ data.group?.label }}
+              </div>
+            </div>
           </ng-container>
           <div class="row mt-4">
             <div class="d-flex justify-content-end">
@@ -434,11 +457,14 @@
           </div>
         </ng-template>
       </div>
-      <div class="col-4">
-        <div style="position: relative">
-          <img #snapshot class="w-100" />
+      <div class="col-4 d-flex justify-content-center align-items-center">
+        <div
+          class="position-relative d-flex align-items-center justify-content-center"
+          style="width: 70%; aspect-ratio: 16/9; background: black"
+        >
+          <img #snapshot alt="Hình ảnh camera" class="mw-100 mh-100" />
           <button
-            style="cursor: pointer; position: absolute; top: 5px; left: 5px"
+            class="position-absolute top-0 end-0 bg-transparent border-0"
             (click)="takeSnapshot(data, snapshot)"
           >
             <i class="bi bi-arrow-clockwise"></i>

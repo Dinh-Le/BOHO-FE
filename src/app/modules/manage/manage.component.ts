@@ -1,10 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, HostBinding, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ViewMode } from '@shared/components/tree-view/view-mode.enum';
 import {
   Level2Menu,
   NavigationService,
+  SideMenuItemType,
 } from 'src/app/data/service/navigation.service';
 
 @Component({
@@ -13,6 +14,7 @@ import {
   styleUrls: ['./manage.component.scss'],
 })
 export class ManageComponent implements OnInit {
+  @HostBinding('class') classNames = 'h-100 d-flex flex-column';
   router = inject(Router);
   activatedRoute = inject(ActivatedRoute);
   private _navigationService = inject(NavigationService);
@@ -95,13 +97,13 @@ export class ManageComponent implements OnInit {
     Object.values(this.menuLevel2).forEach((e) => (e.isActive = false));
     this.menuLevel2[menuId].isActive = true;
     this._navigationService.level2 = menuId;
+
     this._navigationService.navigate();
 
     if (menuId === Level2Menu.NODE) {
       this._navigationService.viewMode = ViewMode.Logical;
+    } else if (menuId === Level2Menu.CAMERA) {
+      this._navigationService.viewMode = ViewMode.Geolocation;
     }
-    //  else if (menuId === Level2Menu.CAMERA) {
-    //   this._navigationService.viewMode = ViewMode.Geolocation;
-    // }
   }
 }

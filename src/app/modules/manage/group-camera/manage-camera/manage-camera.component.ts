@@ -32,6 +32,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ListViewItemModel } from '@shared/components/list-view/list-view-item.model';
 import { InvalidId } from 'src/app/data/constants';
+import {
+  NavigationService,
+  SideMenuItemType,
+} from 'src/app/data/service/navigation.service';
+import { ThemeService } from 'ng2-charts';
 
 @Component({
   selector: 'app-manage-camera',
@@ -47,6 +52,7 @@ export class ManageCameraComponent implements OnInit {
   private _deviceService = inject(DeviceService);
   private _groupManagementService = inject(GroupManagementService);
   private _toastService = inject(ToastService);
+  private _navigationService = inject(NavigationService);
 
   id!: string;
   name!: string;
@@ -140,7 +146,7 @@ export class ManageCameraComponent implements OnInit {
             );
             return {
               id: e.id,
-              text: device!.name,
+              text: device?.name ?? '',
               data: device,
             };
           });
@@ -150,7 +156,7 @@ export class ManageCameraComponent implements OnInit {
             if (
               this.deviceListItems.some(
                 (e) =>
-                  `${DeviceTreeBuilder.DeviceIDPrefix}${e.data.id}` === item.id
+                  `${DeviceTreeBuilder.DeviceIDPrefix}${e.data?.id}` === item.id
               )
             ) {
               item.isVisible = false;
@@ -225,6 +231,20 @@ export class ManageCameraComponent implements OnInit {
           }))
       );
 
+      results
+        .filter((r) => r.response.success)
+        .forEach((r) => {
+          this._navigationService.treeItemChange$.next({
+            action: 'create',
+            type: SideMenuItemType.DEVICE,
+            data: {
+              id: r.item.data.id,
+              name: r.item.label,
+              group_id: this.id,
+            },
+          });
+        });
+
       // Hide devices that added to the group
       this.treeViewData.traverse((item) => {
         const id = item.id.split('-').slice(-1)[0];
@@ -278,6 +298,19 @@ export class ManageCameraComponent implements OnInit {
       if (deviceIds.size == 0) {
         return;
       }
+
+      results
+        .filter((r) => r.response.success)
+        .forEach((r) => {
+          this._navigationService.treeItemChange$.next({
+            type: SideMenuItemType.DEVICE,
+            action: 'delete',
+            data: {
+              id: r.item.data.id,
+              group_id: this.id,
+            },
+          });
+        });
 
       this.treeViewData.traverse((item) => {
         if (item.isLeaf) {

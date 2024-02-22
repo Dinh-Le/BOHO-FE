@@ -12,6 +12,9 @@ table {
   thead {
     background: rgb(242, 242, 242);
     color: rgb(95, 93, 96);
+
+    position: sticky;
+    top: 0;
   }
 
   .expand-icon {
