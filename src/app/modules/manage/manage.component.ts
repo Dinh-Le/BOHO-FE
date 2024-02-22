@@ -5,6 +5,7 @@ import { ViewMode } from '@shared/components/tree-view/view-mode.enum';
 import {
   Level2Menu,
   NavigationService,
+  SideMenuItemType,
 } from 'src/app/data/service/navigation.service';
 
 @Component({
@@ -96,13 +97,13 @@ export class ManageComponent implements OnInit {
     Object.values(this.menuLevel2).forEach((e) => (e.isActive = false));
     this.menuLevel2[menuId].isActive = true;
     this._navigationService.level2 = menuId;
+
     this._navigationService.navigate();
 
     if (menuId === Level2Menu.NODE) {
       this._navigationService.viewMode = ViewMode.Logical;
+    } else if (menuId === Level2Menu.CAMERA) {
+      this._navigationService.viewMode = ViewMode.Geolocation;
     }
-    //  else if (menuId === Level2Menu.CAMERA) {
-    //   this._navigationService.viewMode = ViewMode.Geolocation;
-    // }
   }
 }
