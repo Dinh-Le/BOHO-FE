@@ -7,6 +7,7 @@ import {
   inject,
   ChangeDetectorRef,
   OnDestroy,
+  HostBinding,
 } from '@angular/core';
 
 import { v4 } from 'uuid';
@@ -27,7 +28,7 @@ import {
   DeviceStatus_Disconnected,
 } from 'src/app/data/constants';
 import { switchMap } from 'rxjs/operators';
-import { Subscription } from 'rxjs';
+import { EMPTY, Subscription } from 'rxjs';
 import { RowItemModel } from './row-item.model';
 import { Device } from 'src/app/data/schema/boho-v2';
 import {
@@ -35,6 +36,7 @@ import {
   SideMenuItemType,
 } from 'src/app/data/service/navigation.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { GroupService } from 'src/app/data/service/group.service';
 
 @Component({
   selector: 'app-camera',
@@ -42,6 +44,8 @@ import { HttpErrorResponse } from '@angular/common/http';
   styleUrls: ['./camera.component.scss', '../shared/my-input.scss'],
 })
 export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
+  @HostBinding('class') classNames = 'flex-grow-1 d-flex flex-column';
+
   @ViewChild('statusColumnTemplate')
   statusColumnTemplate!: TemplateRef<any>;
 
@@ -50,6 +54,8 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
   private _toastService = inject(ToastService);
   private _changeDetectorRef = inject(ChangeDetectorRef);
   private _navigationService = inject(NavigationService);
+  private _groupService = inject(GroupService);
+
   private _subscription: Subscription[] = [];
 
   cameraDrivers: SelectItemModel[] = CameraDrivers.map((e) => ({
@@ -67,6 +73,7 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
     label: `Camera ${e}`,
     value: `camera-${e}`,
   }));
+  groups: SelectItemModel[] = [];
 
   ngAfterViewInit(): void {
     this.columns = [
@@ -86,7 +93,7 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
         sortable: true,
       },
       {
-        label: 'Nút',
+        label: 'Node',
         prop: 'nodeName',
       },
       {
@@ -100,10 +107,22 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    const groupServiceSubscription = this._groupService.findAll().subscribe({
+      next: ({ data: groups }) => {
+        this.groups = groups.map((group) => ({
+          value: group.id,
+          label: group.name,
+        }));
+      },
+      error: (err: HttpErrorResponse) =>
+        this._toastService.showError(err.error?.message ?? err.message),
+    });
+    this._subscription.push(groupServiceSubscription);
+
     const activatedRouteSubscription = this._activatedRoute.params
       .pipe(
         switchMap(({ nodeId }) => {
-          this.nodeId = nodeId;
+          this.initialize(nodeId);
           return this._deviceService.findAll(this.nodeId);
         })
       )
@@ -131,9 +150,10 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
 
   //#region Event handlers
   add() {
+    const index = this.data.filter((e) => /Camera \d+/.test(e.name)).length + 1;
     const device: Device = {
       id: v4(),
-      name: '',
+      name: `Camera ${index}`,
       is_active: true,
       type: DeviceType_Camera,
       location: HoChiMinhCoord,
@@ -312,4 +332,9 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   //#endregion
+
+  private initialize(nodeId: string) {
+    this.nodeId = nodeId;
+    this.data = [];
+  }
 }

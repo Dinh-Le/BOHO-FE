@@ -32,6 +32,9 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
           : undefined,
         [Validators.required]
       ),
+      group: new FormControl<SelectItemModel | undefined>(undefined, [
+        Validators.required,
+      ]),
     });
     this.update(device);
   }
@@ -119,6 +122,10 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
 
   get isFailure() {
     return this.status === DeviceStatus_Failure;
+  }
+
+  get group() {
+    return this.form.get('group')?.value;
   }
 
   updateCameraForm(device?: Device): void {
