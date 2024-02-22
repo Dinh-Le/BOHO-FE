@@ -1,12 +1,11 @@
-<div class="menu-container d-flex justify-content-between">
-  <span class="ms-2">Node</span>
-  <div class="me-2">
-    <button class="btn btn-primary text-white px-2" (click)="add()">
-      <i class="bi bi-plus"></i>Thêm
-    </button>
-  </div>
+<div class="menu-container d-flex align-items-center px-2">
+  <span class="my-text-white fw-bold fs-14">Quản lý node</span>
+
+  <button class="ms-auto my-btn-primary" (click)="add()">
+    <i class="bi bi-plus me-1"></i>Thêm
+  </button>
 </div>
-<div class="content-wrapper">
+<div class="flex-grow-1 flex-basis-0 overflow-y-auto overflow-x-hidden">
   <app-expandable-table
     rowKey="id"
     [data]="data"

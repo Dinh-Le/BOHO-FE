@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   Component,
+  HostBinding,
   OnDestroy,
   OnInit,
   TemplateRef,
@@ -25,6 +26,7 @@ import {
   SideMenuItemType,
 } from 'src/app/data/service/navigation.service';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 
 class RowItemModel extends ExpandableTableRowItemModelBase {
   id: string = v4();
@@ -42,7 +44,11 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
   });
 
   get name() {
-    return this.form.value.name;
+    return this.form.value.name ?? '';
+  }
+
+  set name(value: string) {
+    this.form.get('name')?.setValue(value);
   }
 
   get type() {
@@ -109,6 +115,8 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
   styleUrls: ['node.component.scss', '../shared/my-input.scss'],
 })
 export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
+  @HostBinding('class') classNames = 'flex-grow-1 d-flex flex-column';
+
   private _activatedRoute = inject(ActivatedRoute);
   private _nodeService = inject(NodeService);
   private _toastService = inject(ToastService);
@@ -132,26 +140,18 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
         switchMap(({ nodeOperatorId }) => {
           this._nodeOperatorId = nodeOperatorId;
           return this._nodeService.findAll(this._nodeOperatorId);
-        }),
-        switchMap((response) => {
-          if (!response.success) {
-            throw new Error(
-              `Fetch node data failed with error: ${response.message}`
-            );
-          }
-
-          return of(response.data);
         })
       )
       .subscribe({
-        next: (nodes) => {
+        next: ({ data: nodes }) => {
           this.data = nodes.map((node) => {
             const item = new RowItemModel();
             item.data = node;
             return item;
           });
         },
-        error: ({ message }) => this._toastService.showError(message),
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(err.error?.message ?? err.message),
       });
     this._subscriptions.push(activatedRouteSubscription);
   }
@@ -159,7 +159,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.columns = [
       {
-        label: 'Tên nút',
+        label: 'Tên node',
         prop: 'name',
         sortable: true,
       },
@@ -195,6 +195,9 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   add() {
     const item = new RowItemModel();
+    const index =
+      this.data.filter((e) => /Analytic node \d+/.test(e.name)).length + 1;
+    item.name = `Analytic node ${index}`;
     item.isEditable = true;
     item.isNew = true;
     item.isExpanded = true;
@@ -215,59 +218,50 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (item.isNew) {
       this._nodeService
         .create(data)
-        .pipe(
-          switchMap((response) => {
-            if (!response.success) {
-              throw Error(`Create node failed with error: ${response.message}`);
-            }
 
-            return of(response);
-          })
-        )
         .subscribe({
-          next: (response) => {
+          next: ({ data: id }) => {
             this._toastService.showSuccess('Create node successfully');
             item.isNew = false;
             item.isEditable = false;
             item.form.disable();
-            item.id = response.data;
+            item.id = id;
             this._navigationService.treeItemChange$.next({
               type: SideMenuItemType.NODE,
               action: 'create',
               data: Object.assign({}, data, {
-                id: response.data,
+                id,
               }),
             });
           },
-          error: ({ message }) => this._toastService.showError(message),
+          error: (err: HttpErrorResponse) =>
+            this._toastService.showError(
+              `Create node failed with error: ${
+                err.error?.message ?? err.message
+              }`
+            ),
         });
     } else {
-      this._nodeService
-        .update(item.id, data)
-        .pipe(
-          switchMap((response) => {
-            if (!response.success) {
-              throw Error(`Update node failed with error: ${response.message}`);
-            }
-
-            return of(response);
-          })
-        )
-        .subscribe({
-          next: () => {
-            this._toastService.showSuccess('Update node successfully');
-            item.isEditable = false;
-            item.form.disable();
-            this._navigationService.treeItemChange$.next({
-              type: SideMenuItemType.NODE,
-              action: 'update',
-              data: Object.assign({}, data, {
-                id: item.id,
-              }),
-            });
-          },
-          error: ({ message }) => this._toastService.showError(message),
-        });
+      this._nodeService.update(item.id, data).subscribe({
+        complete: () => {
+          this._toastService.showSuccess('Update node successfully');
+          item.isEditable = false;
+          item.form.disable();
+          this._navigationService.treeItemChange$.next({
+            type: SideMenuItemType.NODE,
+            action: 'update',
+            data: Object.assign({}, data, {
+              id: item.id,
+            }),
+          });
+        },
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(
+            `Update node failed with error: ${
+              err.error?.message ?? err.message
+            }`
+          ),
+      });
     }
   }
 
@@ -282,24 +276,9 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   remove({ id }: RowItemModel) {
-    this._nodeService
-      .delete(id)
-      .pipe(
-        catchError(({ message }) =>
-          of({
-            success: false,
-            message,
-          })
-        )
-      )
-      .subscribe((response) => {
-        if (!response.success) {
-          this._toastService.showError(
-            'Delete node failed. Reason: ' + response.message
-          );
-          return;
-        }
-
+    this._nodeService.delete(id).subscribe({
+      complete: () => {
+        this._toastService.showSuccess('Delete node successfully');
         this.data = this.data.filter((e) => e.id !== id);
         this._navigationService.treeItemChange$.next({
           type: SideMenuItemType.NODE,
@@ -308,6 +287,11 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
             id,
           },
         });
-      });
+      },
+      error: (err: HttpErrorResponse) =>
+        this._toastService.showError(
+          `Delete node failed with error: ${err.error?.message ?? err.message}`
+        ),
+    });
   }
 }
