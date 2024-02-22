@@ -7,6 +7,10 @@ import { ManageCameraComponent } from './manage-camera/manage-camera.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription, of, switchMap } from 'rxjs';
+import {
+  NavigationService,
+  SideMenuItemType,
+} from 'src/app/data/service/navigation.service';
 
 interface RowData {
   id: string;
@@ -25,6 +29,7 @@ export class GroupCameraComponent implements OnInit, OnDestroy {
   private _groupService = inject(GroupService);
   private _toastService = inject(ToastService);
   private _modalService = inject(NgbModal);
+  private _navigationService = inject(NavigationService);
 
   data: RowData[] = [];
   private _subscriptions: Subscription[] = [];
@@ -78,6 +83,14 @@ export class GroupCameraComponent implements OnInit, OnDestroy {
             cameraCount: 0,
             isEditable: false,
           });
+          this._navigationService.treeItemChange$.next({
+            type: SideMenuItemType.GROUP,
+            action: 'create',
+            data: {
+              id,
+              name,
+            },
+          });
         },
         error: (err: HttpErrorResponse) =>
           this._toastService.showError(err.error?.message ?? err.message),
@@ -92,6 +105,13 @@ export class GroupCameraComponent implements OnInit, OnDestroy {
       complete: () => {
         this._toastService.showSuccess('Delete group successfully');
         this.data = this.data.filter((e) => e.id !== item.id);
+        this._navigationService.treeItemChange$.next({
+          type: SideMenuItemType.GROUP,
+          action: 'delete',
+          data: {
+            id: item.id,
+          },
+        });
       },
       error: (err: HttpErrorResponse) =>
         this._toastService.showError(err.error?.message ?? err.message),
@@ -110,6 +130,14 @@ export class GroupCameraComponent implements OnInit, OnDestroy {
         complete: () => {
           this._toastService.showSuccess('Update group successfully');
           item.isEditable = false;
+          this._navigationService.treeItemChange$.next({
+            type: SideMenuItemType.GROUP,
+            action: 'update',
+            data: {
+              id: item.id,
+              name: item.name,
+            },
+          });
         },
       });
   }
@@ -120,6 +148,16 @@ export class GroupCameraComponent implements OnInit, OnDestroy {
     });
     modal.componentInstance.id = item.id;
     modal.componentInstance.name = item.name;
+    modal.result.finally(() => {
+      this._groupService.findAll().subscribe(
+        ({ data: groups }) =>
+          (this.data = groups.map(({ id, name, camera_count }) => ({
+            id,
+            name,
+            cameraCount: camera_count ?? 0,
+          })))
+      );
+    });
   }
 
   //#endregion
