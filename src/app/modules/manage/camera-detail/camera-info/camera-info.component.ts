@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ActivatedRoute } from '@angular/router';
 import { DeviceService } from 'src/app/data/service/device.service';
@@ -11,140 +11,183 @@ import {
   NavigationService,
   SideMenuItemType,
 } from 'src/app/data/service/navigation.service';
-import { CameraDriver_Onvif, CameraDriver_RTSP } from 'src/app/data/constants';
-import { Subscription } from 'rxjs';
+import {
+  CameraDriver_Onvif,
+  CameraDriver_RTSP,
+  HoChiMinhCoord,
+} from 'src/app/data/constants';
+import { Subscription, filter, finalize, of, switchMap, tap } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
-
-interface CameraInfo {
-  name: string;
-  address: string;
-  driverName: string;
-  typeName: string;
-  rtspUrl: string;
-}
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-camera-info',
   templateUrl: 'camera-info.component.html',
   styleUrls: ['camera-info.component.scss', '../../shared/my-input.scss'],
+  host: {
+    class: 'flex-grow-1 d-flex flex-column my-bg-default px-5 pb-5 pt-1',
+  },
 })
 export class CameraInfoComponent implements OnInit, OnDestroy {
-  modalService = inject(NgbModal);
-  private _navigationService = inject(NavigationService);
-  device: Device | undefined;
-  data: CameraInfo = {
-    name: '',
-    address: '',
-    driverName: '',
-    typeName: '',
-    rtspUrl: '',
-  };
-  private _activatedRouteSubscription: Subscription | undefined;
+  private subscriptions: Subscription[] = [];
+  private _nodeId: string = '';
+  private _deviceId: string = '';
+  private _device!: Device;
+
+  form = new FormGroup({
+    name: new FormControl<string>('', [Validators.required]),
+    address: new FormControl<string>('', [Validators.required]),
+    location: new FormControl<LatLng>(HoChiMinhCoord, [Validators.required]),
+    driverName: new FormControl<string>({ value: '', disabled: true }, [
+      Validators.required,
+    ]),
+    typeName: new FormControl<string>({ value: '', disabled: true }, [
+      Validators.required,
+    ]),
+    rtspUrl: new FormControl<string>({ value: '', disabled: true }, [
+      Validators.required,
+    ]),
+  });
+  isLoading: boolean = false;
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private deviceService: DeviceService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private navigationService: NavigationService,
+    private modalService: NgbModal
   ) {}
 
   ngOnInit(): void {
-    this._navigationService.level3 = Level3Menu.DEVICE_INFO;
-    this._activatedRouteSubscription =
-      this.activatedRoute.parent?.params.subscribe((params) => {
-        const { nodeId, cameraId } = params;
-        this.data = {
-          name: '',
-          address: '',
-          driverName: '',
-          typeName: '',
-          rtspUrl: '',
-        };
+    this.navigationService.level3 = Level3Menu.DEVICE_INFO;
 
-        this.deviceService.find(nodeId, cameraId).subscribe((response) => {
-          if (!response.success) {
-            this.toastService.showError('Fetch camera data failed.');
-            return;
-          }
-
-          this.device = response.data;
-          let rtspUrl = '';
-          switch (response.data.camera.driver) {
-            case CameraDriver_RTSP:
-              rtspUrl =
-                response.data.camera.connection_metadata.rtsp?.rtsp_url || '';
-              break;
-            case CameraDriver_Onvif:
-              rtspUrl =
-                response.data.camera.connection_metadata.onvif?.rtsp_url || '';
-              break;
-            default:
-              break;
-          }
-          this.data = {
-            name: response.data.name,
-            address: this.geodecode(response.data.location),
-            driverName: response.data.camera.driver,
-            typeName: response.data.camera.type,
-            rtspUrl,
-          };
+    const activatedRouteSubscription = this.activatedRoute
+      .parent!.params.pipe(filter(({ nodeId, cameraId }) => nodeId && cameraId))
+      .subscribe(({ nodeId, cameraId: deviceId }) => {
+        this.initialize({ nodeId, deviceId });
+        this.loadData().subscribe({
+          error: (err: HttpErrorResponse) =>
+            this.toastService.showError(
+              `Fetch data failed with error: ${
+                err.error?.message ?? err.message
+              }`
+            ),
         });
       });
+
+    this.subscriptions.push(activatedRouteSubscription);
   }
 
   ngOnDestroy(): void {
-    this._activatedRouteSubscription?.unsubscribe();
+    this.subscriptions.forEach((s) => s.unsubscribe());
   }
 
-  async changeAddress() {
+  changeAddress() {
     const modal = this.modalService.open(LocationPickerComponent, {
       size: 'xl',
       centered: true,
     });
+    const { lat, long } = this.form.get('location')!.value!;
     modal.componentInstance.latLng = {
-      lat: this.device!.location.lat,
-      lng: this.device!.location.long,
+      lat: parseFloat(lat),
+      lng: parseFloat(long),
     };
 
-    try {
-      const { lat, lng } = await modal.result;
-      this.device!.location = {
-        lat: lat.toString(),
-        long: lng.toString(),
-      };
-
-      this.data.address = this.geodecode(this.device?.location);
-      this.device!.name = this.data.name;
-      this.device!.camera = Object.assign(this.device!.camera, {
-        created_at: undefined,
-        deleted_at: undefined,
-        updated_at: undefined,
-        device_id: undefined,
-        id: undefined,
-      });
-      this.deviceService
-        .update(this.device!.node_id!, this.device!.id, this.device!)
-        .subscribe({
-          error: (err: HttpErrorResponse) =>
-            this.toastService.showError(err.error?.message ?? err.message),
-          complete: () => {
-            this.toastService.showSuccess('Update the camera successfully');
-            this._navigationService.treeItemChange$.next({
-              type: SideMenuItemType.DEVICE,
-              action: 'update',
-              data: Object.assign({}, this.device),
-            });
-          },
+    modal.result
+      .then(({ lat, lng }) => {
+        this.form.get('location')?.setValue({
+          lat: lat.toString(),
+          long: lng.toString(),
         });
-    } catch {
-      // No action required.
-    }
+      })
+      .catch(() => {
+        // dismiss, ignore
+      });
   }
 
-  geodecode(latlng: LatLng | undefined) {
-    if (latlng) {
-      return `Toa do: ${latlng.lat}, ${latlng.long}`;
-    } else {
-      return '';
-    }
+  cancel() {
+    this.loadData().subscribe({
+      error: (err: HttpErrorResponse) =>
+        this.toastService.showError(
+          `Fetch data failed with error: ${err.error?.message ?? err.message}`
+        ),
+    });
+  }
+
+  submit() {
+    this.form.disable();
+
+    this.deviceService
+      .update(this._nodeId, this._deviceId, {
+        name: this.form.get('name')!.value!,
+        address: this.form.get('address')!.value!,
+        location: this.form.get('location')!.value!,
+        is_active: this._device.is_active,
+        type: this._device.type,
+        camera: {
+          driver: this._device.camera.driver,
+          type: this._device.camera.type,
+          connection_metadata: this._device.camera.connection_metadata,
+        },
+      })
+      .subscribe({
+        error: (err: HttpErrorResponse) =>
+          this.toastService.showError(err.error?.message ?? err.message),
+        complete: () => {
+          this.toastService.showSuccess('Update the camera successfully');
+          this.navigationService.treeItemChange$.next({
+            type: SideMenuItemType.DEVICE,
+            action: 'update',
+            data: {
+              id: this._deviceId,
+              name: this.form.get('name')?.value,
+            },
+          });
+          this.form.enable();
+        },
+      });
+  }
+
+  private initialize({ nodeId, deviceId }: any) {
+    this._nodeId = nodeId;
+    this._deviceId = deviceId;
+    this.form.reset();
+  }
+
+  private loadData() {
+    return this.deviceService.find(this._nodeId, this._deviceId).pipe(
+      tap(() => {
+        this.form.disable();
+      }),
+      switchMap(({ data: device }) => {
+        this._device = device;
+
+        let rtspUrl = '';
+        switch (this._device.camera.driver) {
+          case CameraDriver_RTSP:
+            rtspUrl =
+              this._device.camera.connection_metadata.rtsp?.rtsp_url || '';
+            break;
+          case CameraDriver_Onvif:
+            rtspUrl =
+              this._device.camera.connection_metadata.onvif?.rtsp_url || '';
+            break;
+          default:
+            break;
+        }
+
+        this.form.setValue({
+          name: this._device.name,
+          address: this._device.address ?? '',
+          driverName: this._device.camera.driver,
+          typeName: this._device.camera.type,
+          rtspUrl,
+          location: this._device.location,
+        });
+
+        return of(true);
+      }),
+      finalize(() => this.form.enable())
+    );
   }
 }

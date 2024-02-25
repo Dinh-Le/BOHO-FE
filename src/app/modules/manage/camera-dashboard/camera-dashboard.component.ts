@@ -3,7 +3,6 @@ import {
   ElementRef,
   OnDestroy,
   OnInit,
-  TemplateRef,
   ViewChild,
 } from '@angular/core';
 import { ChartConfiguration } from 'chart.js';
@@ -11,9 +10,10 @@ import * as moment from 'moment';
 import 'chartjs-adapter-moment';
 import { ActivatedRoute } from '@angular/router';
 import { DeviceService } from 'src/app/data/service/device.service';
-import { Subscription, filter, of, switchMap } from 'rxjs';
+import { NEVER, Subscription, filter, switchMap } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from '@app/services/toast.service';
+import { Device } from 'src/app/data/schema/boho-v2';
 
 @Component({
   selector: 'app-camera-dashboard',
@@ -95,9 +95,14 @@ export class CameraDashboardComponent implements OnInit, OnDestroy {
     return this.snapshotRef?.nativeElement as HTMLImageElement;
   }
 
+  get address() {
+    return this.device?.address;
+  }
+
   private subscriptions: Subscription[] = [];
   private deviceId: string = '';
   private nodeId: string = '';
+  private device?: Device;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -107,29 +112,40 @@ export class CameraDashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const activatedRouteSubscription = this.activatedRoute.params
-      .pipe(
-        filter(({ nodeId, cameraId }) => nodeId && cameraId),
-        switchMap(({ nodeId, cameraId }) => {
-          this.initialize(nodeId, cameraId);
-          return this.deviceService.snapshot(this.nodeId, this.deviceId);
-        }),
-        switchMap(({ data: snapshot }) => {
-          this.snapshotEl.src = `data:image/${snapshot.format};charset=utf-8;base64,${snapshot.img}`;
-          this.snapshotEl.style.aspectRatio = (
-            snapshot.size[0] / snapshot.size[1]
-          ).toString();
-          return of(true);
-        })
-      )
-      .subscribe({
-        next: () => {},
-        error: (err: HttpErrorResponse) =>
-          this.toastService.showError(err.error?.message ?? err.message),
+      .pipe(filter(({ nodeId, cameraId }) => nodeId && cameraId))
+      .subscribe(({ nodeId, cameraId }) => {
+        this.initialize(nodeId, cameraId);
+        this.deviceService
+          .find(this.nodeId, this.deviceId)
+          .pipe(
+            switchMap(({ data: device }) => {
+              this.device = device;
+              return this.deviceService.snapshot(this.nodeId, this.deviceId);
+            }),
+            switchMap(({ data: snapshot }) => {
+              this.snapshotEl.src = `data:image/${snapshot.format};charset=utf-8;base64,${snapshot.img}`;
+              this.snapshotEl.style.aspectRatio = (
+                snapshot.size[0] / snapshot.size[1]
+              ).toString();
+              return NEVER;
+            })
+          )
+          .subscribe({
+            error: (err: HttpErrorResponse) => {
+              this.toastService.showError(
+                `Fetch data failed with error: ${
+                  err.error?.message ?? err.message
+                }`
+              );
+              return NEVER;
+            },
+          });
       });
     this.subscriptions.push(activatedRouteSubscription);
   }
 
   ngOnDestroy(): void {
+    console.log('here');
     this.subscriptions.forEach((s) => s.unsubscribe());
   }
 
@@ -139,5 +155,6 @@ export class CameraDashboardComponent implements OnInit, OnDestroy {
     if (this.snapshotEl) {
       this.snapshotEl.src = '';
     }
+    this.device = undefined;
   }
 }

@@ -1,6 +1,6 @@
-import { NavigationEnd, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { ViewMode } from '@shared/components/tree-view/view-mode.enum';
 
 export enum Level1Menu {

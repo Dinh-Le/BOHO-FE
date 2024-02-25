@@ -1,4 +1,5 @@
-<div class="full-height bg-dark p-5">
+<div class="fs-18">Thông tin camera</div>
+<div class="mb-auto" [formGroup]="form">
   <div class="row mt-3 align-items-center">
     <div class="col-2">
       <label for="name">Tên:</label>
@@ -7,7 +8,7 @@
       <input
         id="name"
         class="form-control bg-light text-dark"
-        [(ngModel)]="data.name"
+        formControlName="name"
       />
     </div>
   </div>
@@ -19,11 +20,16 @@
       <input
         id="address"
         class="form-control bg-light text-dark"
-        [(ngModel)]="data.address"
+        formControlName="address"
       />
     </div>
     <div class="col-auto">
-      <button type="button" class="my-button submit" (click)="changeAddress()">
+      <button
+        type="button"
+        class="my-button submit"
+        (click)="changeAddress()"
+        [disabled]="form.disabled"
+      >
         Định vị trên bản đồ
       </button>
     </div>
@@ -36,7 +42,7 @@
       <input
         id="driver-name"
         class="form-control bg-transparent border-light"
-        [value]="data.driverName"
+        formControlName="driverName"
         readonly
       />
     </div>
@@ -49,7 +55,7 @@
       <input
         id="type-name"
         class="form-control bg-transparent border-light"
-        [value]="data.typeName"
+        formControlName="typeName"
         readonly
       />
     </div>
@@ -62,9 +68,29 @@
       <input
         id="rtspUrl"
         class="form-control bg-transparent border-light"
-        [value]="data.rtspUrl"
+        formControlName="rtspUrl"
         readonly
       />
     </div>
   </div>
+</div>
+<div class="d-flex justify-content-center gap-3">
+  <button
+    type="button"
+    (click)="cancel()"
+    class="my-btn"
+    style="width: 100px"
+    [disabled]="form.disabled"
+  >
+    Hủy
+  </button>
+  <button
+    type="button"
+    (click)="submit()"
+    [disabled]="form.invalid || form.disabled"
+    class="my-btn my-bg-primary"
+    style="width: 100px"
+  >
+    Lưu
+  </button>
 </div>

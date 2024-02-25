@@ -9,6 +9,9 @@ import { ToastService } from '@app/services/toast.service';
 @Component({
   selector: 'app-camera-detail',
   templateUrl: 'camera-detail.component.html',
+  host: {
+    class: 'flex-grow-1 d-flex flex-column',
+  },
 })
 export class CameraDetailComponent implements OnInit {
   private _activatedRoute = inject(ActivatedRoute);

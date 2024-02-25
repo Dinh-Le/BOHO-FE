@@ -23,9 +23,14 @@
 
 .my-bg-default {
   background: var(--my-bg-default);
-  * {
-    background: inherit;
-  }
+}
+
+.my-bg-primary {
+  background: var(--my-bg-primary);
+}
+
+.my-bg-secondary {
+  background: var(--my-bg-secondary);
 }
 
 .my-btn-primary {
@@ -38,7 +43,14 @@
   user-select: none;
 }
 
-.my-btn-primary:disabled {
+.my-btn {
+  border: 1px solid var(--my-border-primary);
+  color: var(--my-white);
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+}
+
+.my-btn:disabled {
   background: var(--my-bg-secondary);
 }
 

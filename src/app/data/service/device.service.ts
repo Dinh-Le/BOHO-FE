@@ -8,7 +8,7 @@ import { HoChiMinhCoord } from '../constants';
 
 export type CreateOrUpdateDeviceRequestDto = Pick<
   Device,
-  'name' | 'is_active' | 'type' | 'camera'
+  'name' | 'is_active' | 'type' | 'camera' | 'address' | 'location'
 > & {
   location?: any;
 };
@@ -98,14 +98,21 @@ export abstract class DeviceService extends RestfullApiService {
 export class DeviceServiceImpl extends DeviceService {
   public override create(
     nodeId: string,
-    { name, is_active, type, camera, location }: CreateOrUpdateDeviceRequestDto
+    {
+      name,
+      is_active,
+      type,
+      camera,
+      location,
+      address,
+    }: CreateOrUpdateDeviceRequestDto
   ): Observable<CreateDeviceResponeDto> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device`;
     return this.httpClient.post<CreateDeviceResponeDto>(
       url,
       Object.assign(
         {},
-        { name, is_active, type, camera },
+        { name, is_active, type, camera, address },
         {
           location: location ?? HoChiMinhCoord,
         }
@@ -131,7 +138,14 @@ export class DeviceServiceImpl extends DeviceService {
   public override update(
     nodeId: string,
     deviceId: string,
-    { name, is_active, type, camera, location }: CreateOrUpdateDeviceRequestDto
+    {
+      name,
+      is_active,
+      type,
+      camera,
+      location,
+      address,
+    }: CreateOrUpdateDeviceRequestDto
   ): Observable<
     ResponseBase & {
       data: {
@@ -150,7 +164,7 @@ export class DeviceServiceImpl extends DeviceService {
       url,
       Object.assign(
         {},
-        { name, is_active, type, camera },
+        { name, is_active, type, camera, address },
         {
           location: location ?? HoChiMinhCoord,
         }
