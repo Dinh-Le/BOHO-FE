@@ -23,6 +23,7 @@ export enum Level2Menu {
 export enum Level3Menu {
   NONE = 'NONE',
   DEVICE_INFO = 'DEVICE_INFO',
+  GENERAL_SETTINGS = 'GENERAL_SETTINGS',
   PRESET_SETTINGS = 'PRESET_SETTINGS',
   PATROL_SETTINGS = 'PATROL_SETTINGS',
   TOUR_SETTINGS = 'TOUR_SETTINGS',
@@ -205,7 +206,9 @@ export class NavigationService {
           targetUrl += `/node/${this.sideMenu.id}/camera`;
         } else if (this.sideMenu?.type === SideMenuItemType.DEVICE) {
           const nodeId = this.sideMenu.data?.node_id;
-          if (this.level3 === Level3Menu.PRESET_SETTINGS) {
+          if (this.level3 === Level3Menu.GENERAL_SETTINGS) {
+            targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/settings`;
+          } else if (this.level3 === Level3Menu.PRESET_SETTINGS) {
             targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/preset-settings`;
           } else if (this.level3 === Level3Menu.PATROL_SETTINGS) {
             targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/patrol-settings`;
