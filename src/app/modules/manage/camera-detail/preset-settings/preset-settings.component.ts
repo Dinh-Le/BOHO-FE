@@ -2,7 +2,15 @@ import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { EditableListViewItemModel } from '../editable-list-view/editable-list-view-item.model';
 import { PresetService } from 'src/app/data/service/preset.service';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription, catchError, of, switchMap } from 'rxjs';
+import {
+  Subscription,
+  catchError,
+  filter,
+  finalize,
+  of,
+  pipe,
+  switchMap,
+} from 'rxjs';
 import { ToastService } from '@app/services/toast.service';
 import {
   Level3Menu,
@@ -10,12 +18,14 @@ import {
 } from 'src/app/data/service/navigation.service';
 import { DeviceService } from 'src/app/data/service/device.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ResponseBase } from 'src/app/data/schema/boho-v2/response-base';
 
 @Component({
   selector: 'app-preset-settings',
   templateUrl: 'preset-settings.component.html',
   styleUrls: ['preset-settings.component.scss', '../../shared/my-input.scss'],
+  host: {
+    class: 'flex-grow-1 d-flex flex-column my-bg-default px-5 pb-5 pt-1',
+  },
 })
 export class PresetSettingsComponent implements OnInit, OnDestroy {
   private _activatedRoute = inject(ActivatedRoute);
@@ -24,27 +34,40 @@ export class PresetSettingsComponent implements OnInit, OnDestroy {
   private _deviceService = inject(DeviceService);
   private _toastService = inject(ToastService);
   presetList: EditableListViewItemModel[] = [];
-  selectedItem: EditableListViewItemModel | undefined;
+  selectedItem?: EditableListViewItemModel;
   nodeId = '';
-  cameraId = '';
+  deviceId = '';
+  loading: boolean = true;
   private _subscriptions: Subscription[] = [];
 
   ngOnInit(): void {
     this._navigationService.level3 = Level3Menu.PRESET_SETTINGS;
     const activatedRouteSubscription = this._activatedRoute
-      .parent!.params.pipe(
-        switchMap(({ nodeId, cameraId }) => {
-          this.nodeId = nodeId;
-          this.cameraId = cameraId;
-          return this._presetService.findAll(nodeId, cameraId);
-        })
-      )
+      .parent!.params.pipe(filter(({ nodeId, cameraId }) => nodeId && cameraId))
       .subscribe({
-        next: (response) => {
-          this.presetList = response.data.map((e) => ({
-            id: e.id.toString(),
-            label: e.name,
-          }));
+        next: ({ nodeId, cameraId: deviceId }) => {
+          this.nodeId = nodeId;
+          this.deviceId = deviceId;
+          this.presetList = [];
+
+          this.loading = true;
+          this._presetService
+            .findAll(this.nodeId, this.deviceId)
+            .pipe(finalize(() => (this.loading = false)))
+            .subscribe({
+              next: ({ data: presets }) => {
+                this.presetList = presets.map((e) => ({
+                  id: e.id.toString(),
+                  label: e.name,
+                }));
+              },
+              error: (err: HttpErrorResponse) =>
+                this._toastService.showError(
+                  `Fetch data failed with error: ${
+                    err.error?.message ?? err.message
+                  }`
+                ),
+            });
         },
         error: ({ message }) => this._toastService.showError(message),
       });
@@ -55,26 +78,28 @@ export class PresetSettingsComponent implements OnInit, OnDestroy {
     this._subscriptions.forEach((e) => e.unsubscribe());
   }
 
-  load() {
-    this._presetService
-      .sync(this.nodeId, this.cameraId)
-      .pipe(
-        switchMap((response) => {
-          if (!response.success) {
-            throw Error(`Load preset failed with error: ${response.message}`);
-          }
+  trackById(_: any, { id }: any) {
+    return id;
+  }
 
-          return of(response.data);
-        })
-      )
+  load() {
+    this.loading = true;
+    this._presetService
+      .sync(this.nodeId, this.deviceId)
+      .pipe(finalize(() => (this.loading = false)))
       .subscribe({
-        next: (presets) => {
+        next: ({ data: presets }) => {
           this.presetList = presets.map((e) => ({
             id: e.id.toString(),
             label: e.name,
           }));
         },
-        error: ({ message }) => this._toastService.showError(message),
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(
+            `Load preset failed with error: ${
+              err.error?.message ?? err.message
+            }`
+          ),
       });
   }
 
@@ -85,41 +110,14 @@ export class PresetSettingsComponent implements OnInit, OnDestroy {
 
     const presetId = parseInt(this.selectedItem.id);
     this._presetService
-      .control(this.nodeId, this.cameraId, presetId)
+      .control(this.nodeId, this.deviceId, presetId)
       .pipe(
-        catchError((err: HttpErrorResponse) => {
-          if (err.status > 0) {
-            return of(err.error);
-          }
-
-          throw Error(err.message);
-        })
-      )
-      .pipe(
-        switchMap((response) => {
-          if (!response.success) {
-            // throw Error(
-            //   `Move PTZ at direct preset failed with error ${response.message}`
-            // );
-            this._toastService.showError(
-              `Move PTZ at direct preset failed with error ${response.message}`
-            );
-          }
-
-          return this._deviceService.snapshot(this.nodeId, this.cameraId);
-        }),
-        switchMap((response) => {
-          if (!response.success) {
-            throw Error(
-              `Get snapshot from camera failed with error ${response.message}`
-            );
-          }
-
-          return of(response.data);
-        })
+        switchMap(() =>
+          this._deviceService.snapshot(this.nodeId, this.deviceId)
+        )
       )
       .subscribe({
-        next: (snapshot) => {
+        next: ({ data: snapshot }) => {
           img.src = `data:image/${snapshot.format};charset=utf-8;base64,${snapshot.img}`;
           img.style.aspectRatio = (
             snapshot.size[0] / snapshot.size[1]
@@ -129,44 +127,49 @@ export class PresetSettingsComponent implements OnInit, OnDestroy {
       });
   }
 
-  remove(item: EditableListViewItemModel) {
-    this._presetService
-      .delete(this.nodeId, this.cameraId, parseInt(item.id))
-      .pipe(
-        switchMap((response) => {
-          if (!response.success) {
-            throw Error(`Delete preset failed with error: ${response.message}`);
-          }
+  select(item: EditableListViewItemModel) {
+    if (this.selectedItem?.id === item.id) {
+      return;
+    }
 
-          return of(response);
-        })
-      )
+    if (this.selectedItem?.isEditable) {
+      this.save(item);
+      this.selectedItem.isEditable = false;
+    }
+
+    this.selectedItem = item;
+  }
+
+  remove(item: EditableListViewItemModel) {
+    this.loading = true;
+    this._presetService
+      .delete(this.nodeId, this.deviceId, parseInt(item.id))
+      .pipe(finalize(() => (this.loading = false)))
       .subscribe({
-        next: () => {
+        complete: () => {
           this._toastService.showSuccess('Delete preset successfully');
           this.presetList = this.presetList.filter((e) => e.id !== item.id);
         },
-        error: ({ message }) => this._toastService.showError(message),
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(
+            `Delete preset failed with error: ${
+              err.error?.message ?? err.message
+            }`
+          ),
       });
   }
 
-  save(item: EditableListViewItemModel) {
+  save({ id, label: name }: EditableListViewItemModel) {
+    this.loading = true;
     this._presetService
-      .update(this.nodeId, this.cameraId, parseInt(item.id), {
-        name: item.label,
+      .update(this.nodeId, this.deviceId, parseInt(id), {
+        name,
       })
-      .pipe(
-        switchMap((response) => {
-          if (!response.success) {
-            throw Error(`Update preset failed with error: ${response.message}`);
-          }
-
-          return of(response);
-        })
-      )
+      .pipe(finalize(() => (this.loading = false)))
       .subscribe({
-        next: () =>
-          this._toastService.showSuccess('Update preset successfully'),
+        complete: () => {
+          this._toastService.showSuccess('Update preset successfully');
+        },
         error: ({ message }) => this._toastService.showError(message),
       });
   }
