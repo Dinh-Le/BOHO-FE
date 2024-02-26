@@ -13,6 +13,10 @@
   --my-bg-secondary: #7f7f7fff;
 }
 
+.my-bg-primary-hover:hover {
+  background: var(--my-bg-primary);
+}
+
 .my-bg-black {
   background: var(--my-black);
 }

@@ -3,6 +3,8 @@ import {
   ElementRef,
   HostListener,
   Input,
+  OnChanges,
+  SimpleChanges,
   TemplateRef,
   forwardRef,
   inject,
@@ -22,7 +24,7 @@ import { SelectItemModel } from '@shared/models/select-item-model';
     },
   ],
 })
-export class Select2Component implements ControlValueAccessor {
+export class Select2Component implements ControlValueAccessor, OnChanges {
   @Input()
   contentTemplateRef!: TemplateRef<any>;
 
@@ -34,7 +36,7 @@ export class Select2Component implements ControlValueAccessor {
 
   @Input({
     transform: (items: SelectItemModel[]) =>
-      items.map((it) => Object.assign({}, it, { selected: false })),
+      items.map((it) => Object.assign(it, { selected: false })),
   })
   items: SelectItemModel[] = [];
 
@@ -86,6 +88,14 @@ export class Select2Component implements ControlValueAccessor {
     );
     this.currentItems.forEach((e) => (e.selected = true));
     this.onChange(this.model);
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if ('items' in changes) {
+      this.currentItems = this.items.filter((it1) =>
+        this.currentItems.some((it2) => it2.value === it1.value)
+      );
+    }
   }
 
   writeValue(value: any): void {

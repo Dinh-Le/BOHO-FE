@@ -226,7 +226,18 @@ export class NavigationService {
         ) {
           targetUrl += '/group-camera/0';
         } else if (this.sideMenu?.type === SideMenuItemType.DEVICE) {
-          targetUrl += `/node/${this.sideMenu.data?.node_id}/camera/${this.sideMenu.id}/info`;
+          const nodeId = this.sideMenu.data?.node_id;
+          if (this.level3 === Level3Menu.GENERAL_SETTINGS) {
+            targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/settings`;
+          } else if (this.level3 === Level3Menu.PRESET_SETTINGS) {
+            targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/preset-settings`;
+          } else if (this.level3 === Level3Menu.PATROL_SETTINGS) {
+            targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/patrol-settings`;
+          } else if (this.level3 === Level3Menu.TOUR_SETTINGS) {
+            targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/tour-settings`;
+          } else {
+            targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/info`;
+          }
         } else {
           targetUrl += '/group-camera';
         }
