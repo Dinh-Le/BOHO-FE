@@ -1,4 +1,6 @@
-<div class="bg-dark p-5 full-height">
+<div class="my-text-white fs-18">Lịch trình PTZ</div>
+
+<div class="flex-grow-1 mt-5">
   <div class="d-flex">
     <div class="day-label"></div>
     <div class="hour-container">
@@ -33,101 +35,100 @@
       Xóa tất cả
     </button>
   </div>
-  <form [formGroup]="form" (ngSubmit)="add()">
-    <div class="row mt-4">
-      <div class="col-4">
-        <div class="d-flex align-items-center">
-          <span class="label">Thời gian:</span>
-          <app-time-input
-            formControlName="startTime"
-            name="start-time"
-            id="start-time"
-          ></app-time-input>
-          <span class="mx-2">~</span>
-          <app-time-input
-            formControlName="endTime"
-            name="end-time"
-            id="end-time"
-          ></app-time-input>
-        </div>
+
+  <form
+    [formGroup]="form"
+    (ngSubmit)="add()"
+    class="d-flex flex-column gap-4 mt-5 ms-5"
+  >
+    <div class="d-flex align-items-center">
+      <label class="me-4">Thời gian</label>
+      <app-time-input
+        formControlName="startTime"
+        name="start-time"
+        id="start-time"
+        class="ms-4"
+      ></app-time-input>
+      <span class="mx-2">~</span>
+      <app-time-input
+        formControlName="endTime"
+        name="end-time"
+        id="end-time"
+      ></app-time-input>
+
+      <label for="day" class="me-4" style="margin-inline-start: 100px"
+        >Ngày</label
+      >
+      <app-select-2
+        [items]="daysInWeek"
+        name="day"
+        formControlName="day"
+        id="day"
+        style="width: 200px"
+      ></app-select-2>
+    </div>
+
+    <div class="d-flex align-items-center">
+      <label class="me-4">Loại hành trình</label>
+      <div>
+        <input
+          type="radio"
+          name="type"
+          id="type-patrol"
+          value="patrol"
+          formControlName="type"
+        />
+        <label class="ms-1" for="type-patrol">Tuần tra</label>
       </div>
-      <div class="col-4 d-flex align-items-center">
-        <label for="day" class="label">Ngày:</label>
-        <app-select-2
-          class="w-100"
-          [items]="daysInWeek"
-          name="day"
-          formControlName="day"
-          id="day"
-        ></app-select-2>
+      <div class="ms-4">
+        <input
+          type="radio"
+          name="type"
+          id="type-preset"
+          value="preset"
+          formControlName="type"
+        />
+        <label class="ms-1" for="type-preset">Điểm giám sát</label>
       </div>
     </div>
 
-    <div class="row mt-3">
-      <div class="d-flex align-items-center">
-        <span class="label">Loại hành trình:</span>
-        <div class="me-2 w-40">
-          <input
-            type="radio"
-            name="type"
-            id="type-patrol"
-            value="patrol"
-            formControlName="type"
-          />
-          <label class="ms-1" for="type-patrol">Tuần tra</label>
+    <div class="d-flex align-items-center">
+      <label for="patrol" class="me-4">Hành trình </label>
+      <app-select-2
+        style="width: 400px"
+        [items]="journeyList"
+        formControlName="journey"
+        [menuItemTemplateRef]="journeyItemTemplate"
+        class="ms-4"
+      ></app-select-2>
+      <ng-template #journeyItemTemplate let-item="item">
+        <div style="display: flex; user-select: none; cursor: pointer">
+          <div
+            [style.background]="item.color"
+            style="width: 20px; height: 20px"
+          ></div>
+          <span class="ms-1">{{ item.label }}</span>
         </div>
-        <div class="w-40">
-          <input
-            type="radio"
-            name="type"
-            id="type-preset"
-            value="preset"
-            formControlName="type"
-          />
-          <label class="ms-1" for="type-preset">Điểm giám sát</label>
-        </div>
-      </div>
-    </div>
-
-    <div class="row mt-3">
-      <div class="col-4 d-flex align-items-center">
-        <label for="patrol" class="label">Hành trình: </label>
-        <app-select-2
-          class="w-100"
-          [items]="journeyList"
-          formControlName="journey"
-          [menuItemTemplateRef]="journeyItemTemplate"
-        ></app-select-2>
-        <ng-template #journeyItemTemplate let-item="item">
-          <div style="display: flex; user-select: none; cursor: pointer">
-            <div
-              [style.background]="item.color"
-              style="width: 20px; height: 20px"
-            ></div>
-            <span class="ms-1">{{ item.label }}</span>
-          </div>
-        </ng-template>
-      </div>
-      <div class="col-4">
-        <button class="my-button submit" [disabled]="!canAdd()">
-          Thêm lịch trình
-        </button>
-      </div>
+      </ng-template>
+      <button class="ms-4 my-btn my-bg-primary" [disabled]="!canAdd()">
+        Thêm lịch trình
+      </button>
     </div>
   </form>
+</div>
 
-  <div class="d-flex justify-content-center align-items-center mt-5">
-    <button type="button" class="my-button cancel mx-1" (click)="cancel()">
-      Hủy
-    </button>
-    <button
-      type="submit"
-      class="my-button submit mx-1"
-      type="button"
-      [disabled]="!canSave"
-      (click)="save()"
-    >
-      Lưu
-    </button>
-  </div>
+<div class="d-flex justify-content-center gap-4">
+  <button type="button" class="my-btn" (click)="cancel()" style="width: 80px">
+    Hủy
+  </button>
+  <button
+    type="submit"
+    class="my-btn my-bg-primary"
+    type="button"
+    [disabled]="!canSave"
+    (click)="save()"
+    style="width: 80px"
+  >
+    Lưu
+  </button>
 </div>

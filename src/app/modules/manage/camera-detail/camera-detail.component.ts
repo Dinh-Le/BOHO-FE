@@ -60,23 +60,21 @@ export class CameraDetailComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this._activatedRoute.params
-      .pipe(
-        switchMap(({ nodeId, cameraId }) =>
-          this._deviceService.find(nodeId, cameraId)
-        )
-      )
-      .subscribe({
-        next: ({ data }) => {
-          this._camera = data;
+    this._activatedRoute.params.subscribe({
+      next: ({ nodeId, cameraId }) => {
+        this._deviceService.find(nodeId, cameraId).subscribe({
+          next: ({ data: camera }) => {
+            this._camera = camera;
 
-          for (let i = 2; i < this.menuItems.length; i++) {
-            this.menuItems[i].visible = data.camera.type === 'PTZ';
-          }
-        },
-        error: (err: HttpErrorResponse) =>
-          this._toastService.showError(err.error?.message ?? err.message),
-      });
+            for (let i = 2; i < this.menuItems.length; i++) {
+              this.menuItems[i].visible = this._camera.camera.type === 'PTZ';
+            }            
+          },
+        });
+      },
+      error: (err: HttpErrorResponse) =>
+        this._toastService.showError(err.error?.message ?? err.message),
+    });
 
     const { url } = this._router;
     const currentMenuItem = this.menuItems.find((e) => url.endsWith(e.path!));
