@@ -35,6 +35,7 @@ import { AutoResizeDirective } from './node-dashboard/auto-resize.directive';
 import { GroupNodeDashboardComponent } from './group-node-dashboard/group-node-dashboard.component';
 import { CameraDashboardComponent } from './camera-dashboard/camera-dashboard.component';
 import { EmptyComponent } from './empty/empty.component';
+import { FormDialogComponent } from '@shared/components/form-dialog/form-dialog.component';
 
 @NgModule({
   declarations: [
@@ -75,6 +76,7 @@ import { EmptyComponent } from './empty/empty.component';
     NgbDropdownModule,
     LeafletModule,
     NgChartsModule,
+    FormDialogComponent,
   ],
 })
 export class ManageModule {}

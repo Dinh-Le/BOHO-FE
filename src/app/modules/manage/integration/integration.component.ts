@@ -1,4 +1,10 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import {
+  Component,
+  HostBinding,
+  OnDestroy,
+  OnInit,
+  inject,
+} from '@angular/core';
 import {
   ColumnConfig,
   ExpandableTableRowItemModelBase,
@@ -116,6 +122,7 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
   styleUrls: ['../shared/my-input.scss'],
 })
 export class IntegrationComponent implements OnInit, OnDestroy {
+  @HostBinding('class') classNames = 'd-flex flex-column flex-grow-1';
   private _modalService = inject(NgbModal);
   private _navigationService = inject(NavigationService);
   private _integrationService = inject(IntegrationService);
@@ -253,6 +260,10 @@ export class IntegrationComponent implements OnInit, OnDestroy {
 
   add() {
     const rowItem = new RowItemModel();
+    const index =
+      this.data.filter((it) => /Analytic event - Milestone \d+/.test(it.name))
+        .length + 1;
+    rowItem.form.get('name')?.setValue(`Analytic event - Milestone ${index}`);
     rowItem.isExpanded = rowItem.isEditable = rowItem.isNew = true;
     this.data.push(rowItem);
   }

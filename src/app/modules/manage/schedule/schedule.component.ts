@@ -1,4 +1,10 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import {
+  Component,
+  HostBinding,
+  OnDestroy,
+  OnInit,
+  inject,
+} from '@angular/core';
 import {
   ColumnConfig,
   ExpandableTableRowItemModelBase,
@@ -99,6 +105,8 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
   styleUrls: ['../shared/my-input.scss'],
 })
 export class ScheduleComponent implements OnInit, OnDestroy {
+  @HostBinding('class') classNames = 'flex-grow-1 d-flex flex-column';
+
   _activatedRoute = inject(ActivatedRoute);
   _scheduleService = inject(ScheduleService);
   _toastService = inject(ToastService);

@@ -41,6 +41,9 @@ interface PtzSchedule {
   selector: 'app-tour-settings',
   templateUrl: 'tour-settings.component.html',
   styleUrls: ['tour-settings.component.scss', '../../shared/my-input.scss'],
+  host: {
+    class: 'flex-grow-1 d-flex flex-column my-bg-default px-5 pb-5 pt-1',
+  },
 })
 export class TourSettingsComponent implements OnInit, OnDestroy {
   private _patrolService = inject(PatrolService);
@@ -83,7 +86,7 @@ export class TourSettingsComponent implements OnInit, OnDestroy {
   get journeyList(): SelectItemModel[] {
     const isPatrolType = this.form.get('type')!.value === 'patrol';
     const sources = isPatrolType ? this.patrols : this.presets;
-    const offset = isPatrolType ? 0 : this.presets.length;
+    const offset = isPatrolType ? 0 : this.patrols.length;
     const items = sources.map((e, index) => ({
       value: e.id,
       label: e.name,
@@ -116,11 +119,11 @@ export class TourSettingsComponent implements OnInit, OnDestroy {
           return this._patrolService.findAll(this._nodeId, this._cameraId);
         }),
         switchMap(({ data: patrols }) => {
-          this.patrols = patrols;
+          this.patrols = patrols ?? [];
           return this._presetService.findAll(this._nodeId, this._cameraId);
         }),
         switchMap(({ data: presets }) => {
-          this.presets = presets;
+          this.presets = presets ?? [];
           return this._tourService.findAll(this._nodeId, this._cameraId);
         })
       )

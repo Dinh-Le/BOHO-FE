@@ -1,87 +1,123 @@
-<div class="patrol-container full-height">
-  <div class="patrol">
-    <app-editable-list-view
+<div class="my-text-white fs-18">Tuần tra PTZ</div>
+<div class="d-flex mt-3 flex-grow-1 flex-column">
+  <div>Tên tuần tra:</div>
+  <div class="d-flex">
+    <app-select-2
+      [(ngModel)]="selectedPatrol"
+      (ngModelChange)="onSelectedPatrolChanged()"
       [items]="patrols"
-      title="Tuần tra"
-      (save)="save($event)"
-      (remove)="remove($event)"
-      (change)="onPatrolSelected($event)"
-    ></app-editable-list-view>
-    <div class="d-flex mt-3 justify-content-center">
-      <button class="my-button submit mx-2" (click)="add()">Thêm</button>
-      <button
-        class="my-button submit mx-2"
-        (click)="play($event, snapshot)"
-        [disabled]="patrolManagementList.length === 0"
-      >
-        Chạy
-      </button>
-    </div>
+      style="width: 40%"
+    ></app-select-2>
+    <button
+      class="my-btn ms-4 my-bg-primary"
+      style="min-width: 150px"
+      (click)="add(patrol)"
+    >
+      Thêm
+    </button>
+    <button
+      class="my-btn ms-3"
+      style="min-width: 150px"
+      [disabled]="!this.selectedPatrol"
+      (click)="rename(patrol)"
+    >
+      Đặt tên
+    </button>
+    <button
+      class="my-btn ms-3"
+      style="min-width: 150px"
+      (click)="remove()"
+      [disabled]="!this.selectedPatrol"
+    >
+      Xóa
+    </button>
   </div>
-  <div class="preview">
-    <div class="text-white">Xem trước:</div>
-    <div class="d-flex justify-content-start">
-      <div
-        class="ratio ratio-16x9 border border-1 border-light"
-        style="width: 320px"
-      >
-        <img #snapshot class="w-100" />
-      </div>
+  <div class="mt-3">Tiểu sử:</div>
+  <div class="d-flex gap-4">
+    <div
+      class="overflow-y-auto"
+      style="height: 300px; background: #d8d8d8ff; width: 60%; padding: 1px"
+    >
+      <table class="w-100">
+        <colgroup>
+          <col width="auto" />
+          <col width="150" />
+          <col width="150" />
+        </colgroup>
+        <thead style="background: #7f7f7fff; color: #d8d8d8">
+          <th class="px-2 py-1">Điểm giám sát</th>
+          <th class="px-2 py-1">Thời gian dừng (s)</th>
+          <th class="px-2 py-1">Thời gian chuyển (s)</th>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let item of patrolManagements; trackBy: trackById"
+            [ngClass]="item.isSelected ? 'my-bg-primary' : ''"
+            class="cursor-pointer my-bg-primary-hover user-select-none"
+            (click)="item.isSelected = !item.isSelected"
+          >
+            <td class="px-2 py-1 text-dark">{{ item.presetName }}</td>
+            <td class="px-2 py-1 text-dark text-center">
+              {{ item.stand_time }}
+            </td>
+            <td class="px-2 py-1 text-dark text-center">
+              {{ item.moving_time }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-  </div>
-  <div class="preset-management">
-    <div class="preset-management left">
-      <div class="table-wrapper">
-        <table>
-          <colgroup>
-            <col width="auto" />
-            <col span="2" width="150" />
-            <col width="32" />
-          </colgroup>
-          <thead>
-            <th>Điểmm giám sát</th>
-            <th>Thời gian dừng (s)</th>
-            <th>Thời gian chuyển (s)</th>
-            <th></th>
-          </thead>
-          <tbody>
-            <tr
-              *ngFor="let item of patrolManagementList; trackBy: trackById"
-              [class.active]="item.isRunning"
-            >
-              <td>{{ item.presetName }}</td>
-              <td>
-                {{ item.stand_time }}
-              </td>
-              <td>
-                {{ item.moving_time }}
-              </td>
-              <td>
-                <i
-                  class="func-button bi bi-trash-fill"
-                  (click)="detetePatrolManagement(item)"
-                ></i>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <div>
+      <div class="d-flex flex-column gap-3" style="min-width: 100px">
+        <button
+          class="my-btn my-bg-primary"
+          [disabled]="!this.selectedPatrol"
+          (click)="addPatrolManagement()"
+        >
+          Thêm điểm giám sát
+        </button>
+        <button
+          class="my-btn"
+          [disabled]="!canDeletePatrolManagement"
+          (click)="removeSelectedPatrolManagement()"
+        >
+          Xóa điểm giám sát
+        </button>
       </div>
-    </div>
-    <div class="preset-management right">
-      <button
-        type="button"
-        (click)="addPatrolManagement()"
-        [disabled]="!selectedPatrol"
-      >
-        Thêm
-      </button>
-      <button
-        type="button"
-        (click)="updatePatrolManagementList()"
-        [disabled]="!selectedPatrol || patrolManagementList.length === 0"
-      >
-        Lưu
-      </button>
     </div>
   </div>
 </div>
+<div class="d-flex justify-content-center gap-4">
+  <button
+    class="my-btn"
+    style="width: 80px"
+    [disabled]="selectedPatrol?.value == -1"
+    (click)="cancel()"
+  >
+    Hủy
+  </button>
+  <button
+    class="my-btn my-bg-primary"
+    style="width: 80px"
+    (click)="save($event)"
+    [disabled]="!this.selectedPatrol"
+  >
+    Lưu
+  </button>
+</div>
+
+<ng-template #patrol>
+  <app-form-dialog
+    [formGroup]="patrolForm"
+    title="Thêm tuần tra"
+    [canSubmit]="patrolForm.valid"
+    (cancel)="activeModal?.dismiss()"
+    (submit)="activeModal?.close(patrolForm.value)"
+  >
+    <input type="hidden" formControlName="id" />
+    <div class="form-group">
+      <label>Tên</label>
+      <input class="form-control" formControlName="name" />
+    </div>
+  </app-form-dialog>
+</ng-template>

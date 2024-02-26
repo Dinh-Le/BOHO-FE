@@ -1,11 +1,9 @@
 import { Component, HostBinding, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Store } from '@ngrx/store';
 import { ViewMode } from '@shared/components/tree-view/view-mode.enum';
 import {
   Level2Menu,
   NavigationService,
-  SideMenuItemType,
 } from 'src/app/data/service/navigation.service';
 
 @Component({

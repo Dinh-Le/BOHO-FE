@@ -53,4 +53,5 @@ export interface Device {
   camera: Camera;
   node_id?: string;
   status?: string;
+  address?: string;
 }

@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   Component,
+  HostBinding,
   OnDestroy,
   OnInit,
   TemplateRef,
@@ -23,12 +24,7 @@ import {
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { PresetService } from 'src/app/data/service/preset.service';
 import { ScheduleService } from 'src/app/data/service/schedule.service';
-import {
-  Subscription,
-  filter,
-  of,
-  switchMap,
-} from 'rxjs';
+import { Subscription, filter, of, switchMap } from 'rxjs';
 import { ToastService } from '@app/services/toast.service';
 import { Objects, RuleTypes, Severities } from 'src/app/data/constants';
 import { Point } from '@shared/components/bounding-box-editor/bounding-box-editor.component';
@@ -206,6 +202,8 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
   styleUrls: ['./rule.component.scss', '../shared/my-input.scss'],
 })
 export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
+  @HostBinding('class') classNames = 'flex-grow-1 d-flex flex-column';
+
   @ViewChild('objectColumnTemplate', { static: true })
   objectColumnTemplate!: TemplateRef<any>;
 
@@ -326,6 +324,11 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
 
   add() {
     const newItem = new RowItemModel();
+    const index =
+      this.data.filter((it) => /Quy tắc mới \d\d\d/.test(it.name)).length + 1;
+    newItem.form
+      .get('name')
+      ?.setValue(`Quy tắc mới ${index.toString().padStart(3, '0')}`);
     newItem.isEditable = true;
     newItem.isExpanded = true;
     newItem.isNew = true;

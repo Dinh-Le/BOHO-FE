@@ -191,6 +191,7 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
         driver: item.driver,
         connection_metadata: {},
       },
+      location: HoChiMinhCoord,
     };
 
     if (item.isRtsp) {

@@ -10,7 +10,7 @@
     [style.display]="item.visible ? 'block' : 'none'"
   >
     <a
-      class="text-white text-decoration-none"
+      class="my-text-white text-decoration-none"
       (click)="handleMenuItemClicked(item)"
     >
       <i class="bi" [ngClass]="item.icon"></i>
@@ -18,6 +18,5 @@
     </a>
   </div>
 </div>
-<div class="content-wrapper">
-  <router-outlet></router-outlet>
-</div>
+
+<router-outlet></router-outlet>
