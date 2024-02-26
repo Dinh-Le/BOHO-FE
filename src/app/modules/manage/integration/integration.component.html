@@ -1,18 +1,17 @@
-<div class="menu-container px-2" style="justify-content: space-between">
-  <span>Tích hợp</span>
-  <button
-    class="btn btn-primary text-white px-2"
-    (click)="add()"
-    [disabled]="!addable"
-  >
-    <i class="bi bi-plus px-1"></i>Thêm
+<div class="menu-container px-2 align-items-center">
+  <span class="fw-bold my-text-white">Tích hợp sự kiện</span>
+  <button class="ms-auto my-btn-primary" (click)="add()" [disabled]="!addable">
+    <i class="bi bi-plus me-1"></i>Thêm
   </button>
 </div>
-<app-expandable-table
-  [data]="data"
-  [columns]="columns"
-  [collapseContentTemplateRef]="contentTemplate"
-></app-expandable-table>
+<div class="flex-grow-1 flex-basis-0 overflow-y-auto overflow-x-hidden">
+  <app-expandable-table
+    [data]="data"
+    [columns]="columns"
+    [collapseContentTemplateRef]="contentTemplate"
+  ></app-expandable-table>
+</div>
+
 <ng-template #contentTemplate let-row="data">
   <form [formGroup]="row.form">
     <div class="row mt-2">

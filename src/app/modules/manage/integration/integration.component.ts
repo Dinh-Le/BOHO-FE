@@ -1,4 +1,10 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import {
+  Component,
+  HostBinding,
+  OnDestroy,
+  OnInit,
+  inject,
+} from '@angular/core';
 import {
   ColumnConfig,
   ExpandableTableRowItemModelBase,
@@ -116,6 +122,7 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
   styleUrls: ['../shared/my-input.scss'],
 })
 export class IntegrationComponent implements OnInit, OnDestroy {
+  @HostBinding('class') classNames = 'd-flex flex-column flex-grow-1';
   private _modalService = inject(NgbModal);
   private _navigationService = inject(NavigationService);
   private _integrationService = inject(IntegrationService);
