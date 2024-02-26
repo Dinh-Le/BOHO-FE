@@ -1,4 +1,95 @@
-<div class="patrol-container full-height">
+<div class="my-text-white fs-18">Tuần tra PTZ</div>
+<div class="d-flex mt-3 flex-grow-1 flex-column">
+  <div>Tên tuần tra:</div>
+  <div class="d-flex">
+    <app-select-2
+      [(ngModel)]="selectedPatrol"
+      (ngModelChange)="onSelectedPatrolChanged()"
+      [items]="patrols"
+      style="width: 40%"
+    ></app-select-2>
+    <button
+      class="my-btn ms-4 my-bg-primary"
+      style="min-width: 150px"
+      (click)="add(patrol)"
+    >
+      Thêm
+    </button>
+    <button
+      class="my-btn ms-3"
+      style="min-width: 150px"
+      (click)="rename(patrol)"
+    >
+      Đặt tên
+    </button>
+    <button class="my-btn ms-3" style="min-width: 150px" (click)="remove()">
+      Xóa
+    </button>
+  </div>
+  <div class="mt-3">Tiểu sử:</div>
+  <div class="d-flex gap-4">
+    <div
+      class="overflow-y-auto"
+      style="height: 300px; background: #d8d8d8ff; width: 60%"
+    >
+      <table class="w-100">
+        <colgroup>
+          <col width="auto" />
+          <col width="150" />
+          <col width="150" />
+        </colgroup>
+        <thead style="background: #7f7f7fff; color: #d8d8d8">
+          <th class="px-2 py-1">Điểm giám sát</th>
+          <th class="px-2 py-1">Thời gian dừng (s)</th>
+          <th class="px-2 py-1">Thời gian chuyển (s)</th>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="px-2 py-1"></td>
+            <td class="px-2 py-1"></td>
+            <td class="px-2 py-1"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <div class="d-flex flex-column gap-3" style="min-width: 100px">
+        <button
+          class="my-btn my-bg-primary"
+          [disabled]="!this.selectedPatrol"
+          (click)="addPatrolManagement()"
+        >
+          Thêm điểm giám sát
+        </button>
+        <button
+          class="my-btn"
+          [disabled]="
+            !this.selectedPatrol || this.patrolManagementList.length === 0
+          "
+        >
+          Xóa điểm giám sát
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="d-flex justify-content-center gap-4">
+  <button
+    class="my-btn"
+    style="width: 80px"
+    (click)="loadPatrolManagementList()"
+  >
+    Hủy
+  </button>
+  <button
+    class="my-btn my-bg-primary"
+    style="width: 80px"
+    (click)="submitPatrolManagementList()"
+  >
+    Lưu
+  </button>
+</div>
+<!-- <div class="patrol-container full-height d-none">
   <div class="patrol">
     <app-editable-list-view
       [items]="patrols"
@@ -84,4 +175,20 @@
       </button>
     </div>
   </div>
-</div>
+</div> -->
+
+<ng-template #patrol>
+  <app-form-dialog
+    [formGroup]="patrolForm"
+    title="Thêm tuần tra"
+    [canSubmit]="patrolForm.valid"
+    (cancel)="activeModal?.dismiss()"
+    (submit)="activeModal?.close(patrolForm.value)"
+  >
+    <input type="hidden" formControlName="id" />
+    <div class="form-group">
+      <label>Tên</label>
+      <input class="form-control" formControlName="name" />
+    </div>
+  </app-form-dialog>
+</ng-template>

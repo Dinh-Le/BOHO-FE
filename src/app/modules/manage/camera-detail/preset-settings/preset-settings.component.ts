@@ -4,11 +4,8 @@ import { PresetService } from 'src/app/data/service/preset.service';
 import { ActivatedRoute } from '@angular/router';
 import {
   Subscription,
-  catchError,
   filter,
   finalize,
-  of,
-  pipe,
   switchMap,
 } from 'rxjs';
 import { ToastService } from '@app/services/toast.service';
