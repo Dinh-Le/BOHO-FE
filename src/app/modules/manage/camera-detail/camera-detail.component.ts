@@ -1,6 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { switchMap } from 'rxjs';
 import { DeviceService } from 'src/app/data/service/device.service';
 import { Device } from 'src/app/data/schema/boho-v2';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -68,7 +67,7 @@ export class CameraDetailComponent implements OnInit {
 
             for (let i = 2; i < this.menuItems.length; i++) {
               this.menuItems[i].visible = this._camera.camera.type === 'PTZ';
-            }            
+            }
           },
         });
       },
