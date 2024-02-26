@@ -260,6 +260,10 @@ export class IntegrationComponent implements OnInit, OnDestroy {
 
   add() {
     const rowItem = new RowItemModel();
+    const index =
+      this.data.filter((it) => /Analytic event - Milestone \d+/.test(it.name))
+        .length + 1;
+    rowItem.form.get('name')?.setValue(`Analytic event - Milestone ${index}`);
     rowItem.isExpanded = rowItem.isEditable = rowItem.isNew = true;
     this.data.push(rowItem);
   }
