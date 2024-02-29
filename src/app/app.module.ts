@@ -21,6 +21,7 @@ import {
 } from '@fortawesome/angular-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { NgChartsModule } from 'ng2-charts';
+import { MqttModule } from 'ngx-mqtt';
 
 @NgModule({
   imports: [
@@ -35,6 +36,7 @@ import { NgChartsModule } from 'ng2-charts';
     NgChartsModule,
 
     StoreModule.forRoot({ sidebar: sidebarReducer }),
+    MqttModule.forRoot({ connectOnCreate: false }),
 
     // core & shared
     CoreModule.forRoot(),

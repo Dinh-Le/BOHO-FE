@@ -26,15 +26,15 @@
 }
 
 .my-bg-default {
-  background: var(--my-bg-default);
+  background: var(--my-bg-default) !important;
 }
 
 .my-bg-primary {
-  background: var(--my-bg-primary);
+  background: var(--my-bg-primary) !important;
 }
 
 .my-bg-secondary {
-  background: var(--my-bg-secondary);
+  background: var(--my-bg-secondary) !important;
 }
 
 .my-btn-primary {

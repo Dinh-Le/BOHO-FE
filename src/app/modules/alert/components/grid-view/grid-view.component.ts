@@ -6,7 +6,7 @@ import {
   ViewContainerRef,
   inject,
 } from '@angular/core';
-import { EventInfo } from '../../models';
+import { MqttEventMessage } from '@modules/alert/alert.component';
 
 @Component({
   selector: 'app-grid-view',
@@ -15,10 +15,9 @@ import { EventInfo } from '../../models';
 })
 export class GridViewComponent implements OnChanges {
   private _viewContainerRef = inject(ViewContainerRef);
-  @Input() events: EventInfo[] = [];
+  @Input() events: MqttEventMessage[] = [];
   @Input() col: number = 2;
   @Input() maxLength: number = 50;
-  
 
   ngOnChanges(changes: SimpleChanges): void {
     if ('col' in changes) {
@@ -27,6 +26,10 @@ export class GridViewComponent implements OnChanges {
         'gridTemplateColumns'
       ] = `repeat(${changes['col'].currentValue}, 1fr)`;
     }
+  }
+
+  trackByDetectionId(_: number, data: MqttEventMessage) {
+    return data.detection_id;
   }
 
   get count() {

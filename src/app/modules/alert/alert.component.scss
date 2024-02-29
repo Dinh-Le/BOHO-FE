@@ -156,8 +156,10 @@ button:disabled {
       }
 
       .sub-menu {
-        left: 200px;
-        top: 0px !important;
+        left: 198px;
+        top: -2px !important;
+        margin-top: 2px;
+        padding-inline-start: 2px;
       }
 
       .menu > li {

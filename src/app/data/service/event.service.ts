@@ -22,8 +22,8 @@ export abstract class EventService extends RestfullApiService {
   ): Observable<ResponseBase>;
   public abstract getImage(
     nodeId: string,
-    deviceId: number,
-    eventId: number,
+    deviceId: string | number,
+    eventId: string,
     type: 'full' | 'crop'
   ): Observable<Blob>;
   public abstract verify(
@@ -60,8 +60,8 @@ export class EventServiceImpl extends EventService {
 
   public override getImage(
     nodeId: string,
-    deviceId: number,
-    eventId: number,
+    deviceId: string |number,
+    eventId: string,
     type: 'full' | 'crop'
   ): Observable<Blob> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/event/${eventId}/image`;
