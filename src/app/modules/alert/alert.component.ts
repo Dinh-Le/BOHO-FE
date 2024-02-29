@@ -16,6 +16,7 @@ import { DeviceService } from 'src/app/data/service/device.service';
 import { EventService } from 'src/app/data/service/event.service';
 import { Device } from 'src/app/data/schema/boho-v2';
 import { Objects, Severities } from 'src/app/data/constants';
+import { NavigationService } from 'src/app/data/service/navigation.service';
 
 export interface MqttEventMessage {
   node_id: string;
@@ -47,6 +48,7 @@ interface FilterOptions {
   level: number;
   object: string;
   rule_name: string;
+  device_ids: string[];
 }
 
 @Component({
@@ -100,18 +102,19 @@ export class AlertComponent implements OnInit, OnDestroy {
     { label: 'Vượt đường kẻ', value: 'tripwire event' },
     { label: 'Đỗ xe sai nơi quy định', value: 'sabotage event' },
   ];
-  severities: SelectItemModel[] = Severities.map(e => ({
+  severities: SelectItemModel[] = Severities.map((e) => ({
     value: e.id,
-    label: e.name
-  }))
-  objectTypes: SelectItemModel[] = Objects.map(e => ({
+    label: e.name,
+  }));
+  objectTypes: SelectItemModel[] = Objects.map((e) => ({
     value: e.id,
-    label: e.name
+    label: e.name,
   }));
   filterOptions: FilterOptions = {
-    level: -1,
+    level: 0,
     object: 'all',
     rule_name: 'all',
+    device_ids: [],
   };
 
   private _subscriptions: Subscription[] = [];
@@ -139,7 +142,8 @@ export class AlertComponent implements OnInit, OnDestroy {
   constructor(
     private _mqttService: MqttService,
     private _deviceService: DeviceService,
-    private _eventService: EventService
+    private _eventService: EventService,
+    private _navigationService: NavigationService
   ) {}
 
   ngOnInit(): void {
@@ -173,7 +177,8 @@ export class AlertComponent implements OnInit, OnDestroy {
             event.object_type = 'people';
           }
 
-          event.object_icon = Objects.find(o => o.id === event.object_type)?.icon ?? '';
+          event.object_icon =
+            Objects.find((o) => o.id === event.object_type)?.icon ?? '';
 
           console.log('Received new event:', event);
           return event;
@@ -183,18 +188,41 @@ export class AlertComponent implements OnInit, OnDestroy {
             return false;
           }
 
-          if (this.filterOptions.level >= 0 && this.filterOptions.level !== event.level) {
+          if (
+            this.filterOptions.level > 0 &&
+            this.filterOptions.level !== event.level
+          ) {
             return false;
           }
 
-          if (this.filterOptions.rule_name !== 'all' && this.filterOptions.rule_name !== event.alarm_type.toLowerCase()) {
+          if (
+            this.filterOptions.rule_name !== 'all' &&
+            this.filterOptions.rule_name !== event.alarm_type.toLowerCase()
+          ) {
             return false;
           }
 
-          if (this.filterOptions.object !== 'all' && this.filterOptions.object !== event.object_type) {
+          if (
+            this.filterOptions.object !== 'all' &&
+            this.filterOptions.object !== event.object_type
+          ) {
             return false;
           }
 
+          const noSelectedDevices = Object.values(
+            this._navigationService.selectedDeviceIds
+          ).every((devices) => Object.keys(devices).length === 0);
+          if (
+            noSelectedDevices ||
+            !(
+              event.node_id in this._navigationService.selectedDeviceIds &&
+              event.camera_id.toString() in
+                this._navigationService.selectedDeviceIds[event.node_id]
+            )
+          ) {
+            return false;
+          }
+            
           return true;
         }), // filter here,
         tap(() => {
@@ -228,7 +256,16 @@ export class AlertComponent implements OnInit, OnDestroy {
     this._mqttService.disconnect(true);
   }
 
-  trackByValue(_:number, item: SelectItemModel) {
+  trackByValue(_: number, item: SelectItemModel) {
     return item.value;
+  }
+
+  clearFilter() {
+    this.filterOptions = {
+      level: 0,
+      object: 'all',
+      rule_name: 'all',
+      device_ids: [],
+    };
   }
 }
