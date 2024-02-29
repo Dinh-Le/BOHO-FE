@@ -1,7 +1,14 @@
 <div class="toolbar">
   <div class="left">
-    <button><i class="bi bi-pause-fill"></i></button>
-    <button><i class="bi bi-volume-mute-fill"></i></button>
+    <button (click)="isPaused = !isPaused">
+      <i class="bi" [ngClass]="isPaused ? 'bi-play-fill' : 'bi-pause-fill'"></i>
+    </button>
+    <button (click)="isMuted = !isMuted">
+      <i
+        class="bi"
+        [ngClass]="isMuted ? 'bi-volume-mute-fill' : 'bi-volume-up-fill'"
+      ></i>
+    </button>
     <div class="time-intervals">
       <button><i class="bi bi-clock"></i></button>
       <div class="dropdown-content">
@@ -33,8 +40,15 @@
             <span>Loại đối tượng</span> <i class="bi bi-chevron-right"></i>
           </div>
           <ul class="menu sub-menu">
-            <li>Người</li>
-            <li>Ô tô</li>
+            <li
+              *ngFor="let item of objectTypes; trackBy: trackByValue"
+              (click)="filterOptions.object = item.value"
+              [ngClass]="
+                item.value === filterOptions.object ? 'my-bg-primary' : ''
+              "
+            >
+              {{ item.label }}
+            </li>
           </ul>
         </li>
         <li>
@@ -42,9 +56,15 @@
             <span>Mức độ nghiêm trọng</span> <i class="bi bi-chevron-right"></i>
           </div>
           <ul class="menu sub-menu">
-            <li>Cao</li>
-            <li>Trung bình</li>
-            <li>Bình thường</li>
+            <li
+              *ngFor="let item of severities; trackBy: trackByValue"
+              (click)="filterOptions.level = item.value"
+              [ngClass]="
+                item.value === filterOptions.level ? 'my-bg-primary' : ''
+              "
+            >
+              {{ item.label }}
+            </li>
           </ul>
         </li>
         <li>
@@ -52,10 +72,15 @@
             <span>Nhóm quy tắc</span> <i class="bi bi-chevron-right"></i>
           </div>
           <ul class="menu sub-menu">
-            <li>Vượt đường kẻ</li>
-            <li>Xâm nhập vùng</li>
-            <li>Đi luẩn quẩn</li>
-            <li>Đỗ xe sai nơi quy định</li>
+            <li
+              *ngFor="let item of ruleTypes; trackBy: trackByValue"
+              (click)="filterOptions.rule_name = item.value"
+              [ngClass]="
+                item.value === filterOptions.rule_name ? 'my-bg-primary' : ''
+              "
+            >
+              {{ item.label }}
+            </li>
           </ul>
         </li>
         <li>Loại quy tắc</li>
@@ -147,13 +172,17 @@
   <container-element [ngSwitch]="viewMode">
     <app-grid-view
       *ngSwitchCase="'grid'"
-      [events]="events"
+      [events]="currentMqttEvents"
       [col]="gridCol"
-      [maxLength]="25"
+      [maxLength]="paginationInfo.pageLength"
     ></app-grid-view>
     <app-map-view *ngSwitchCase="'map'"></app-map-view>
     <app-list-view-alert *ngSwitchCase="'list'"></app-list-view-alert>
   </container-element>
 </div>
 
-<app-pagination class="paginationbar" [totalItems]="1000"></app-pagination>
+<app-pagination
+  class="paginationbar"
+  [(ngModel)]="paginationInfo"
+  [totalItems]="mqttEvents.length"
+></app-pagination>

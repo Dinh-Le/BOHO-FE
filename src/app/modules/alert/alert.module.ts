@@ -8,6 +8,7 @@ import { MapViewComponent } from './components/map-view/map-view.component';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { MapEventInfoComponent } from './components/map-view/map-event-info/map-event-info.component';
 import { ListViewComponent } from './components/list-view/list-view.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -17,6 +18,12 @@ import { ListViewComponent } from './components/list-view/list-view.component';
     MapViewComponent,
     MapEventInfoComponent,
   ],
-  imports: [CommonModule, SharedModule, AlertRoutingModule, LeafletModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    SharedModule,
+    AlertRoutingModule,
+    LeafletModule
+  ],
 })
 export class AlertModule {}

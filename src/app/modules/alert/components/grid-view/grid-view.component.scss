@@ -1,12 +1,15 @@
 :host {
+  grid-auto-rows: 1fr;
   display: grid;
+  row-gap: 1px;
+  column-gap: 1px;
   background: #bfbfbf;
-  gap: 1px;
   border: 1px solid #bfbfbf;
 }
 
 .event-container {
   background: #28282aff;
+  aspect-ratio: 16/9;
 
   .event-info {
     display: flex;

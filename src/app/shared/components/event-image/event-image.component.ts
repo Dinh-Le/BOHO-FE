@@ -67,6 +67,7 @@ export class EventImage implements AfterViewInit, OnChanges {
           this.image = new Image();
           this.image.onload = () => {
             const canvas = this.canvasRef.nativeElement as HTMLCanvasElement;
+            
             let { bottomrightx, bottomrighty, topleftx, toplefty } =
               this.event.images_info[this.index].bounding_box;
             if (bottomrightx < topleftx) {
