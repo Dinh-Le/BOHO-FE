@@ -122,8 +122,18 @@
     />
   </div>
   <div class="form-item">
+    <label class="label">Loại quy tắc</label>
+    <app-select-2
+      [styles]="{
+        'border-radius': 0
+      }"
+      [items]="ruleItems"
+      formControlName="rule"
+    ></app-select-2>
+  </div>
+  <div class="form-item">
     <label>Đối đối tượng</label>
-    <ul class="list-unstyle control" style="min-height: 80px">
+    <ul class="list-unstyle control mb-0" style="min-height: 80px">
       <li
         *ngFor="let item of selectedObjects; trackBy: trackById"
         class="d-flex align-items-center"
@@ -146,17 +156,8 @@
       Thêm
     </button>
   </div>
-  <div class="form-item">
-    <label class="label">Quy tắc</label>
-    <app-select-2
-      [styles]="{
-        'border-radius': 0
-      }"
-      [items]="ruleItems"
-      formControlName="rule"
-    ></app-select-2>
-  </div>
-  <div class="form-item">
+  
+  <!-- <div class="form-item">
     <label class="label">T.gian giữa 2 kết quả</label>
     <div class="d-flex">
       <app-numeric-input
@@ -188,7 +189,7 @@
         }"
       ></app-numeric-input>
     </div>
-  </div>
+  </div> -->
   <div class="form-item">
     <label for="licensePlate" class="label">Biển số xe</label>
     <input

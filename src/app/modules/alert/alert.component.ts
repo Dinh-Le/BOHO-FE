@@ -21,6 +21,7 @@ import { NavigationService } from 'src/app/data/service/navigation.service';
 export interface MqttEventMessage {
   node_id: string;
   camera_id: string;
+  device_id?: string;
   camera_name: string;
   event_time: string;
   preset_id: number;
@@ -39,6 +40,16 @@ export interface MqttEventMessage {
     bottomrightx: number;
     bottomrighty: number;
   };
+  images_info: {
+    detection_id: string;
+    bounding_box: {
+      topleftx: number;
+      toplefty: number;
+      bottomrightx: number;
+      bottomrighty: number;
+    };
+    bounding_box_color: string;
+  }[];
   object_type: string;
   background_color?: string;
   object_icon: string;
@@ -93,7 +104,44 @@ export class AlertComponent implements OnInit, OnDestroy {
   gridCol: number = 5;
   viewMode: 'grid' | 'map' | 'list' = 'grid';
   events: EventInfo[] = [{}];
-  mqttEvents: MqttEventMessage[] = [];
+  mqttEvents: MqttEventMessage[] = [
+    {
+      camera_id: '65',
+      camera_name: 'Camerra 188',
+      event_time: '2024-03-01T00:48:39.604596+07',
+      preset_id: 141,
+      level: 3,
+      tracking_number: '108424',
+      alarm_type: 'TRESPASSING EVENT',
+      rule_id: 71,
+      event_id: '9f5217f7-9183-456b-8ae7-99532a82fcab',
+      detection_id: 'a5011cf8-1ad7-4720-89e1-daacaf79a21e',
+      bounding_box: {
+        topleftx: 444,
+        toplefty: 670,
+        bottomrightx: 586,
+        bottomrighty: 795,
+      },
+      object_type: 'car',
+      rule_name: 'TRESPASSING EVENT',
+      node_id: '8732910f-bb14-4cd4-8ecd-9bee6f335b1a',
+      background_color: '#b84043ff',
+      object_icon: 'side-car',
+      images_info: [
+        {
+          detection_id: 'a5011cf8-1ad7-4720-89e1-daacaf79a21e',
+          bounding_box: {
+            topleftx: 444,
+            toplefty: 670,
+            bottomrightx: 586,
+            bottomrighty: 795,
+          },
+          bounding_box_color: 'green',
+        },
+      ],
+      device_id: '65',
+    },
+  ];
   isMuted: boolean = false;
   isPaused: boolean = false;
   ruleTypes: SelectItemModel[] = [
@@ -177,8 +225,18 @@ export class AlertComponent implements OnInit, OnDestroy {
             event.object_type = 'people';
           }
 
-          event.object_icon =
-            Objects.find((o) => o.id === event.object_type)?.icon ?? '';
+          const object = Objects.find((o) => o.id === event.object_type);
+          event.object_icon = object?.icon ?? '';
+
+          event.images_info = [
+            {
+              detection_id: event.detection_id,
+              bounding_box: event.bounding_box,
+              bounding_box_color: object?.bounding_box_color ?? 'red',
+            },
+          ];
+
+          event.device_id = event.camera_id;
 
           console.log('Received new event:', event);
           return event;
@@ -209,20 +267,20 @@ export class AlertComponent implements OnInit, OnDestroy {
             return false;
           }
 
-          const noSelectedDevices = Object.values(
-            this._navigationService.selectedDeviceIds
-          ).every((devices) => Object.keys(devices).length === 0);
-          if (
-            noSelectedDevices ||
-            !(
-              event.node_id in this._navigationService.selectedDeviceIds &&
-              event.camera_id.toString() in
-                this._navigationService.selectedDeviceIds[event.node_id]
-            )
-          ) {
-            return false;
-          }
-            
+          // const noSelectedDevices = Object.values(
+          //   this._navigationService.selectedDeviceIds
+          // ).every((devices) => Object.keys(devices).length === 0);
+          // if (
+          //   noSelectedDevices ||
+          //   !(
+          //     event.node_id in this._navigationService.selectedDeviceIds &&
+          //     event.camera_id.toString() in
+          //       this._navigationService.selectedDeviceIds[event.node_id]
+          //   )
+          // ) {
+          //   return false;
+          // }
+
           return true;
         }), // filter here,
         tap(() => {
