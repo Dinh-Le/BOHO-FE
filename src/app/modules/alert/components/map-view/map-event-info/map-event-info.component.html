@@ -1,17 +1,21 @@
-<div class="event-info">
+<div class="d-flex px-3 gap-2 py-1 my-text-white"
+    style="border-bottom: 1px solid #bfbfbf"
+    [ngStyle]="{ background: event?.background_color }" >
   <app-svg-icon
-    class="object-icon"
+    class="align-self-center"
     width="24px"
     height="24px"
-    icon="bicycle"
+    [icon]="event?.object_icon ?? 'people'"
   ></app-svg-icon>
-  <div class="event-detail">
-    <div>10:56:32 16-08-2...</div>
-    <div>Sảnh siêu thị Co...</div>
-    <div>Người di chuyển ...</div>
+  <div class="d-flex flex-column flex-grow-1">
+    <div>{{ event?.device?.address ?? '[Địa chỉ camera]' }}</div>
+    <div>{{ event?.event_time | datetime: 'HH:mm:ss DD-MM-YYYY' }}</div>
+    <div>{{ event?.object_type }},{{event?.alarm_type}}</div>
   </div>
-  <div class="event-controls">
-    <button><i class="bi bi-circle"></i></button>
+  <div class="d-flex flex-column">
+    <i class="bi bi-circle cursor-pointer"></i>
   </div>
 </div>
-<img class="event-image" src="/assets/images/car.png" />
+<div style="aspect-ratio: 16/9">
+  <app-event-image [event]="event"></app-event-image>
+</div>

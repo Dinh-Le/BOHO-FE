@@ -100,7 +100,7 @@ export class MapViewComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnInit(): void {
     this.subscriptions.push(
-      this._navigationService.selectedDeviceChange$.subscribe(() =>
+      this._navigationService.selectedDevices$.subscribe(() =>
         this.refresh()
       )
     );

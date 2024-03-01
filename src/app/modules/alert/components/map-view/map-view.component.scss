@@ -1,20 +1,3 @@
-:host {
-  display: flex;
-
-  height: 100%;
-}
-
-.map {
-  flex-grow: 1;
-}
-
-.event-list {
-  width: 300px;
-  overflow-y: scroll;
-  background: #bfbfbf;
-  gap: 1px;
-}
-
 ::ng-deep .event-popup .leaflet-popup-content-wrapper {
   padding: 0 !important;
   border-radius: 0 !important;

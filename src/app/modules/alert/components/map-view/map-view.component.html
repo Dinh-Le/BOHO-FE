@@ -1,13 +1,18 @@
 <div
-  class="map"
+  class="flex-grow-1"
   leaflet
-  class="w-100 h-100"
   [leafletOptions]="options"
   (leafletMapReady)="onMapReady($event)"
-  (leafletClick)="mapClicked($event)"
 ></div>
-<div class="event-list">
-  <app-map-event-info
-    *ngFor="let item of [].constructor(25)"
-  ></app-map-event-info>
+<div class="overflow-y-auto">
+  <div class="d-flex flex-column" style="width: 300px">
+    <app-map-event-info
+      *ngFor="let item of events"
+      [event]="item"
+    ></app-map-event-info>
+    <div *ngFor="let item of [].constructor(maxLength - events.length)" class="d-flex flex-column" style="border: 1px solid whitesmoke;">
+      <div style="height: 71px;"></div>
+      <div style="aspect-ratio: 16/9;"></div>
+    </div>
+  </div>
 </div>

@@ -176,7 +176,7 @@
       [col]="gridCol"
       [maxLength]="paginationInfo.pageLength"
     ></app-grid-view>
-    <app-map-view *ngSwitchCase="'map'"></app-map-view>
+    <app-map-view *ngSwitchCase="'map'" [events]="currentMqttEvents" [maxLength]="paginationInfo.pageLength"></app-map-view>
     <app-list-view-alert *ngSwitchCase="'list'"></app-list-view-alert>
   </container-element>
 </div>

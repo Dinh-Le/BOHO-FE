@@ -22,7 +22,7 @@
         {{ item.event_time | datetime : "HH:mm:ss DD/MM/YYYY" }}
       </div>
       <div class="text-truncate">
-        {{ (item.device$ | async)?.address ?? "[Địa chỉ camera]" }}
+        {{ item.device?.address ?? '[Địa chỉ camera]' }}
       </div>
       <div class="text-truncate">{{ item.rule_name }}</div>
     </div>

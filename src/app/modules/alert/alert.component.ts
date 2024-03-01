@@ -22,6 +22,7 @@ export interface MqttEventMessage {
   node_id: string;
   camera_id: string;
   device_id?: string;
+  address?: string;
   camera_name: string;
   event_time: string;
   preset_id: number;
@@ -33,7 +34,7 @@ export interface MqttEventMessage {
   event_id: string;
   detection_id: string;
   snapshot$?: Observable<string>;
-  device$?: Observable<Device>;
+  device?: Device;
   bounding_box: {
     topleftx: number;
     toplefty: number;
@@ -102,7 +103,7 @@ export class AlertComponent implements OnInit, OnDestroy {
     },
   ];
   gridCol: number = 5;
-  viewMode: 'grid' | 'map' | 'list' = 'grid';
+  viewMode: 'grid' | 'map' | 'list' = 'map';
   events: EventInfo[] = [{}];
   mqttEvents: MqttEventMessage[] = [
     // {
@@ -237,6 +238,9 @@ export class AlertComponent implements OnInit, OnDestroy {
           ];
 
           event.device_id = event.camera_id;
+          event.device = this._navigationService.selectedDevices$
+            .getValue()
+            .find(({ id }) => event.camera_id === id.toString());
 
           console.log('Received new event:', event);
           return event;
@@ -264,6 +268,10 @@ export class AlertComponent implements OnInit, OnDestroy {
             this.filterOptions.object !== 'all' &&
             this.filterOptions.object !== event.object_type
           ) {
+            return false;
+          }
+
+          if (!event.device) {
             return false;
           }
 
@@ -298,9 +306,6 @@ export class AlertComponent implements OnInit, OnDestroy {
           .getImage(event.node_id, event.camera_id, event.detection_id, 'full')
           .pipe(switchMap((blod) => of(URL.createObjectURL(blod))));
 
-        event.device$ = this._deviceService
-          .find(event.node_id, event.camera_id)
-          .pipe(switchMap(({ data: device }) => of(device)));
         this.mqttEvents.unshift(event);
         if (this.mqttEvents.length > AlertComponent.MAX_EVENTS) {
           this.mqttEvents.pop();

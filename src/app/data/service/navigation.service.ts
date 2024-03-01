@@ -1,6 +1,6 @@
 import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { ViewMode } from '@shared/components/tree-view/view-mode.enum';
 
 export enum Level1Menu {
@@ -52,7 +52,7 @@ export class NavigationService {
       [key: string]: any;
     };
   } = {};
-  selectedDeviceChange$ = new Subject();
+  selectedDevices$ = new BehaviorSubject<any[]>([]);
   treeItemChange$ = new Subject<{
     type: SideMenuItemType;
     action: 'create' | 'update' | 'delete';
@@ -173,7 +173,7 @@ export class NavigationService {
         break;
     }
 
-    // console.log('Target url: ', targetUrl);
+    console.log('Target url: ', targetUrl);
     this.router.navigateByUrl(targetUrl);
   }
 

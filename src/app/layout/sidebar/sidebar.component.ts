@@ -313,12 +313,12 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
           this._navigationService.selectedDeviceIds[child.data.node_id][
             child.data.id
           ] = child.data;
-        this._navigationService.selectedDeviceChange$.next(0);
+        this._navigationService.selectedDevices$.next([]);
       } else {
         delete this._navigationService.selectedDeviceIds[child.data.node_id][
           child.data.id
         ];
-        this._navigationService.selectedDeviceChange$.next(0);
+        this._navigationService.selectedDevices$.next([]);
       }
     });
   }
@@ -327,6 +327,17 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectedItems = event as TreeViewItemModel[];
 
     if (this._navigationService.level1 === Level1Menu.SEARCH) {
+      return;
+    } else if (this._navigationService.level1 === Level1Menu.ALERT) {
+      const devices: any[] = [];
+
+      this.selectedItems[0].traverse((item)=> {
+        if (item.id.startsWith(DeviceTreeBuilder.DeviceIDPrefix)) {
+          devices.push(item.data);
+        }
+      })
+
+      this._navigationService.selectedDevices$.next(devices);
       return;
     }
 
