@@ -177,7 +177,7 @@
       [maxLength]="paginationInfo.pageLength"
     ></app-grid-view>
     <app-map-view *ngSwitchCase="'map'" [events]="currentMqttEvents" [maxLength]="paginationInfo.pageLength"></app-map-view>
-    <app-list-view-alert *ngSwitchCase="'list'"></app-list-view-alert>
+    <app-list-view-alert [events]="currentMqttEvents" *ngSwitchCase="'list'"></app-list-view-alert>
   </container-element>
 </div>
 

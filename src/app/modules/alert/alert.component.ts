@@ -19,6 +19,7 @@ import { Objects, Severities } from 'src/app/data/constants';
 import { NavigationService } from 'src/app/data/service/navigation.service';
 
 export interface MqttEventMessage {
+  severity_name?: string;
   node_id: string;
   camera_id: string;
   device_id?: string;
@@ -103,7 +104,7 @@ export class AlertComponent implements OnInit, OnDestroy {
     },
   ];
   gridCol: number = 5;
-  viewMode: 'grid' | 'map' | 'list' = 'map';
+  viewMode: 'grid' | 'map' | 'list' = 'list';
   events: EventInfo[] = [{}];
   mqttEvents: MqttEventMessage[] = [
     // {
@@ -236,6 +237,8 @@ export class AlertComponent implements OnInit, OnDestroy {
               bounding_box_color: object?.bounding_box_color ?? 'red',
             },
           ];
+
+          event.severity_name = Severities.find(s => s.id === event.level)?.name;
 
           event.device_id = event.camera_id;
           event.device = this._navigationService.selectedDevices$

@@ -1,59 +1,58 @@
-<div class="top">
-  <div class="left">
-    <div
-      class="map"
-      leaflet
-      [leafletOptions]="options"
-      (leafletMapReady)="map = $event"
-    ></div>
-  </div>
-
-  <div class="right">
-    <img src="/assets/images/car.png" />
+<div class="d-flex" style="height: 400px">
+  <div
+    class="w-50 border border-light"
+    leaflet
+    [leafletOptions]="options"
+    (leafletMapReady)="onMapReady($event)"
+  ></div>
+  <div class="w-50 border border-light d-flex justify-content-center">
+    <div style="aspect-ratio: 16/9">
+      <app-event-image
+        *ngIf="events.length > 0"
+        [event]="event"
+      ></app-event-image>
+    </div>
   </div>
 </div>
-<div class="bottom">
-  <table>
+<div class="overflow-y-auto my-text-white flex-grow-1">
+  <table class="w-100">
     <colgroup>
       <col width="24" />
       <col span="5" width="auto" />
-      <col width="24" />
+      <col width="150" />
     </colgroup>
-    <thead>
-      <th></th>
-      <th>Thời gian</th>
-      <th>Camera</th>
-      <th>Nội dụng</th>
-      <th>Đối tượng</th>
-      <th>Nghiêm trọng</th>
-      <th></th>
+    <thead style="background: #4a494bff">
+      <th class="py-1 px-2"></th>
+      <th class="py-1 px-2">Thời gian</th>
+      <th class="py-1 px-2">Camera</th>
+      <th class="py-1 px-2">Quy tắc</th>
+      <th class="py-1 px-2">Đối tượng</th>
+      <th class="py-1 px-2">Nghiêm trọng</th>
+      <th class="py-1 px-2"></th>
     </thead>
     <tbody>
-      <tr>
-        <td>
-          <label class="custom-checkbox">
+      <tr
+        *ngFor="let item of events; trackBy: trackByDetectionId"
+        class="my-bg-primary-hover cursor-pointer"
+      >
+        <td class="py-1 px-2">
+          <label class="custom-checkbox bg-transparent">
             <input type="checkbox" />
           </label>
         </td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td><i class="bi bi-circle"></i></td>
+        <td class="py-1 px-2">
+          {{ item.event_time | datetime : "HH:mm:ss DD-MM-YYYY" }}
+        </td>
+        <td class="py-1 px-2">{{ item.device?.address ?? "Chưa xác định" }}</td>
+        <td class="py-1 px-2">{{ item.rule_name }}</td>
+        <td class="py-1 px-2">
+          <app-svg-icon [icon]="item.object_icon"></app-svg-icon>
+        </td>
+        <td class="py-1 px-2">{{ item.severity_name }}</td>
+        <td class="py-1 px-2"><i class="bi bi-circle cursor-pointer"></i></td>
       </tr>
-      <tr>
-        <td>
-          <label class="custom-checkbox">
-            <input type="checkbox" />
-          </label>
-        </td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td><i class="bi bi-circle"></i></td>
+      <tr *ngIf="events.length === 0" style="background-color: #303030ff">
+        <td [colSpan]="7" class="text-center py-1">No data</td>
       </tr>
     </tbody>
   </table>

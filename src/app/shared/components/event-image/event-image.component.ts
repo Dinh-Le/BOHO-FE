@@ -4,8 +4,10 @@ import {
   ElementRef,
   HostBinding,
   Input,
+  OnChanges,
   OnDestroy,
   OnInit,
+  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import { ToastService } from '@app/services/toast.service';
@@ -16,7 +18,7 @@ import { EventService } from 'src/app/data/service/event.service';
   selector: 'app-event-image',
   template: '<canvas  class="w-100 h-100"  #canvas></canvas>',
 })
-export class EventImage implements AfterViewInit, OnInit, OnDestroy {
+export class EventImage implements AfterViewInit, OnInit, OnDestroy, OnChanges {
   @HostBinding('class') classes = 'w-100 h-100 d-block';
   @ViewChild('canvas') canvasRef!: ElementRef;
   @Input() event: any;
@@ -40,6 +42,10 @@ export class EventImage implements AfterViewInit, OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.resizeObserver.observe(this.elRef.nativeElement);
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    this.render();
   }
 
   ngAfterViewInit(): void {
