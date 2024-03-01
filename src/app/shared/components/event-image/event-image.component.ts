@@ -3,16 +3,13 @@ import {
   Component,
   ElementRef,
   HostBinding,
-  HostListener,
   Input,
-  OnChanges,
   OnDestroy,
   OnInit,
-  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import { ToastService } from '@app/services/toast.service';
-import { observable, retry } from 'rxjs';
+import { retry } from 'rxjs';
 import { EventService } from 'src/app/data/service/event.service';
 
 @Component({
@@ -58,16 +55,18 @@ export class EventImage implements AfterViewInit, OnInit, OnDestroy {
       return;
     }
 
-    const rect = this.elRef.nativeElement.getBoundingClientRect();
-    
     const canvas = this.canvasRef.nativeElement as HTMLCanvasElement;
-    if (parseInt(canvas.width.toString()) !== parseInt(rect.width)) {
-      canvas.width = rect.width;
-      canvas.height = rect.height;
-    }    
 
     const context = canvas.getContext('2d')!;
-    context.clearRect(0, 0, canvas.width, canvas.height);
+    let { clientWidth: canvasWidth, clientHeight: canvasHeight } = canvas;
+    if (canvas.width !== canvasWidth) {
+      canvasHeight = (canvasWidth * 9) / 16;
+      context.canvas.width = canvasWidth - 1;
+      context.canvas.height = canvasHeight;
+    }
+
+    context.clearRect(0, 0, canvasWidth, canvasHeight);
+    // context.reset();
 
     let { bottomrightx, bottomrighty, topleftx, toplefty } =
       this.event.images_info[this.index].bounding_box;
@@ -95,13 +94,14 @@ export class EventImage implements AfterViewInit, OnInit, OnDestroy {
     const sx = this.type === 'full' ? 0 : topleftx * this.image!.width;
     const sy = this.type === 'full' ? 0 : toplefty * this.image!.height;
 
-    const scaleFactor = Math.min(canvas.width / width, canvas.height / height);
+    const scaleFactor = Math.min(canvasWidth / width, canvasHeight / height);
 
-    const dx = Math.abs(canvas.width - width * scaleFactor) / 2;
-    const dy = Math.abs(canvas.height - height * scaleFactor) / 2;
+    const dx = Math.abs(canvasWidth - width * scaleFactor) / 2;
+    const dy = Math.abs(canvasHeight - height * scaleFactor) / 2;
     const dw = width * scaleFactor;
     const dh = height * scaleFactor;
     context.drawImage(this.image!, sx, sy, width, height, dx, dy, dw, dh);
+    console.log({ dx, dy, dw, dh });
 
     // Render the bounding box if full image
     if (this.type === 'full') {

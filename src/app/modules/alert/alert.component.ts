@@ -105,42 +105,42 @@ export class AlertComponent implements OnInit, OnDestroy {
   viewMode: 'grid' | 'map' | 'list' = 'grid';
   events: EventInfo[] = [{}];
   mqttEvents: MqttEventMessage[] = [
-    {
-      camera_id: '65',
-      camera_name: 'Camerra 188',
-      event_time: '2024-03-01T00:48:39.604596+07',
-      preset_id: 141,
-      level: 3,
-      tracking_number: '108424',
-      alarm_type: 'TRESPASSING EVENT',
-      rule_id: 71,
-      event_id: '9f5217f7-9183-456b-8ae7-99532a82fcab',
-      detection_id: 'a5011cf8-1ad7-4720-89e1-daacaf79a21e',
-      bounding_box: {
-        topleftx: 444,
-        toplefty: 670,
-        bottomrightx: 586,
-        bottomrighty: 795,
-      },
-      object_type: 'car',
-      rule_name: 'TRESPASSING EVENT',
-      node_id: '8732910f-bb14-4cd4-8ecd-9bee6f335b1a',
-      background_color: '#b84043ff',
-      object_icon: 'side-car',
-      images_info: [
-        {
-          detection_id: 'a5011cf8-1ad7-4720-89e1-daacaf79a21e',
-          bounding_box: {
-            topleftx: 444,
-            toplefty: 670,
-            bottomrightx: 586,
-            bottomrighty: 795,
-          },
-          bounding_box_color: 'green',
-        },
-      ],
-      device_id: '65',
-    },
+    // {
+    //   camera_id: '65',
+    //   camera_name: 'Camerra 188',
+    //   event_time: '2024-03-01T00:48:39.604596+07',
+    //   preset_id: 141,
+    //   level: 3,
+    //   tracking_number: '108424',
+    //   alarm_type: 'TRESPASSING EVENT',
+    //   rule_id: 71,
+    //   event_id: '9f5217f7-9183-456b-8ae7-99532a82fcab',
+    //   detection_id: 'a5011cf8-1ad7-4720-89e1-daacaf79a21e',
+    //   bounding_box: {
+    //     topleftx: 444,
+    //     toplefty: 670,
+    //     bottomrightx: 586,
+    //     bottomrighty: 795,
+    //   },
+    //   object_type: 'car',
+    //   rule_name: 'TRESPASSING EVENT',
+    //   node_id: '8732910f-bb14-4cd4-8ecd-9bee6f335b1a',
+    //   background_color: '#b84043ff',
+    //   object_icon: 'side-car',
+    //   images_info: [
+    //     {
+    //       detection_id: 'a5011cf8-1ad7-4720-89e1-daacaf79a21e',
+    //       bounding_box: {
+    //         topleftx: 444,
+    //         toplefty: 670,
+    //         bottomrightx: 586,
+    //         bottomrighty: 795,
+    //       },
+    //       bounding_box_color: 'green',
+    //     },
+    //   ],
+    //   device_id: '65',
+    // },
   ];
   isMuted: boolean = false;
   isPaused: boolean = false;
