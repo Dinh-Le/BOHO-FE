@@ -19,7 +19,7 @@
   <tbody *ngIf="data && data.length > 0; else noDataTemplate" class="bg-black">
     <ng-container *ngFor="let row of data; trackBy: trackById">
       <tr>
-        <td (click)="row.isExpanded = !row.isExpanded">
+        <td (click)="toggle(row)">
           <span
             class="expand-icon"
             [ngClass]="{ 'transform-rotate-90': row.isExpanded }"

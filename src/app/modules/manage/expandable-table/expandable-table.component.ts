@@ -1,4 +1,13 @@
-import { Component, Input, TemplateRef } from '@angular/core';
+import {
+  Component,
+  DoCheck,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  TemplateRef,
+} from '@angular/core';
 
 export interface ColumnConfig {
   label: string;
@@ -25,7 +34,7 @@ export class ExpandableTableRowItemModelBase implements ExpandableTableRowData {
   templateUrl: 'expandable-table.component.html',
   styleUrls: ['expandable-table.component.scss'],
 })
-export class ExpandableTableComponent {
+export class ExpandableTableComponent implements DoCheck {
   @Input()
   columns: ColumnConfig[] = [];
 
@@ -41,6 +50,24 @@ export class ExpandableTableComponent {
   @Input()
   classNames: string = '';
 
+  private _lastItemCount: number = 0;
+
+  ngDoCheck(): void {
+    if (this._lastItemCount == this.data.length) {
+      return;
+    }
+
+    const expandingItems = this.data.filter((item) => item.isExpanded);
+
+    if (expandingItems.length > 1) {
+      expandingItems.forEach((item, index) => {
+        item.isExpanded = index === expandingItems.length - 1;
+      });
+    }
+
+    this._lastItemCount = this.data.length;
+  }
+
   trackById(_: any, data: any) {
     return data[this.rowKey];
   }
@@ -51,5 +78,15 @@ export class ExpandableTableComponent {
     } catch {
       return '';
     }
+  }
+
+  toggle(row: any) {
+    this.data.forEach((item) => {
+      if (item[this.rowKey] !== row[this.rowKey]) {
+        item.isExpanded = false;
+      } else {
+        item.isExpanded = !item.isExpanded;
+      }
+    });
   }
 }
