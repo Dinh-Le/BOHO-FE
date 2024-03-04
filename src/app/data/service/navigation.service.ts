@@ -29,6 +29,8 @@ export enum Level3Menu {
   TOUR_SETTINGS = 'TOUR_SETTINGS',
   RULE = 'RULE',
   SCHEDULE = 'SCHEDULE',
+  MILESTONE_VMS = 'MILESTONE_VMS',
+  LICENSE_MANAGER = 'LICENSE_MANAGER',
 }
 
 export enum SideMenuItemType {
@@ -196,6 +198,11 @@ export class NavigationService {
         break;
       case Level2Menu.SYSTEM:
         targetUrl += '/system';
+        if (this.level3 === Level3Menu.MILESTONE_VMS) {
+          targetUrl += '/milestone-vms';
+        } else {
+          targetUrl += '/license-manager';
+        }
         break;
       case Level2Menu.NODE:
         if (this.sideMenu?.type === SideMenuItemType.USER) {

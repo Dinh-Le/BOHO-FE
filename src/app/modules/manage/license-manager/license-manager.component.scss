@@ -1,0 +1,12 @@
+.license-table {
+  thead {
+    background-color: var(--my-bg-primary);
+  }
+
+  th, td {
+    color: white;
+    text-align: center;
+    padding: 0.25rem;
+    border: 2px solid whitesmoke;
+  }
+}

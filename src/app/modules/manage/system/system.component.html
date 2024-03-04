@@ -1,9 +1,16 @@
 <div class="menu-container">
-  <ul>
+  <ul class="list-inline">
     <li
       *ngFor="let item of systems"
-      [ngClass]="{ active: item.selected }"
-      (click)="selectSystem(item)"
+      [ngStyle]="
+        item.selected
+          ? {
+              borderBottom: '2px solid #517da8',
+              poiterEvent: 'none'
+            }
+          : {}
+      "
+      (click)="onMenuItemClick(item)"
     >
       {{ item.label }}
     </li>

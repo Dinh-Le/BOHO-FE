@@ -65,26 +65,6 @@ export class ManageComponent implements OnInit {
     if (this._navigationService.level2 in this.menuLevel2) {
       this.menuLevel2[this._navigationService.level2].isActive = true;
     }
-
-    // this._navigationService.viewModeChange$.subscribe((viewMode) => {
-    //   if (
-    //     this._navigationService.level2 === Level2Menu.NODE &&
-    //     viewMode === ViewMode.Geolocation
-    //   ) {
-    //     // this.menuLevel2[Level2Menu.NODE].isActive = false;
-    //     // this.menuLevel2[Level2Menu.CAMERA].isActive = true;
-    //     this._navigationService.level2 = Level2Menu.CAMERA;
-    //     this._navigationService.navigate();
-    //   } else if (
-    //     this._navigationService.level2 === Level2Menu.CAMERA &&
-    //     viewMode === ViewMode.Logical
-    //   ) {
-    //     this.menuLevel2[Level2Menu.NODE].isActive = true;
-    //     this.menuLevel2[Level2Menu.CAMERA].isActive = false;
-    //     this._navigationService.level2 = Level2Menu.CAMERA;
-    //     this._navigationService.navigate();
-    //   }
-    // });
   }
 
   onMenuItemClick(menuId: Level2Menu): void {
@@ -95,7 +75,6 @@ export class ManageComponent implements OnInit {
     Object.values(this.menuLevel2).forEach((e) => (e.isActive = false));
     this.menuLevel2[menuId].isActive = true;
     this._navigationService.level2 = menuId;
-
     this._navigationService.navigate();
 
     if (menuId === Level2Menu.NODE) {

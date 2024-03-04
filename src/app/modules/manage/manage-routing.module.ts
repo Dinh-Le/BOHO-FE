@@ -21,6 +21,7 @@ import { NodeDashboardComponent } from './node-dashboard/node-dashboard.componen
 import { GroupNodeDashboardComponent } from './group-node-dashboard/group-node-dashboard.component';
 import { CameraDashboardComponent } from './camera-dashboard/camera-dashboard.component';
 import { EmptyComponent } from './empty/empty.component';
+import { LicenseManagerComponent } from './license-manager/license-manager.component';
 
 @NgModule({
   imports: [
@@ -47,7 +48,21 @@ import { EmptyComponent } from './empty/empty.component';
           },
           {
             path: 'system',
-            component: SystemComponent,
+            children: [
+              {
+                path: '',
+                pathMatch: 'full',
+                redirectTo: 'license-manager'
+              },
+              {
+                path: 'license-manager',
+                component: LicenseManagerComponent,
+              },
+              {
+                path: 'milestone-vms',
+                component: SystemComponent,
+              },
+            ]
           },
           {
             path: 'group-node',

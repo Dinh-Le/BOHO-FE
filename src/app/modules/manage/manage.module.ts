@@ -36,6 +36,7 @@ import { GroupNodeDashboardComponent } from './group-node-dashboard/group-node-d
 import { CameraDashboardComponent } from './camera-dashboard/camera-dashboard.component';
 import { EmptyComponent } from './empty/empty.component';
 import { FormDialogComponent } from '@shared/components/form-dialog/form-dialog.component';
+import { LicenseManagerComponent } from './license-manager/license-manager.component';
 
 @NgModule({
   declarations: [
@@ -65,6 +66,7 @@ import { FormDialogComponent } from '@shared/components/form-dialog/form-dialog.
     CameraDashboardComponent,
     AutoResizeDirective,
     EmptyComponent,
+    LicenseManagerComponent,
   ],
   imports: [
     CommonModule,

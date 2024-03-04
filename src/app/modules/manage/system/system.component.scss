@@ -1,33 +1,3 @@
-.menu-container {
-  display: flex;
-  justify-items: center;
-  justify-content: space-between;
-
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-
-    li {
-      display: inline;
-      padding: 0;
-      margin: 0;
-      margin-inline-start: 1rem;
-      cursor: pointer;
-      color: white;
-    }
-
-    li:hover {
-      cursor: pointer;
-    }
-
-    li.active {
-      border-bottom: 2px solid #517da8;
-      pointer-events: none;
-    }
-  }
-}
-
 .status {
   margin: 2px;
   width: 150px;
