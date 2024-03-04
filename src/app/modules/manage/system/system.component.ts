@@ -19,6 +19,7 @@ import { MilestoneService } from 'src/app/data/service/milestone.service';
 import { ToastService } from '@app/services/toast.service';
 import { EMPTY, switchMap } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Level2Menu, Level3Menu, NavigationService } from 'src/app/data/service/navigation.service';
 
 class RowItemModel extends ExpandableTableRowItemModelBase {
   static counter: number = 1;
@@ -145,10 +146,16 @@ export class SystemComponent implements AfterViewInit, OnInit {
   private _milestoneSevice = inject(MilestoneService);
   private _toastService = inject(ToastService);
   private _changeDetectorRef = inject(ChangeDetectorRef);
+  private _navigationService = inject(NavigationService);
 
   @ViewChild('statusCellTemplateRef') statusCellTemplateRef!: TemplateRef<any>;
 
   systems: SelectItemModel[] = [
+    {
+      value: 'license-manager',
+      label: 'Bản quyền',
+      selected: false,
+    },
     {
       value: 'milestone-vms',
       label: 'Milestone VMS',
@@ -218,10 +225,10 @@ export class SystemComponent implements AfterViewInit, OnInit {
     this._changeDetectorRef.detectChanges();
   }
 
-  selectSystem(item: SelectItemModel) {
-    this.selectedSystem.selected = false;
-    this.selectedSystem = item;
-    this.selectedSystem.selected = true;
+  onMenuItemClick(_: SelectItemModel) {
+    this._navigationService.level2 = Level2Menu.SYSTEM;
+    this._navigationService.level3 = Level3Menu.LICENSE_MANAGER;
+    this._navigationService.navigate();
   }
 
   add() {
