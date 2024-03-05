@@ -6,7 +6,9 @@ import {
   ViewContainerRef,
   inject,
 } from '@angular/core';
-import { MqttEventMessage } from '@modules/alert/alert.component';
+import { EventInfo } from '@modules/alert/models';
+import { EventDetailComponent } from '@modules/search/components/event-detail/event-detail.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-grid-view',
@@ -14,10 +16,11 @@ import { MqttEventMessage } from '@modules/alert/alert.component';
   styleUrls: ['grid-view.component.scss'],
 })
 export class GridViewComponent implements OnChanges {
-  private _viewContainerRef = inject(ViewContainerRef);
-  @Input() events: MqttEventMessage[] = [];
+  @Input() events: EventInfo[] = [];
   @Input() col: number = 2;
-  @Input() maxLength: number = 50;
+  @Input() row: number = 25;
+
+  constructor(private _viewContainerRef: ViewContainerRef, private _modalService: NgbModal) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if ('col' in changes) {
@@ -28,11 +31,16 @@ export class GridViewComponent implements OnChanges {
     }
   }
 
-  trackByDetectionId(_: number, data: MqttEventMessage) {
-    return data.detection_id;
+  trackByEventId(_: number, event: EventInfo) {
+    return event.data.images_info[0].detection_id;
   }
 
-  get count() {
-    return this.col * Math.ceil(this.maxLength / this.col);
+  showDetailedEvent(event: EventInfo) {
+    console.log(event);
+    const modalRef = this._modalService.open(EventDetailComponent, {
+      size: 'xl',
+    });
+    const component = modalRef.componentInstance as EventDetailComponent;
+    component.event = event.data;
   }
 }

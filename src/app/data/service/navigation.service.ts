@@ -166,6 +166,7 @@ export class NavigationService {
         break;
       case Level1Menu.ALERT:
         targetUrl = '/alert';
+        this.sideMenu.type = SideMenuItemType.USER;
         break;
       case Level1Menu.REPORT:
         targetUrl = '/report';

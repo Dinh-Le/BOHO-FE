@@ -9,29 +9,6 @@
         [ngClass]="isMuted ? 'bi-volume-mute-fill' : 'bi-volume-up-fill'"
       ></i>
     </button>
-    <div class="time-intervals">
-      <button><i class="bi bi-clock"></i></button>
-      <div class="dropdown-content">
-        <span>Khoảng thời gian hiển thị</span>
-        <div class="time-period-input-group">
-          <app-numeric-input
-            unit="min"
-            [min]="0"
-            [max]="59"
-            style="background: #f2f2f2ff !important; padding: 0; flex: 1"
-          ></app-numeric-input>
-          <app-numeric-input
-            unit="sec"
-            [min]="0"
-            [max]="59"
-            style="background: #f2f2f2ff !important; padding: 0; flex: 1"
-          ></app-numeric-input>
-        </div>
-        <div class="button-container">
-          <button>Áp dụng</button>
-        </div>
-      </div>
-    </div>
     <div class="filter">
       <button><i class="bi bi-funnel"></i></button>
       <ul class="menu">
@@ -42,10 +19,8 @@
           <ul class="menu sub-menu">
             <li
               *ngFor="let item of objectTypes; trackBy: trackByValue"
-              (click)="filterOptions.object = item.value"
-              [ngClass]="
-                item.value === filterOptions.object ? 'my-bg-primary' : ''
-              "
+              (click)="item.selected = !item.selected"
+              [ngClass]="item.selected ? 'my-bg-primary' : ''"
             >
               {{ item.label }}
             </li>
@@ -57,11 +32,10 @@
           </div>
           <ul class="menu sub-menu">
             <li
+              class="cursor-pointer"
               *ngFor="let item of severities; trackBy: trackByValue"
-              (click)="filterOptions.level = item.value"
-              [ngClass]="
-                item.value === filterOptions.level ? 'my-bg-primary' : ''
-              "
+              (click)="item.selected = !item.selected"
+              [ngClass]="item.selected ? 'my-bg-primary' : ''"
             >
               {{ item.label }}
             </li>
@@ -73,11 +47,10 @@
           </div>
           <ul class="menu sub-menu">
             <li
+              class="cursor-pointer"
               *ngFor="let item of ruleTypes; trackBy: trackByValue"
-              (click)="filterOptions.rule_name = item.value"
-              [ngClass]="
-                item.value === filterOptions.rule_name ? 'my-bg-primary' : ''
-              "
+              (click)="item.selected = !item.selected"
+              [ngClass]="item.selected ? 'my-bg-primary' : ''"
             >
               {{ item.label }}
             </li>
@@ -89,13 +62,14 @@
             <span>Trạng thái sự kiện</span> <i class="bi bi-chevron-right"></i>
           </div>
           <ul class="menu sub-menu">
-            <li>Tất cả</li>
-            <li>Đã xem</li>
-            <li>Chưa xem</li>
-            <li>Có sao</li>
-            <li>Không sao</li>
-            <li>Thật</li>
-            <li>Giả</li>
+            <li
+              class="cursor-pointer"
+              *ngFor="let item of eventStatues; trackBy: trackByValue"
+              [ngClass]="item.selected ? 'my-bg-primary' : ''"
+              (click)="setItem(item, eventStatues)"
+            >
+              {{ item.label }}
+            </li>
           </ul>
         </li>
         <li class="seperator"></li>
@@ -105,11 +79,16 @@
 
     <div class="time-periods">
       <div class="selected-item">
-        <span>12h trước</span>
+        <span>{{ getItem(timePeriods)?.label }}</span>
         <i class="bi bi-chevron-down"></i>
       </div>
       <ul class="menu">
-        <li class="menu-item" *ngFor="let item of timePeriods">
+        <li
+          class="menu-item cursor-pointer"
+          *ngFor="let item of timePeriods"
+          (click)="setItem(item, timePeriods)"
+          [ngClass]="item.selected ? 'my-bg-primary' : ''"
+        >
           {{ item.label }}
         </li>
       </ul>
@@ -172,17 +151,23 @@
   <container-element [ngSwitch]="viewMode">
     <app-grid-view
       *ngSwitchCase="'grid'"
-      [events]="currentMqttEvents"
+      [events]="currentEvents"
       [col]="gridCol"
-      [maxLength]="paginationInfo.pageLength"
+      [row]="gridRow"
     ></app-grid-view>
-    <app-map-view *ngSwitchCase="'map'" [events]="currentMqttEvents" [maxLength]="paginationInfo.pageLength"></app-map-view>
-    <app-list-view-alert [events]="currentMqttEvents" *ngSwitchCase="'list'"></app-list-view-alert>
+    <app-map-view
+      *ngSwitchCase="'map'"
+      [events]="currentEvents"
+    ></app-map-view>
+    <app-list-view-alert
+      [events]="currentEvents"
+      *ngSwitchCase="'list'"
+    ></app-list-view-alert>
   </container-element>
 </div>
 
 <app-pagination
   class="paginationbar"
   [(ngModel)]="paginationInfo"
-  [totalItems]="mqttEvents.length"
+  [totalItems]="events.length"
 ></app-pagination>

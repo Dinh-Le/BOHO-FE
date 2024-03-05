@@ -12,7 +12,9 @@ import * as Leaflet from 'leaflet';
 import { MapEventInfoComponent } from './map-event-info/map-event-info.component';
 import { NavigationService } from 'src/app/data/service/navigation.service';
 import { Subscription } from 'rxjs';
-import { MqttEventMessage } from '@modules/alert/alert.component';
+import { EventInfo } from '@modules/alert/models';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { EventDetailComponent } from '@modules/search/components/event-detail/event-detail.component';
 
 class ExtendedMarker extends Leaflet.Marker {
   private _camera: any;
@@ -54,73 +56,15 @@ export class MapViewComponent implements OnInit, OnDestroy {
     center: { lat: 28.626137, lng: 79.821603 },
   };
 
-  cameraList: any[] = [
-    {
-      latlng: new Leaflet.LatLng(10.769906, 106.775626),
-      numOfEvent: 20,
-      type: 'ptz',
-      events: Array(20)
-        .fill(0)
-        .map((e, index) =>
-          Object.assign(
-            {},
-            {
-              seen: false,
-              boundingBoxes: [],
-              date: '12-20-2023',
-              time: '11:11:11',
-              imgUrl: '/assets/images/car.png',
-            }
-          )
-        ),
-    },
-    {
-      latlng: new Leaflet.LatLng(10.780198, 106.762805),
-      numOfEvent: 10,
-      type: 'static',
-      events: Array(20)
-        .fill(0)
-        .map((e, index) =>
-          Object.assign(
-            {},
-            {
-              seen: false,
-              boundingBoxes: [],
-              date: '12-20-2023',
-              time: '11:11:11',
-              imgUrl: '/assets/images/car.png',
-            }
-          )
-        ),
-    },
-    {
-      latlng: new Leaflet.LatLng(10.774633, 106.781173),
-      numOfEvent: 1,
-      type: 'static',
-      events: Array(20)
-        .fill(0)
-        .map((e, index) =>
-          Object.assign(
-            {},
-            {
-              seen: false,
-              boundingBoxes: [],
-              date: '12-20-2023',
-              time: '11:11:11',
-              imgUrl: '/assets/images/car.png',
-            }
-          )
-        ),
-    },
-  ];
-
-  @Input() events: MqttEventMessage[] = [];
-  @Input() maxLength: number = 50;
+  @Input() events: EventInfo[] = [];
 
   _selectedMarker: ExtendedMarker | undefined;
   private _subscriptions: Subscription[] = [];
 
-  constructor(private navigationService: NavigationService) {}
+  constructor(
+    private navigationService: NavigationService,
+    private _modalService: NgbModal
+  ) {}
 
   ngOnInit(): void {
     const selectedDevicesSubscription =
@@ -178,7 +122,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
         'mouseover',
         ({ target: marker }: Leaflet.LeafletMouseEvent) => {
           const event = this.events.find(
-            ({ camera_id }) => camera_id === device.id.toString()
+            (event) => event.device?.id === device.id
           );
 
           if (!event) {
@@ -210,8 +154,20 @@ export class MapViewComponent implements OnInit, OnDestroy {
     if (markers.length > 0) {
       const group = Leaflet.featureGroup(markers);
       this.map.fitBounds(group.getBounds(), {
-        padding: [50,50]
+        padding: [50, 50],
       });
     }
+  }
+
+  trackByDetectionId(_: number, item: EventInfo) {
+    return item.data.images_info[0].detection_id;
+  }
+
+  showDetailedEvent(event: EventInfo) {
+    const modalRef = this._modalService.open(EventDetailComponent, {
+      size: 'xl',
+    });
+    const component = modalRef.componentInstance as EventDetailComponent;
+    component.event = event.data;
   }
 }

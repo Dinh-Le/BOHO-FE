@@ -1,33 +1,19 @@
-export type EventInfo = Partial<{
-  checked: boolean;
-  seen: boolean;
-  severity: Partial<{
-    id: string;
-    name: string;
-  }>[];
-  state: 'accepted' | 'rejected' | 'important' | 'none';
-  location: Partial<{
-    lat: string;
-    lng: string;
-  }>;
-  imgUrl: string;
-  camera: Partial<{
-    id: string;
-    name: string;
-  }>;
-  preset: Partial<{
-    id: string;
-    name: string;
-  }>;
-  rule: Partial<{
-    id: string;
-    name: string;
-  }>;
-  color: string;
-  object: Partial<{
-    id: string;
-    icon: string;
-    name: string;
-  }>;
-  datetime: string;
-}>;
+import { SelectItemModel } from '@shared/models/select-item-model';
+import { Device } from 'src/app/data/schema/boho-v2';
+import { SearchEvent } from 'src/app/data/service/search.service';
+
+export interface EventFilterOptions {
+  timePeriod: SelectItemModel;
+  rules: SelectItemModel[];
+  objects: SelectItemModel[];
+  severities: SelectItemModel[];
+  status: SelectItemModel;
+}
+
+export interface EventInfo {
+  data: SearchEvent;
+  device: Device;
+  background_color: string;
+  object_icon: string;
+  severity: string;
+}

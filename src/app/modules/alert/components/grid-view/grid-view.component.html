@@ -1,12 +1,13 @@
 <div
-  *ngFor="let item of events; trackBy: trackByDetectionId"
+  *ngFor="let item of events; trackBy: trackByEventId"
   class="d-flex flex-column"
   style="background: #4a494bff"
+  (click)="showDetailedEvent(item)"
 >
   <div
     class="d-flex align-items-center p-1 gap-1"
     style="border-bottom: 1px solid #bfbfbf"
-    [ngStyle]="{ background: item.background_color ?? '#4a494bff' }"
+    [ngStyle]="{ background: item.background_color }"
   >
     <label class="custom-checkbox" style="background-color: transparent">
       <input type="checkbox" />
@@ -19,12 +20,17 @@
     ></app-svg-icon>
     <div class="d-flex flex-column flex-grow-1">
       <div class="text-truncate">
-        {{ item.event_time | datetime : "HH:mm:ss DD/MM/YYYY" }}
+        {{
+          item.data.images_info[0].detection_time
+            | datetime : "HH:mm:ss MM-MM-YYYY"
+        }}
       </div>
       <div class="text-truncate">
-        {{ item.device?.address ?? '[Địa chỉ camera]' }}
+        {{ item.device.address }}
       </div>
-      <div class="text-truncate">{{ item.rule_name }}</div>
+      <div class="text-truncate">
+        {{ item.data.images_info[0].event_type }} {{ item.data.alarm_type }}
+      </div>
     </div>
     <div class="d-flex flex-column h-100">
       <i class="bi bi-circle cursor-pointer"></i>
@@ -32,13 +38,12 @@
     </div>
   </div>
   <div style="aspect-ratio: 16/9">
-    <app-event-image [event]="item"></app-event-image>
+    <app-event-image [event]="item.data"></app-event-image>
   </div>
 </div>
 <div
-  *ngFor="let item of [].constructor(maxLength - events.length)"
-  class="d-flex flex-column"
   style="background: #4a494bff"
+  *ngFor="let item of [].constructor(row * col - events.length)"
 >
   <div style="height: 71px"></div>
   <div style="aspect-ratio: 16/9"></div>

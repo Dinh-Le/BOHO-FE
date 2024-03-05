@@ -45,7 +45,7 @@ export class EventImage implements AfterViewInit, OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.render();
+    this.update();
   }
 
   ngAfterViewInit(): void {

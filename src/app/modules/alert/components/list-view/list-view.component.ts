@@ -1,14 +1,17 @@
 import { Component, HostBinding, Input } from '@angular/core';
-import { MqttEventMessage } from '@modules/alert/alert.component';
+import { EventInfo } from '@modules/alert/models';
+import { EventDetailComponent } from '@modules/search/components/event-detail/event-detail.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Leaflet from 'leaflet';
 
 @Component({
   selector: 'app-list-view-alert',
   templateUrl: 'list-view.component.html',
+  styleUrls: ['list-view.component.scss'],
 })
 export class ListViewComponent {
-  @HostBinding('class') className = 'd-flex flex-column';
-  @Input() events: MqttEventMessage[] = [];
+  @HostBinding('class') classNames = 'd-flex flex-column h-100';
+  @Input() events: EventInfo[] = [];
 
   map?: Leaflet.Map;
   options: Leaflet.MapOptions = {
@@ -22,15 +25,27 @@ export class ListViewComponent {
     center: { lat: 28.626137, lng: 79.821603 },
   };
 
-  get event(): MqttEventMessage {
-    return this.events[0];
+  get event(): EventInfo {
+    return this.events[this.eventIndex];
   }
 
-  trackByDetectionId(_: number, event: MqttEventMessage) {
-    return event.detection_id;
+  eventIndex: number = 0;
+
+  constructor(private _modalService: NgbModal) {}
+
+  trackByDetectionId(_: number, event: EventInfo) {
+    return event.data.images_info[0].detection_id;
   }
 
   onMapReady(map: Leaflet.Map) {
     this.map = map;
+  }
+
+  showEventDetail() {
+    const modalRef = this._modalService.open(EventDetailComponent, {
+      size: 'xl',
+    });
+    const component = modalRef.componentInstance as EventDetailComponent;
+    component.event = this.event.data;
   }
 }
