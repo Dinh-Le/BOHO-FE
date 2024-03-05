@@ -25,7 +25,8 @@ export interface SearchQuery {
   pl: number;
 }
 
-export type SearchEvent = {
+export interface SearchEvent {
+  node_id: string;
   alarm_level: number;
   alarm_type: string;
   created_at: string;
@@ -65,6 +66,8 @@ export type SearchEvent = {
   tracking_number: number;
   updated_at: Date;
 };
+
+namespace SearchService {}
 
 export type SearchResultResponse = ResponseBase & {
   data: {

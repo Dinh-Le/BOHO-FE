@@ -9,7 +9,7 @@ export abstract class EventService extends RestfullApiService {
   public abstract update(
     nodeId: string,
     deviceId: number,
-    eventId: number,
+    eventId: string,
     data: Partial<{
       is_watch: boolean;
       is_verify: boolean;
@@ -18,7 +18,7 @@ export abstract class EventService extends RestfullApiService {
   public abstract delete(
     nodeId: string,
     deviceId: number,
-    eventId: number
+    eventId: string
   ): Observable<ResponseBase>;
   public abstract getImage(
     nodeId: string,
@@ -29,7 +29,7 @@ export abstract class EventService extends RestfullApiService {
   public abstract verify(
     nodeId: string,
     deviceId: number,
-    eventId: number,
+    eventId: string,
     data: Partial<{
       is_verify: boolean;
       is_watch: boolean;
@@ -42,7 +42,7 @@ export class EventServiceImpl extends EventService {
   public override update(
     nodeId: string,
     deviceId: number,
-    eventId: number,
+    eventId: string,
     data: Partial<{ is_watch: boolean; is_verify: boolean }>
   ): Observable<ResponseBase> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/event/${eventId}`;
@@ -52,7 +52,7 @@ export class EventServiceImpl extends EventService {
   public override delete(
     nodeId: string,
     deviceId: number,
-    eventId: number
+    eventId: string
   ): Observable<ResponseBase> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/event/${eventId}`;
     return this.httpClient.delete<ResponseBase>(url);
@@ -72,7 +72,7 @@ export class EventServiceImpl extends EventService {
   public override verify(
     nodeId: string,
     deviceId: number,
-    eventId: number,
+    eventId: string,
     data: Partial<{ is_verify: boolean; is_watch: boolean }>
   ): Observable<ResponseBase> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/event/${eventId}/verify_event`;

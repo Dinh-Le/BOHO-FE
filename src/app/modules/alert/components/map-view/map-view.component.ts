@@ -14,7 +14,7 @@ import { NavigationService } from 'src/app/data/service/navigation.service';
 import { Subscription } from 'rxjs';
 import { EventInfo } from '@modules/alert/models';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { EventDetailComponent } from '@modules/search/components/event-detail/event-detail.component';
+import { EventDetailComponent } from '@shared/components/event-detail/event-detail.component';
 
 class ExtendedMarker extends Leaflet.Marker {
   private _camera: any;

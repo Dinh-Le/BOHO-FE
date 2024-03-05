@@ -45,7 +45,17 @@ export class EventImage implements AfterViewInit, OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.update();
+    if (
+      'event' in changes &&
+      changes['event'].currentValue.event_id !=
+        changes['event'].previousValue.event_id
+    ) {
+      this.update();
+    }
+
+    // if ('type' in changes || 'showObject' in changes || 'index' in changes) {
+    //   this.render();
+    // }
   }
 
   ngAfterViewInit(): void {
@@ -107,7 +117,7 @@ export class EventImage implements AfterViewInit, OnInit, OnDestroy, OnChanges {
     const dw = width * scaleFactor;
     const dh = height * scaleFactor;
     context.drawImage(this.image!, sx, sy, width, height, dx, dy, dw, dh);
-    console.log({ dx, dy, dw, dh });
+    // console.log({ dx, dy, dw, dh });
 
     // Render the bounding box if full image
     if (this.type === 'full') {

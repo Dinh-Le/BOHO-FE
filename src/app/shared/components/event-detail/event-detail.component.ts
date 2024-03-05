@@ -4,7 +4,10 @@ import { ToastService } from '@app/services/toast.service';
 import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from '@shared/shared.module';
 import { finalize, tap } from 'rxjs';
+import { DeviceService } from 'src/app/data/service/device.service';
 import { EventService } from 'src/app/data/service/event.service';
+import { NavigationService } from 'src/app/data/service/navigation.service';
+import { SearchEvent } from 'src/app/data/service/search.service';
 
 @Component({
   selector: 'app-event-detail-dialog',
@@ -14,16 +17,17 @@ import { EventService } from 'src/app/data/service/event.service';
   imports: [SharedModule, NgbModalModule],
 })
 export class EventDetailComponent {
-  event: any;
+  event!: SearchEvent;
   index: number = 0;
 
   constructor(
     private activeModal: NgbActiveModal,
     private eventService: EventService,
+    private navigationService: NavigationService,
     private toastService: ToastService
   ) {}
 
-  get length() {
+  get length(): number {
     return this.event?.images_info?.length ?? 0;
   }
 
@@ -32,7 +36,7 @@ export class EventDetailComponent {
       return null;
     }
 
-    return this.event?.images_info[this.index];
+    return this.event.images_info[this.index];
   }
 
   get percentage() {
@@ -80,9 +84,9 @@ export class EventDetailComponent {
         error: (err: HttpErrorResponse) =>
           this.toastService.showError(err.error?.message ?? err.message),
         complete: () => {
-          this.toastService.showSuccess('Successfully');
+          this.toastService.showSuccess('Update event successfully');
           this.event.is_verify = value;
-          this.activeModal.close();
+          // this.activeModal.close();
         },
       });
   }

@@ -9,7 +9,7 @@ import {
   inject,
 } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { EventDetailComponent } from '../event-detail/event-detail.component';
+import { EventDetailComponent } from '../../../../shared/components/event-detail/event-detail.component';
 
 @Component({
   selector: 'app-grid-view',

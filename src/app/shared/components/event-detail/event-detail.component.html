@@ -12,17 +12,17 @@
   ></app-event-image>
 </div>
 <div class="event-info">
-  <p>Chi tiết đối tượng</p>
-  <p>Camera: {{ event?.device_name }}</p>
-  <p>Điểm giám sát:</p>
-  <p>
+  <div>Chi tiết đối tượng</div>
+  <div>Camera: {{ event.device_name }}</div>
+  <div>Điểm giám sát:</div>
+  <div>
     Thời gian:
     {{ image?.detection_time | datetime : " DD/MM/YYYY HH:mm" }}
-  </p>
-  <p>ID đối tượng: {{ image?.detection_id }}</p>
-  <p>Loại: {{ image?.event_type }}</p>
-  <p>Màu sắc: {{ image?.recognize_result?.color }}</p>
-  <p>Biển số: {{ image?.recognize_result?.lisence_plate }}</p>
+  </div>
+  <div>ID đối tượng: {{ image?.detection_id }}</div>
+  <div>Loại: {{ image?.event_type }}</div>
+  <div>Màu sắc: {{ image?.recognize_result?.color }}</div>
+  <div>Biển số: {{ image?.recognize_result?.lisence_plate }}</div>
 </div>
 <div class="progress-bar">
   <div class="progress" [style.width]="percentage"></div>
@@ -67,7 +67,6 @@
     #rejectButton
     class="reject"
     type="button"
-    [disabled]="!event.is_verify"
     (click)="verify(rejectButton, false)"
   >
     Công nhận giả
@@ -76,7 +75,6 @@
     #acceptButton
     class="accept"
     type="button"
-    [disabled]="event.is_verify"
     (click)="verify(acceptButton, true)"
   >
     Công nhận thật

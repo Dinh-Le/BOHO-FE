@@ -7,7 +7,7 @@ import {
   inject,
 } from '@angular/core';
 import { EventInfo } from '@modules/alert/models';
-import { EventDetailComponent } from '@modules/search/components/event-detail/event-detail.component';
+import { EventDetailComponent } from '@shared/components/event-detail/event-detail.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -32,11 +32,11 @@ export class GridViewComponent implements OnChanges {
   }
 
   trackByEventId(_: number, event: EventInfo) {
+    console.log(event.data.images_info[0].detection_id);
     return event.data.images_info[0].detection_id;
   }
 
   showDetailedEvent(event: EventInfo) {
-    console.log(event);
     const modalRef = this._modalService.open(EventDetailComponent, {
       size: 'xl',
     });

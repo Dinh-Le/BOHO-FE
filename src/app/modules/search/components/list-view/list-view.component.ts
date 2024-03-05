@@ -7,7 +7,7 @@ import {
   SimpleChanges,
   inject,
 } from '@angular/core';
-import { EventDetailComponent } from '../event-detail/event-detail.component';
+import { EventDetailComponent } from '../../../../shared/components/event-detail/event-detail.component';
 import { NgbModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({

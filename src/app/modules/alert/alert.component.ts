@@ -1,12 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SelectItemModel } from '@shared/models/select-item-model';
-import {
-  Observable,
-  Subscription,
-} from 'rxjs';
+import { Subscription } from 'rxjs';
 import { DeviceService } from 'src/app/data/service/device.service';
 import { EventService } from 'src/app/data/service/event.service';
-import { Device } from 'src/app/data/schema/boho-v2';
 import { Objects, Severities } from 'src/app/data/constants';
 import { NavigationService } from 'src/app/data/service/navigation.service';
 import {
@@ -16,54 +12,12 @@ import {
 import { EventFilterOptions, EventInfo } from './models';
 import * as moment from 'moment';
 
-export interface MqttEventMessage {
-  severity_name?: string;
-  node_id: string;
-  camera_id: string;
-  device_id?: string;
-  address?: string;
-  camera_name: string;
-  event_time: string;
-  preset_id: number;
-  level: number;
-  tracking_number: string;
-  alarm_type: string;
-  rule_id: number;
-  rule_name: string;
-  event_id: string;
-  detection_id: string;
-  snapshot$?: Observable<string>;
-  device?: Device;
-  bounding_box: {
-    topleftx: number;
-    toplefty: number;
-    bottomrightx: number;
-    bottomrighty: number;
-  };
-  images_info: {
-    detection_id: string;
-    bounding_box: {
-      topleftx: number;
-      toplefty: number;
-      bottomrightx: number;
-      bottomrighty: number;
-    };
-    bounding_box_color: string;
-  }[];
-  object_type: string;
-  background_color?: string;
-  object_icon: string;
-}
-
 @Component({
   selector: 'app-alert',
   templateUrl: './alert.component.html',
   styleUrls: ['./alert.component.scss'],
 })
 export class AlertComponent implements OnInit, OnDestroy {
-  private static readonly MAX_EVENTS = 100;
-  private static readonly EVENT_IMAGE_DELAY = 2000; // 4 miliseconds
-
   eventStatues: SelectItemModel[] = [
     { label: 'Tất cả', value: 0 },
     { label: 'Đã xem', value: 1 },
@@ -191,22 +145,26 @@ export class AlertComponent implements OnInit, OnDestroy {
     private _searchService: SearchService
   ) {
     this.clearFilter();
-    this.startTimer();
   }
 
   startTimer() {
     this.refresh();
-    this._timer = setTimeout(() => this.startTimer(), 3000);
   }
 
   refresh() {
-    const devices = this._navigationService.selectedDevices$.getValue();
+    const devices = this._navigationService.selectedDevices$.getValue().reduce(
+      (devices, device) =>
+        Object.assign(devices, {
+          [device.id]: device,
+        }),
+      {}
+    );
     const timePeriod = this.getItem(this.timePeriods);
     const [amount, unit] = timePeriod!.value.toString().split(' ');
 
     return this._searchService
       .search({
-        dis: devices.map(({ id }) => id + ''),
+        dis: Object.keys(devices),
         tq: 'custom',
         p: this.paginationInfo.pageIndex,
         pl: 100,
@@ -215,20 +173,34 @@ export class AlertComponent implements OnInit, OnDestroy {
         start: moment().subtract(amount, unit).format('Y-M-D H:m:s'),
         end: moment().format('Y-M-D H:m:s'),
       })
-      .subscribe(({ data }) => {
-        this.events = data.events
-          .map((event) => ({
-            data: event,
-            device: devices.find((device) => device.id === event.device_id),
-            background_color: this.getBackgroundColor(event),
-            object_icon: this.getObjectIcon(event),
-            severity: Severities.find(s => s.id === event.alarm_level)?.name ?? ''
-          }))
-          .filter((event) => event.device);
+      .subscribe({
+        next: ({ data }) => {
+          this.events = data.events
+            .filter((event) => event.device_id in devices)
+            .map((event) => {
+              const device = devices[event.device_id];
+              event.node_id = device.node_id;
+              return {
+                data: event,
+                device: device,
+                background_color: this.getBackgroundColor(event),
+                object_icon: this.getObjectIcon(event),
+                severity:
+                  Severities.find((s) => s.id === event.alarm_level)?.name ??
+                  '',
+              };
+            });
+        },
+        complete: () => {
+          clearTimeout(this._timer);
+          this._timer = setTimeout(() => this.refresh(), 30000);
+        },
       });
   }
 
   ngOnInit(): void {
+    this.startTimer();
+
     this._navigationService.selectedDevices$.subscribe(() => {
       clearTimeout(this._timer);
       this.startTimer();
@@ -271,13 +243,11 @@ export class AlertComponent implements OnInit, OnDestroy {
   }
 
   getObjectIcon(event: SearchEvent): string {
-    const id =
+    const event_type =
       event.images_info[0].event_type === 'person'
         ? 'people'
         : event.images_info[0].event_type;
 
-    return (
-      Objects.find((o) => o.id === event.images_info[0].event_type)?.icon ?? ''
-    );
+    return Objects.find((o) => o.id === event_type)?.icon ?? '';
   }
 }

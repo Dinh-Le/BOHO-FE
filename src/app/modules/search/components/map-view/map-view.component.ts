@@ -14,7 +14,7 @@ import {
 import * as Leaflet from 'leaflet';
 import { LatLng } from 'leaflet';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { EventDetailComponent } from '../event-detail/event-detail.component';
+import { EventDetailComponent } from '../../../../shared/components/event-detail/event-detail.component';
 import { CustomMarker } from '@shared/models/custom-marker';
 import { NavigationService } from 'src/app/data/service/navigation.service';
 import { Subscription, finalize, tap } from 'rxjs';

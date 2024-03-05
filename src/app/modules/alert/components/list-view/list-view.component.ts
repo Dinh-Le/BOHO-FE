@@ -1,6 +1,6 @@
 import { Component, HostBinding, Input } from '@angular/core';
 import { EventInfo } from '@modules/alert/models';
-import { EventDetailComponent } from '@modules/search/components/event-detail/event-detail.component';
+import { EventDetailComponent } from '@shared/components/event-detail/event-detail.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Leaflet from 'leaflet';
 
