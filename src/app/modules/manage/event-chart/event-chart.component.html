@@ -1,0 +1,26 @@
+<select
+  class="position-absolute top-0 end-0 px-2 py-1"
+  [disabled]="(isChartLoading$ | async) ?? false"
+  style="
+    background: #5285b6ff;
+    border: 1px solid #31538f;
+    border-radius: 0.25rem;
+  "
+  [(ngModel)]="timespan"
+  (ngModelChange)="triggerFetchChartData$.next({ timespan, deviceIds })"
+>
+  <option value="5 minutes" class="bg-light text-dark">5p qua</option>
+  <option value="10 minutes" class="bg-light text-dark">10p qua</option>
+  <option value="30 minutes" class="bg-light text-dark">30p qua</option>
+  <option value="60 minutes" class="bg-light text-dark">1h qua</option>
+  <option value="24 hours" class="bg-light text-dark">24h qua</option>
+  <option value="7 days" class="bg-light text-dark">1 tuần qua</option>
+  <option value="30 days" class="bg-light text-dark">1 tháng qua</option>
+  <option value="12 months" class="bg-light text-dark">1 năm qua</option>
+</select>
+<canvas
+  baseChart
+  type="bar"
+  [data]="(chartData$ | async) ?? undefined"
+  [options]="chartOptions"
+></canvas>

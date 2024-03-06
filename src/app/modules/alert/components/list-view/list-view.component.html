@@ -15,14 +15,14 @@
     </div>
   </div>
 </div>
-<div class="overflow-y-auto my-text-white flex-grow-1">
+<div class="overflow-y-auto my-text-white flex-grow-1 flex-basis-0">
   <table class="w-100">
     <colgroup>
       <col width="24" />
       <col span="5" width="auto" />
       <col width="150" />
     </colgroup>
-    <thead style="background: #4a494bff">
+    <thead style="background: #4a494bff" class="sticky-top">
       <th class="py-1 px-2"></th>
       <th class="py-1 px-2">Thời gian</th>
       <th class="py-1 px-2">Camera</th>
@@ -35,7 +35,7 @@
       <tr
         *ngFor="let item of events; index as i; trackBy: trackByDetectionId"
         class="my-bg-primary-hover cursor-pointer"
-        [ngClass]="eventIndex === i ? 'selected pe-none': ''"
+        [ngClass]="eventIndex === i ? 'selected pe-none' : ''"
         (click)="eventIndex = i"
       >
         <td class="py-1 px-2">
@@ -44,7 +44,10 @@
           </label>
         </td>
         <td class="py-1 px-2">
-          {{ item.data.images_info[0].detection_time | datetime : "HH:mm:ss DD-MM-YYYY" }}
+          {{
+            item.data.images_info[0].detection_time
+              | datetime : "HH:mm:ss DD-MM-YYYY"
+          }}
         </td>
         <td class="py-1 px-2">{{ item.device.address }}</td>
         <td class="py-1 px-2">{{ item.data.alarm_type }}</td>
@@ -52,7 +55,16 @@
           <app-svg-icon [icon]="item.object_icon"></app-svg-icon>
         </td>
         <td class="py-1 px-2">{{ item.severity }}</td>
-        <td class="py-1 px-2"><i class="bi bi-circle cursor-pointer"></i></td>
+        <td class="py-1 px-2">
+          <i
+            class="bi cursor-pointer fs-18 text-light rounded-circle border-0 p-0 m-0"
+            [ngClass]="
+              item.data.is_verify
+                ? 'bi-check-circle bg-success'
+                : 'bi-x-circle bg-dark'
+            "
+          ></i>
+        </td>
       </tr>
       <tr *ngIf="events.length === 0" style="background-color: #303030ff">
         <td [colSpan]="7" class="text-center py-1">No data</td>

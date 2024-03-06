@@ -9,7 +9,7 @@
     style="border-bottom: 1px solid #bfbfbf"
     [ngStyle]="{ background: item.background_color }"
   >
-    <label class="custom-checkbox" style="background-color: transparent">
+    <label class="custom-checkbox bg-transparent">
       <input type="checkbox" />
     </label>
     <app-svg-icon
@@ -26,15 +26,22 @@
         }}
       </div>
       <div class="text-truncate">
-        {{ item.device.address }}
+        {{ item.device.address ?? '[Địa chỉ camera]' }}
       </div>
       <div class="text-truncate">
         {{ item.data.images_info[0].event_type }} {{ item.data.alarm_type }}
       </div>
     </div>
     <div class="d-flex flex-column h-100">
-      <i class="bi cursor-pointer fs-18" [ngClass]="item.data.is_verify ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-dark'"></i>
-      <i class="fs-18 mt-auto bi bi-geo-alt-fill cursor-pointer"></i>
+      <i
+        class="bi cursor-pointer fs-18"
+        [ngClass]="
+          item.data.is_verify
+            ? 'bi-check-circle-fill text-success'
+            : 'bi-x-circle-fill text-dark'
+        "
+      ></i>
+      <i class="fs-18 mt-auto bi bi-geo-alt-fill cursor-pointer" (click)="showEventLocation($event, item)"></i>
     </div>
   </div>
   <div style="aspect-ratio: 16/9">

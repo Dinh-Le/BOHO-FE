@@ -1,5 +1,6 @@
+import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { ToastService } from '@app/services/toast.service';
 import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from '@shared/shared.module';
@@ -8,15 +9,18 @@ import { DeviceService } from 'src/app/data/service/device.service';
 import { EventService } from 'src/app/data/service/event.service';
 import { NavigationService } from 'src/app/data/service/navigation.service';
 import { SearchEvent } from 'src/app/data/service/search.service';
+import * as Leaflet from 'leaflet';
 
 @Component({
   selector: 'app-event-detail-dialog',
   templateUrl: 'event-detail.component.html',
   styleUrls: ['event-detail.component.scss'],
   standalone: true,
-  imports: [SharedModule, NgbModalModule],
+  imports: [SharedModule, NgbModalModule, CommonModule],
 })
 export class EventDetailComponent {
+  @Input() type: 'location' | 'image' = 'image';
+
   event!: SearchEvent;
   index: number = 0;
 
@@ -45,6 +49,16 @@ export class EventDetailComponent {
     }
 
     return (100 * (this.index + 1)) / this.length + '%';
+  }
+
+  get title(): string {
+    return this.type === 'image' ? 'Chi tiết sự kiện' : 'Địa điểm sự kiện';
+  }
+
+  get locationData(): Leaflet.LatLng[] {
+    const { lat, long } = this.event.device_location;
+    const location = Leaflet.latLng(parseFloat(lat), parseFloat(long));
+    return [location];
   }
 
   close() {

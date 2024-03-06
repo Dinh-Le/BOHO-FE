@@ -47,8 +47,8 @@ export class EventImage implements AfterViewInit, OnInit, OnDestroy, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (
       'event' in changes &&
-      changes['event'].currentValue.event_id !=
-        changes['event'].previousValue.event_id
+      changes['event'].currentValue?.event_id !=
+        changes['event'].previousValue?.event_id
     ) {
       this.update();
     }
@@ -77,7 +77,7 @@ export class EventImage implements AfterViewInit, OnInit, OnDestroy, OnChanges {
     let { clientWidth: canvasWidth, clientHeight: canvasHeight } = canvas;
     if (canvas.width !== canvasWidth) {
       canvasHeight = (canvasWidth * 9) / 16;
-      context.canvas.width = canvasWidth - 1;
+      context.canvas.width = canvasWidth - 2;
       context.canvas.height = canvasHeight;
     }
 

@@ -20,7 +20,10 @@ export class GridViewComponent implements OnChanges {
   @Input() col: number = 2;
   @Input() row: number = 25;
 
-  constructor(private _viewContainerRef: ViewContainerRef, private _modalService: NgbModal) {}
+  constructor(
+    private _viewContainerRef: ViewContainerRef,
+    private _modalService: NgbModal
+  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if ('col' in changes) {
@@ -32,7 +35,6 @@ export class GridViewComponent implements OnChanges {
   }
 
   trackByEventId(_: number, event: EventInfo) {
-    console.log(event.data.images_info[0].detection_id);
     return event.data.images_info[0].detection_id;
   }
 
@@ -42,5 +44,16 @@ export class GridViewComponent implements OnChanges {
     });
     const component = modalRef.componentInstance as EventDetailComponent;
     component.event = event.data;
+  }
+
+  showEventLocation(event: Event, eventData: EventInfo) {
+    const modalRef = this._modalService.open(EventDetailComponent, {
+      size: 'xl',
+    });
+    const component = modalRef.componentInstance as EventDetailComponent;
+    component.event = eventData.data;
+    component.type = 'location';  
+
+    event.stopPropagation();
   }
 }

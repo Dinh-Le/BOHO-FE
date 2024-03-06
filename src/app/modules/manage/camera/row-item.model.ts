@@ -54,6 +54,7 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
         : undefined,
     });
     this.updateCameraForm(device);
+    this.status = device.status ?? DeviceStatus_Disconnected;
   }
 
   get name() {

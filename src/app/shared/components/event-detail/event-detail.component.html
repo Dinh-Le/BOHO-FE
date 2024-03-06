@@ -1,19 +1,22 @@
 <div class="header">
-  <span class="title">Chi tiết sự kiện</span>
+  <span class="title">{{ title }}</span>
   <button class="close-button" (click)="close()">
     <i class="bi bi-x-lg"></i>
   </button>
 </div>
-<div class="event-image">
+<div class="event-image" *ngIf="type === 'image'">
   <app-event-image
     [event]="event"
     [index]="index"
     [showObject]="true"
   ></app-event-image>
 </div>
+<div class="event-image" *ngIf="type === 'location'">
+  <app-static-map [locationData]="locationData"></app-static-map>
+</div>
 <div class="event-info">
-  <div>Chi tiết đối tượng</div>
-  <div>Camera: {{ event.device_name }}</div>
+  <div class="fw-bold">Chi tiết đối tượng</div>
+  <div class="mt-1">Camera: {{ event.device_name }}</div>
   <div>Điểm giám sát:</div>
   <div>
     Thời gian:
@@ -24,10 +27,10 @@
   <div>Màu sắc: {{ image?.recognize_result?.color }}</div>
   <div>Biển số: {{ image?.recognize_result?.lisence_plate }}</div>
 </div>
-<div class="progress-bar">
+<div class="progress-bar" *ngIf="type === 'image'">
   <div class="progress" [style.width]="percentage"></div>
 </div>
-<div class="toolbar">
+<div class="toolbar" *ngIf="type === 'image'">
   <button class="border-0">
     <app-svg-icon
       width="1.5em"
@@ -62,7 +65,7 @@
     ></app-svg-icon>
   </button>
 </div>
-<div class="footer">
+<div class="footer" *ngIf="type === 'image'">
   <button
     #rejectButton
     class="reject"
@@ -79,4 +82,7 @@
   >
     Công nhận thật
   </button>
+</div>
+<div class="footer" *ngIf="type === 'location'">
+  <button class="accept" style="width: 100px;" type="button" (click)="close()">Đóng</button>
 </div>

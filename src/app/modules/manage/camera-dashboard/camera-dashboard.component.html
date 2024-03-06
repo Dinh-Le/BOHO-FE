@@ -18,7 +18,7 @@
       </div>
     </div>
     <div class="w-50 d-flex justify-content-center">
-      <div>
+      <div class="d-none">
         <canvas
           baseChart
           type="pie"
@@ -28,22 +28,9 @@
       </div>
     </div>
   </div>
-  <div class="flex-grow-1 position-relative">
-    <select
-      class="position-absolute top-0 end-0 px-2 py-1"
-      style="
-        background: #5285b6ff;
-        border: 1px solid #31538f;
-        border-radius: 0.25rem;
-      "
-    >
-      <option selected>24h qua</option>
-    </select>
-    <canvas
-      baseChart
-      type="bar"
-      [data]="barChartData"
-      [options]="barChartOptions"
-    ></canvas>
-  </div>
+  <app-event-chart
+    *ngIf="deviceIds.length > 0"
+    [deviceIds]="deviceIds"
+    class="flex-basis-0 flex-grow-1"
+  ></app-event-chart>
 </div>

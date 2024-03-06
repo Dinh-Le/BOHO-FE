@@ -4,9 +4,24 @@ import * as moment from 'moment';
 import 'chartjs-adapter-moment';
 import { NodeService } from 'src/app/data/service/node.service';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription, of, switchMap } from 'rxjs';
+import {
+  BehaviorSubject,
+  EMPTY,
+  Observable,
+  Subject,
+  Subscription,
+  catchError,
+  filter,
+  finalize,
+  of,
+  skip,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from '@app/services/toast.service';
+import { SearchService } from 'src/app/data/service/search.service';
+import { DeviceService } from 'src/app/data/service/device.service';
 
 interface DoughnutChart {
   label: string;
@@ -188,44 +203,6 @@ export class NodeDashboardComponent implements OnInit, OnDestroy {
     ],
   };
 
-  barChartOptions: ChartConfiguration<'bar'>['options'] = {
-    responsive: true,
-    animation: false,
-    maintainAspectRatio: false,
-    plugins: {
-      title: {
-        display: true,
-        text: 'Số lượng sự kiện',
-        position: 'top',
-        color: 'white',
-      },
-      legend: {
-        display: false,
-      },
-    },
-    scales: {
-      x: {
-        type: 'time',
-        time: {
-          tooltipFormat: 'DD T',
-        },
-      },
-    },
-  };
-  barChartData: ChartConfiguration<'bar'>['data'] = {
-    labels: Array.from({ length: 8 }, (_, index) =>
-      moment()
-        .subtract(7 - index, 'days')
-        .toDate()
-    ),
-
-    datasets: [
-      {
-        data: [1, 2, 3, 5, 3, 4, 10, 1],
-      },
-    ],
-  };
-
   get cpu(): number {
     return this.doughnutCharts[0].data.value;
   }
@@ -274,7 +251,20 @@ export class NodeDashboardComponent implements OnInit, OnDestroy {
     );
   }
 
-  timeSpan: string = '24h';
+  triggerFetchDeviceIds$ = new BehaviorSubject<{ nodeId: string }>({
+    nodeId: '',
+  });
+  deviceIds$ = this.triggerFetchDeviceIds$.pipe(
+    filter(({ nodeId }) => nodeId !== ''),
+    switchMap(({ nodeId }) => {
+      return this.deviceService.findAll(nodeId).pipe(
+        switchMap(({ data: devices }) => {
+          const deviceIds = devices.map((device) => device.id.toString());
+          return of(deviceIds);
+        })
+      );
+    })
+  );
 
   private subscriptions: Subscription[] = [];
   private nodeId: string = '';
@@ -282,43 +272,43 @@ export class NodeDashboardComponent implements OnInit, OnDestroy {
   constructor(
     private activatedRoute: ActivatedRoute,
     private nodeService: NodeService,
+    private deviceService: DeviceService,
     private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
-    const activatedRouteSubscription = this.activatedRoute.params
-      .pipe(
-        switchMap(({ nodeId }) => {
-          this.initialize(nodeId);
-          return this.nodeService.getNodeHealth(this.nodeId);
-        }),
-        switchMap(({ data: nodeHealth }) => {
-          this.ram = nodeHealth.cpu.memory.percent;
-          this.cpu = nodeHealth.cpu.processor.usage;
-          this.storage = nodeHealth.cpu.storage.percent;
-          this.gpu = Object.values(nodeHealth.gpu)[0].gpu.percent;
-          return this.nodeService.getDeviceHealth(this.nodeId);
-        }),
-        switchMap(({ data: deviceHealth }) => {
-          this.pieChartData.datasets[0].data = [
-            deviceHealth.online,
-            deviceHealth.offline,
-            deviceHealth.error,
-          ];
-          this.pieChartData = Object.assign({}, this.pieChartData);
-          return this.nodeService.getEventSummary(this.nodeId, this.timeSpan);
-        }),
-        switchMap(({ data: datapoints }) => {
-          console.log(datapoints);
-          return of(true);
-        })
-      )
-      .subscribe({
-        error: (err: HttpErrorResponse) => {
-          this.toastService.showError(err.error?.message ?? err.message);
-          return of(false);
-        },
-      });
+    const activatedRouteSubscription = this.activatedRoute.params.subscribe({
+      next: ({ nodeId }) => {
+        this.initialize(nodeId);
+
+        this.nodeService
+          .getNodeHealth(this.nodeId)
+          .pipe(
+            switchMap(({ data: nodeHealth }) => {
+              this.ram = nodeHealth.cpu.memory.percent;
+              this.cpu = nodeHealth.cpu.processor.usage;
+              this.storage = nodeHealth.cpu.storage.percent;
+              this.gpu = Object.values(nodeHealth.gpu)[0].gpu.percent;
+              return this.nodeService.getDeviceHealth(this.nodeId);
+            }),
+            switchMap(({ data: deviceHealth }) => {
+              this.pieChartData.datasets[0].data = [
+                deviceHealth.online,
+                deviceHealth.offline,
+                deviceHealth.error,
+              ];
+              this.pieChartData = Object.assign({}, this.pieChartData);
+              return EMPTY;
+            }),
+            catchError(() => EMPTY)
+          )
+          .subscribe();
+      },
+      error: (err: HttpErrorResponse) => {
+        this.toastService.showError(err.error?.message ?? err.message);
+        return of(false);
+      },
+    });
     this.subscriptions.push(activatedRouteSubscription);
   }
 
@@ -328,5 +318,7 @@ export class NodeDashboardComponent implements OnInit, OnDestroy {
 
   private initialize(nodeId: string) {
     this.nodeId = nodeId;
+    console.log('here');
+    this.triggerFetchDeviceIds$.next({ nodeId });
   }
 }

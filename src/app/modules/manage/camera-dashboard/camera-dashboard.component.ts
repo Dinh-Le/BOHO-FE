@@ -104,6 +104,8 @@ export class CameraDashboardComponent implements OnInit, OnDestroy {
   private nodeId: string = '';
   private device?: Device;
 
+  deviceIds: string[] = [];
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private deviceService: DeviceService,
@@ -145,7 +147,6 @@ export class CameraDashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    console.log('here');
     this.subscriptions.forEach((s) => s.unsubscribe());
   }
 
@@ -156,5 +157,6 @@ export class CameraDashboardComponent implements OnInit, OnDestroy {
       this.snapshotEl.src = '';
     }
     this.device = undefined;
+    this.deviceIds = [deviceId];
   }
 }

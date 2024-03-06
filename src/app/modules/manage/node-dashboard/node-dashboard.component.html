@@ -45,30 +45,8 @@
       </div>
     </div>
   </div>
-  <div class="flex-grow-1 position-relative">
-    <select
-      class="position-absolute top-0 end-0 px-2 py-1"
-      style="
-        background: #5285b6ff;
-        border: 1px solid #31538f;
-        border-radius: 0.25rem;
-      "
-      [(ngModel)]="timeSpan"
-    >
-      <option value="5min" class="bg-light text-dark">5p qua</option>
-      <option value="10min" class="bg-light text-dark">10p qua</option>
-      <option value="30min" class="bg-light text-dark">30p qua</option>
-      <option value="hour" class="bg-light text-dark">1h qua</option>
-      <option value="day" class="bg-light text-dark">24h qua</option>
-      <option value="week" class="bg-light text-dark">1 tuần qua</option>
-      <option value="month" class="bg-light text-dark">1 tháng qua</option>
-      <option value="year" class="bg-light text-dark">1 năm qua</option>
-    </select>
-    <canvas
-      baseChart
-      type="bar"
-      [data]="barChartData"
-      [options]="barChartOptions"
-    ></canvas>
-  </div>
+  <app-event-chart
+    [deviceIds]="(deviceIds$ | async)!"
+    class="flex-grow-1 flex-basis-0"
+  ></app-event-chart>
 </div>

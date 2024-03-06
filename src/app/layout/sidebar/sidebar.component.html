@@ -88,7 +88,16 @@
         [htmlFor]="'ckb-' + item.id"
         class="mx-1 flex-grow-1 text-truncate user-select-none cursor-pointer"
       >
-        <app-svg-icon [icon]="item.icon" color="green"></app-svg-icon>
+        <app-svg-icon
+          [icon]="item.icon"
+          [color]="
+            item.data?.status === 'OFFLINE'
+              ? 'red'
+              : item.data?.status === 'FAIL'
+              ? 'yellow'
+              : 'green'
+          "
+        ></app-svg-icon>
         {{ item.label }}
       </label>
     </ng-template>

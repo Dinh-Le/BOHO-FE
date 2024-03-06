@@ -5,7 +5,7 @@ import 'chartjs-adapter-moment';
 import * as Leaflet from 'leaflet';
 import { HoChiMinhCoord } from 'src/app/data/constants';
 import { ActivatedRoute } from '@angular/router';
-import { EMPTY, Subscription, concat, of, switchMap, toArray } from 'rxjs';
+import { BehaviorSubject, EMPTY, Subject, Subscription, concat, of, switchMap, toArray } from 'rxjs';
 import { DeviceService } from 'src/app/data/service/device.service';
 import { NodeService } from 'src/app/data/service/node.service';
 import { Device, NodeOperator } from 'src/app/data/schema/boho-v2';
@@ -81,6 +81,7 @@ export class GroupNodeDashboardComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
 
   status!: NodeOperatorStatus;
+  deviceIds: string[] = [];
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -104,6 +105,7 @@ export class GroupNodeDashboardComponent implements OnInit, OnDestroy {
         }),
         switchMap((responses) => {
           this.devices = responses.flatMap((r) => r.data ?? []);
+          this.deviceIds = this.devices.map((device) => device.id.toString());
           return this.nodeOperatorService.getNodeStatus(this.nodeOperatorId);
         }),
         switchMap(({ data: status }) => {
@@ -144,6 +146,7 @@ export class GroupNodeDashboardComponent implements OnInit, OnDestroy {
 
   private initialize(nodeOperatorId: string) {
     this.nodeOperatorId = nodeOperatorId;
+    this.deviceIds = [];
 
     if (this.map) {
       this.markers.forEach((m) => m.removeFrom(this.map));

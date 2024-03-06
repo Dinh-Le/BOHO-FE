@@ -23,6 +23,8 @@ import { EventImage } from './components/event-image/event-image.component';
 import { DateTimeFormatPipe } from './pipes/datetime.pipe';
 import { TranslatePipe } from './pipes/translate-vi.pipe';
 import { PasswordInputComponent } from './components/password-input/password-input.component';
+import { StaticMapComponent } from './components/static-map/static-map.component';
+import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 
 @NgModule({
   declarations: [
@@ -46,8 +48,9 @@ import { PasswordInputComponent } from './components/password-input/password-inp
     NumericInputComponent,
     EventImage,
     PasswordInputComponent,
+    StaticMapComponent,
   ],
-  imports: [CommonModule, FormsModule, NgbModule, FontAwesomeModule],
+  imports: [CommonModule, FormsModule, NgbModule, FontAwesomeModule, LeafletModule],
   exports: [
     SearchInputComponent,
     SelectComponent,
@@ -67,6 +70,7 @@ import { PasswordInputComponent } from './components/password-input/password-inp
     NumericInputComponent,
     EventImage,
     PasswordInputComponent,
+    StaticMapComponent,
   ],
 })
 export class SharedModule {}

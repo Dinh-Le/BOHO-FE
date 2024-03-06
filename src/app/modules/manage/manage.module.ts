@@ -37,6 +37,7 @@ import { CameraDashboardComponent } from './camera-dashboard/camera-dashboard.co
 import { EmptyComponent } from './empty/empty.component';
 import { FormDialogComponent } from '@shared/components/form-dialog/form-dialog.component';
 import { LicenseManagerComponent } from './license-manager/license-manager.component';
+import { EventChartComponent } from './event-chart/event-chart.component';
 
 @NgModule({
   declarations: [
@@ -67,6 +68,7 @@ import { LicenseManagerComponent } from './license-manager/license-manager.compo
     AutoResizeDirective,
     EmptyComponent,
     LicenseManagerComponent,
+    EventChartComponent,
   ],
   imports: [
     CommonModule,
