@@ -1,6 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ToastInfo, ToastService } from '@app/services/toast.service';
-import { NavigationService } from './data/service/navigation.service';
 
 @Component({
   selector: 'app-root',

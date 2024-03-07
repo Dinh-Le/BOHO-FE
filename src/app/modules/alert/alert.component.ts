@@ -1,6 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SelectItemModel } from '@shared/models/select-item-model';
-import { Subscription } from 'rxjs';
+import {
+  EMPTY,
+  Subscription,
+  concat,
+  switchMap,
+  toArray,
+} from 'rxjs';
 import { DeviceService } from 'src/app/data/service/device.service';
 import { EventService } from 'src/app/data/service/event.service';
 import { Objects, Severities } from 'src/app/data/constants';
@@ -11,6 +17,8 @@ import {
 } from 'src/app/data/service/search.service';
 import { EventFilterOptions, EventInfo } from './models';
 import * as moment from 'moment';
+import { ToastService } from '@app/services/toast.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-alert',
@@ -132,6 +140,10 @@ export class AlertComponent implements OnInit, OnDestroy {
     );
   }
 
+  get hasSelectedEvent(): boolean {
+    return this.currentEvents.some((event) => event.selected);
+  }
+
   get gridRow(): number {
     return Math.ceil(this.paginationInfo.pageLength / this.gridCol);
   }
@@ -142,7 +154,8 @@ export class AlertComponent implements OnInit, OnDestroy {
     private _deviceService: DeviceService,
     private _eventService: EventService,
     private _navigationService: NavigationService,
-    private _searchService: SearchService
+    private _searchService: SearchService,
+    private _toastService: ToastService
   ) {
     this.clearFilter();
   }
@@ -249,5 +262,37 @@ export class AlertComponent implements OnInit, OnDestroy {
         : event.images_info[0].event_type;
 
     return Objects.find((o) => o.id === event_type)?.icon ?? '';
+  }
+
+  markEventsAs(type: 'fake' | 'real' | 'important') {
+    const requests = this.currentEvents
+      .filter((event) => event.selected)
+      .map((event) => {
+        return this._eventService
+          .verify(event.device.node_id!, event.device.id as any, event.data.event_id, {
+            is_verify: type === 'real',
+          })
+          .pipe(
+            switchMap(() => {
+              event.data.is_verify = type === 'real';
+              event.selected = false;
+              return EMPTY;
+            })
+          );
+      });
+    concat(...requests)
+      .pipe(toArray())
+      .subscribe({
+        complete: () => {
+          this._toastService.showSuccess('Update event successfully');
+        },
+        error: (err: HttpErrorResponse) => {
+          this._toastService.showError(
+            `Update event failed with error: ${
+              err.error?.message ?? err.message
+            }`
+          );
+        },
+      });
   }
 }

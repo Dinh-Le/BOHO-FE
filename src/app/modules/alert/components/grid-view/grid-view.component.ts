@@ -4,7 +4,6 @@ import {
   OnChanges,
   SimpleChanges,
   ViewContainerRef,
-  inject,
 } from '@angular/core';
 import { EventInfo } from '@modules/alert/models';
 import { EventDetailComponent } from '@shared/components/event-detail/event-detail.component';
@@ -52,7 +51,7 @@ export class GridViewComponent implements OnChanges {
     });
     const component = modalRef.componentInstance as EventDetailComponent;
     component.event = eventData.data;
-    component.type = 'location';  
+    component.type = 'location';
 
     event.stopPropagation();
   }

@@ -9,8 +9,8 @@
     style="border-bottom: 1px solid #bfbfbf"
     [ngStyle]="{ background: item.background_color }"
   >
-    <label class="custom-checkbox bg-transparent">
-      <input type="checkbox" />
+    <label class="custom-checkbox bg-transparent" (click)="$event.stopPropagation()">
+      <input type="checkbox" [(ngModel)]="item.selected"/>
     </label>
     <app-svg-icon
       class="object-icon"
@@ -22,7 +22,7 @@
       <div class="text-truncate">
         {{
           item.data.images_info[0].detection_time
-            | datetime : "HH:mm:ss MM-MM-YYYY"
+            | datetime : "HH:mm:ss DD-MM-YYYY"
         }}
       </div>
       <div class="text-truncate">

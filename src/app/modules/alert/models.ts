@@ -16,4 +16,5 @@ export interface EventInfo {
   background_color: string;
   object_icon: string;
   severity: string;
+  selected?: boolean;
 }

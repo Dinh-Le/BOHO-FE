@@ -232,6 +232,7 @@ button:disabled {
 
 .content {
   flex-grow: 1;
+  flex-basis: 0;
   overflow-y: auto;
 }
 

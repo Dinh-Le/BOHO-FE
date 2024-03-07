@@ -237,3 +237,17 @@ button {
 .flex-basis-0 {
   flex-basis: 0;
 }
+
+.my-dropdown {
+      .menu {
+        display: none;
+        .menu-item:hover {
+          background-color: var(--my-bg-primary);
+        }
+      }
+    }
+    .my-dropdown:hover {
+      .menu {
+        display: block;
+      }
+    }

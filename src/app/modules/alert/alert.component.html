@@ -1,98 +1,145 @@
 <div class="toolbar">
   <div class="left">
-    <button (click)="isPaused = !isPaused">
-      <i class="bi" [ngClass]="isPaused ? 'bi-play-fill' : 'bi-pause-fill'"></i>
-    </button>
-    <button (click)="isMuted = !isMuted">
-      <i
-        class="bi"
-        [ngClass]="isMuted ? 'bi-volume-mute-fill' : 'bi-volume-up-fill'"
-      ></i>
-    </button>
-    <div class="filter">
-      <button><i class="bi bi-funnel"></i></button>
-      <ul class="menu">
-        <li>
-          <div class="title">
-            <span>Loại đối tượng</span> <i class="bi bi-chevron-right"></i>
-          </div>
-          <ul class="menu sub-menu">
-            <li
-              *ngFor="let item of objectTypes; trackBy: trackByValue"
-              (click)="item.selected = !item.selected"
-              [ngClass]="item.selected ? 'my-bg-primary' : ''"
-            >
-              {{ item.label }}
-            </li>
-          </ul>
-        </li>
-        <li>
-          <div class="title">
-            <span>Mức độ nghiêm trọng</span> <i class="bi bi-chevron-right"></i>
-          </div>
-          <ul class="menu sub-menu">
-            <li
-              class="cursor-pointer"
-              *ngFor="let item of severities; trackBy: trackByValue"
-              (click)="item.selected = !item.selected"
-              [ngClass]="item.selected ? 'my-bg-primary' : ''"
-            >
-              {{ item.label }}
-            </li>
-          </ul>
-        </li>
-        <li>
-          <div class="title">
-            <span>Nhóm quy tắc</span> <i class="bi bi-chevron-right"></i>
-          </div>
-          <ul class="menu sub-menu">
-            <li
-              class="cursor-pointer"
-              *ngFor="let item of ruleTypes; trackBy: trackByValue"
-              (click)="item.selected = !item.selected"
-              [ngClass]="item.selected ? 'my-bg-primary' : ''"
-            >
-              {{ item.label }}
-            </li>
-          </ul>
-        </li>
-        <li>Loại quy tắc</li>
-        <li>
-          <div class="title">
-            <span>Trạng thái sự kiện</span> <i class="bi bi-chevron-right"></i>
-          </div>
-          <ul class="menu sub-menu">
-            <li
-              class="cursor-pointer"
-              *ngFor="let item of eventStatues; trackBy: trackByValue"
-              [ngClass]="item.selected ? 'my-bg-primary' : ''"
-              (click)="setItem(item, eventStatues)"
-            >
-              {{ item.label }}
-            </li>
-          </ul>
-        </li>
-        <li class="seperator"></li>
-        <li (click)="clearFilter()">Xóa sự kiện</li>
-      </ul>
-    </div>
-
-    <div class="time-periods">
-      <div class="selected-item">
-        <span>{{ getItem(timePeriods)?.label }}</span>
-        <i class="bi bi-chevron-down"></i>
+    <ng-container *ngIf="!hasSelectedEvent; else hasSelectedEventView">
+      <button (click)="isPaused = !isPaused">
+        <i
+          class="bi"
+          [ngClass]="isPaused ? 'bi-play-fill' : 'bi-pause-fill'"
+        ></i>
+      </button>
+      <button (click)="isMuted = !isMuted">
+        <i
+          class="bi"
+          [ngClass]="isMuted ? 'bi-volume-mute-fill' : 'bi-volume-up-fill'"
+        ></i>
+      </button>
+      <div class="filter">
+        <button><i class="bi bi-funnel"></i></button>
+        <ul class="menu">
+          <li>
+            <div class="title">
+              <span>Loại đối tượng</span> <i class="bi bi-chevron-right"></i>
+            </div>
+            <ul class="menu sub-menu">
+              <li
+                *ngFor="let item of objectTypes; trackBy: trackByValue"
+                (click)="item.selected = !item.selected"
+                [ngClass]="item.selected ? 'my-bg-primary' : ''"
+              >
+                {{ item.label }}
+              </li>
+            </ul>
+          </li>
+          <li>
+            <div class="title">
+              <span>Mức độ nghiêm trọng</span>
+              <i class="bi bi-chevron-right"></i>
+            </div>
+            <ul class="menu sub-menu">
+              <li
+                class="cursor-pointer"
+                *ngFor="let item of severities; trackBy: trackByValue"
+                (click)="item.selected = !item.selected"
+                [ngClass]="item.selected ? 'my-bg-primary' : ''"
+              >
+                {{ item.label }}
+              </li>
+            </ul>
+          </li>
+          <li>
+            <div class="title">
+              <span>Nhóm quy tắc</span> <i class="bi bi-chevron-right"></i>
+            </div>
+            <ul class="menu sub-menu">
+              <li
+                class="cursor-pointer"
+                *ngFor="let item of ruleTypes; trackBy: trackByValue"
+                (click)="item.selected = !item.selected"
+                [ngClass]="item.selected ? 'my-bg-primary' : ''"
+              >
+                {{ item.label }}
+              </li>
+            </ul>
+          </li>
+          <li>Loại quy tắc</li>
+          <li>
+            <div class="title">
+              <span>Trạng thái sự kiện</span>
+              <i class="bi bi-chevron-right"></i>
+            </div>
+            <ul class="menu sub-menu">
+              <li
+                class="cursor-pointer"
+                *ngFor="let item of eventStatues; trackBy: trackByValue"
+                [ngClass]="item.selected ? 'my-bg-primary' : ''"
+                (click)="setItem(item, eventStatues)"
+              >
+                {{ item.label }}
+              </li>
+            </ul>
+          </li>
+          <li class="seperator"></li>
+          <li (click)="clearFilter()">Xóa sự kiện</li>
+        </ul>
       </div>
-      <ul class="menu">
-        <li
-          class="menu-item cursor-pointer"
-          *ngFor="let item of timePeriods"
-          (click)="setItem(item, timePeriods)"
-          [ngClass]="item.selected ? 'my-bg-primary' : ''"
+
+      <div class="time-periods">
+        <div class="selected-item">
+          <span>{{ getItem(timePeriods)?.label }}</span>
+          <i class="bi bi-chevron-down"></i>
+        </div>
+        <ul class="menu">
+          <li
+            class="menu-item cursor-pointer"
+            *ngFor="let item of timePeriods"
+            (click)="setItem(item, timePeriods)"
+            [ngClass]="item.selected ? 'my-bg-primary' : ''"
+          >
+            {{ item.label }}
+          </li>
+        </ul>
+      </div>
+    </ng-container>
+    <ng-template #hasSelectedEventView>
+      <div class="ms-2 position-relative my-dropdown">
+        <div
+          class="position-absolute top-0 menu"
+          style="
+            padding-top: 30px;
+            left: 50px;
+            padding-left: 50px;
+            width: 200px;
+            z-index: 1000;
+          "
         >
-          {{ item.label }}
-        </li>
-      </ul>
-    </div>
+          <ul
+            class="list-unstyled my-bg-default"
+            style="border: 1px solid var(--my-bg-primary)"
+          >
+            <li
+              class="menu-item px-2 py-1 cursor-pointer"
+              (click)="markEventsAs('real')"
+            >
+              Sự kiện thật
+            </li>
+            <li
+              class="menu-item px-2 py-1 cursor-pointer"
+              (click)="markEventsAs('fake')"
+            >
+              Sự kiện giả
+            </li>
+            <li
+              class="menu-item px-2 py-1 cursor-pointer"
+              (click)="markEventsAs('important')"
+            >
+              Sự kiện quan trọng
+            </li>
+          </ul>
+        </div>
+
+        <div class="my-btn-primary" style="width: 100px">Đánh dấu là</div>
+      </div>
+    </ng-template>
   </div>
   <div class="right">
     <app-svg-icon
@@ -155,10 +202,7 @@
       [col]="gridCol"
       [row]="gridRow"
     ></app-grid-view>
-    <app-map-view
-      *ngSwitchCase="'map'"
-      [events]="currentEvents"
-    ></app-map-view>
+    <app-map-view *ngSwitchCase="'map'" [events]="currentEvents"></app-map-view>
     <app-list-view-alert
       [events]="currentEvents"
       *ngSwitchCase="'list'"
