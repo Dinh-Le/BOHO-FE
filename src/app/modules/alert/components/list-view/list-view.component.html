@@ -8,7 +8,7 @@
   <div class="w-50 border border-light d-flex justify-content-center">
     <div style="aspect-ratio: 16/9">
       <app-event-image
-        *ngIf="events.length > 0"
+        *ngIf="event"
         [event]="event.data"
         (click)="showEventDetail()"
       ></app-event-image>
@@ -35,12 +35,12 @@
       <tr
         *ngFor="let item of events; index as i; trackBy: trackByDetectionId"
         class="my-bg-primary-hover cursor-pointer"
-        [ngClass]="eventIndex === i ? 'selected pe-none' : ''"
-        (click)="eventIndex = i"
+        [ngClass]="eventIndex === i ? 'selected' : ''"
+        (click)="onEventClick(item, i)"
       >
         <td class="py-1 px-2">
-          <label class="custom-checkbox bg-transparent">
-            <input type="checkbox" />
+          <label class="custom-checkbox bg-transparent" (click)="$event.stopPropagation()">
+            <input type="checkbox" [(ngModel)]="item.selected"/>
           </label>
         </td>
         <td class="py-1 px-2">
@@ -49,7 +49,7 @@
               | datetime : "HH:mm:ss DD-MM-YYYY"
           }}
         </td>
-        <td class="py-1 px-2">{{ item.device.address }}</td>
+        <td class="py-1 px-2">{{ item.device.address ?? '[Chưa cập nhật]' }}</td>
         <td class="py-1 px-2">{{ item.data.alarm_type }}</td>
         <td class="py-1 px-2">
           <app-svg-icon [icon]="item.object_icon"></app-svg-icon>
@@ -67,7 +67,7 @@
         </td>
       </tr>
       <tr *ngIf="events.length === 0" style="background-color: #303030ff">
-        <td [colSpan]="7" class="text-center py-1">No data</td>
+        <td [colSpan]="7" class="text-center py-1">Không có dữ liệu</td>
       </tr>
     </tbody>
   </table>
