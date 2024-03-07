@@ -9,4 +9,5 @@ export interface Milestone {
     password: string;
   };
   authen_type: string;
+  status?: string;
 }

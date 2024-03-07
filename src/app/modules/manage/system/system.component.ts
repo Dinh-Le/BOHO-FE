@@ -25,6 +25,7 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
   static counter: number = 1;
   private _id: number;
   private _form: FormGroup<any>;
+  private _status: string = 'FAILURE';
 
   constructor() {
     super();
@@ -112,6 +113,11 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
         emitEvent: true,
       }
     );
+    this._status = value.status ?? 'FAILURE';
+  }
+
+  get status(): string {
+    return this._status;
   }
 
   get data(): Milestone {
@@ -185,7 +191,7 @@ export class SystemComponent implements AfterViewInit, OnInit {
       },
       error: (err: HttpErrorResponse) =>
         this._toastService.showError(
-          `Create milestone failed with error: ${
+          `Fetch milestone failed with error: ${
             err.error?.message ?? err.message
           }`
         ),
@@ -283,7 +289,7 @@ export class SystemComponent implements AfterViewInit, OnInit {
           },
           error: (err: HttpErrorResponse) =>
             this._toastService.showError(
-              `Create milestone failed with error: ${
+              `Update milestone failed with error: ${
                 err.error?.message ?? err.message
               }`
             ),

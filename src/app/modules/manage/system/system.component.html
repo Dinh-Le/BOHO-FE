@@ -189,8 +189,9 @@
     </ng-template>
   </ng-template>
   <ng-template #statusCellTemplateRef let-row="row">
-    <div class="status" [ngClass]="row.status ? 'success' : 'failure'">
-      {{ row.status ? "THÀNH CÔNG" : "THẤT BẠI" }}
-    </div>
+    <ng-container [ngSwitch]="row.status">
+      <div class="status success" *ngSwitchCase="'SUCCESS'">THÀNH CÔNG</div>
+      <div class="status failure" *ngSwitchDefault>THẤT BẠI</div>
+    </ng-container>
   </ng-template>
 </div>
