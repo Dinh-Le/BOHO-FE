@@ -4,6 +4,7 @@ import {
   EMPTY,
   Subscription,
   concat,
+  finalize,
   switchMap,
   toArray,
 } from 'rxjs';
@@ -26,6 +27,8 @@ import { HttpErrorResponse } from '@angular/common/http';
   styleUrls: ['./alert.component.scss'],
 })
 export class AlertComponent implements OnInit, OnDestroy {
+  private readonly POLLING_INTERVAL: number = 3000;
+
   eventStatues: SelectItemModel[] = [
     { label: 'Tất cả', value: 0 },
     { label: 'Đã xem', value: 1 },
@@ -131,14 +134,7 @@ export class AlertComponent implements OnInit, OnDestroy {
     pageLength: 50,
   };
 
-  get currentEvents(): EventInfo[] {
-    const startIndex =
-      (this.paginationInfo.pageIndex - 1) * this.paginationInfo.pageLength;
-    return this.events.slice(
-      startIndex,
-      startIndex + this.paginationInfo.pageLength
-    );
-  }
+  currentEvents: EventInfo[] = [];
 
   get hasSelectedEvent(): boolean {
     return this.currentEvents.some((event) => event.selected);
@@ -148,7 +144,9 @@ export class AlertComponent implements OnInit, OnDestroy {
     return Math.ceil(this.paginationInfo.pageLength / this.gridCol);
   }
 
-  private _timer!: NodeJS.Timeout;
+  private _timer?: NodeJS.Timeout;
+  private _refreshSubscription?: Subscription;
+  private _mostRecentEventId: string = '';
 
   constructor(
     private _deviceService: DeviceService,
@@ -160,11 +158,10 @@ export class AlertComponent implements OnInit, OnDestroy {
     this.clearFilter();
   }
 
-  startTimer() {
-    this.refresh();
-  }
-
   refresh() {
+    this.cleanup();
+
+    const startTime = moment();
     const devices = this._navigationService.selectedDevices$.getValue().reduce(
       (devices, device) =>
         Object.assign(devices, {
@@ -175,7 +172,7 @@ export class AlertComponent implements OnInit, OnDestroy {
     const timePeriod = this.getItem(this.timePeriods);
     const [amount, unit] = timePeriod!.value.toString().split(' ');
 
-    return this._searchService
+    this._refreshSubscription = this._searchService
       .search({
         dis: Object.keys(devices),
         tq: 'custom',
@@ -186,6 +183,23 @@ export class AlertComponent implements OnInit, OnDestroy {
         start: moment().subtract(amount, unit).format('Y-M-D H:m:s'),
         end: moment().format('Y-M-D H:m:s'),
       })
+      .pipe(
+        finalize(() => {
+          if (this.isPaused) {
+            return;
+          }
+
+          const elapsed = moment().diff(startTime, 'milliseconds');
+          if (elapsed >= this.POLLING_INTERVAL) {
+            setImmediate(() => this.refresh());
+          } else {
+            this._timer = setTimeout(
+              () => this.refresh(),
+              this.POLLING_INTERVAL - elapsed
+            );
+          }
+        })
+      )
       .subscribe({
         next: ({ data }) => {
           this.events = data.events
@@ -203,25 +217,34 @@ export class AlertComponent implements OnInit, OnDestroy {
                   '',
               };
             });
-        },
-        complete: () => {
-          clearTimeout(this._timer);
-          this._timer = setTimeout(() => this.refresh(), 30000);
+
+          // console.log(this._mostRecentEventId, this.events[0]?.data.event_id);
+          if (
+            this._mostRecentEventId !== (this.events[0]?.data.event_id ?? '')
+          ) {
+            this._beep.play();
+            this._mostRecentEventId = this.events[0].data.event_id;
+          }
+
+          this.updateCurrentEventList();
         },
       });
   }
 
   ngOnInit(): void {
-    this.startTimer();
+    this.refresh();
 
-    this._navigationService.selectedDevices$.subscribe(() => {
-      clearTimeout(this._timer);
-      this.startTimer();
-    });
+    this._subscriptions.push(
+      this._navigationService.selectedDevices$.subscribe(() => {
+        this._mostRecentEventId = '';
+        this.refresh();
+      })
+    );
   }
 
   ngOnDestroy(): void {
-    clearTimeout(this._timer);
+    this.cleanup();
+    this._subscriptions.forEach((s) => s.unsubscribe());
   }
 
   trackByValue(_: number, item: SelectItemModel) {
@@ -269,9 +292,14 @@ export class AlertComponent implements OnInit, OnDestroy {
       .filter((event) => event.selected)
       .map((event) => {
         return this._eventService
-          .verify(event.device.node_id!, event.device.id as any, event.data.event_id, {
-            is_verify: type === 'real',
-          })
+          .verify(
+            event.device.node_id!,
+            event.device.id as any,
+            event.data.event_id,
+            {
+              is_verify: type === 'real',
+            }
+          )
           .pipe(
             switchMap(() => {
               event.data.is_verify = type === 'real';
@@ -294,5 +322,38 @@ export class AlertComponent implements OnInit, OnDestroy {
           );
         },
       });
+  }
+
+  toggleRun() {
+    this.isPaused = !this.isPaused;
+
+    if (this.isPaused) {
+      this.cleanup();
+    } else {
+      this.refresh();
+    }
+  }
+
+  toggleVolume() {
+    this.isMuted = !this.isMuted;
+    this._beep.muted = this.isMuted;
+  }
+
+  updateCurrentEventList() {
+    const startIndex =
+      (this.paginationInfo.pageIndex - 1) * this.paginationInfo.pageLength;
+    this.currentEvents = this.events.slice(
+      startIndex,
+      startIndex + this.paginationInfo.pageLength
+    );
+  }
+
+  private cleanup() {
+    if (this._timer) {
+      clearTimeout(this._timer);
+      this._timer = undefined;
+    }
+
+    this._refreshSubscription?.unsubscribe();
   }
 }

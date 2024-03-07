@@ -1,13 +1,13 @@
 <div class="toolbar">
   <div class="left">
     <ng-container *ngIf="!hasSelectedEvent; else hasSelectedEventView">
-      <button (click)="isPaused = !isPaused">
+      <button (click)="toggleRun()">
         <i
           class="bi"
           [ngClass]="isPaused ? 'bi-play-fill' : 'bi-pause-fill'"
         ></i>
       </button>
-      <button (click)="isMuted = !isMuted">
+      <button (click)="toggleVolume()">
         <i
           class="bi"
           [ngClass]="isMuted ? 'bi-volume-mute-fill' : 'bi-volume-up-fill'"
@@ -214,4 +214,5 @@
   class="paginationbar"
   [(ngModel)]="paginationInfo"
   [totalItems]="events.length"
+  (ngModelChange)="updateCurrentEventList()"
 ></app-pagination>
