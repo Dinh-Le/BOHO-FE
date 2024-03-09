@@ -28,7 +28,7 @@ export abstract class RuleService {
 
   public abstract find(
     nodeId: string,
-    deviceId: string,
+    deviceId: string | number,
     ruleId: string | number
   ): Observable<ResponseBase & { data: Rule }>;
 

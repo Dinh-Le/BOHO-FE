@@ -5,12 +5,12 @@
       height="24px"
       icon="arrow-back-arrow"
       class="cursor-pointer"
-      *ngIf="selectedEvents.length"
-      (click)="selectedEvents = []"
+      *ngIf="selectedEvents.size > 0"
+      (click)="export()"
     ></app-svg-icon>
     <button
-      *ngIf="selectedEvents.length"
-      (click)="export($event)"
+      *ngIf="selectedEvents.size > 0"
+      (click)="export()"
       class="px-3 w-auto"
       style="background: #5285b6ff"
     >
@@ -78,20 +78,23 @@
 >
   <app-grid-view
     *ngSwitchCase="'grid-view'"
-    [cols]="gridColumn"
-    [pageLength]="paginationInfo.pageLength"
-    [events]="events"
-    [(selectedEvents)]="selectedEvents"
+    [col]="gridColumn"
+    [row]="gridRow"
+    [events]="eventDataset"
+    (onChange)="onEventSelectionChange($event)"
+    (onClick)="onEventClick($event)"
   ></app-grid-view>
   <app-map-view
     *ngSwitchCase="'map-view'"
-    [events]="events"
-    [(selectedEvents)]="selectedEvents"
+    [events]="eventDataset"
+    (onChange)="onEventSelectionChange($event)"
+    (onClick)="onEventClick($event)"
   ></app-map-view>
   <app-list-view-search
     *ngSwitchCase="'list-view'"
-    [events]="events"
-    [(selectedEvents)]="selectedEvents"
+    [events]="eventDataset"
+    (onChange)="onEventSelectionChange($event)"
+    (onClick)="onEventClick($event)"
   ></app-list-view-search>
   <div *ngSwitchDefault>Unsupported view mode</div>
 </div>
@@ -156,40 +159,7 @@
       Thêm
     </button>
   </div>
-  
-  <!-- <div class="form-item">
-    <label class="label">T.gian giữa 2 kết quả</label>
-    <div class="d-flex">
-      <app-numeric-input
-        class="control"
-        unit="min"
-        formControlName="resolutionMinute"
-        required
-        [min]="0"
-        [max]="59"
-        [style]="{
-          background: '#d0cece',
-          padding: 0,
-          flex: 1,
-          marginRight: '1px',
-        }"
-      ></app-numeric-input>
-      <app-numeric-input
-        class="control"
-        unit="sec"
-        formControlName="resolutionSecond"
-        required
-        [min]="0"
-        [max]="59"
-        [style]="{
-          background: '#d0cece',
-          padding: 0,
-          flex: 1,
-          marginLeft: '1px',
-        }"
-      ></app-numeric-input>
-    </div>
-  </div> -->
+
   <div class="form-item">
     <label for="licensePlate" class="label">Biển số xe</label>
     <input

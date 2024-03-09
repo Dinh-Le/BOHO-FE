@@ -17,7 +17,7 @@
 <div class="event-info">
   <div class="fw-bold">Chi tiết đối tượng</div>
   <div class="mt-1">Camera: {{ event.device_name }}</div>
-  <div>Điểm giám sát:</div>
+  <div>Điểm giám sát: {{ (preset$ | async)?.name ?? "" }}</div>
   <div>
     Thời gian:
     {{ image?.detection_time | datetime : " DD/MM/YYYY HH:mm" }}
@@ -84,5 +84,7 @@
   </button>
 </div>
 <div class="footer" *ngIf="type === 'location'">
-  <button class="accept" style="width: 100px;" type="button" (click)="close()">Đóng</button>
+  <button class="accept" style="width: 100px" type="button" (click)="close()">
+    Đóng
+  </button>
 </div>

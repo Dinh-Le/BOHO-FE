@@ -5,10 +5,8 @@ import {
   OnChanges,
   Output,
   SimpleChanges,
-  inject,
 } from '@angular/core';
-import { EventDetailComponent } from '../../../../shared/components/event-detail/event-detail.component';
-import { NgbModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { EventData } from '@modules/search/models';
 
 @Component({
   selector: 'app-list-view-search',
@@ -16,65 +14,46 @@ import { NgbModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./list-view.component.scss'],
 })
 export class ListViewComponent implements OnChanges {
-  private _modalService = inject(NgbModal);
+  @Input() events: EventData[] = [];
+  @Output() onClick = new EventEmitter<EventData>();
+  @Output() onChange = new EventEmitter<EventData>();
 
-  @Input() events: any[] = [];
-  @Input() selectedEvents: any[] = [];
-  @Output() selectedEventsChange = new EventEmitter<any[]>();
+  currentEvent?: EventData;
 
-  currentEvent: any;
+  get address(): string {
+    return this.currentEvent?.address ?? '';
+  }
 
-  get address() {
-    return this.currentEvent
-      ? `${this.currentEvent.device_location.lat}, ${this.currentEvent.device_location.long}`
-      : '';
+  get licensePlate(): string {
+    return (
+      this.currentEvent?.data.images_info[0].recognize_result?.lisence_plate ??
+      ''
+    );
+  }
+
+  get model(): string {
+    return this.currentEvent?.data.images_info[0].recognize_result?.model ?? '';
+  }
+
+  get color(): string {
+    return this.currentEvent?.data.images_info[0].recognize_result?.color ?? '';
+  }
+
+  get alarmType(): string {
+    return this.currentEvent?.data.alarm_type ?? '';
+  }
+
+  get detectionTime(): string {
+    return this.currentEvent?.data.images_info[0].detection_time ?? '';
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (
-      'selectedEvents' in changes &&
-      changes['selectedEvents'].currentValue.length === 0
-    ) {
-      this.events = this.events.map((e) =>
-        Object.assign(e, {
-          checked: false,
-        })
-      );
-    }
-
     if ('events' in changes) {
       if (this.events.length > 0) {
         this.currentEvent = this.events[0];
       } else {
-        this.currentEvent = null;
+        this.currentEvent = undefined;
       }
-    }
-  }
-
-  onEventSelectionChange() {
-    this.selectedEvents = this.events.filter((e) => e.checked);
-    this.selectedEventsChange.emit(this.selectedEvents);
-  }
-
-  showEventDetail() {
-    if (!this.currentEvent) {
-      return;
-    }
-
-    const modalRef = this._modalService.open(EventDetailComponent, {
-      size: 'xl',
-    });
-    const component = modalRef.componentInstance as EventDetailComponent;
-    component.event = this.currentEvent;
-  }
-
-  getEventInfoBackgroundClass(level?: string): string {
-    if (level === 'medium') {
-      return 'bg-primary';
-    } else if (level === 'high') {
-      return 'bg-danger';
-    } else {
-      return 'bg-secondary';
     }
   }
 }

@@ -8,7 +8,7 @@ import { Preset } from '../schema/boho-v2/preset';
 export abstract class PresetService extends RestfullApiService {
   public abstract findAll(
     nodeId: string,
-    deviceId: string
+    deviceId: string | number
   ): Observable<FindAllResponse<Preset>>;
   public abstract update(
     nodeId: string,

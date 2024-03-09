@@ -50,7 +50,7 @@ export interface SearchEvent {
       detection_id: string;
       detection_time: string;
       event_type: string;
-      recognize_result: {
+      recognize_result?: {
         color: string;
         direction: string;
         lisence_plate: string;

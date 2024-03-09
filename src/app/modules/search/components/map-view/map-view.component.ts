@@ -14,17 +14,15 @@ import {
 import * as Leaflet from 'leaflet';
 import { LatLng } from 'leaflet';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { EventDetailComponent } from '../../../../shared/components/event-detail/event-detail.component';
 import { CustomMarker } from '@shared/models/custom-marker';
 import { NavigationService } from 'src/app/data/service/navigation.service';
-import { Subscription, finalize, tap } from 'rxjs';
-import { EventService } from 'src/app/data/service/event.service';
-import { ToastService } from '@app/services/toast.service';
-import { HttpErrorResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
+import { EventData } from '@modules/search/models';
+import { Device } from 'src/app/data/schema/boho-v2';
 
 declare class CameraInfo {
   latlng: LatLng;
-  type: 'ptz' | 'static';
+  type: 'ptz' | 'static' | string;
   events: any[];
 }
 
@@ -36,14 +34,13 @@ declare class CameraInfo {
 export class MapViewComponent implements OnInit, OnChanges, OnDestroy {
   private _modalService = inject(NgbModal);
   private _navigationService = inject(NavigationService);
-  private _eventService = inject(EventService);
-  private _toastService = inject(ToastService);
+  private _markers: CustomMarker[] = [];
+  private map?: Leaflet.Map;
 
   @ViewChild('eventListDialogTemplate')
   eventListDialogTemplateRef!: TemplateRef<any>;
 
-  map: Leaflet.Map | undefined;
-  options: Leaflet.MapOptions = {
+  readonly options: Leaflet.MapOptions = {
     layers: [
       Leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution:
@@ -53,71 +50,27 @@ export class MapViewComponent implements OnInit, OnChanges, OnDestroy {
     zoom: 16,
     center: { lat: 28.626137, lng: 79.821603 },
   };
-
-  _selectedMarker: CustomMarker | undefined;
+  
+  deviceEvents: EventData[] = [];
   subscriptions: Subscription[] = [];
 
-  @Input() events: any[] = [];
-
-  @Input() selectedEvents: any[] = [];
-  @Output() selectedEventsChange = new EventEmitter<any[]>();
-
-  get cameraList(): CameraInfo[] {
-    return Object.entries(this._navigationService.selectedDeviceIds)
-      .flatMap(([_, v]) => Object.values(v))
-      .map((device) => {
-        const lat = parseFloat(device.location.lat);
-        const lng = parseFloat(device.location.long);
-        return {
-          events: this.events.filter((e) => e.device_id === device.id),
-          latlng: new LatLng(lat, lng),
-          type: 'ptz',
-        };
-      });
-  }
-
-  get markers(): CustomMarker[] {
-    return this.cameraList.map((e) => {
-      const marker = new CustomMarker(e.latlng, e, {
-        icon: this.createMarkerIcon(e.type, true, e.events.length),
-      });
-
-      marker.on('click', (ev) => {
-        this._selectedMarker = ev.sourceTarget as CustomMarker;
-        this._modalService
-          .open(this.eventListDialogTemplateRef, {})
-          .closed.subscribe(() => (this._selectedMarker = undefined));
-      });
-
-      marker.addTo(this.map!);
-      return marker;
-    });
-  }
-
-  get eventList(): any[] {
-    return this._selectedMarker?.data.events || [];
-  }
+  @Input() events: EventData[] = [];
+  @Output() onClick = new EventEmitter<EventData>();
+  @Output() onChange = new EventEmitter<EventData>();
 
   ngOnInit(): void {
+    this.updateMarkers(this._navigationService.selectedDevices$.getValue());
+
     this.subscriptions.push(
-      this._navigationService.selectedDevices$.subscribe(() =>
-        this.refresh()
+      this._navigationService.selectedDevices$.subscribe((devices) =>
+        this.updateMarkers(devices)
       )
     );
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if ('events' in changes) {
-      this.refresh();
-    }
-
-    if (
-      'selectedEvents' in changes &&
-      changes['selectedEvents'].currentValue.length === 0
-    ) {
-      this.events = this.events.map((e) =>
-        Object.assign(e, { checked: false })
-      );
+      this.updateEventCount();
     }
   }
 
@@ -127,39 +80,74 @@ export class MapViewComponent implements OnInit, OnChanges, OnDestroy {
 
   onMapReady(map: Leaflet.Map) {
     this.map = map;
-    this.refresh();
+    this.showMarkersOnMap();
   }
 
-  refresh() {
-    if (this.map && this.markers.length > 0) {
-      let group = Leaflet.featureGroup(this.markers);
-      this.map!.fitBounds(group.getBounds());
+  closeDialog() {
+    this._modalService.dismissAll();
+  }
+
+  private updateMarkers(devices: Device[]) {
+    this._markers.forEach((marker) => {
+      if (this.map) {
+        marker.removeFrom(this.map);
+      }
+
+      marker.removeEventListener('click');
+    });
+
+    this._markers = devices.map((device) => {
+      const lat = parseFloat(device.location.lat);
+      const lng = parseFloat(device.location.long);
+      return new CustomMarker({ lat, lng }, device);
+    });
+
+    this._markers.forEach((marker) => {
+      marker.addEventListener('click', this.onMarkerClick.bind(this));
+    });
+
+    this.updateEventCount();
+
+    this.showMarkersOnMap();
+  }
+
+  private updateEventCount() {
+    this._markers.forEach((marker) => {
+      const eventCount = this.events.reduce(
+        (count, event) => count + +(event.data.device_id === marker.data.id),
+        0
+      );
+      marker.setIcon(this.createMarkerIcon(marker.data.type, true, eventCount));
+    });
+  }
+
+  private showMarkersOnMap() {
+    if (this.map && this._markers.length > 0) {
+      this._markers.forEach((marker) => marker.addTo(this.map!));
+      const group = Leaflet.featureGroup(this._markers);
+      this.map.fitBounds(group.getBounds(), {
+        padding: [50, 50],
+      });
     }
   }
 
-  generateMarker(data: any, index: number) {
-    return Leaflet.marker(data.position);
+  private onMarkerClick({ sourceTarget }: Leaflet.LeafletMouseEvent) {
+    const device = sourceTarget.data as Device;
+    this.deviceEvents = this.events.filter(
+      (event) => event.data.device_id === (device.id as any)
+    );
+    this._modalService.open(this.eventListDialogTemplateRef);
   }
 
-  getEventInfoBackgroundClass(level?: string): string {
-    if (level === 'medium') {
-      return 'bg-primary';
-    } else if (level === 'high') {
-      return 'bg-danger';
-    } else {
-      return 'bg-secondary';
-    }
-  }
-
-  createMarkerIcon(
-    type: 'ptz' | 'static',
+  private createMarkerIcon(
+    type: 'ptz' | 'static' | string,
     isSeen: boolean,
     numOfEvent: number = 0
   ): Leaflet.DivIcon {
     return Leaflet.divIcon({
       className: `leaflet-div-icon camera-icon-container`,
       html:
-        type === 'static'
+        type.toLocaleLowerCase() === 'static'
           ? `<div class="marker-icon-container me-2 ${
               isSeen ? 'event-seen' : 'event-unseen'
             }"><i class="bi bi-camera-video-fill"></i></div><span>${numOfEvent}<span>`
@@ -168,22 +156,5 @@ export class MapViewComponent implements OnInit, OnChanges, OnDestroy {
             }"><img src="assets/icons/icons8-dome-camera-32.png"/></div><span>${numOfEvent}<span>`, // Bootstrap icon class here
       iconSize: [80, 42], // Size of the icon
     });
-  }
-
-  closeDialog() {
-    this._modalService.dismissAll();
-  }
-
-  onEventSelectionChanged() {
-    this.selectedEvents = this.events.filter((e) => e.checked);
-    this.selectedEventsChange.emit(this.selectedEvents);
-  }
-
-  showEventDetail(event: any) {
-    const modalRef = this._modalService.open(EventDetailComponent, {
-      size: 'xl',
-    });
-    const component = modalRef.componentInstance as EventDetailComponent;
-    component.event = event;
   }
 }

@@ -23,22 +23,27 @@
     <div class="events-container">
       <div
         class="event-container"
-        (click)="showEventDetail(item)"
-        *ngFor="let item of eventList"
+        (click)="onClick.emit(item)"
+        *ngFor="let item of deviceEvents"
       >
-        <app-event-image class="event-image" [event]="item"></app-event-image>
+        <app-event-image
+          class="event-image"
+          [event]="item.data"
+        ></app-event-image>
         <div class="event-date">
-          {{ item.images_info[0].detection_time | datetime : "DD/MM/YYYY" }}
+          {{
+            item.data.images_info[0].detection_time | datetime : "DD/MM/YYYY"
+          }}
         </div>
         <div class="event-time">
-          {{ item.images_info[0].detection_time | datetime : "HH:mm" }}
+          {{ item.data.images_info[0].detection_time | datetime : "HH:mm" }}
         </div>
         <div class="checkbox-container">
           <label class="custom-checkbox" (click)="$event.stopPropagation()">
             <input
               type="checkbox"
-              [(ngModel)]="item.checked"
-              (ngModelChange)="onEventSelectionChanged()"
+              [(ngModel)]="item.selected"
+              (ngModelChange)="onChange.emit(item)"
             />
           </label>
         </div>

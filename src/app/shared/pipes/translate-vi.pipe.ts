@@ -6,6 +6,9 @@ const VI_Dict: {
   ONLINE: 'TỐT',
   OFFLINE: 'MẤT KẾT NỐI',
   ERROR: 'CÓ LỖI',
+  'TRESPASSING EVENT': 'Xâm nhập vùng',
+  'LOITERING EVENT': 'Đi luẩn quẩn',
+  'TRIPWIRE EVENT': 'Vượt đường kẻ',
 };
 
 @Pipe({

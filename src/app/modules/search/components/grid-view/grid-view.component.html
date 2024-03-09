@@ -9,39 +9,40 @@
   "
 >
   <div
-    *ngFor="let item of [].constructor(count); let i = index"
+    *ngFor="let item of events"
     class="event-container"
-    (click)="i < events.length && showEventDetail(i)"
+    (click)="onClick.emit(item)"
   >
-    <ng-container *ngIf="i < events.length">
-      <app-event-image [event]="events[i]"></app-event-image>
+    <app-event-image [event]="item.data"></app-event-image>
 
-      <div class="checkbox-container">
-        <label class="custom-checkbox" (click)="$event.stopPropagation()">
-          <input
-            type="checkbox"
-            [(ngModel)]="events[i].checked"
-            (ngModelChange)="onEventSelectionChanged()"
-          />
-        </label>
-      </div>
+    <div class="checkbox-container">
+      <label class="custom-checkbox" (click)="$event.stopPropagation()">
+        <input
+          type="checkbox"
+          [(ngModel)]="item.selected"
+          (ngModelChange)="onChange.emit(item)"
+        />
+      </label>
+    </div>
 
-      <span
-        style="
-          position: absolute;
-          bottom: 5px;
-          left: 50%;
-          transform: translateX(-75px);
-          background-color: #7f7f7f7f;
-          width: 150px;
-          text-align: center;
-          color: white;
-        "
-        >{{
-          events[i].images_info[0].detection_time
-            | datetime : "DD/MM/YYYY HH:mm"
-        }}</span
-      >
-    </ng-container>
+    <span
+      style="
+        position: absolute;
+        bottom: 5px;
+        left: 50%;
+        transform: translateX(-75px);
+        background-color: #7f7f7f7f;
+        width: 150px;
+        text-align: center;
+        color: white;
+      "
+      >{{
+        item.data.images_info[0].detection_time | datetime : "DD/MM/YYYY HH:mm"
+      }}</span
+    >
   </div>
+  <div
+    *ngFor="let item of [].constructor(row * col - events.length)"
+    class="event-container"
+  ></div>
 </div>

@@ -46,16 +46,17 @@ export class EventImage implements AfterViewInit, OnInit, OnDestroy, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (
-      'event' in changes &&
-      changes['event'].currentValue?.event_id !=
-        changes['event'].previousValue?.event_id
+      ('event' in changes &&
+        changes['event'].currentValue?.event_id !=
+          changes['event'].previousValue?.event_id) ||
+      'index' in changes
     ) {
       this.update();
     }
 
-    // if ('type' in changes || 'showObject' in changes || 'index' in changes) {
-    //   this.render();
-    // }
+    if ('type' in changes || 'showObject' in changes) {
+      this.render();
+    }
   }
 
   ngAfterViewInit(): void {

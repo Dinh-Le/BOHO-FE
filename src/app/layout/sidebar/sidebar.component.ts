@@ -296,6 +296,14 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onCheckboxChanged(item: TreeViewItemModel) {
+    const selectedDevicesMap: Map<number, any> =
+      this._navigationService.selectedDevices$
+        .getValue()
+        .reduce(
+          (map: Map<any, any>, device: any) => map.set(device.id, device),
+          new Map<number, any>()
+        );
+
     item.traverse((child) => {
       child.checked = item.checked;
 
@@ -304,23 +312,16 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
-      if (!(child.data.node_id in this._navigationService.selectedDeviceIds)) {
-        this._navigationService.selectedDeviceIds[child.data.node_id] = {};
-      }
-
-      if (item.checked) {
-        if (child.data.node_id in this._navigationService.selectedDeviceIds)
-          this._navigationService.selectedDeviceIds[child.data.node_id][
-            child.data.id
-          ] = child.data;
-        this._navigationService.selectedDevices$.next([]);
+      const device = child.data;
+      if (child.checked) {
+        selectedDevicesMap.set(device.id, device);
       } else {
-        delete this._navigationService.selectedDeviceIds[child.data.node_id][
-          child.data.id
-        ];
-        this._navigationService.selectedDevices$.next([]);
+        selectedDevicesMap.delete(device.id);
       }
     });
+    this._navigationService.selectedDevices$.next(
+      Array.from(selectedDevicesMap.values())
+    );
   }
 
   onMenuItemClick(event: TreeViewItemModel[]) {
@@ -331,11 +332,11 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
     } else if (this._navigationService.level1 === Level1Menu.ALERT) {
       const devices: any[] = [];
 
-      this.selectedItems[0].traverse((item)=> {
+      this.selectedItems[0].traverse((item) => {
         if (item.id.startsWith(DeviceTreeBuilder.DeviceIDPrefix)) {
           devices.push(item.data);
         }
-      })
+      });
 
       this._navigationService.selectedDevices$.next(devices);
       return;

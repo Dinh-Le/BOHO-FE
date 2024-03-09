@@ -1,32 +1,43 @@
 <div class="top">
-  <div class="event-image" (click)="showEventDetail()">
-    <app-event-image [event]="currentEvent"></app-event-image>
+  <div class="event-image">
+    <app-event-image
+      *ngIf="currentEvent"
+      [event]="currentEvent.data"
+      (click)="onClick.emit(currentEvent)"
+    ></app-event-image>
   </div>
   <div class="event-detail">
     <div class="event-prop">
       <label class="prop-label">Đối tượng:</label>
-      <ng-container [ngSwitch]="currentEvent?.images_info[0].event_type">
-        <app-svg-icon icon="side-car" *ngSwitchCase="'car'"></app-svg-icon>
-      </ng-container>
+      <app-svg-icon
+        *ngIf="currentEvent"
+        [icon]="currentEvent.objectIcon"
+        width="24px"
+        height="24px"
+      ></app-svg-icon>
     </div>
     <div class="event-prop">
       <label class="prop-label">Biển số:</label>
-      <p>{{ currentEvent?.images_info[0].recognize_result?.lisence_plate }}</p>
+      <p>
+        {{ licensePlate }}
+      </p>
     </div>
     <div class="event-prop">
       <label class="prop-label">NSX, Model, Màu:</label>
       <p>
-        {{ currentEvent?.images_info[0].recognize_result?.model }}
-        {{ currentEvent?.images_info[0].recognize_result?.color }}
+        {{ model }}
+        {{ color }}
       </p>
     </div>
     <div class="event-prop">
       <label class="prop-label">Nội dung:</label>
-      <p>{{ currentEvent?.alarm_type }}</p>
+      <p>{{ alarmType | translate }}</p>
     </div>
     <div class="event-prop">
       <label class="prop-label">Thời gian:</label>
-      <p>{{ currentEvent?.images_info[0].detection_time }}</p>
+      <p *ngIf="currentEvent">
+        {{ detectionTime | datetime : "DD/MM/YYYY H:mm:ss" }}
+      </p>
     </div>
     <div class="event-prop">
       <label class="prop-label">Địa điểm:</label>
@@ -40,13 +51,14 @@
   <table>
     <colgroup>
       <col width="32" />
+      <col span="2" width="150" class="text-center" />
+      <col width="200" />
     </colgroup>
-    <thead>
+    <thead class="sticky-top bg-black">
       <th></th>
       <th>Hình ảnh</th>
-      <th>Biển số</th>
-      <th>Loại xe</th>
-      <th>NSX, Model, Màu xe</th>
+      <th>Đối tượng</th>
+      <th>Màu</th>
       <th>Nội dung</th>
       <th>Địa điểm</th>
     </thead>
@@ -54,42 +66,41 @@
       <tr
         *ngFor="let item of events"
         (click)="currentEvent = item"
-        [class.active]="currentEvent?.event_id === item.event_id"
+        [class.active]="
+          currentEvent && item.data.event_id === currentEvent.data.event_id
+        "
         class="event-container"
       >
         <td>
-          <div class="checkbox-container">
-            <label class="custom-checkbox" (click)="$event.stopPropagation()"
-              ><input
-                type="checkbox"
-                [(ngModel)]="item.checked"
-                (ngModelChange)="onEventSelectionChange()"
-            /></label>
-          </div>
+          <label class="custom-checkbox" (click)="$event.stopPropagation()"
+            ><input
+              type="checkbox"
+              [(ngModel)]="item.selected"
+              (ngModelChange)="onChange.emit(item)"
+          /></label>
         </td>
         <td>
           <app-event-image
             class="crop-image"
-            [event]="item"
+            [event]="item.data"
             type="crop"
           ></app-event-image>
         </td>
-        <td>{{ item.images_info[0].recognize_result?.lisence_plate }}</td>
         <td>
-          {{ item.images_info[0].event_type }}
+          <app-svg-icon [icon]="item.objectIcon" width="32px" height="32px"></app-svg-icon>
         </td>
         <td>
-          {{ item.images_info[0].recognize_result?.model }}
-          {{ item.images_info[0].recognize_result?.color }}
+          {{ item.data.images_info[0].recognize_result?.color }}
         </td>
-        <td>{{ item.alarm_type }}</td>
         <td>
-          {{
-            currentEvent?.device_location.lat +
-              "," +
-              currentEvent?.device_location.long
-          }}
+          {{ item.data.alarm_type | translate }}
         </td>
+        <td>
+          {{ item.address }}
+        </td>
+      </tr>
+      <tr *ngIf="events.length === 0">
+        <td colspan="6" class="text-center py-2">No data</td>
       </tr>
     </tbody>
   </table>

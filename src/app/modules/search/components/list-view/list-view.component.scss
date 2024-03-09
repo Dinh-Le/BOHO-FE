@@ -40,28 +40,28 @@
 .event-list {
   overflow: auto;
   border-top: 1px solid #d8d8d8;
-  padding: 0px 10px;
+  // padding: 0px 10px;
 
   table {
     width: 100%;
 
-    thead {
-      position: sticky;
-    }
-
     thead,
     tr {
       border-bottom: 1px solid #d8d8d8;
+      background-color: #28282aff;
     }
 
     tr.active {
-      background: #7f7f7fff;
+      td {
+        background: #7f7f7fff;
+      }
     }
 
     th,
     td {
       margin: 0;
       padding: 2px;
+      background-color: #28282aff;
     }
 
     td,
@@ -70,8 +70,8 @@
     }
 
     .crop-image {
-      width: 50px !important;
-      height: 50px !important;
+      width: 75px !important;
+      height: 75px !important;
     }
   }
 }
