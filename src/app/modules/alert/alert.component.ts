@@ -8,18 +8,17 @@ import {
   switchMap,
   toArray,
 } from 'rxjs';
-import { DeviceService } from 'src/app/data/service/device.service';
 import { EventService } from 'src/app/data/service/event.service';
-import { Objects, Severities } from 'src/app/data/constants';
+import { Severities } from 'src/app/data/constants';
 import { NavigationService } from 'src/app/data/service/navigation.service';
 import {
-  SearchEvent,
   SearchService,
 } from 'src/app/data/service/search.service';
-import { EventFilterOptions, EventInfo } from './models';
+import { EventInfo as EventData } from './models';
 import * as moment from 'moment';
 import { ToastService } from '@app/services/toast.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import * as Utils from '@app/helpers/function';
 
 @Component({
   selector: 'app-alert',
@@ -28,6 +27,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 })
 export class AlertComponent implements OnInit, OnDestroy {
   private readonly POLLING_INTERVAL: number = 3000;
+  private readonly MAX_EVENTS: number = 100;
 
   eventStatues: SelectItemModel[] = [
     { label: 'Tất cả', value: 0 },
@@ -112,20 +112,13 @@ export class AlertComponent implements OnInit, OnDestroy {
       label: 'Người',
     },
   ];
-  filterOptions: EventFilterOptions = {
-    timePeriod: this.timePeriods[0],
-    objects: [],
-    rules: [],
-    severities: [],
-    status: this.eventStatues[0],
-  };
 
   private _subscriptions: Subscription[] = [];
   private _beep = new Audio(
     'data:audio/wav;base64,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qJrx4KOQjahZxWbcZgztj2c49nKmkId44S71j0c8eV9yDK6uPRzx5X18eDvjvQ6yKo9ZSS6l//8elePK/Lf//IInrOF/FvDoADYAGBMGb7FtErm5MXMlmPAJQVgWta7Zx2go+8xJ0UiCb8LHHdftWyLJE0QIAIsI+UbXu67dZMjmgDGCGl1H+vpF4NSDckSIkk7Vd+sxEhBQMRU8j/12UIRhzSaUdQ+rQU5kGeFxm+hb1oh6pWWmv3uvmReDl0UnvtapVaIzo1jZbf/pD6ElLqSX+rUmOQNpJFa/r+sa4e/pBlAABoAAAAA3CUgShLdGIxsY7AUABPRrgCABdDuQ5GC7DqPQCgbbJUAoRSUj+NIEig0YfyWUho1VBBBA//uQZB4ABZx5zfMakeAAAAmwAAAAF5F3P0w9GtAAACfAAAAAwLhMDmAYWMgVEG1U0FIGCBgXBXAtfMH10000EEEEEECUBYln03TTTdNBDZopopYvrTTdNa325mImNg3TTPV9q3pmY0xoO6bv3r00y+IDGid/9aaaZTGMuj9mpu9Mpio1dXrr5HERTZSmqU36A3CumzN/9Robv/Xx4v9ijkSRSNLQhAWumap82WRSBUqXStV/YcS+XVLnSS+WLDroqArFkMEsAS+eWmrUzrO0oEmE40RlMZ5+ODIkAyKAGUwZ3mVKmcamcJnMW26MRPgUw6j+LkhyHGVGYjSUUKNpuJUQoOIAyDvEyG8S5yfK6dhZc0Tx1KI/gviKL6qvvFs1+bWtaz58uUNnryq6kt5RzOCkPWlVqVX2a/EEBUdU1KrXLf40GoiiFXK///qpoiDXrOgqDR38JB0bw7SoL+ZB9o1RCkQjQ2CBYZKd/+VJxZRRZlqSkKiws0WFxUyCwsKiMy7hUVFhIaCrNQsKkTIsLivwKKigsj8XYlwt/WKi2N4d//uQRCSAAjURNIHpMZBGYiaQPSYyAAABLAAAAAAAACWAAAAApUF/Mg+0aohSIRobBAsMlO//Kk4soosy1JSFRYWaLC4qZBYWFRGZdwqKiwkNBVmoWFSJkWFxX4FFRQWR+LsS4W/rFRb/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////VEFHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU291bmRib3kuZGUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMjAwNGh0dHA6Ly93d3cuc291bmRib3kuZGUAAAAAAAAAACU='
   );
 
-  events: EventInfo[] = [];
+  events: EventData[] = [];
   paginationInfo: {
     pageIndex: number;
     pageLength: number;
@@ -133,8 +126,7 @@ export class AlertComponent implements OnInit, OnDestroy {
     pageIndex: 1,
     pageLength: 50,
   };
-
-  currentEvents: EventInfo[] = [];
+  currentEvents: EventData[] = [];
 
   get hasSelectedEvent(): boolean {
     return this.currentEvents.some((event) => event.selected);
@@ -147,9 +139,9 @@ export class AlertComponent implements OnInit, OnDestroy {
   private _timer?: NodeJS.Timeout;
   private _refreshSubscription?: Subscription;
   private _mostRecentEventId: string = '';
+  private _firstValue: boolean = true;
 
   constructor(
-    private _deviceService: DeviceService,
     private _eventService: EventService,
     private _navigationService: NavigationService,
     private _searchService: SearchService,
@@ -177,9 +169,9 @@ export class AlertComponent implements OnInit, OnDestroy {
         dis: Object.keys(devices),
         tq: 'custom',
         p: this.paginationInfo.pageIndex,
-        pl: 100,
+        pl: this.MAX_EVENTS,
         eit: this.getItem(this.ruleTypes)?.value,
-        ot: this.getItems(this.ruleTypes).map((it) => it.value),
+        ot: this.getItems(this.objectTypes).map((o) => o.value),
         start: moment().subtract(amount, unit).format('Y-M-D H:m:s'),
         end: moment().format('Y-M-D H:m:s'),
       })
@@ -190,19 +182,15 @@ export class AlertComponent implements OnInit, OnDestroy {
           }
 
           const elapsed = moment().diff(startTime, 'milliseconds');
-          if (elapsed >= this.POLLING_INTERVAL) {
-            setImmediate(() => this.refresh());
-          } else {
-            this._timer = setTimeout(
-              () => this.refresh(),
-              this.POLLING_INTERVAL - elapsed
-            );
-          }
+          this._timer = setTimeout(
+            () => this.refresh(),
+            Math.max(1, this.POLLING_INTERVAL - elapsed)
+          );
         })
       )
       .subscribe({
         next: ({ data }) => {
-          this.events = data.events
+          const events = data.events
             .filter((event) => event.device_id in devices)
             .map((event) => {
               const device = devices[event.device_id];
@@ -210,23 +198,50 @@ export class AlertComponent implements OnInit, OnDestroy {
               return {
                 data: event,
                 device: device,
-                background_color: this.getBackgroundColor(event),
-                object_icon: this.getObjectIcon(event),
+                background_color: Utils.getBackgroundColor(event),
+                object_icon: Utils.getObjectIcon(event),
                 severity:
                   Severities.find((s) => s.id === event.alarm_level)?.name ??
                   '',
               };
             });
 
-          // console.log(this._mostRecentEventId, this.events[0]?.data.event_id);
-          if (
-            this._mostRecentEventId !== (this.events[0]?.data.event_id ?? '')
-          ) {
-            this._beep.play();
-            this._mostRecentEventId = this.events[0].data.event_id;
-          }
+          if (this._firstValue) {
+            this._firstValue = false;
 
-          this.updateCurrentEventList();
+            this.events = events;
+
+            this.paginationInfo.pageIndex = 1;
+            this.updateCurrentEventList();
+
+            this._mostRecentEventId = this.events[0]?.data.event_id ?? '';
+          } else if (
+            this._mostRecentEventId !== (events[0]?.data.event_id ?? '')
+          ) {
+            const newEvents = [];
+            for (let event of events) {
+              if (event.data.event_id === this._mostRecentEventId) {
+                break;
+              }
+
+              newEvents.push(event);
+            }
+
+            this.events.unshift(...newEvents);
+
+            // Drop old events
+            if (this.events.length > this.MAX_EVENTS) {
+              this.events.splice(
+                this.MAX_EVENTS,
+                this.events.length - this.MAX_EVENTS
+              );
+            }
+
+            this.updateCurrentEventList();
+
+            this._mostRecentEventId = this.events[0].data.event_id;
+            this._beep.play();
+          }
         },
       });
   }
@@ -235,10 +250,9 @@ export class AlertComponent implements OnInit, OnDestroy {
     this.refresh();
 
     this._subscriptions.push(
-      this._navigationService.selectedDevices$.subscribe(() => {
-        this._mostRecentEventId = '';
-        this.refresh();
-      })
+      this._navigationService.selectedDevices$.subscribe(() =>
+        this.onFilterOptionsChange()
+      )
     );
   }
 
@@ -252,7 +266,7 @@ export class AlertComponent implements OnInit, OnDestroy {
   }
 
   clearFilter() {
-    this.setItem(this.timePeriods[2], this.timePeriods);
+    this.setItem(this.timePeriods[1], this.timePeriods);
   }
 
   setItem(item: SelectItemModel, items: SelectItemModel[]) {
@@ -265,26 +279,6 @@ export class AlertComponent implements OnInit, OnDestroy {
 
   getItems(items: SelectItemModel[]): SelectItemModel[] {
     return items.filter((it) => it.selected);
-  }
-
-  getBackgroundColor({ alarm_level }: SearchEvent): string {
-    switch (alarm_level) {
-      case 3:
-        return '#b84043ff';
-      case 2:
-        return '#4d8df6ff';
-      default:
-        return '#4a494bff';
-    }
-  }
-
-  getObjectIcon(event: SearchEvent): string {
-    const event_type =
-      event.images_info[0].event_type === 'person'
-        ? 'people'
-        : event.images_info[0].event_type;
-
-    return Objects.find((o) => o.id === event_type)?.icon ?? '';
   }
 
   markEventsAs(type: 'fake' | 'real' | 'important') {
@@ -346,6 +340,12 @@ export class AlertComponent implements OnInit, OnDestroy {
       startIndex,
       startIndex + this.paginationInfo.pageLength
     );
+  }
+
+  onFilterOptionsChange() {
+    this._firstValue = true;
+    this._mostRecentEventId = '';
+    this.refresh();
   }
 
   private cleanup() {

@@ -15,3 +15,14 @@ export function getObjectIcon(event: SearchEvent): string {
 
   return Objects.find((o) => o.id === event_type)?.icon ?? '';
 }
+
+export function getBackgroundColor({ alarm_level }: SearchEvent): string {
+  switch (alarm_level) {
+    case 3:
+      return '#b84043ff';
+    case 2:
+      return '#4d8df6ff';
+    default:
+      return '#4a494bff';
+  }
+}
