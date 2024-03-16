@@ -26,7 +26,50 @@
 </nav>
 <div class="d-flex align-items-center pe-2" style="z-index: 200">
   <div class="fs-18">Admin</div>
-  <div class="ms-2">
-    <i (click)="logout()" class="bi bi-person-circle fs-3 cursor-pointer"></i>
+  <div
+    class="ms-2"
+    #userMenuPopover="ngbPopover"
+    [ngbPopover]="userMenuContent"
+    triggers="manual"
+    [autoClose]="'outside'"
+    (click)="userMenuPopover.open()"
+    popoverClass="bg-light text-dark"
+  >
+    <i class="bi bi-person-circle fs-3 cursor-pointer"></i>
   </div>
 </div>
+<ng-template #userMenuContent>
+  <ul class="list-unstyled user-menu">
+    <li (click)="userMenuPopover.close(); showChangePasswordDialog()">
+      Đổi mật khẩu
+    </li>
+    <li (click)="logout()">Đăng xuất</li>
+  </ul>
+</ng-template>
+<ng-template #changePasswordContent let-modal>
+  <div class="modal-header">
+    <span class="fs-16 fw-bold">Đổi mật khẩu</span>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss()"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <password-input [formControl]="passwordFormControl"></password-input>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">
+      Đóng
+    </button>
+    <button
+      [disabled]="passwordFormControl.invalid"
+      type="button"
+      class="btn btn-primary"
+      (click)="changePassword()"
+    >
+      Lưu
+    </button>
+  </div>
+</ng-template>

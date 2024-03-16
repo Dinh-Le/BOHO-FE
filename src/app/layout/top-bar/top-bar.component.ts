@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef } from '@angular/core';
+import { FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { JWTTokenService } from '@app/services/jwt-token.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import {
   Level1Menu,
@@ -8,6 +10,7 @@ import {
 } from 'src/app/data/service/navigation.service';
 import { SidebarActions } from 'src/app/state/sidebar.action';
 import { SidebarState } from 'src/app/state/sidebar.state';
+import { ChangePasswordComponent } from '../change-password/change-password.component';
 
 interface NavItem {
   isActive?: boolean;
@@ -50,11 +53,14 @@ export class TopBarComponent implements OnInit {
     },
   ];
 
+  passwordFormControl = new FormControl<string>("", [Validators.required])
+
   constructor(
     private router: Router,
     private navigationService: NavigationService,
     private store: Store<{ sidebar: SidebarState }>,
-    private tokenService: JWTTokenService
+    private tokenService: JWTTokenService,
+    private modalService: NgbModal
   ) {}
 
   ngOnInit(): void {
@@ -83,5 +89,13 @@ export class TopBarComponent implements OnInit {
       })
     );
     this.navigationService.navigate();
+  }
+
+  showChangePasswordDialog() {
+    this.modalService.open(ChangePasswordComponent, { size: 'sm' });
+  }
+
+  changePassword() {
+
   }
 }

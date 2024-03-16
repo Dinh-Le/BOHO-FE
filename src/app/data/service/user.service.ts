@@ -63,7 +63,7 @@ export class UserServiceImpl extends UserService {
     userId: string,
     password: string
   ): Observable<ResponseBase> {
-    const url = `${environment.baseUrl}/user/update_password`;
+    const url = `${environment.baseUrl}/api/rest/v1/user/update_password`;
     return this.httpClient.post<ResponseBase>(url, {
       user_id: userId,
       password,

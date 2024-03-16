@@ -14,7 +14,7 @@ import { StoreModule } from '@ngrx/store';
 import { sidebarReducer } from './state/sidebar.reducer';
 import { TopBarComponent } from './layout/top-bar/top-bar.component';
 import { DataModule } from './data/data.module';
-import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbPopoverModule, NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
 import {
   FaIconLibrary,
   FontAwesomeModule,
@@ -34,6 +34,7 @@ import { MqttModule } from 'ngx-mqtt';
     // 3rd party module
     FontAwesomeModule,
     NgChartsModule,
+    NgbPopoverModule,
 
     StoreModule.forRoot({ sidebar: sidebarReducer }),
     MqttModule.forRoot({ connectOnCreate: false }),

@@ -4,6 +4,12 @@
 @import "../node_modules/bootstrap-icons/font/bootstrap-icons.scss";
 @import "~leaflet/dist/leaflet.css";
 
+@font-face {
+  font-family: 'Roboto';
+  src: url('./assets/fonts/Roboto-Regular.ttf');
+}
+
+
 :root {
   --my-black: #000000;
   --my-white: #ffffff;
@@ -59,7 +65,7 @@
 }
 
 * {
-  font-family: "Roboto Arial";
+  font-family: "Roboto";
   font-weight: normal;
   font-size: 14px;
 }
