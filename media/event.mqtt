@@ -4,3 +4,17 @@ url: mqtt://127.0.0.1:1883
 
 # $$
 service-communicate
+
+# ##
+topic: service-communicate
+qos: 0
+retain: false
+
+{ "bounding_box": {
+              "bottomrightx": 0.7265625,
+              "bottomrighty": 0.6083333333333333,
+              "topleftx": 0.6026041666666667,
+              "toplefty": 0.17222222222222222
+            }, "device_id": 71, "node_id": "ssjsjsj" }
+
+

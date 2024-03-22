@@ -5,10 +5,9 @@
 @import "~leaflet/dist/leaflet.css";
 
 @font-face {
-  font-family: 'Roboto';
-  src: url('./assets/fonts/Roboto-Regular.ttf');
+  font-family: "Roboto";
+  src: url("./assets/fonts/Roboto-Regular.ttf");
 }
-
 
 :root {
   --my-black: #000000;
@@ -245,15 +244,28 @@ button {
 }
 
 .my-dropdown {
-      .menu {
-        display: none;
-        .menu-item:hover {
-          background-color: var(--my-bg-primary);
-        }
-      }
+  .menu {
+    display: none;
+    .menu-item:hover {
+      background-color: var(--my-bg-primary);
     }
-    .my-dropdown:hover {
-      .menu {
-        display: block;
-      }
-    }
+  }
+}
+
+.my-dropdown:hover {
+  .menu {
+    display: block;
+  }
+}
+
+.bg-good {
+  background: rgb(168, 208, 140);
+}
+
+.bg-error {
+  background: #fcc002;
+}
+
+.bg-disconnected {
+  background: #fa0b00;
+}

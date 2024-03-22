@@ -123,16 +123,24 @@
       </div>
     </form>
   </ng-template>
-  <ng-template #statusTemplate let-data="data">
-    <div
-      style="
-        background: #a9d18e;
-        width: 120px;
-        text-align: center;
-        color: white;
-      "
-    >
-      ĐANG CHẠY
+  <ng-template #statusTemplate let-row="row">
+    <div class="d-flex align-items-center">
+      <ng-container [ngSwitch]="row.status">
+        <div
+          *ngSwitchCase="true"
+          class="badge text-capitalize"
+          style="background-color: lightgreen; color: black"
+        >
+          Đang chạy
+        </div>
+        <div
+          *ngSwitchDefault
+          class="badge text-light text-capitalize"
+          style="background-color: gray; color: white"
+        >
+          Dừng
+        </div>
+      </ng-container>
     </div>
   </ng-template>
 </div>

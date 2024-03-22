@@ -474,16 +474,18 @@
     </div>
   </ng-template>
   <ng-template #statusColumnTemplate let-row="row">
-    <container-element [ngSwitch]="row.status">
-      <span class="px-2 device-status bg-good" *ngSwitchCase="'ONLINE'">
-        {{ row.status | translate }}
-      </span>
-      <span class="px-2 device-status bg-error" *ngSwitchCase="'FAIL'">
-        {{ row.status | translate }}
-      </span>
-      <span class="px-2 device-status bg-disconnected" *ngSwitchDefault>
-        {{ row.status | translate }}
-      </span>
-    </container-element>
+    <div class="d-flex align-items-center">
+      <ng-container [ngSwitch]="row.status">
+        <span class="badge rounded-pill bg-good text-dark" *ngSwitchCase="'ONLINE'">
+          {{ row.status | translate }}
+        </span>
+        <span class="badge rounded-pill bg-error text-dark" *ngSwitchCase="'FAIL'">
+          {{ row.status | translate }}
+        </span>
+        <span class="badge rounded-pill bg-disconnected text-dark" *ngSwitchDefault>
+          {{ row.status | translate }}
+        </span>
+      </ng-container>
+    </div>
   </ng-template>
 </div>

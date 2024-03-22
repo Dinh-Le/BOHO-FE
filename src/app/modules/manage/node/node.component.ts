@@ -19,7 +19,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NodeService } from 'src/app/data/service/node.service';
 import { ToastService } from '@app/services/toast.service';
 import { Node } from 'src/app/data/schema/boho-v2/node';
-import { Subscription, catchError, of, switchMap } from 'rxjs';
+import { Subscription, switchMap } from 'rxjs';
 import { NodeTypes } from 'src/app/data/constants';
 import {
   NavigationService,
@@ -80,7 +80,7 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
       id: this.id,
       name: this.name!,
       ip: this.host!,
-      is_active: true,
+      is_activate: true,
       port: this.port!,
       node_operator_id: this.nodeOperatorId,
       type: this.type?.value!,
@@ -93,7 +93,7 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
 
   set data(node: Node) {
     this.id = node.id;
-    this.status = node.is_active;
+    this.status = node.is_activate;
     this.nodeOperatorId = node.node_operator_id;
     this.form.reset({
       name: node.name,

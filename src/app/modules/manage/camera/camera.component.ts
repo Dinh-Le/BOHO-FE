@@ -93,10 +93,6 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
         sortable: true,
       },
       {
-        label: 'Node',
-        prop: 'nodeName',
-      },
-      {
         label: 'Trạng thái',
         prop: 'status',
         width: '200',

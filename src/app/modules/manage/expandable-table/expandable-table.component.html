@@ -19,14 +19,14 @@
   <tbody *ngIf="data && data.length > 0; else noDataTemplate" class="bg-black">
     <ng-container *ngFor="let row of data; trackBy: trackById">
       <tr>
-        <td (click)="toggle(row)">
+        <td (click)="toggle(row)" class="py-1">
           <span
             class="expand-icon"
             [ngClass]="{ 'transform-rotate-90': row.isExpanded }"
             ><i class="bi bi-chevron-right"></i
           ></span>
         </td>
-        <td *ngFor="let column of columns">
+        <td *ngFor="let column of columns" class="py-1">
           <ng-container
             *ngIf="column.contentTemplateRef; else defaultContentTemplate"
             [ngTemplateOutlet]="column.contentTemplateRef"
@@ -39,7 +39,7 @@
         </td>
       </tr>
       <tr *ngIf="row.isExpanded && collapseContentTemplateRef">
-        <td [colSpan]="columns.length + 1">
+        <td [colSpan]="columns.length + 1" class="py-1">
           <div class="show px-4 py-2">
             <ng-container
               [ngTemplateOutlet]="collapseContentTemplateRef"

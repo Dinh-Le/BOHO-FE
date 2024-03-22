@@ -49,7 +49,7 @@ export interface Node {
   type: string;
   ip: string;
   port: number;
-  is_active: boolean;
+  is_activate: boolean;
   node_metadata: NodeMetadata;
   connection_metadata?: NodeConnectionMetadata;
   engine_metadata?: EngineMetadata;
