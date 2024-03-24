@@ -190,8 +190,8 @@
   </ng-template>
   <ng-template #statusCellTemplateRef let-row="row">
     <ng-container [ngSwitch]="row.status">
-      <div class="status success" *ngSwitchCase="'SUCCESS'">THÀNH CÔNG</div>
-      <div class="status failure" *ngSwitchDefault>THẤT BẠI</div>
+      <span class="badge bg-success text-dark" *ngSwitchCase="'SUCCESS'">THÀNH CÔNG</span>
+      <span class="badge bg-secondary text-light" *ngSwitchDefault>THẤT BẠI</span>
     </ng-container>
   </ng-template>
 </div>

@@ -128,15 +128,13 @@
       <ng-container [ngSwitch]="row.status">
         <div
           *ngSwitchCase="true"
-          class="badge text-capitalize"
-          style="background-color: lightgreen; color: black"
+          class="badge text-capitalize bg-success text-dark"
         >
           Đang chạy
         </div>
         <div
           *ngSwitchDefault
-          class="badge text-light text-capitalize"
-          style="background-color: gray; color: white"
+          class="badge text-light text-capitalize bg-secondary text-light"
         >
           Dừng
         </div>
