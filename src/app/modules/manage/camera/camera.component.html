@@ -476,13 +476,13 @@
   <ng-template #statusColumnTemplate let-row="row">
     <div class="d-flex align-items-center">
       <ng-container [ngSwitch]="row.status">
-        <span class="badge rounded-pill bg-good text-dark" *ngSwitchCase="'ONLINE'">
+        <span class="px-2 py-1 rounded-2 fs-10 text-uppercase status-running" *ngSwitchCase="'ONLINE'">
           {{ row.status | translate }}
         </span>
-        <span class="badge rounded-pill bg-error text-dark" *ngSwitchCase="'FAIL'">
+        <span class="px-2 py-1 rounded-2 fs-10 text-uppercase status-failure" *ngSwitchCase="'FAIL'">
           {{ row.status | translate }}
         </span>
-        <span class="badge rounded-pill bg-disconnected text-dark" *ngSwitchDefault>
+        <span class="px-2 py-1 rounded-2 fs-10 text-uppercase status-disconnected" *ngSwitchDefault>
           {{ row.status | translate }}
         </span>
       </ng-container>

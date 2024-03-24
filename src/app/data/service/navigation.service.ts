@@ -176,7 +176,7 @@ export class NavigationService {
         break;
     }
 
-    console.log('Target url: ', targetUrl);
+    // console.log('Target url: ', targetUrl);
     this.router.navigateByUrl(targetUrl);
   }
 

@@ -109,7 +109,7 @@
   cursor: pointer;
 }
 
-@for $size from 14 through 20 {
+@for $size from 10 through 20 {
   .fs-#{$size} {
     font-size: #{$size}px !important;
   }
@@ -268,4 +268,19 @@ button {
 
 .bg-disconnected {
   background: #fa0b00;
+}
+
+.status-running {
+  background-color: #70ad46;
+  color: #000000;
+}
+
+.status-disconnected {
+  background-color: #fe0000;
+  color: #000000;
+}
+
+.status-failure {
+  background-color: #ffc000;
+  color: #000000;
 }

@@ -40,6 +40,10 @@ import {
   IntegrationService,
   IntegrationServiceImpl,
 } from './service/integration.service';
+import {
+  LicenseKeyService,
+  LicenseKeyServiceImpl,
+} from './service/license_key.service';
 
 const providers = [
   { provide: UserService, useClass: UserServiceImpl },
@@ -60,6 +64,7 @@ const providers = [
   { provide: SearchService, useClass: SearchServiceImpl },
   { provide: EventService, useClass: EventServiceImpl },
   { provide: IntegrationService, useClass: IntegrationServiceImpl },
+  { provide: LicenseKeyService, useClass: LicenseKeyServiceImpl },
 ];
 
 @NgModule({
