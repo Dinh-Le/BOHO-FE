@@ -16,6 +16,6 @@ jobs:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_PASSWORD }}
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag blackrookie/boho:v1.0 --platform linux/amd64
+      run: docker build . --file Dockerfile --tag blackrookie/boho:v1.0-bh --platform linux/amd64
     - name: Push the Docker image to registry
       run: docker push blackrookie/boho:v1.0-bh
