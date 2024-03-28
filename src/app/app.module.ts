@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { ContentLayoutComponent } from './layout/content-layout/content-layout.component';
@@ -22,6 +22,7 @@ import {
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { NgChartsModule } from 'ng2-charts';
 import { MqttModule } from 'ngx-mqtt';
+import { AppConfigurationService } from '@app/services/app-config.service';
 
 @NgModule({
   imports: [
@@ -48,7 +49,15 @@ import { MqttModule } from 'ngx-mqtt';
     AppRoutingModule,
     NgbToastModule,
   ],
-  providers: [{ provide: LocationStrategy, useClass: PathLocationStrategy }],
+  providers: [
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (appConfig: AppConfigurationService) => () => appConfig.load(),
+      deps: [AppConfigurationService],
+      multi: true,
+    },
+    { provide: LocationStrategy, useClass: PathLocationStrategy }
+  ],
   bootstrap: [AppComponent],
   declarations: [
     AppComponent,

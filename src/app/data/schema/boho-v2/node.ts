@@ -54,4 +54,5 @@ export interface Node {
   connection_metadata?: NodeConnectionMetadata;
   engine_metadata?: EngineMetadata;
   node_operator_id: string;
+  status?: boolean;
 }

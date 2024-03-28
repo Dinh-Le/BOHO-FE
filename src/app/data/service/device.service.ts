@@ -1,4 +1,4 @@
-import { Injectable, Optional } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ResponseBase } from '../schema/boho-v2/response-base';
 import { Device } from '../schema/boho-v2/device';

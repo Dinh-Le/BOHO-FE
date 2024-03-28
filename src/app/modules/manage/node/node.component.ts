@@ -93,7 +93,7 @@ class RowItemModel extends ExpandableTableRowItemModelBase {
 
   set data(node: Node) {
     this.id = node.id;
-    this.status = node.is_activate;
+    this.status = node.status ?? false;
     this.nodeOperatorId = node.node_operator_id;
     this.form.reset({
       name: node.name,
