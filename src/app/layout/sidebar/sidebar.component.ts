@@ -100,7 +100,7 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getColor(item: TreeViewItemModel): string {
     if (item.id.startsWith(DeviceTreeBuilder.NodeIDPrefix)) {
-      return item.data?.is_activate ? '#70ad46' : '#fe0000';
+      return item.data?.status ? '#70ad46' : '#fe0000';
     }
 
     return item.data?.status === 'OFFLINE'
