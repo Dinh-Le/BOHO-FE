@@ -90,13 +90,7 @@
       >
         <app-svg-icon
           [icon]="item.icon"
-          [color]="
-            item.data?.status === 'OFFLINE'
-              ? 'red'
-              : item.data?.status === 'FAIL'
-              ? 'yellow'
-              : 'green'
-          "
+          [color]="getColor(item)"
         ></app-svg-icon>
         {{ item.label }}
       </label>
