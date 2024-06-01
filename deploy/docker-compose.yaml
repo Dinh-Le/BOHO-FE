@@ -1,0 +1,10 @@
+version: "3.1"
+
+services:
+  webapp:
+    image: blackrookie/boho:v1.0
+    restart: always
+    volumes:
+      - ./app-configuration.json:/usr/share/nginx/html/boho/assets/app-configuration.json
+    ports:
+      - 8081:80
