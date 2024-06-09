@@ -11,9 +11,7 @@ import {
 import { EventService } from 'src/app/data/service/event.service';
 import { Severities } from 'src/app/data/constants';
 import { NavigationService } from 'src/app/data/service/navigation.service';
-import {
-  SearchService,
-} from 'src/app/data/service/search.service';
+import { SearchService } from 'src/app/data/service/search.service';
 import { EventInfo as EventData } from './models';
 import * as moment from 'moment';
 import { ToastService } from '@app/services/toast.service';
@@ -257,6 +255,7 @@ export class AlertComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.isPaused = true;
     this.cleanup();
     this._subscriptions.forEach((s) => s.unsubscribe());
   }

@@ -1,4 +1,4 @@
 {
   "production": true,
-  "baseUrl": "http://10.20.30.250:5500"
+  "baseUrl": "http://127.0.0.1:5500"
 }
