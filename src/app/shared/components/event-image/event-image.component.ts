@@ -154,7 +154,34 @@ export class EventImage implements AfterViewInit, OnInit, OnDestroy, OnChanges {
       // console.log({ bx, by, bw, bh });
 
       if (this.showObject) {
-        const text = this.event.images_info[this.index].event_type;
+        let text = '';
+        // 1. Person: current = Person --> change = P
+        // 2. Car: current = Car --> change = C
+        // 3. Truck: current = Truck --> change = T
+        // 4. Bus: current = Bus --> change = B
+        // 5. Motorcycle: current = Motorcycle --> change = M
+
+        // 0 - bike, 1 - car, 2 - bus, 3 - truck, 4 - ambulance, 5 - firetruck, 6 - people;
+        switch (this.event.images_info[this.index].event_type) {
+          case 'bike':
+            text = 'M';
+            break;
+          case 'car':
+            text = 'C';
+            break;
+          case 'bus':
+            text = 'B';
+            break;
+          case 'struck':
+            text = 'T';
+            break;
+          case 'people':
+            text = 'P';
+            break;
+          default:
+            text = this.event.images_info[this.index].event_type;
+            break;
+        }
 
         context.font = '14px Arial';
         const { width: textWidth } = context.measureText(text);
