@@ -8,6 +8,7 @@ import { HttpParams } from '@angular/common/http';
 export interface SearchQuery {
   dis?: string[];
   ot?: number[];
+  lp?: string;
   tq:
     | 'custom'
     | 'day'
@@ -65,7 +66,7 @@ export interface SearchEvent {
   start_time: Date;
   tracking_number: number;
   updated_at: Date;
-};
+}
 
 namespace SearchService {}
 

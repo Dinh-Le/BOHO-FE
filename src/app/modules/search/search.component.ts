@@ -72,7 +72,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     endTime: string;
     objectIds?: string[];
     ruleId?: string;
-    liencePlate: string;
+    licensePlate: string;
     showVehicleOnly: boolean;
     pageIndex: number;
     pageLength: number;
@@ -135,6 +135,7 @@ export class SearchComponent implements OnInit, OnDestroy {
               ruleId,
               pageIndex,
               pageLength,
+              licensePlate,
             }) =>
               this._searchService
                 .search({
@@ -146,6 +147,7 @@ export class SearchComponent implements OnInit, OnDestroy {
                   ot: objectIds?.map((id) => this.ObjectIdMap[id]),
                   start: startTime,
                   end: endTime,
+                  lp: licensePlate === '' ? undefined : licensePlate,
                 })
                 .pipe(
                   switchMap(({ data: { events, total, total_pages } }) => {
@@ -202,7 +204,7 @@ export class SearchComponent implements OnInit, OnDestroy {
         'Y-M-D H:m:s'
       ),
       endTime: moment(this.form.get('endTime')!.value).format('Y-M-D H:m:s'),
-      liencePlate: '',
+      licensePlate: this.form.get('licensePlate')?.value?.trim() ?? '',
       showVehicleOnly: false,
       pageIndex: this.paginationInfo.pageIndex,
       pageLength: this.paginationInfo.pageLength,
