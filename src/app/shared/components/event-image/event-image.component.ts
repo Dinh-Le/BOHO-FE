@@ -192,11 +192,7 @@ export class EventImage implements AfterViewInit, OnInit, OnDestroy, OnChanges {
         context.fillStyle =
           context.strokeStyle === '#ffff00' ? 'black' : 'white';
         // console.log(context.strokeStyle, context.fillStyle);
-        context.fillText(
-          this.event.images_info[this.index].event_type,
-          bx,
-          by - 12 * scaleFactor
-        );
+        context.fillText(text, bx, by - 12 * scaleFactor);
       }
     }
   }
