@@ -15,6 +15,14 @@ const VI_Dict: {
   bus: 'Xe buýt',
   struck: 'Xe tải',
   white: 'Trắng',
+  black: 'Đen',
+  blue: 'Xanh',
+  brown: 'Nâu',
+  gray: 'Xám',
+  green: 'Xanh lá cây',
+  pink: 'Hồng',
+  red: 'Đỏ',
+  yellow: 'Vàng',
 };
 
 @Pipe({
