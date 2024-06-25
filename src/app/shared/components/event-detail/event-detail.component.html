@@ -23,8 +23,8 @@
     {{ image?.detection_time | datetime : " DD/MM/YYYY HH:mm" }}
   </div>
   <div>ID đối tượng: {{ image?.detection_id }}</div>
-  <div>Loại: {{ image?.event_type }}</div>
-  <div>Màu sắc: {{ image?.recognize_result?.color }}</div>
+  <div>Loại: {{ image?.event_type | translate }}</div>
+  <div>Màu sắc: {{ image?.recognize_result?.color | translate }}</div>
   <div>Biển số: {{ image?.recognize_result?.lisence_plate }}</div>
 </div>
 <div class="progress-bar" *ngIf="type === 'image'">

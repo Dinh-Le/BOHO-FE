@@ -3,19 +3,25 @@ import { Pipe, PipeTransform } from '@angular/core';
 const VI_Dict: {
   [key: string]: string;
 } = {
-  ONLINE: 'Tốt',
-  OFFLINE: 'Mất Kết Nối',
-  ERROR: 'Có Lỗi',
-  'TRESPASSING EVENT': 'Xâm nhập vùng',
-  'LOITERING EVENT': 'Đi luẩn quẩn',
-  'TRIPWIRE EVENT': 'Vượt đường kẻ',
+  online: 'Tốt',
+  offline: 'Mất Kết Nối',
+  error: 'Có Lỗi',
+  'trespassing event': 'Xâm nhập vùng',
+  'loitering event': 'Đi luẩn quẩn',
+  'tripwire event': 'Vượt đường kẻ',
+  car: 'Ô tô',
+  people: 'Người',
+  bike: 'Xe máy',
+  bus: 'Xe buýt',
+  struck: 'Xe tải',
+  white: 'Trắng',
 };
 
 @Pipe({
   name: 'translate',
 })
 export class TranslatePipe implements PipeTransform {
-  transform(value: any, ...args: any[]) {
-    return VI_Dict[value] || value;
+  transform(value: string | undefined, ...args: any[]) {
+    return VI_Dict[value?.toLowerCase() ?? ''] || value;
   }
 }
