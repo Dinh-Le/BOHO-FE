@@ -11,6 +11,7 @@ import * as Leaflet from 'leaflet';
 import { PresetService } from 'src/app/data/service/preset.service';
 import { Preset } from 'src/app/data/schema/boho-v2/preset';
 import { RuleService } from 'src/app/data/service/rule.service';
+import { NavigationService } from 'src/app/data/service/navigation.service';
 
 @Component({
   selector: 'app-event-detail-dialog',
@@ -21,6 +22,7 @@ import { RuleService } from 'src/app/data/service/rule.service';
 })
 export class EventDetailComponent implements OnInit {
   @Input() type: 'location' | 'image' = 'image';
+  @Input() showPresetInfo: boolean = false;
 
   event!: SearchEvent;
   index: number = 0;

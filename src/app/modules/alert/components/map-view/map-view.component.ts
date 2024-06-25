@@ -15,6 +15,7 @@ import { Subscription } from 'rxjs';
 import { EventInfo } from '@modules/alert/models';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventDetailComponent } from '@shared/components/event-detail/event-detail.component';
+import { CameraType_PTZ } from 'src/app/data/constants';
 
 class ExtendedMarker extends Leaflet.Marker {
   private _camera: any;
@@ -169,5 +170,6 @@ export class MapViewComponent implements OnInit, OnDestroy {
     });
     const component = modalRef.componentInstance as EventDetailComponent;
     component.event = event.data;
+    component.showPresetInfo = event.device.camera.type === CameraType_PTZ;
   }
 }

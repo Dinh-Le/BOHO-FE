@@ -12,6 +12,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Leaflet from 'leaflet';
 import { NavigationService } from 'src/app/data/service/navigation.service';
 import { Subject, Subscription } from 'rxjs';
+import { CameraType_PTZ } from 'src/app/data/constants';
 
 @Component({
   selector: 'app-list-view-alert',
@@ -59,7 +60,6 @@ export class ListViewComponent implements OnChanges {
     }
   }
 
-
   trackByDetectionId(_: number, event: EventInfo) {
     return event.data.images_info[0].detection_id;
   }
@@ -74,6 +74,8 @@ export class ListViewComponent implements OnChanges {
     });
     const component = modalRef.componentInstance as EventDetailComponent;
     component.event = this.event!.data;
+    component.showPresetInfo =
+      this.event!.device.camera.type === CameraType_PTZ;
   }
 
   onEventClick(event: EventInfo, index: number) {

@@ -17,7 +17,9 @@
 <div class="event-info">
   <div class="fw-bold">Chi tiết đối tượng</div>
   <div class="mt-1">Camera: {{ event.device_name }}</div>
-  <div>Điểm giám sát: {{ (preset$ | async)?.name ?? "" }}</div>
+  <div *ngIf="showPresetInfo">
+    Điểm giám sát: {{ (preset$ | async)?.name ?? "" }}
+  </div>
   <div>
     Thời gian:
     {{ image?.detection_time | datetime : " DD/MM/YYYY HH:mm" }}

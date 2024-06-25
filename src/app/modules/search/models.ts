@@ -5,4 +5,5 @@ export interface EventData {
   address: string;
   selected?: boolean;
   objectIcon: string;
+  cameraType: string;
 }

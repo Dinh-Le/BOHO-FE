@@ -8,6 +8,7 @@ import {
 import { EventInfo } from '@modules/alert/models';
 import { EventDetailComponent } from '@shared/components/event-detail/event-detail.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { CameraType_PTZ } from 'src/app/data/constants';
 
 @Component({
   selector: 'app-grid-view',
@@ -43,6 +44,7 @@ export class GridViewComponent implements OnChanges {
     });
     const component = modalRef.componentInstance as EventDetailComponent;
     component.event = event.data;
+    component.showPresetInfo = event.device.camera.type === CameraType_PTZ;
   }
 
   showEventLocation(event: Event, eventData: EventInfo) {

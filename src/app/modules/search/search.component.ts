@@ -26,6 +26,7 @@ import * as Utils from '@app/helpers/function';
 import { Device } from 'src/app/data/schema/boho-v2';
 import { EventData } from './models';
 import { EventDetailComponent } from '@shared/components/event-detail/event-detail.component';
+import { CameraType_PTZ } from 'src/app/data/constants';
 
 @Component({
   selector: 'app-search',
@@ -162,6 +163,7 @@ export class SearchComponent implements OnInit, OnDestroy {
                         address: device?.address ?? '[Chưa cập nhật]',
                         objectIcon: Utils.getObjectIcon(event),
                         selected: false,
+                        cameraType: device?.camera.type || '',
                       };
                     });
                     return EMPTY;
@@ -253,11 +255,12 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
   }
 
-  onEventClick({ data }: EventData) {
+  onEventClick({ data, cameraType }: EventData) {
     const modalRef = this._modalService.open(EventDetailComponent, {
       size: 'xl',
     });
     const component = modalRef.componentInstance as EventDetailComponent;
     component.event = data;
+    component.showPresetInfo = cameraType === CameraType_PTZ;
   }
 }
