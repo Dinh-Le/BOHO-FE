@@ -42,7 +42,7 @@ export class SelectObjectDialogComponent {
   objectItemModels: ObjectItemModel[] = Objects.map(
     (e) => new ObjectItemModel(e)
   );
-  colors = Colors;
+  colors = Colors.slice(1);
   showHumanColorSelection = false;
   selectedItem?: ObjectItemModel;
 

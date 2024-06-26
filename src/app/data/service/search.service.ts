@@ -24,6 +24,7 @@ export interface SearchQuery {
   end?: string;
   p: number;
   pl: number;
+  color?: number[];
 }
 
 export interface SearchEvent {

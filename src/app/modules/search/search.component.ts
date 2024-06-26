@@ -27,6 +27,7 @@ import { Device } from 'src/app/data/schema/boho-v2';
 import { EventData } from './models';
 import { EventDetailComponent } from '@shared/components/event-detail/event-detail.component';
 import { CameraType_PTZ } from 'src/app/data/constants';
+import { ColorNames } from 'src/app/data/constants/colors.constant';
 
 @Component({
   selector: 'app-search',
@@ -77,6 +78,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     showVehicleOnly: boolean;
     pageIndex: number;
     pageLength: number;
+    color: number[];
   }>();
   isLoading$ = new BehaviorSubject<boolean>(false);
   form = new FormGroup({
@@ -137,6 +139,7 @@ export class SearchComponent implements OnInit, OnDestroy {
               pageIndex,
               pageLength,
               licensePlate,
+              color,
             }) =>
               this._searchService
                 .search({
@@ -149,6 +152,7 @@ export class SearchComponent implements OnInit, OnDestroy {
                   start: startTime,
                   end: endTime,
                   lp: licensePlate === '' ? undefined : licensePlate,
+                  color,
                 })
                 .pipe(
                   switchMap(({ data: { events, total, total_pages } }) => {
@@ -210,8 +214,16 @@ export class SearchComponent implements OnInit, OnDestroy {
       showVehicleOnly: false,
       pageIndex: this.paginationInfo.pageIndex,
       pageLength: this.paginationInfo.pageLength,
-      objectIds: this.form.get('objects')?.value?.map((object) => object.id),
+      objectIds: this.selectedObjects.map((object) => object.id),
       ruleId: this.form.get('rule')?.value?.value,
+      color: this.selectedObjects.map((o) => {
+        /// Not support color for type of people/bike
+        if (o.id === 'people' || o.id === 'bike' || o.colors[0] === '') {
+          return 0;
+        }
+
+        return ColorNames.findIndex((color) => color === o.colors[0]);
+      }),
     });
   }
 
