@@ -1,1 +1,1 @@
-export const NodeTypes: string[] = ['TensorTRT', 'DeepStream'];
+export const NodeTypes: string[] = ['TensorTRT'];

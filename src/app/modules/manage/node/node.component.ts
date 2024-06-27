@@ -202,6 +202,10 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     item.isNew = true;
     item.isExpanded = true;
     item.nodeOperatorId = this._nodeOperatorId;
+    item.form.get('type')?.setValue({
+      value: NodeTypes[0],
+      label: NodeTypes[0],
+    });
     this.data.push(item);
   }
 
