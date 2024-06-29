@@ -262,6 +262,29 @@ export class ScheduleComponent implements OnInit, OnDestroy {
       });
   }
 
+  _isMouseDown = false;
+  _state = false;
+
+  onMouseUp() {
+    // console.log(`mouseup`);
+    this._isMouseDown = false;
+  }
+
+  onMouseDown(item: RowItemModel, i: number, j: number) {
+    // console.log(`mousedown: ${i}, ${j}`);
+    this._isMouseDown = item.isEditable ?? false;
+    this._state = item.scheduleData[i][j];
+  }
+
+  onMouseEnter(item: RowItemModel, i: number, j: number) {
+    // console.log(`mouseenter: ${i}, ${j}`);
+    if (!this._isMouseDown) {
+      return;
+    }
+
+    item.scheduleData[i][j] = this._state;
+  }
+
   get ruleUrl() {
     return `/manage/device-rule/node/${this._nodeId}/camera/${this._cameraId}/rule`;
   }

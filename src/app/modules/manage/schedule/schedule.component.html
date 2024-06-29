@@ -50,6 +50,7 @@
           grid-template-columns: 20px repeat(48, 1fr);
           height: 40px;
         "
+        (mouseup)="onMouseUp()"
       >
         <span>{{ daysInWeek[i] }}</span>
         <span
@@ -57,6 +58,8 @@
           class="border border-1 border-dark cursor-pointer"
           *ngFor="let hour of day; let j = index"
           [ngStyle]="{ background: hour ? '#5285B6' : '#7F7F7F' }"
+          (mousedown)="onMouseDown(data, i, j)"
+          (mouseenter)="onMouseEnter(data, i, j)"
         >
         </span>
       </div>
