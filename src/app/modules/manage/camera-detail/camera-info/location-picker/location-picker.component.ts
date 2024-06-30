@@ -3,6 +3,7 @@ import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { FormDialogComponent } from '@shared/components/form-dialog/form-dialog.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Leaflet from 'leaflet';
+import Geocoder from 'leaflet-control-geocoder';
 
 @Component({
   selector: 'app-location-picker',
@@ -57,6 +58,9 @@ export class LocationPickerComponent {
     this.map = $event as Leaflet.Map;
     this.marker.addTo(this.map);
     this.map.panTo(this.marker.getLatLng());
+
+    const control = new Geocoder();
+    control.addTo(this.map);
   }
 
   mapClicked($event: any) {

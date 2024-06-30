@@ -3,6 +3,7 @@
 @import "../node_modules/bootstrap/scss/bootstrap.scss";
 @import "../node_modules/bootstrap-icons/font/bootstrap-icons.scss";
 @import "~leaflet/dist/leaflet.css";
+@import "~leaflet-control-geocoder/dist/Control.Geocoder.css";
 
 @font-face {
   font-family: "Roboto";
@@ -283,4 +284,8 @@ button {
 .status-failure {
   background-color: #ffc000;
   color: #000000;
+}
+
+.leaflet-control-geocoder-form input {
+  color: black;
 }
