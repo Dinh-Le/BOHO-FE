@@ -11,6 +11,7 @@ export type CreateOrUpdateDeviceRequestDto = Pick<
   'name' | 'is_active' | 'type' | 'camera' | 'address' | 'location'
 > & {
   location?: any;
+  group_id?: number;
 };
 
 export type CreateDeviceResponeDto = ResponseBase & {
@@ -105,6 +106,7 @@ export class DeviceServiceImpl extends DeviceService {
       camera,
       location,
       address,
+      group_id,
     }: CreateOrUpdateDeviceRequestDto
   ): Observable<CreateDeviceResponeDto> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device`;
@@ -112,7 +114,7 @@ export class DeviceServiceImpl extends DeviceService {
       url,
       Object.assign(
         {},
-        { name, is_active, type, camera, address },
+        { name, is_active, type, camera, address, group_id },
         {
           location: location ?? HoChiMinhCoord,
         }
@@ -145,6 +147,7 @@ export class DeviceServiceImpl extends DeviceService {
       camera,
       location,
       address,
+      group_id,
     }: CreateOrUpdateDeviceRequestDto
   ): Observable<
     ResponseBase & {
@@ -164,7 +167,7 @@ export class DeviceServiceImpl extends DeviceService {
       url,
       Object.assign(
         {},
-        { name, is_active, type, camera, address },
+        { name, is_active, type, camera, address, group_id },
         {
           location: location ?? HoChiMinhCoord,
         }

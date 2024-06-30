@@ -129,6 +129,7 @@ export class CameraInfoComponent implements OnInit, OnDestroy {
           type: this._device.camera.type,
           connection_metadata: this._device.camera.connection_metadata,
         },
+        group_id: this._device.group_info?.group_id,
       })
       .subscribe({
         error: (err: HttpErrorResponse) =>

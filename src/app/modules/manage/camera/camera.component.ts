@@ -126,6 +126,12 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
         next: ({ data: devices }) => {
           this.data = devices.map((device) => {
             const row = new RowItemModel(device);
+            if (device.group_info) {
+              row.form.get('group')?.setValue({
+                value: device.group_info.group_id,
+                label: device.group_info.group_name,
+              } as SelectItemModel);
+            }
             row.status = device.status ?? DeviceStatus_Disconnected;
             return row;
           });
@@ -188,6 +194,7 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
         connection_metadata: {},
       },
       location: HoChiMinhCoord,
+      group_id: (item.group as SelectItemModel).value,
     };
 
     if (item.isRtsp) {

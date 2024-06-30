@@ -54,4 +54,9 @@ export interface Device {
   node_id?: string;
   status?: string;
   address?: string;
+  group_info?: {
+    group_id: number;
+    group_management_id: number;
+    group_name: string;
+  };
 }
