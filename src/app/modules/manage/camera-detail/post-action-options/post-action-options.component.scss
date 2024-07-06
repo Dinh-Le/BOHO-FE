@@ -1,0 +1,30 @@
+.form {
+  background: inherit;
+}
+.form-header {
+  background: #d9d9d9;
+  color: black;
+}
+.form-body {
+  .form-item {
+    display: grid;
+    grid-template-columns: 150px 200px auto;
+    margin-bottom: 0.5rem;
+    column-gap: 0.5rem;
+    align-items: center;
+
+    select,
+    input {
+      border-radius: 5px;
+      border: 1px solid #f2f2f2;
+      color: white;
+      background: inherit;
+      outline: none;
+      padding: 0.5rem 0.25rem;
+    }
+  }
+
+  .form-item:last-child {
+    margin-bottom: 0;
+  }
+}

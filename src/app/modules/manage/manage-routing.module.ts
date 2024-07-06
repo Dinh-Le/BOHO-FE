@@ -22,6 +22,7 @@ import { GroupNodeDashboardComponent } from './group-node-dashboard/group-node-d
 import { CameraDashboardComponent } from './camera-dashboard/camera-dashboard.component';
 import { EmptyComponent } from './empty/empty.component';
 import { LicenseManagerComponent } from './license-manager/license-manager.component';
+import { ChuyenPTZComponent } from './camera-detail/chuyen-ptz/chuyen-ptz.component';
 
 @NgModule({
   imports: [
@@ -52,7 +53,7 @@ import { LicenseManagerComponent } from './license-manager/license-manager.compo
               {
                 path: '',
                 pathMatch: 'full',
-                redirectTo: 'license-manager'
+                redirectTo: 'license-manager',
               },
               {
                 path: 'license-manager',
@@ -62,7 +63,7 @@ import { LicenseManagerComponent } from './license-manager/license-manager.compo
                 path: 'milestone-vms',
                 component: SystemComponent,
               },
-            ]
+            ],
           },
           {
             path: 'group-node',
@@ -104,6 +105,10 @@ import { LicenseManagerComponent } from './license-manager/license-manager.compo
               {
                 path: 'tour-settings',
                 component: TourSettingsComponent,
+              },
+              {
+                path: 'chuyen-ptz',
+                component: ChuyenPTZComponent,
               },
             ],
           },

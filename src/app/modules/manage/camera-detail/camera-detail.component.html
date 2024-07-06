@@ -17,6 +17,14 @@
       {{ item.title }}
     </a>
   </div>
+  <div class="ms-auto" *ngIf="isChuyenPtzActive">
+    <button class="my-btn my-bg-primary me-2" (click)="add()">
+      <span class="me-2">+</span> Thêm
+    </button>
+    <button class="my-btn my-bg-secondary me-2" (click)="remove()">
+      <span class="me-2">-</span> Xóa
+    </button>
+  </div>
 </div>
 
-<router-outlet></router-outlet>
+<router-outlet (activate)="onActivate($event)"></router-outlet>

@@ -1,0 +1,35 @@
+table {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    background: #f2f2f2;
+    color: #3d3b3e;
+    text-align: center;
+    border-bottom: 1px solid black;
+    padding: 5px 10px;
+  }
+
+  td {
+    text-align: center;
+    color: white;
+    background: #4a494bff;
+    border-bottom: 2px solid black;
+    padding: 5px 10px;
+  }
+
+  select,
+  input {
+    border-radius: 5px;
+    border: 1px solid #f2f2f2;
+    padding: 4px 2px;
+    color: white;
+    background: inherit;
+    outline: none;
+  }
+
+  select {
+    width: 100%;
+  }
+}

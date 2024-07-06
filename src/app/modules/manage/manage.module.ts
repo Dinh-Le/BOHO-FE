@@ -38,6 +38,8 @@ import { EmptyComponent } from './empty/empty.component';
 import { FormDialogComponent } from '@shared/components/form-dialog/form-dialog.component';
 import { LicenseManagerComponent } from './license-manager/license-manager.component';
 import { EventChartComponent } from './event-chart/event-chart.component';
+import { ChuyenPTZComponent } from './camera-detail/chuyen-ptz/chuyen-ptz.component';
+import { PostActionOptions } from './camera-detail/post-action-options/post-action-options.component';
 
 @NgModule({
   declarations: [
@@ -69,6 +71,8 @@ import { EventChartComponent } from './event-chart/event-chart.component';
     EmptyComponent,
     LicenseManagerComponent,
     EventChartComponent,
+    ChuyenPTZComponent,
+    PostActionOptions,
   ],
   imports: [
     CommonModule,

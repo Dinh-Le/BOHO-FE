@@ -31,6 +31,7 @@ export enum Level3Menu {
   SCHEDULE = 'SCHEDULE',
   MILESTONE_VMS = 'MILESTONE_VMS',
   LICENSE_MANAGER = 'LICENSE_MANAGER',
+  CHUYEN_PTZ = 'CHUYEN_PTZ',
 }
 
 export enum SideMenuItemType {
@@ -222,6 +223,8 @@ export class NavigationService {
             targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/patrol-settings`;
           } else if (this.level3 === Level3Menu.TOUR_SETTINGS) {
             targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/tour-settings`;
+          } else if (this.level3 === Level3Menu.CHUYEN_PTZ) {
+            targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/chuyen-ptz`;
           } else {
             targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/info`;
           }
@@ -243,6 +246,8 @@ export class NavigationService {
             targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/patrol-settings`;
           } else if (this.level3 === Level3Menu.TOUR_SETTINGS) {
             targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/tour-settings`;
+          } else if (this.level3 === Level3Menu.CHUYEN_PTZ) {
+            targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/chuyen-ptz`;
           } else {
             targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/info`;
           }
