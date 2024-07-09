@@ -246,9 +246,18 @@ export class BoundingBoxEditorComponent
 
         context.stroke();
       } else {
-        context.fillStyle = '#FFFF7F3F';
-        context.beginPath();
+        context.fillStyle = '#4472c47f';
 
+        // Draw points (circles)
+        for (let i = 0; i < this.model.length; i++) {
+          const point = this.model[i];
+          context.beginPath();
+          context.arc(point.x, point.y, 3, 0, 2 * Math.PI);
+          context.fill();
+        }
+
+        context.strokeStyle = '#31538f';
+        context.beginPath();
         context.moveTo(this.model[0].x, this.model[0].y);
 
         for (let i = 1; i < this.model.length; i++) {

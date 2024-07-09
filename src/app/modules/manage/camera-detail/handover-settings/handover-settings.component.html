@@ -49,7 +49,7 @@
               Không
             </option>
             <option
-              *ngFor="let preset of item.presets$ | async; trackBy: trackById"
+              *ngFor="let preset of item.presets; trackBy: trackById"
               [ngValue]="preset"
             >
               {{ preset.name }}
@@ -85,7 +85,19 @@
     </tbody>
   </table>
   <div class="d-flex justify-content-center mt-5">
-    <button class="my-btn bg-secondary mx-3" style="width: 80px">Hủy</button>
-    <button class="my-btn bg-primary" style="width: 80px">Lưu</button>
+    <button
+      class="my-btn bg-secondary mx-3"
+      style="width: 80px"
+      (click)="onCancelClicked()"
+    >
+      Hủy
+    </button>
+    <button
+      class="my-btn bg-primary"
+      style="width: 80px"
+      (click)="onSaveClicked()"
+    >
+      Lưu
+    </button>
   </div>
 </ng-template>

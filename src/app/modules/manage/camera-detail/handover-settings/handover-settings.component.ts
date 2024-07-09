@@ -37,7 +37,7 @@ class RowItemModel {
   selected: boolean = false;
   device?: Device;
   preset?: Preset;
-  presets$: Observable<Preset[]> = of([]);
+  presets: Preset[] = [];
   postAction: PostActionType = 'none';
   postActionOptions?: AutoTrackingOptions | ZoomAndFocusOptions;
 }
@@ -122,7 +122,7 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
   }
 
   onDeviceChanged(item: RowItemModel) {
-    item.presets$ = this._presetService
+    this._presetService
       .findAll(item.device!.node_id!, item.device!.id)
       .pipe(
         switchMap((response) => of(response.data)),
@@ -131,7 +131,8 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
           this._toastService.showError(errorMessage);
           return [];
         })
-      );
+      )
+      .subscribe((presets) => (item.presets = presets));
   }
 
   onPostActionChanged(item: RowItemModel) {
@@ -211,4 +212,8 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
   trackByValue(_: any, item: any): any {
     return item.value;
   }
+
+  onCancelClicked() {}
+
+  onSaveClicked() {}
 }

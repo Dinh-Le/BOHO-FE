@@ -11,7 +11,14 @@ import {
   PostActionType,
   ZoomAndFocusOptions,
 } from '../models';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { SelectItemModel } from '@shared/models/select-item-model';
 import { Point } from '@shared/components/bounding-box-editor/bounding-box-editor.component';
 
@@ -79,7 +86,19 @@ export class PostActionOptions implements OnChanges {
       Validators.min(5),
       Validators.max(60),
     ]),
-    roi: new FormControl<Point[]>([], [Validators.required]),
+    roi: new FormControl<Point[]>(
+      [],
+      (): ValidatorFn =>
+        (control: AbstractControl): ValidationErrors | null => {
+          const value = control.value;
+
+          if (Array.isArray(value) && value.length > 0) {
+            return null;
+          }
+
+          return { required: true };
+        }
+    ),
     nodeId: new FormControl<string>('', [Validators.required]),
     deviceId: new FormControl<string>('', [Validators.required]),
     presetId: new FormControl<number>(0, [
