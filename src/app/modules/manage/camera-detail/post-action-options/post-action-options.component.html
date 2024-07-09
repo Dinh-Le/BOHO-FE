@@ -30,6 +30,14 @@
     <ng-container *ngIf="type === 'autoTracking'">
       <div class="form-item">
         <label style="width: 200px">Vùng kích hoạt theo dõi:</label>
+        <div style="grid-column: 2 / span 2">
+          <app-bounding-box-editor
+            style="aspect-ratio: 16/9; height: 300px"
+            type="polygon"
+            formControlName="roi"
+            [src]="boundingBoxEditorSrc"
+          ></app-bounding-box-editor>
+        </div>
       </div>
       <div class="form-item">
         <label style="width: 200px">Tốc đọ Pan:</label>

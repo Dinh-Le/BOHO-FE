@@ -22,7 +22,7 @@ import { GroupNodeDashboardComponent } from './group-node-dashboard/group-node-d
 import { CameraDashboardComponent } from './camera-dashboard/camera-dashboard.component';
 import { EmptyComponent } from './empty/empty.component';
 import { LicenseManagerComponent } from './license-manager/license-manager.component';
-import { ChuyenPTZComponent } from './camera-detail/chuyen-ptz/chuyen-ptz.component';
+import { HandoverSettingsComponent } from './camera-detail/handover-settings/handover-settings.component';
 
 @NgModule({
   imports: [
@@ -108,7 +108,7 @@ import { ChuyenPTZComponent } from './camera-detail/chuyen-ptz/chuyen-ptz.compon
               },
               {
                 path: 'chuyen-ptz',
-                component: ChuyenPTZComponent,
+                component: HandoverSettingsComponent,
               },
             ],
           },

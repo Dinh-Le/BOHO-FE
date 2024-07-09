@@ -13,6 +13,7 @@ import {
 } from '../models';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { SelectItemModel } from '@shared/models/select-item-model';
+import { Point } from '@shared/components/bounding-box-editor/bounding-box-editor.component';
 
 @Component({
   selector: 'app-post-action-options',
@@ -36,7 +37,13 @@ export class PostActionOptions implements OnChanges {
   ];
 
   @Input() type: PostActionType = 'focusAndZoom';
-  @Input() data?: ZoomAndFocusOptions | AutoTrackingOptions;
+  @Input() data?:
+    | ZoomAndFocusOptions
+    | (AutoTrackingOptions & {
+        nodeId: string;
+        deviceId: string;
+        presetId: number;
+      });
   @Output() exit = new EventEmitter();
   @Output() save = new EventEmitter<
     ZoomAndFocusOptions | AutoTrackingOptions
@@ -72,6 +79,13 @@ export class PostActionOptions implements OnChanges {
       Validators.min(5),
       Validators.max(60),
     ]),
+    roi: new FormControl<Point[]>([], [Validators.required]),
+    nodeId: new FormControl<string>('', [Validators.required]),
+    deviceId: new FormControl<string>('', [Validators.required]),
+    presetId: new FormControl<number>(0, [
+      Validators.required,
+      Validators.min(1),
+    ]),
   });
 
   get formGroup() {
@@ -82,6 +96,15 @@ export class PostActionOptions implements OnChanges {
 
   get canSubmit() {
     return this.formGroup.valid;
+  }
+
+  get boundingBoxEditorSrc(): {
+    nodeId?: string | null;
+    deviceId?: string | null;
+    presetId?: number | null;
+  } {
+    const { nodeId, deviceId, presetId } = this._autoTrackingFormGroup.value;
+    return { nodeId, deviceId, presetId };
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -96,8 +119,15 @@ export class PostActionOptions implements OnChanges {
   onSaveClicked() {
     const data =
       this.type === 'focusAndZoom'
-        ? (this._zoomAndFocusFormGroup.value as ZoomAndFocusOptions)
-        : (this._autoTrackingFormGroup.value as AutoTrackingOptions);
+        ? (Object.assign(
+            {},
+            this._zoomAndFocusFormGroup.value
+          ) as ZoomAndFocusOptions)
+        : (Object.assign({}, this._autoTrackingFormGroup.value, {
+            nodeId: undefined,
+            deviceId: undefined,
+            presetId: undefined,
+          }) as AutoTrackingOptions);
     this.save.emit(data);
   }
 }

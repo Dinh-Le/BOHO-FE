@@ -4,7 +4,7 @@ import { DeviceService } from 'src/app/data/service/device.service';
 import { Device } from 'src/app/data/schema/boho-v2';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from '@app/services/toast.service';
-import { ChuyenPTZComponent } from './chuyen-ptz/chuyen-ptz.component';
+import { HandoverSettingsComponent } from './handover-settings/handover-settings.component';
 
 @Component({
   selector: 'app-camera-detail',
@@ -119,10 +119,10 @@ export class CameraDetailComponent implements OnInit {
   }
 
   add() {
-    (this._currentComponent as ChuyenPTZComponent).add();
+    (this._currentComponent as HandoverSettingsComponent).add();
   }
 
   remove() {
-    (this._currentComponent as ChuyenPTZComponent).remove();
+    (this._currentComponent as HandoverSettingsComponent).remove();
   }
 }

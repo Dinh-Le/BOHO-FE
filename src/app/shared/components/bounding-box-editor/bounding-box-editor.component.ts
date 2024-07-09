@@ -15,7 +15,7 @@ import {
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ToastService } from '@app/services/toast.service';
 import { ControlValueAccessorImpl } from '@shared/helpers/control-value-accessor-impl';
-import { EMPTY, switchMap } from 'rxjs';
+import { catchError, EMPTY, of, switchMap } from 'rxjs';
 import { DeviceService } from 'src/app/data/service/device.service';
 import { PresetService } from 'src/app/data/service/preset.service';
 import { v4 } from 'uuid';
@@ -51,14 +51,10 @@ export class BoundingBoxEditorComponent
 
   @Input() type: 'line' | 'polygon' = 'line';
   @Input() src: {
-    nodeId: string;
-    deviceId: string;
-    presetId: number;
-  } = {
-    nodeId: '',
-    deviceId: '',
-    presetId: 0,
-  };
+    nodeId?: string | null;
+    deviceId?: string | null;
+    presetId?: number | null;
+  } = {};
 
   private _elRef = inject(ElementRef);
   private _scaleX = 1;
@@ -79,43 +75,47 @@ export class BoundingBoxEditorComponent
 
     if (
       'src' in changes &&
-      this.src.nodeId &&
-      this.src.deviceId &&
-      this.src.presetId
+      changes['src'].currentValue?.['presetId'] !==
+        changes['src'].previousValue?.['presetId']
     ) {
-      // this._image = new Image();
-      // this._image.src =
-      //   'https://img.freepik.com/free-photo/forest-landscape_71767-127.jpg?w=996&t=st=1706722112~exp=1706722712~hmac=d601b4c15712b81042c6a9c42e09584fc7f091923db6fd15d1f8bd5b355c68b3';
-      // this._image.onload = (_: any) => this.update();
+      const { nodeId, deviceId, presetId } = this.src;
+      if (!nodeId || !deviceId || !presetId) {
+        return;
+      }
 
-      this._deviceService
-        .pauseDevice(this.src.nodeId, this.src.deviceId)
-        .pipe(
-          switchMap(() =>
-            this._presetService.control(
-              this.src.nodeId,
-              this.src.deviceId,
-              this.src.presetId
-            )
-          ),
-          switchMap(() =>
-            this._deviceService.snapshot(this.src.nodeId, this.src.deviceId)
-          ),
-          switchMap(({ data }) => {
-            this._image = new Image(data.size[0], data.size[1]);
-            this._image.src = `data:image/${data.format};charset=utf-8;base64,${data.img}`;
-            this._image.onload = (_: any) => this.update();
+      this._deviceService.snapshot(nodeId, deviceId).subscribe({
+        next: ({ data }) => {
+          this._image = new Image(data.size[0], data.size[1]);
+          this._image.src = `data:image/${data.format};charset=utf-8;base64,${data.img}`;
+          this._image.onload = (_: any) => this.update();
+        },
+        error: (err: HttpErrorResponse) =>
+          this._toastService.showError(err.error.message ?? err.message),
+      });
 
-            return this._deviceService.resumeDevice(
-              this.src.nodeId,
-              this.src.deviceId
-            );
-          })
-        )
-        .subscribe({
-          error: (err: HttpErrorResponse) =>
-            this._toastService.showError(err.error.message ?? err.message),
-        });
+      // this._deviceService
+      //   .pauseDevice(nodeId, deviceId)
+      //   .pipe(
+      // switchMap(() =>
+      //   this._presetService.control(
+      //     this.src.nodeId!,
+      //     this.src.deviceId!,
+      //     this.src.presetId!
+      //   )
+      // ),
+      //   switchMap(() => this._deviceService.snapshot(nodeId, deviceId)),
+      //   switchMap(({ data }) => {
+      //     this._image = new Image(data.size[0], data.size[1]);
+      //     this._image.src = `data:image/${data.format};charset=utf-8;base64,${data.img}`;
+      //     this._image.onload = (_: any) => this.update();
+
+      //     return this._deviceService.resumeDevice(nodeId, deviceId);
+      //   })
+      // )
+      // .subscribe({
+      //   error: (err: HttpErrorResponse) =>
+      //     this._toastService.showError(err.error.message ?? err.message),
+      // });
     }
   }
 

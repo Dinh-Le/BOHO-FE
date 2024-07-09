@@ -1,7 +1,7 @@
 <app-post-action-options
   *ngIf="!!editingRowItem; else elseBlock"
   [type]="editingRowItem.postAction"
-  [data]="editingRowItem.postActionOptions"
+  [data]="postActionOptions"
   (exit)="exitSettingMode()"
   (save)="saveAndExitSettingMode($event)"
 >
@@ -32,6 +32,9 @@
             (ngModelChange)="onDeviceChanged(item)"
             aria-placeholder="Không"
           >
+            <option [value]="undefined" disabled selected class="d-none">
+              Không
+            </option>
             <option
               *ngFor="let device of devices; trackBy: trackById"
               [ngValue]="device"
@@ -42,6 +45,9 @@
         </td>
         <td>
           <select [(ngModel)]="item.preset">
+            <option [value]="undefined" disabled selected class="d-none">
+              Không
+            </option>
             <option
               *ngFor="let preset of item.presets$ | async; trackBy: trackById"
               [ngValue]="preset"
@@ -70,7 +76,7 @@
           <button
             class="my-btn bg-primary"
             (click)="enterSettingMode(item)"
-            [disabled]="item.postAction === 'none'"
+            [disabled]="!canEnterSettingMode(item)"
           >
             Cài đặt
           </button>

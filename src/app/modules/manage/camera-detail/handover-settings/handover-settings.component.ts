@@ -43,11 +43,11 @@ class RowItemModel {
 }
 
 @Component({
-  selector: 'app-chuyen-ptz',
-  templateUrl: 'chuyen-ptz.component.html',
-  styleUrls: ['chuyen-ptz.component.scss'],
+  selector: 'app-handover-settings',
+  templateUrl: 'handover-settings.component.html',
+  styleUrls: ['handover-settings.component.scss'],
 })
-export class ChuyenPTZComponent implements OnInit, OnDestroy {
+export class HandoverSettingsComponent implements OnInit, OnDestroy {
   @HostBinding('class') classNames =
     'flex-grow-1 d-flex flex-column my-bg-default';
 
@@ -75,9 +75,15 @@ export class ChuyenPTZComponent implements OnInit, OnDestroy {
   private _nodeId: string = '';
 
   editingRowItem?: RowItemModel;
+  postActionOptions?:
+    | ZoomAndFocusOptions
+    | (AutoTrackingOptions & {
+        nodeId: string;
+        deviceId: string;
+        presetId: number;
+      });
   tableItemsSource: RowItemModel[] = [];
   devices: Device[] = [];
-  settingMode = false;
 
   constructor() {
     this._navigationService.level3 = Level3Menu.CHUYEN_PTZ;
@@ -153,12 +159,35 @@ export class ChuyenPTZComponent implements OnInit, OnDestroy {
 
   enterSettingMode(item: RowItemModel) {
     this.editingRowItem = item;
-    this.settingMode = true;
+
+    if (item.postAction == 'autoTracking') {
+      this.postActionOptions = Object.assign({}, item.postActionOptions, {
+        nodeId: item.device?.node_id,
+        deviceId: item.device?.id,
+        presetId: item.preset?.id,
+      });
+    } else if (item.postAction == 'focusAndZoom') {
+      this.postActionOptions = Object.assign({}, item.postActionOptions);
+    } else {
+      this.postActionOptions = undefined;
+    }
+  }
+
+  canEnterSettingMode(item: RowItemModel) {
+    if (item.postAction === 'focusAndZoom') {
+      return true;
+    }
+
+    if (item.postAction === 'autoTracking' && !!item.device && !!item.preset) {
+      return true;
+    }
+
+    return false;
   }
 
   exitSettingMode() {
     this.editingRowItem = undefined;
-    this.settingMode = false;
+    this.postActionOptions = undefined;
   }
 
   saveAndExitSettingMode(data: ZoomAndFocusOptions | AutoTrackingOptions) {
