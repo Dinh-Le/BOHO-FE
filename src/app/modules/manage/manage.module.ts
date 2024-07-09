@@ -40,6 +40,7 @@ import { LicenseManagerComponent } from './license-manager/license-manager.compo
 import { EventChartComponent } from './event-chart/event-chart.component';
 import { HandoverSettingsComponent } from './camera-detail/handover-settings/handover-settings.component';
 import { PostActionOptions } from './camera-detail/post-action-options/post-action-options.component';
+import { PostActionComponent } from './post-action/post-action.component';
 
 @NgModule({
   declarations: [
@@ -73,6 +74,7 @@ import { PostActionOptions } from './camera-detail/post-action-options/post-acti
     EventChartComponent,
     HandoverSettingsComponent,
     PostActionOptions,
+    PostActionComponent,
   ],
   imports: [
     CommonModule,

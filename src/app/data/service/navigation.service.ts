@@ -32,6 +32,7 @@ export enum Level3Menu {
   MILESTONE_VMS = 'MILESTONE_VMS',
   LICENSE_MANAGER = 'LICENSE_MANAGER',
   CHUYEN_PTZ = 'CHUYEN_PTZ',
+  POST_ACTION = 'POST_ACTION',
 }
 
 export enum SideMenuItemType {
@@ -259,7 +260,9 @@ export class NavigationService {
         targetUrl += '/device-rule';
         const nodeId = this.sideMenu.data?.node_id;
         if (this.sideMenu?.type === SideMenuItemType.DEVICE) {
-          if (this.level3 === Level3Menu.SCHEDULE) {
+          if (this.level3 === Level3Menu.POST_ACTION) {
+            targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/post-action`;
+          } else if (this.level3 === Level3Menu.SCHEDULE) {
             targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/schedule`;
           } else {
             targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/rule`;

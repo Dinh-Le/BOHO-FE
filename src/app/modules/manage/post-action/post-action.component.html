@@ -1,0 +1,114 @@
+<div class="menu-container d-flex align-items-center px-2 my-text-white">
+  <ul>
+    <li
+      class="mx-2"
+      [ngClass]="{ active: item.selected }"
+      *ngFor="let item of menuItemsSource"
+    >
+      <a
+        *ngIf="item.path; else noLink"
+        class="text-decoration-none text-start"
+        [routerLink]="parentPath + item.path"
+      >
+        <i *ngIf="item.icon" [class]="item.icon"></i>
+        {{ item.title }}
+      </a>
+      <ng-template #noLink>
+        <i *ngIf="item.icon" [class]="item.icon"></i>
+        {{ item.title }}
+      </ng-template>
+    </li>
+  </ul>
+  <div class="ms-auto">
+    <button class="my-btn my-bg-primary me-2" (click)="onAddClicked()">
+      + Thêm
+    </button>
+    <button class="my-btn my-bg-secondary" (click)="onDeleteClicked()">
+      - Xóa
+    </button>
+  </div>
+</div>
+<app-post-action-options
+  *ngIf="!!editingItem; else elseBlock"
+  [type]="editingItem.postAction"
+  [data]="postActionOptions"
+  (exit)="exitSettingMode()"
+  (save)="saveAndExitSettingMode($event)"
+>
+</app-post-action-options>
+<ng-template #elseBlock>
+  <table class="w-100">
+    <colgroup>
+      <col [width]="24" />
+      <col width="auto" />
+      <col [width]="240" />
+      <col [width]="120" />
+    </colgroup>
+    <thead>
+      <th><input type="checkbox" [indeterminate]="true" /></th>
+      <th>Quy tắc kích hoạt</th>
+      <th>Hành động sau</th>
+      <th></th>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of tableItemsSource">
+        <td><input type="checkbox" [(ngModel)]="item.selected" /></td>
+        <td>
+          <select [(ngModel)]="item.rule" multiple>
+            <option [value]="undefined" disabled selected class="d-none">
+              Không
+            </option>
+            <option
+              *ngFor="let rule of rules; trackBy: trackById"
+              [ngValue]="rule"
+            >
+              {{ rule.name }}
+            </option>
+          </select>
+        </td>
+
+        <td>
+          <select
+            [(ngModel)]="item.postAction"
+            (ngModelChange)="onPostActionChanged(item)"
+          >
+            <option
+              *ngFor="
+                let option of postActionItemsSource;
+                trackBy: trackByValue
+              "
+              [value]="option.value"
+            >
+              {{ option.label }}
+            </option>
+          </select>
+        </td>
+        <td>
+          <button
+            class="my-btn bg-primary"
+            (click)="enterSettingMode(item)"
+            [disabled]="!canEnterSettingMode(item)"
+          >
+            Cài đặt
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="d-flex justify-content-center mt-5">
+    <button
+      class="my-btn bg-secondary mx-3"
+      style="width: 80px"
+      (click)="onCancelClicked()"
+    >
+      Hủy
+    </button>
+    <button
+      class="my-btn bg-primary"
+      style="width: 80px"
+      (click)="onSaveClicked()"
+    >
+      Lưu
+    </button>
+  </div>
+</ng-template>

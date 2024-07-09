@@ -218,13 +218,25 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
   private _ruleService = inject(RuleService);
   private _nodeService = inject(NodeService);
 
-  menuItems: MenuItem[] = [
+  readonly menuItemsSource: MenuItem[] = [
     {
-      icon: 'bi-plus',
-      title: 'Thêm',
-      onclick: this.add.bind(this),
+      title: 'Quy tắc',
+      icon: 'bi bi-list-check',
+      selected: true,
+    },
+    {
+      title: 'Lịch trình',
+      icon: 'bi bi-clock',
+      path: '/schedule',
+    },
+    {
+      title: 'Hành động sau',
+      icon: 'bi bi-cloud-fog2',
+      path: '/post-action',
     },
   ];
+
+  parentPath = '';
   data: RowItemModel[] = [];
   presets: SelectItemModel[] = [];
   ruleTypes: CustomSelectItemModel[] = RuleTypes.map((e, index) => ({
@@ -251,6 +263,7 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
       .pipe(
         filter(({ nodeId, cameraId }) => nodeId && cameraId),
         switchMap(({ nodeId, cameraId }) => {
+          this.parentPath = `/manage/device-rule/node/${nodeId}/camera/${cameraId}`;
           this.cameraId = cameraId;
           this.nodeId = nodeId;
           return this._presetService.findAll(this.nodeId, this.cameraId);

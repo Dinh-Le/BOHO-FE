@@ -23,6 +23,7 @@ import { CameraDashboardComponent } from './camera-dashboard/camera-dashboard.co
 import { EmptyComponent } from './empty/empty.component';
 import { LicenseManagerComponent } from './license-manager/license-manager.component';
 import { HandoverSettingsComponent } from './camera-detail/handover-settings/handover-settings.component';
+import { PostActionComponent } from './post-action/post-action.component';
 
 @NgModule({
   imports: [
@@ -122,6 +123,10 @@ import { HandoverSettingsComponent } from './camera-detail/handover-settings/han
               {
                 path: 'node/:nodeId/camera/:cameraId/schedule',
                 component: ScheduleComponent,
+              },
+              {
+                path: 'node/:nodeId/camera/:cameraId/post-action',
+                component: PostActionComponent,
               },
             ],
           },

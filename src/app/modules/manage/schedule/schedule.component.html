@@ -1,13 +1,23 @@
-<div
-  class="menu-container d-flex justify-content-between align-items-center px-2 my-text-white"
->
+<div class="menu-container d-flex align-items-center px-2 my-text-white">
   <ul>
-    <li class="mx-2">
-      <a class="text-decoration-none" [routerLink]="ruleUrl"
-        ><i class="bi bi-list-check"></i>Quy tắc</a
+    <li
+      class="mx-2"
+      [ngClass]="{ active: item.selected }"
+      *ngFor="let item of menuItemsSource"
+    >
+      <a
+        *ngIf="item.path; else noLink"
+        class="text-decoration-none text-start"
+        [routerLink]="parentPath + item.path"
       >
+        <i *ngIf="item.icon" [class]="item.icon"></i>
+        {{ item.title }}
+      </a>
+      <ng-template #noLink>
+        <i *ngIf="item.icon" [class]="item.icon"></i>
+        {{ item.title }}
+      </ng-template>
     </li>
-    <li class="mx-2 active"><i class="bi bi-clock"></i>Lịch trình</li>
   </ul>
 </div>
 <div class="menu-container d-flex align-items-center px-2">
