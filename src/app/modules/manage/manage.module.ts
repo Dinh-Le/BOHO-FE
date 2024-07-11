@@ -41,6 +41,7 @@ import { EventChartComponent } from './event-chart/event-chart.component';
 import { HandoverSettingsComponent } from './camera-detail/handover-settings/handover-settings.component';
 import { PostActionOptions } from './camera-detail/post-action-options/post-action-options.component';
 import { PostActionComponent } from './post-action/post-action.component';
+import { RuleMenuComponent } from './rule-menu/rule-menu.component';
 
 @NgModule({
   declarations: [
@@ -75,6 +76,7 @@ import { PostActionComponent } from './post-action/post-action.component';
     HandoverSettingsComponent,
     PostActionOptions,
     PostActionComponent,
+    RuleMenuComponent,
   ],
   imports: [
     CommonModule,

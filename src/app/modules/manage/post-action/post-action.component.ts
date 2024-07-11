@@ -1,10 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, HostBinding, inject } from '@angular/core';
+import { Component, HostBinding } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ToastService } from '@app/services/toast.service';
 import { SelectItemModel } from '@shared/models/select-item-model';
-import { catchError, filter, of, switchMap } from 'rxjs';
-import { Rule } from 'src/app/data/schema/boho-v2/rule';
+import { catchError, of, switchMap } from 'rxjs';
 import {
   Level3Menu,
   NavigationService,
@@ -15,7 +14,6 @@ import {
   AutoTrackingOptions,
   ZoomAndFocusOptions,
 } from '../camera-detail/models';
-import { MenuItem } from '../menu-item';
 
 @Component({
   selector: 'app-post-action',
@@ -26,24 +24,6 @@ import { MenuItem } from '../menu-item';
 })
 export class PostActionComponent {
   @HostBinding('class') classNames = 'flex-grow-1 d-flex flex-column';
-
-  readonly menuItemsSource: MenuItem[] = [
-    {
-      title: 'Quy tắc',
-      icon: 'bi bi-list-check',
-      path: '/rule',
-    },
-    {
-      title: 'Lịch trình',
-      icon: 'bi bi-clock',
-      path: '/schedule',
-    },
-    {
-      title: 'Hành động sau',
-      icon: 'bi bi-cloud-fog2',
-      selected: true,
-    },
-  ];
 
   readonly postActionItemsSource: SelectItemModel[] = [
     {
@@ -57,7 +37,7 @@ export class PostActionComponent {
   ];
 
   parentPath = '';
-  rules: Rule[] = [];
+  rules: SelectItemModel[] = [];
   tableItemsSource: PostActionItemModel[] = [];
   editingItem?: PostActionItemModel;
   postActionOptions?:
@@ -89,7 +69,14 @@ export class PostActionComponent {
             return of([]);
           })
         )
-        .subscribe((rules) => (this.rules = rules));
+        .subscribe(
+          (rules) =>
+            (this.rules = rules.map((rule) => ({
+              value: rule.id,
+              label: rule.name,
+              data: rule,
+            })))
+        );
     });
   }
 

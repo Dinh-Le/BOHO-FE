@@ -1,0 +1,24 @@
+<ul>
+  <li
+    class="mx-2"
+    [class]="item.class || ''"
+    [ngClass]="{ active: item.selected }"
+    *ngFor="let item of menuItemsSource"
+  >
+    <a
+      *ngIf="item.path; else noLink"
+      class="text-decoration-none text-start"
+      [routerLink]="parentPath + item.path"
+    >
+      <i *ngIf="item.icon" [class]="item.icon"></i>
+      {{ item.title }}
+    </a>
+    <ng-template #noLink>
+      <i *ngIf="item.icon" [class]="item.icon"></i>
+      {{ item.title }}
+    </ng-template>
+  </li>
+</ul>
+<div class="ms-auto" *ngIf="buttonsTemplateRef">
+  <ng-template [ngTemplateOutlet]="buttonsTemplateRef"></ng-template>
+</div>

@@ -1,25 +1,4 @@
-<div class="menu-container d-flex align-items-center px-2 my-text-white">
-  <ul>
-    <li
-      class="mx-2"
-      [ngClass]="{ active: item.selected }"
-      *ngFor="let item of menuItemsSource"
-    >
-      <a
-        *ngIf="item.path; else noLink"
-        class="text-decoration-none text-start"
-        [routerLink]="parentPath + item.path"
-      >
-        <i *ngIf="item.icon" [class]="item.icon"></i>
-        {{ item.title }}
-      </a>
-      <ng-template #noLink>
-        <i *ngIf="item.icon" [class]="item.icon"></i>
-        {{ item.title }}
-      </ng-template>
-    </li>
-  </ul>
-</div>
+<app-rule-menu class="menu-container"></app-rule-menu>
 <div class="menu-container d-flex align-items-center px-2">
   <span class="fw-bold my-text-white">Lịch trình sự kiện</span>
   <button class="my-btn-primary ms-auto" (click)="add()">

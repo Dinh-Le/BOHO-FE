@@ -22,7 +22,6 @@ import {
 import { Subscription, of, switchMap } from 'rxjs';
 import { ToastService } from '@app/services/toast.service';
 import { Schedule } from 'src/app/data/schema/boho-v2/shedule';
-import { MenuItem } from '../menu-item';
 
 class RowItemModel extends ExpandableTableRowItemModelBase {
   id = v4();
@@ -124,25 +123,6 @@ export class ScheduleComponent implements OnInit, OnDestroy {
     },
   ];
 
-  readonly menuItemsSource: MenuItem[] = [
-    {
-      title: 'Quy tắc',
-      icon: 'bi bi-list-check',
-      path: '/rule',
-    },
-    {
-      title: 'Lịch trình',
-      icon: 'bi bi-clock',
-      selected: true,
-    },
-    {
-      title: 'Hành động sau',
-      icon: 'bi bi-cloud-fog2',
-      path: '/post-action',
-    },
-  ];
-  parentPath = '';
-
   ngOnInit(): void {
     this._navigationService.level3 = Level3Menu.SCHEDULE;
     const activatedRouteSubscription = this._activatedRoute.params
@@ -151,7 +131,6 @@ export class ScheduleComponent implements OnInit, OnDestroy {
           this._cameraId = cameraId;
           this._nodeId = nodeId;
           this.data = [];
-          this.parentPath = `/manage/device-rule/node/${nodeId}/camera/${cameraId}`;
           return this._scheduleService.findAll(this._nodeId!, this._cameraId!);
         }),
         switchMap((response) => {
@@ -160,8 +139,6 @@ export class ScheduleComponent implements OnInit, OnDestroy {
               `Fetch schedule data failed with error: ${response.message}`
             );
           }
-
-          console.log(response);
 
           return of(response);
         })
