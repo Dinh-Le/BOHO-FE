@@ -92,6 +92,8 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this._activatedRoute.parent?.params.subscribe(({ nodeId }) => {
       this.tableItemsSource = [];
+      this.editingRowItem = undefined;
+      this.postActionOptions = undefined;
 
       if (this._nodeId !== nodeId) {
         this._nodeId = nodeId;

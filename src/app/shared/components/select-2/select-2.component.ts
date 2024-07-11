@@ -1,9 +1,11 @@
 import {
   Component,
   ElementRef,
+  EventEmitter,
   HostListener,
   Input,
   OnChanges,
+  Output,
   SimpleChanges,
   TemplateRef,
   forwardRef,
@@ -36,7 +38,7 @@ export class Select2Component implements ControlValueAccessor, OnChanges {
 
   @Input({
     transform: (items: SelectItemModel[]) =>
-      items.map((it) => Object.assign(it, { selected: false })),
+      items.map((it) => Object.assign({}, it, { selected: false })),
   })
   items: SelectItemModel[] = [];
 
@@ -46,7 +48,12 @@ export class Select2Component implements ControlValueAccessor, OnChanges {
   @Input()
   placeHolder: string = 'Select item...';
 
+  @Input() disabledValues: any[] = [];
+
   @Input() styles: any = {};
+
+  @Output('dropdown-open') onDropdownOpen = new EventEmitter();
+  @Output('dropdown-close') onDropdownClose = new EventEmitter();
 
   menuVisible: boolean = false;
 
@@ -145,6 +152,7 @@ export class Select2Component implements ControlValueAccessor, OnChanges {
   @HostListener('document:click', ['$event'])
   clickout(event: Event) {
     if (!this.eRef.nativeElement.contains(event.target)) {
+      this.onDropdownClose.emit();
       this.menuVisible = false;
     }
   }

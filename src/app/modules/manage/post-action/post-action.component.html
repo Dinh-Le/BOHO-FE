@@ -38,16 +38,24 @@
         <td>
           <ng-template #selectedRulesTemplate let-model="model">
             <div class="d-flex">
-              <span *ngFor="let item of model">{{ item.label }};</span>
+              <span *ngFor="let item of model" class="mx-1"
+                >{{ item.label }};</span
+              >
             </div>
+          </ng-template>
+          <ng-template #ruleItemTemplate let-item="item">
+            {{ item.label }}
           </ng-template>
           <app-select-2
             styles="border-radius: 5px"
             [contentTemplateRef]="selectedRulesTemplate"
+            [menuItemTemplateRef]="ruleItemTemplate"
             [items]="rules"
-            [(ngModel)]="item.rule"
+            [(ngModel)]="item.rules"
+            [disabledValues]="selectedRuleIds"
             [multiple]="true"
             placeHolder="Không"
+            (dropdown-open)="onRuleMenuOpen(item)"
           ></app-select-2>
         </td>
         <td>

@@ -14,6 +14,7 @@ import {
   AutoTrackingOptions,
   ZoomAndFocusOptions,
 } from '../camera-detail/models';
+import { PresetService } from 'src/app/data/service/preset.service';
 
 @Component({
   selector: 'app-post-action',
@@ -47,6 +48,10 @@ export class PostActionComponent {
         deviceId: string;
         presetId: number;
       });
+  selectedRuleIds: number[] = [];
+  presetId: number = 0;
+  deviceId: string = '';
+  nodeId: string = '';
 
   constructor(
     navigationService: NavigationService,
@@ -57,6 +62,12 @@ export class PostActionComponent {
     navigationService.level3 = Level3Menu.POST_ACTION;
     activatedRoute.params.subscribe(({ nodeId, cameraId: deviceId }) => {
       this.parentPath = `/manage/device-rule/node/${nodeId}/camera/${deviceId}`;
+      this.nodeId = nodeId;
+      this.deviceId = deviceId;
+      this.selectedRuleIds = [];
+      this.editingItem = undefined;
+      this.postActionOptions = undefined;
+      this.tableItemsSource = [];
 
       ruleService
         .findAll(nodeId, deviceId)
@@ -81,7 +92,9 @@ export class PostActionComponent {
   }
 
   onAddClicked() {
-    this.tableItemsSource.push(new PostActionItemModel());
+    const newItem = new PostActionItemModel();
+    newItem.id = this.tableItemsSource.length;
+    this.tableItemsSource.push(newItem);
   }
 
   onDeleteClicked() {
@@ -126,11 +139,14 @@ export class PostActionComponent {
   }
 
   canEnterSettingMode(item: PostActionItemModel) {
-    return !!item.rule;
+    return item.rules.length > 0;
   }
 
   enterSettingMode(item: PostActionItemModel) {
-    this.postActionOptions = Object.assign({}, item.postActionOptions);
+    this.postActionOptions = Object.assign({}, item.postActionOptions, {
+      nodeId: this.nodeId,
+      deviceId: this.deviceId,
+    });
     this.editingItem = item;
   }
 
@@ -142,5 +158,11 @@ export class PostActionComponent {
   saveAndExitSettingMode(data: ZoomAndFocusOptions | AutoTrackingOptions) {
     this.editingItem!.postActionOptions = data;
     this.exitSettingMode();
+  }
+
+  onRuleMenuOpen({ id }: PostActionItemModel) {
+    this.selectedRuleIds = this.tableItemsSource.flatMap((item) =>
+      item.id === id ? [] : item.rules.map((rule) => rule.value)
+    );
   }
 }

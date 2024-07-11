@@ -1,31 +1,42 @@
 .menu-wrapper {
-  position: relative;
-  width: 100%;
+  position: absolute;
+  left: 0;
+  top: 120%;
   background: whitesmoke;
+  width: 100%;
+  border: solid 1px #ffffff;
+  background: #4a494b;
+  color: white;
+  z-index: 1000;
 }
 
 .menu {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  position: absolute;
-  z-index: 1000;
+  list-style: none;
   width: 100%;
+  padding: 0;
+  margin: 0;
   max-height: 150px;
   overflow-y: auto;
 
   .menu-item {
-    background: whitesmoke;
-    color: black;
+    background: inherit;
     padding: 2px 4px;
   }
 
-  .menu-item.active {
+  .menu-item.active,
+  .menu-item.active:hover {
     background: lightskyblue;
   }
 
   .menu-item:hover {
-    background: lightskyblue;
+    background: rgb(209, 229, 241);
+    font-weight: bold;
+    color: black;
+  }
+
+  .menu-item.disabled {
+    background: rgb(180, 192, 199);
+    pointer-events: none;
   }
 }
 

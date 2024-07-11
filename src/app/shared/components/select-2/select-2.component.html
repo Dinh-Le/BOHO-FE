@@ -4,8 +4,8 @@
   }}</span>
 </ng-template>
 <div
-  class="form-select form-select-sm bg-dark border-light w-100"
-  (click)="menuVisible = true"
+  class="form-select form-select-sm bg-dark border-light w-100 position-relative"
+  (click)="onDropdownOpen.emit(); menuVisible = true"
   [style]="styles"
 >
   <ng-container
@@ -16,23 +16,27 @@
   <span class="place-holder" *ngIf="currentItems.length === 0">{{
     placeHolder
   }}</span>
-</div>
-<div class="menu-wrapper" [ngClass]="{ 'd-none': !menuVisible }">
-  <ul class="menu">
-    <li
-      *ngFor="let item of items; trackBy: trackByItems"
-      class="menu-item"
-      (click)="selectItem(item)"
-      [ngClass]="{ active: item.selected }"
-    >
-      <ng-template #defaultMenuItemTemplate>
-        {{ item.label }}
-      </ng-template>
-      <ng-container
-        *ngIf="menuItemTemplateRef; else defaultMenuItemTemplate"
-        [ngTemplateOutlet]="menuItemTemplateRef"
-        [ngTemplateOutletContext]="{item}"
-      ></ng-container>
-    </li>
-  </ul>
+
+  <div class="menu-wrapper" [ngClass]="{ 'd-none': !menuVisible }">
+    <ul class="menu">
+      <li
+        *ngFor="let item of items; trackBy: trackByItems"
+        class="menu-item cursor-pointer"
+        (click)="selectItem(item)"
+        [ngClass]="{
+          active: item.selected,
+          disabled: disabledValues.includes(item.value)
+        }"
+      >
+        <ng-template #defaultMenuItemTemplate>
+          {{ item.label }}
+        </ng-template>
+        <ng-container
+          *ngIf="menuItemTemplateRef; else defaultMenuItemTemplate"
+          [ngTemplateOutlet]="menuItemTemplateRef"
+          [ngTemplateOutletContext]="{item}"
+        ></ng-container>
+      </li>
+    </ul>
+  </div>
 </div>

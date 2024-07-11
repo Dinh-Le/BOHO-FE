@@ -74,48 +74,51 @@ export class BoundingBoxEditorComponent
     }
 
     if (
-      'src' in changes &&
+      ('src' in changes &&
+        changes['src'].currentValue?.['deviceId'] !==
+          changes['src'].previousValue?.['deviceId']) ||
       changes['src'].currentValue?.['presetId'] !==
         changes['src'].previousValue?.['presetId']
     ) {
       const { nodeId, deviceId, presetId } = this.src;
-      if (!nodeId || !deviceId || !presetId) {
+      if (!nodeId || !deviceId) {
         return;
       }
 
-      this._deviceService.snapshot(nodeId, deviceId).subscribe({
-        next: ({ data }) => {
-          this._image = new Image(data.size[0], data.size[1]);
-          this._image.src = `data:image/${data.format};charset=utf-8;base64,${data.img}`;
-          this._image.onload = (_: any) => this.update();
-        },
-        error: (err: HttpErrorResponse) =>
-          this._toastService.showError(err.error.message ?? err.message),
-      });
-
-      // this._deviceService
-      //   .pauseDevice(nodeId, deviceId)
-      //   .pipe(
-      // switchMap(() =>
-      //   this._presetService.control(
-      //     this.src.nodeId!,
-      //     this.src.deviceId!,
-      //     this.src.presetId!
-      //   )
-      // ),
-      //   switchMap(() => this._deviceService.snapshot(nodeId, deviceId)),
-      //   switchMap(({ data }) => {
-      //     this._image = new Image(data.size[0], data.size[1]);
-      //     this._image.src = `data:image/${data.format};charset=utf-8;base64,${data.img}`;
-      //     this._image.onload = (_: any) => this.update();
-
-      //     return this._deviceService.resumeDevice(nodeId, deviceId);
-      //   })
-      // )
-      // .subscribe({
-      //   error: (err: HttpErrorResponse) =>
-      //     this._toastService.showError(err.error.message ?? err.message),
-      // });
+      if (!presetId) {
+        this._deviceService.snapshot(nodeId, deviceId).subscribe({
+          next: ({ data }) => {
+            this._image = new Image(data.size[0], data.size[1]);
+            this._image.src = `data:image/${data.format};charset=utf-8;base64,${data.img}`;
+            this._image.onload = (_: any) => this.update();
+          },
+          error: (err: HttpErrorResponse) =>
+            this._toastService.showError(err.error.message ?? err.message),
+        });
+      } else {
+        this._deviceService
+          .pauseDevice(nodeId, deviceId)
+          .pipe(
+            switchMap(() =>
+              this._presetService.control(
+                this.src.nodeId!,
+                this.src.deviceId!,
+                this.src.presetId!
+              )
+            ),
+            switchMap(() => this._deviceService.snapshot(nodeId, deviceId)),
+            switchMap(({ data }) => {
+              this._image = new Image(data.size[0], data.size[1]);
+              this._image.src = `data:image/${data.format};charset=utf-8;base64,${data.img}`;
+              this._image.onload = (_: any) => this.update();
+              return this._deviceService.resumeDevice(nodeId, deviceId);
+            })
+          )
+          .subscribe({
+            error: (err: HttpErrorResponse) =>
+              this._toastService.showError(err.error.message ?? err.message),
+          });
+      }
     }
   }
 
