@@ -25,12 +25,16 @@ import { TranslatePipe } from './pipes/translate-vi.pipe';
 import { PasswordInputComponent } from './components/password-input/password-input.component';
 import { StaticMapComponent } from './components/static-map/static-map.component';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
+import { Select3Component } from './components/select-3/select-3.component';
+import { Select3OptionComponent } from './components/select-3/select-3-option.component';
 
 @NgModule({
   declarations: [
     SearchInputComponent,
     SelectComponent,
     Select2Component,
+    Select3Component,
+    Select3OptionComponent,
     TreeViewComponent,
     TreeViewItemDropDownComponent,
     TreeViewItemComponent,
@@ -50,11 +54,19 @@ import { LeafletModule } from '@asymmetrik/ngx-leaflet';
     PasswordInputComponent,
     StaticMapComponent,
   ],
-  imports: [CommonModule, FormsModule, NgbModule, FontAwesomeModule, LeafletModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    NgbModule,
+    FontAwesomeModule,
+    LeafletModule,
+  ],
   exports: [
     SearchInputComponent,
     SelectComponent,
     Select2Component,
+    Select3Component,
+    Select3OptionComponent,
     FontAwesomeModule,
     TreeViewComponent,
     ListViewComponent,

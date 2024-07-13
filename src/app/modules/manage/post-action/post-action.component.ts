@@ -14,7 +14,7 @@ import {
   AutoTrackingOptions,
   ZoomAndFocusOptions,
 } from '../camera-detail/models';
-import { PresetService } from 'src/app/data/service/preset.service';
+import { Rule } from 'src/app/data/schema/boho-v2/rule';
 
 @Component({
   selector: 'app-post-action',
@@ -38,7 +38,7 @@ export class PostActionComponent {
   ];
 
   parentPath = '';
-  rules: SelectItemModel[] = [];
+  rules: Rule[] = [];
   tableItemsSource: PostActionItemModel[] = [];
   editingItem?: PostActionItemModel;
   postActionOptions?:
@@ -80,14 +80,7 @@ export class PostActionComponent {
             return of([]);
           })
         )
-        .subscribe(
-          (rules) =>
-            (this.rules = rules.map((rule) => ({
-              value: rule.id,
-              label: rule.name,
-              data: rule,
-            })))
-        );
+        .subscribe((rules) => (this.rules = rules));
     });
   }
 
@@ -108,6 +101,7 @@ export class PostActionComponent {
   onSaveClicked() {}
 
   onPostActionChanged(item: PostActionItemModel) {
+    console.log(item);
     switch (item.postAction) {
       case 'focusAndZoom':
         item.postActionOptions = {
@@ -139,7 +133,7 @@ export class PostActionComponent {
   }
 
   canEnterSettingMode(item: PostActionItemModel) {
-    return item.rules.length > 0;
+    return item.ruleIds.length > 0;
   }
 
   enterSettingMode(item: PostActionItemModel) {
@@ -147,6 +141,7 @@ export class PostActionComponent {
       nodeId: this.nodeId,
       deviceId: this.deviceId,
     });
+    console.log(this.postActionOptions);
     this.editingItem = item;
   }
 
@@ -162,7 +157,7 @@ export class PostActionComponent {
 
   onRuleMenuOpen({ id }: PostActionItemModel) {
     this.selectedRuleIds = this.tableItemsSource.flatMap((item) =>
-      item.id === id ? [] : item.rules.map((rule) => rule.value)
+      item.id === id ? [] : item.ruleIds
     );
   }
 }

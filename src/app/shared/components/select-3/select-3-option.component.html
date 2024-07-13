@@ -1,0 +1,17 @@
+<li
+  class="select-3__dropdown_item"
+  (click)="onItemClicked()"
+  [ngClass]="{ disabled: disabled }"
+>
+  <ng-container
+    *ngIf="template; else default"
+    [ngTemplateOutlet]="template"
+    [ngTemplateOutletContext]="{ value, label }"
+  ></ng-container>
+  <ng-template #default>
+    <span class="label">{{ label }}</span>
+  </ng-template>
+  <span class="icon" style="margin-left: auto">{{
+    selected ? "&#10003;" : ""
+  }}</span>
+</li>

@@ -36,43 +36,43 @@
       <tr *ngFor="let item of tableItemsSource">
         <td><input type="checkbox" [(ngModel)]="item.selected" /></td>
         <td>
-          <ng-template #selectedRulesTemplate let-model="model">
+          <ng-template #selectedRulesTemplate let-labels="labels">
             <div class="d-flex">
-              <span *ngFor="let item of model" class="mx-1"
-                >{{ item.label }};</span
+              <span *ngFor="let label of labels" class="mx-1"
+                >{{ label }};</span
               >
             </div>
           </ng-template>
-          <ng-template #ruleItemTemplate let-item="item">
-            {{ item.label }}
-          </ng-template>
-          <app-select-2
-            styles="border-radius: 5px"
-            [contentTemplateRef]="selectedRulesTemplate"
-            [menuItemTemplateRef]="ruleItemTemplate"
-            [items]="rules"
-            [(ngModel)]="item.rules"
-            [disabledValues]="selectedRuleIds"
+          <app-select-3
+            [(ngModel)]="item.ruleIds"
             [multiple]="true"
-            placeHolder="Không"
-            (dropdown-open)="onRuleMenuOpen(item)"
-          ></app-select-2>
+            place-holder="Không"
+            [template]="selectedRulesTemplate"
+            (open)="onRuleMenuOpen(item)"
+          >
+            <app-select-3-option
+              *ngFor="let rule of rules; trackBy: trackById"
+              [value]="rule"
+              [label]="rule.name"
+              value-key="id"
+              [disabled]="selectedRuleIds.includes(rule.id)"
+            ></app-select-3-option>
+          </app-select-3>
         </td>
         <td>
-          <select
+          <app-select-3
             [(ngModel)]="item.postAction"
             (ngModelChange)="onPostActionChanged(item)"
           >
-            <option
+            <app-select-3-option
               *ngFor="
                 let option of postActionItemsSource;
                 trackBy: trackByValue
               "
               [value]="option.value"
-            >
-              {{ option.label }}
-            </option>
-          </select>
+              [label]="option.label"
+            ></app-select-3-option>
+          </app-select-3>
         </td>
         <td>
           <button

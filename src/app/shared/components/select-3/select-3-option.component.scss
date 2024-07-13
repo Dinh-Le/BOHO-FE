@@ -1,0 +1,30 @@
+.select-3__dropdown_item {
+  display: flex;
+  padding: 0.25rem 0.25rem;
+  gap: 0.5rem;
+
+  .label {
+    text-wrap: nowrap;
+  }
+
+  .icon {
+    margin-left: auto;
+    width: 25px;
+    display: block;
+  }
+}
+
+.select-3__dropdown_item:hover {
+  .label {
+    font-weight: bolder;
+  }
+}
+
+.select-3__dropdown_item.disabled {
+  cursor: not-allowed;
+
+  .label {
+    color: #bbb;
+    font-weight: unset;
+  }
+}

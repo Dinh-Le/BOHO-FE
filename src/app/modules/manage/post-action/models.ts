@@ -1,14 +1,14 @@
+import { Rule } from 'src/app/data/schema/boho-v2/rule';
 import {
   AutoTrackingOptions,
   PostActionType,
   ZoomAndFocusOptions,
 } from '../camera-detail/models';
-import { SelectItemModel } from '@shared/models/select-item-model';
 
 export class PostActionItemModel {
   selected: boolean = false;
   id?: number;
-  rules: SelectItemModel[] = [];
+  ruleIds: number[] = [];
   postAction: PostActionType = 'focusAndZoom';
   postActionOptions?: ZoomAndFocusOptions | AutoTrackingOptions;
 }
