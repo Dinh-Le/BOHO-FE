@@ -66,7 +66,7 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
           this.form.controls['abandon_time'].clearValidators();
           this.form.controls['direction'].clearValidators();
           break;
-        case 'sobatage':
+        case 'sabotage':
           this.form.controls['objects'].setValidators([Validators.required]);
 
           this.form.controls['time_stand'].clearValidators();
@@ -247,7 +247,7 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
           time_stand: this.time_stand!,
         };
         break;
-      case 'sobatage':
+      case 'sabotage':
         break;
       case 'tripwire':
         rule.alarm_metadata.tripwire = {

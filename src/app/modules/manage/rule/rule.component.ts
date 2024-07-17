@@ -77,7 +77,6 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   schedules: Schedule[] = [];
-
   columns: ColumnConfig[] = [];
   private _subscriptions: Subscription[] = [];
 
@@ -129,12 +128,12 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       {
         label: 'Điểm giám sát',
-        prop: 'preset.label',
+        prop: 'preset.name',
         sortable: true,
       },
       {
         label: 'Loại quy tắc',
-        prop: 'type.label',
+        prop: 'type.name',
         sortable: true,
       },
       {
@@ -145,7 +144,7 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       {
         label: 'Lịch trình',
-        prop: 'schedule.label',
+        prop: 'schedule.name',
         sortable: true,
       },
     ];
@@ -161,9 +160,9 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
     const index =
       this.data.filter((it) => /Quy tắc mới \d\d\d/.test(it.name ?? ''))
         .length + 1;
-    newItem.form
-      .get('name')
-      ?.setValue(`Quy tắc mới ${index.toString().padStart(3, '0')}`);
+    newItem.form.controls.name.setValue(
+      `Quy tắc mới ${index.toString().padStart(3, '0')}`
+    );
     newItem.isEditable = true;
     newItem.isExpanded = true;
     newItem.isNew = true;
@@ -266,15 +265,15 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   toggleDirection(data: RowItemModel) {
-    switch (data.form.controls['direction'].value) {
+    switch (data.form.controls.direction.value) {
       case 'left to right':
-        data.form.controls['direction'].setValue('right to left');
+        data.form.controls.direction.setValue('right to left');
         break;
       case 'right to left':
-        data.form.controls['direction'].setValue('left to right');
+        data.form.controls.direction.setValue('left to right');
         break;
       default:
-        data.form.controls['direction'].setValue('left to right');
+        data.form.controls.direction.setValue('left to right');
         break;
     }
   }
