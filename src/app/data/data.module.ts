@@ -43,6 +43,10 @@ import {
   LicenseKeyService,
   LicenseKeyServiceImpl,
 } from './service/license_key.service';
+import {
+  HandoverService,
+  HandoverServiceImpl,
+} from './service/handover.service';
 
 const providers = [
   { provide: UserService, useClass: UserServiceImpl },
@@ -63,6 +67,7 @@ const providers = [
   { provide: EventService, useClass: EventServiceImpl },
   { provide: IntegrationService, useClass: IntegrationServiceImpl },
   { provide: LicenseKeyService, useClass: LicenseKeyServiceImpl },
+  { provide: HandoverService, useClass: HandoverServiceImpl },
 ];
 
 @NgModule({

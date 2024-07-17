@@ -7,6 +7,7 @@ export * from './latlng';
 export * from './node-operator';
 export * from './node';
 export * from './integration';
+export * from './handover';
 
 export interface ObjectModel {
   id: ObjectType;
