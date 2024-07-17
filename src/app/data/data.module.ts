@@ -13,7 +13,6 @@ import {
   NodeOperatorService,
   NodeOperatorServiceImpl,
 } from './service/node-operator.service';
-import { ObjectService, ObjectServiceImpl } from './service/object.service';
 import {
   PatrolManagementService,
   PatrolManagementServiceImpl,
@@ -52,7 +51,6 @@ const providers = [
   { provide: GroupManagementService, useClass: GroupManagementServiceImpl },
   { provide: NodeOperatorService, useClass: NodeOperatorServiceImpl },
   { provide: NodeService, useClass: NodeServiceImpl },
-  { provide: ObjectService, useClass: ObjectServiceImpl },
   { provide: PatrolManagementService, useClass: PatrolManagementServiceImpl },
   { provide: PatrolScheduleService, useClass: PatrolScheduleServiceImpl },
   { provide: PatrolService, useClass: PatrolServiceImpl },

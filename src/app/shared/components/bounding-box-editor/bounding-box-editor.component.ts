@@ -15,7 +15,7 @@ import {
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ToastService } from '@app/services/toast.service';
 import { ControlValueAccessorImpl } from '@shared/helpers/control-value-accessor-impl';
-import { catchError, EMPTY, of, switchMap } from 'rxjs';
+import { switchMap } from 'rxjs';
 import { DeviceService } from 'src/app/data/service/device.service';
 import { PresetService } from 'src/app/data/service/preset.service';
 import { v4 } from 'uuid';
@@ -50,6 +50,8 @@ export class BoundingBoxEditorComponent
   tabIndex: string = v4();
 
   @Input() type: 'line' | 'polygon' = 'line';
+  @Input() direction: 'left to right' | 'right to left' | 'both' =
+    'left to right';
   @Input() src: {
     nodeId?: string | null;
     deviceId?: string | null;
@@ -73,12 +75,16 @@ export class BoundingBoxEditorComponent
       this.update();
     }
 
+    if ('direction' in changes) {
+      this.update();
+    }
+
     if (
-      ('src' in changes &&
-        changes['src'].currentValue?.['deviceId'] !==
-          changes['src'].previousValue?.['deviceId']) ||
-      changes['src'].currentValue?.['presetId'] !==
-        changes['src'].previousValue?.['presetId']
+      'src' in changes &&
+      (changes['src'].currentValue?.['deviceId'] !==
+        changes['src'].previousValue?.['deviceId'] ||
+        changes['src'].currentValue?.['presetId'] !==
+          changes['src'].previousValue?.['presetId'])
     ) {
       const { nodeId, deviceId, presetId } = this.src;
       if (!nodeId || !deviceId) {
@@ -220,6 +226,59 @@ export class BoundingBoxEditorComponent
     return { x, y };
   }
 
+  private drawDirection(
+    ctx: CanvasRenderingContext2D,
+    direction: 'left to right' | 'right to left'
+  ) {
+    const d = 60;
+    const d2 = 30;
+    const Ax = this.model[0].x;
+    const Ay = this.model[0].y;
+    const Bx = this.model[1].x;
+    const By = this.model[1].y;
+    const Mx = (Ax + Bx) / 2;
+    const My = (Ay + By) / 2;
+
+    const vAB = [Bx - Ax, By - Ay];
+    const vMP1 =
+      direction === 'left to right' ? [vAB[1], -vAB[0]] : [-vAB[1], vAB[0]];
+    const uMP1 = [
+      vMP1[0] / Math.sqrt(vMP1[0] * vMP1[0] + vMP1[1] * vMP1[1]),
+      vMP1[1] / Math.sqrt(vMP1[0] * vMP1[0] + vMP1[1] * vMP1[1]),
+    ];
+
+    const P1x = Mx + d * uMP1[0];
+    const P1y = My + d * uMP1[1];
+
+    const Nx = Mx + 10 * uMP1[0];
+    const Ny = My + 10 * uMP1[1];
+
+    const uAB = [
+      vAB[0] / Math.sqrt(vAB[0] * vAB[0] + vAB[1] * vAB[1]),
+      vAB[1] / Math.sqrt(vAB[0] * vAB[0] + vAB[1] * vAB[1]),
+    ];
+    const P2x = Nx + d2 * uAB[0];
+    const P2y = Ny + d2 * uAB[1];
+
+    const vBA = [-vAB[0], -vAB[1]];
+    const uNP3 = [
+      vBA[0] / Math.sqrt(vBA[0] * vBA[0] + vBA[1] * vBA[1]),
+      vBA[1] / Math.sqrt(vBA[0] * vBA[0] + vBA[1] * vBA[1]),
+    ];
+    const P3x = Nx + d2 * uNP3[0];
+    const P3y = Ny + d2 * uNP3[1];
+
+    ctx.fillStyle = 'red'; // Triangle color
+    ctx.beginPath();
+
+    ctx.moveTo(P1x, P1y);
+    ctx.lineTo(P2x, P2y);
+    ctx.lineTo(P3x, P3y);
+
+    ctx.closePath();
+    ctx.fill();
+  }
+
   private update(): void {
     if (!this.canvas || !this._image) {
       return;
@@ -238,9 +297,19 @@ export class BoundingBoxEditorComponent
     context.drawImage(this._image, 0, 0);
 
     if (this.model.length) {
+      context.fillStyle = '#4472c47f';
+
+      // Draw points (circles)
+      for (let i = 0; i < this.model.length; i++) {
+        const point = this.model[i];
+        context.beginPath();
+        context.arc(point.x, point.y, 20, 0, 2 * Math.PI);
+        context.fill();
+      }
+
       if (this._isDrawing || this.type === 'line') {
         context.strokeStyle = 'blue';
-        context.lineWidth = 2;
+        context.lineWidth = 5;
         context.beginPath();
         context.moveTo(this.model[0].x, this.model[0].y);
         for (let i = 1; i < this.model.length; i++) {
@@ -248,17 +317,16 @@ export class BoundingBoxEditorComponent
         }
 
         context.stroke();
-      } else {
-        context.fillStyle = '#4472c47f';
 
-        // Draw points (circles)
-        for (let i = 0; i < this.model.length; i++) {
-          const point = this.model[i];
-          context.beginPath();
-          context.arc(point.x, point.y, 3, 0, 2 * Math.PI);
-          context.fill();
+        if (this.model.length == 2) {
+          if (this.direction === 'both') {
+            this.drawDirection(context, 'left to right');
+            this.drawDirection(context, 'right to left');
+          } else {
+            this.drawDirection(context, this.direction);
+          }
         }
-
+      } else {
         context.strokeStyle = '#31538f';
         context.beginPath();
         context.moveTo(this.model[0].x, this.model[0].y);

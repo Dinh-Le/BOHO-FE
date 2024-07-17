@@ -1,7 +1,11 @@
-export const RuleTypes: {
+import { RuleTypeModel } from '../schema/boho-v2';
+
+interface RuleType {
   id: string;
   name: string;
-}[] = [
+}
+
+export const RuleTypes: RuleType[] = [
   {
     id: 'trespassing event',
     name: 'Đi vào vùng',
@@ -29,5 +33,33 @@ export const RuleTypes: {
   {
     id: 'sabotage event',
     name: 'Phá hoại thiết bị',
+  },
+];
+
+export const RuleTypeItemsSource: RuleTypeModel[] = [
+  {
+    id: 'loitering',
+    name: 'Luẩn quẩn',
+    cameraTypes: ['Static', 'PTZ'],
+  },
+  {
+    id: 'sabotage',
+    name: 'Xâm nhập trái phép',
+    cameraTypes: ['Static', 'PTZ'],
+  },
+  {
+    id: 'tripwire',
+    name: 'Vượt đường kẻ',
+    cameraTypes: ['Static', 'PTZ'],
+  },
+  {
+    id: 'lost',
+    name: 'Đối tượng bị bỏ lại',
+    cameraTypes: ['Static'],
+  },
+  {
+    id: 'abandon',
+    name: 'Đối tượng bị lấy đi',
+    cameraTypes: ['Static'],
   },
 ];

@@ -9,191 +9,30 @@ import {
   ViewChild,
   inject,
 } from '@angular/core';
-import {
-  ColumnConfig,
-  ExpandableTableRowItemModelBase,
-} from '../expandable-table/expandable-table.component';
+import { ColumnConfig } from '../expandable-table/expandable-table.component';
 import { SelectItemModel } from '@shared/models/select-item-model';
 import { ActivatedRoute } from '@angular/router';
-import { v4 } from 'uuid';
 import {
   Level3Menu,
   NavigationService,
 } from 'src/app/data/service/navigation.service';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { PresetService } from 'src/app/data/service/preset.service';
 import { ScheduleService } from 'src/app/data/service/schedule.service';
 import { Subscription, filter, of, switchMap } from 'rxjs';
 import { ToastService } from '@app/services/toast.service';
-import { Objects, RuleTypes, Severities } from 'src/app/data/constants';
-import { Point } from '@shared/components/bounding-box-editor/bounding-box-editor.component';
-import { Rule } from 'src/app/data/schema/boho-v2/rule';
+import {
+  Objects,
+  RuleTypeItemsSource,
+  Severities,
+  Severity,
+} from 'src/app/data/constants';
 import { RuleService } from 'src/app/data/service/rule.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { NodeService } from 'src/app/data/service/node.service';
-
-declare interface CustomSelectItemModel extends SelectItemModel {
-  data: any;
-}
-
-export class RowItemModel extends ExpandableTableRowItemModelBase {
-  id = v4();
-  form = new FormGroup({
-    name: new FormControl<string>('', [Validators.required]),
-    status: new FormControl<boolean>(true, [Validators.required]),
-    integration: new FormControl<string>(''),
-    preset: new FormControl<SelectItemModel | undefined>(undefined, [
-      Validators.required,
-    ]),
-    type: new FormControl<CustomSelectItemModel | undefined>(undefined, [
-      Validators.required,
-    ]),
-    points: new FormControl<Point[]>([]),
-    objects: new FormControl<SelectItemModel[]>([], [Validators.required]),
-    exceedingTime: new FormControl<number>(5, [Validators.required]),
-    severity: new FormControl<SelectItemModel | undefined>(undefined, [
-      Validators.required,
-    ]),
-    schedule: new FormControl<SelectItemModel | undefined>(undefined, [
-      Validators.required,
-    ]),
-  });
-
-  constructor() {
-    super();
-    this.form.disable();
-  }
-
-  get name() {
-    return this.form.get('name')?.value || '';
-  }
-
-  get status() {
-    return this.form.get('status')?.value || false;
-  }
-
-  get integration() {
-    return this.form.get('integrationName')?.value;
-  }
-
-  get preset() {
-    return this.form.get('preset')?.value;
-  }
-
-  get type(): CustomSelectItemModel | null | undefined {
-    return this.form.get('type')?.value;
-  }
-
-  get objects() {
-    return this.form.get('objects')?.value;
-  }
-
-  get exceedingTime() {
-    return this.form.get('exceedingTime')?.value;
-  }
-
-  get severity() {
-    return this.form.get('severity')?.value;
-  }
-
-  get schedule() {
-    return this.form.get('schedule')?.value;
-  }
-
-  get canSubmit() {
-    return this.form.valid;
-  }
-
-  get boundingBoxType() {
-    if (!this.type) {
-      return 'polygon';
-    }
-
-    const id = this.type.data.id;
-    if (id && id.includes('tripwire')) {
-      return 'line';
-    } else {
-      return 'polygon';
-    }
-  }
-
-  get points(): Point[] {
-    return this.form.get('points')?.value || [];
-  }
-
-  get data(): Rule {
-    const [alarm_type, direction] = (this.type?.data.id as string)
-      .split(',')
-      .map((e) => e.trim());
-
-    const rule: Rule = {
-      id: this.isNew ? -1 : parseInt(this.id),
-      active: this.status!,
-      name: this.name!,
-      level: this.severity?.value!,
-      objects: this.objects!.map((e) => e.value),
-      combine_name: '',
-      alarm_type: alarm_type,
-      preset_id: this.preset?.value!,
-      schedule_id: this.schedule?.value!,
-      points: this.points.map((e) => [e.x, e.y]),
-      alarm_metadata: {},
-    };
-
-    if (alarm_type === 'loitering event') {
-      rule.alarm_metadata.loitering = {
-        time_stand: this.exceedingTime!.toString(),
-      };
-    } else if (alarm_type === 'tripwire event') {
-      rule.alarm_metadata.tripwire = {
-        direction: direction,
-      };
-    }
-
-    return rule;
-  }
-
-  setData(
-    rule: Rule,
-    schedules: SelectItemModel[],
-    presets: SelectItemModel[]
-  ) {
-    this.id = rule.id.toString();
-    const severityIndex = Severities.findIndex((e) => e.id === rule.level);
-    const typeIndex = RuleTypes.findIndex((e) =>
-      e.id.startsWith(rule.alarm_type)
-    );
-    const objects = Objects.filter((e) => rule.objects.includes(e.id)).map(
-      (e) => ({
-        value: e.id,
-        label: e.name,
-        icon: e.icon,
-      })
-    );
-    this.form.reset({
-      name: rule.name,
-      exceedingTime: parseInt(rule.alarm_metadata.loitering?.time_stand || '5'),
-      integration: '',
-      objects: objects,
-      points: rule.points.map((e) => ({
-        x: e[0],
-        y: e[1],
-      })),
-      preset: presets.find((e) => e.value === rule.preset_id),
-      schedule: schedules.find((e) => e.value === rule.schedule_id),
-      severity: {
-        value: Severities[severityIndex].id,
-        label: Severities[severityIndex].name,
-      },
-      status: rule.active,
-      type: {
-        value: typeIndex,
-        label: RuleTypes[typeIndex].name,
-        data: RuleTypes[typeIndex],
-      },
-    });
-  }
-}
+import { Schedule } from 'src/app/data/schema/boho-v2/shedule';
+import { Preset } from 'src/app/data/schema/boho-v2/preset';
+import { RowItemModel } from './models';
+import { ObjectModel, RuleTypeModel } from 'src/app/data/schema/boho-v2';
 
 @Component({
   selector: 'app-rule',
@@ -201,13 +40,15 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
   styleUrls: ['./rule.component.scss', '../shared/my-input.scss'],
 })
 export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
-  @HostBinding('class') classNames = 'flex-grow-1 d-flex flex-column';
+  @HostBinding('class')
+  classNames = 'flex-grow-1 d-flex flex-column';
 
   @ViewChild('objectColumnTemplate', { static: true })
   objectColumnTemplate!: TemplateRef<any>;
 
   cameraId = '';
   nodeId = '';
+
   private _activatedRoute = inject(ActivatedRoute);
   private _navigationService = inject(NavigationService);
   private _presetService = inject(PresetService);
@@ -218,48 +59,48 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
   private _nodeService = inject(NodeService);
 
   data: RowItemModel[] = [];
-  presets: SelectItemModel[] = [];
-  ruleTypes: CustomSelectItemModel[] = RuleTypes.map((e, index) => ({
-    value: index,
-    label: e.name,
-    data: e,
-  }));
-  objects: SelectItemModel[] = Objects.map((e) => ({
-    value: e.id,
-    label: e.name,
-    icon: e.icon,
-  }));
-  severities: SelectItemModel[] = Severities.map((e) => ({
-    value: e.id,
-    label: e.name,
-  }));
-  schedules: SelectItemModel[] = [];
+  presets: Preset[] = [];
+  _cameraType?: 'Static' | 'PTZ' = 'Static';
+
+  get ruleTypes(): RuleTypeModel[] {
+    return RuleTypeItemsSource.filter((rule) =>
+      rule.cameraTypes.includes(this._cameraType as any)
+    );
+  }
+
+  get objects(): ObjectModel[] {
+    return Objects;
+  }
+
+  get severities(): Severity[] {
+    return Severities;
+  }
+
+  schedules: Schedule[] = [];
+
   columns: ColumnConfig[] = [];
   private _subscriptions: Subscription[] = [];
 
-  ngOnInit(): void {
+  constructor() {
     this._navigationService.level3 = Level3Menu.RULE;
-    const activatedRouteSubscription = this._activatedRoute.params
+    this._activatedRoute.params
       .pipe(
         filter(({ nodeId, cameraId }) => nodeId && cameraId),
         switchMap(({ nodeId, cameraId }) => {
           this.cameraId = cameraId;
           this.nodeId = nodeId;
+          this.data = [];
+          this.presets = [];
+          this.schedules = [];
           return this._presetService.findAll(this.nodeId, this.cameraId);
         }),
         switchMap((response) => {
-          this.presets = response.data.map((e) => ({
-            label: e.name,
-            value: e.id,
-          }));
+          this.presets = response.data;
 
           return this._scheduleService.findAll(this.nodeId, this.cameraId);
         }),
         switchMap((response) => {
-          this.schedules = response.data.map((e) => ({
-            label: e.name,
-            value: e.id,
-          }));
+          this.schedules = response.data;
 
           return this._ruleService.findAll(this.nodeId, this.cameraId);
         })
@@ -275,8 +116,9 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
         error: (err: HttpErrorResponse) =>
           this._toastService.showError(err.error?.message ?? err.message),
       });
-    this._subscriptions.push(activatedRouteSubscription);
   }
+
+  ngOnInit(): void {}
 
   ngAfterViewInit(): void {
     this.columns = [
@@ -314,10 +156,11 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
     this._subscriptions.forEach((e) => e.unsubscribe());
   }
 
-  add() {
+  add(): void {
     const newItem = new RowItemModel();
     const index =
-      this.data.filter((it) => /Quy tắc mới \d\d\d/.test(it.name)).length + 1;
+      this.data.filter((it) => /Quy tắc mới \d\d\d/.test(it.name ?? ''))
+        .length + 1;
     newItem.form
       .get('name')
       ?.setValue(`Quy tắc mới ${index.toString().padStart(3, '0')}`);
@@ -414,7 +257,25 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
       });
   }
 
-  get scheduleUrl() {
-    return `/manage/device-rule/node/${this.nodeId}/camera/${this.cameraId}/schedule`;
+  trackById(_: any, { id }: any): any {
+    return id;
+  }
+
+  trackByValue(_: any, { value }: any): any {
+    return value;
+  }
+
+  toggleDirection(data: RowItemModel) {
+    switch (data.form.controls['direction'].value) {
+      case 'left to right':
+        data.form.controls['direction'].setValue('right to left');
+        break;
+      case 'right to left':
+        data.form.controls['direction'].setValue('left to right');
+        break;
+      default:
+        data.form.controls['direction'].setValue('left to right');
+        break;
+    }
   }
 }

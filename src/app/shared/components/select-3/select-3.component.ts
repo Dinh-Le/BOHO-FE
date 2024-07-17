@@ -16,7 +16,10 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 interface SelectOption {
   value: any;
   label: string;
+  compareFn: AreEqualFn;
 }
+
+type AreEqualFn = (a: any, b: any) => boolean;
 
 @Component({
   selector: 'app-select-3',
@@ -59,13 +62,6 @@ export class Select3Component implements ControlValueAccessor, OnChanges {
       value = [value];
     }
 
-    if (
-      value.length === this._selectedValues.length &&
-      value.every((x: any) => this._selectedValues.includes(x))
-    ) {
-      return;
-    }
-
     this._selectedValues = [...value];
     this._onChange?.(this.model);
     this.modelChange.emit(this.model);
@@ -80,7 +76,11 @@ export class Select3Component implements ControlValueAccessor, OnChanges {
 
   get labels(): string[] {
     return this._options
-      .filter((option) => this._selectedValues.includes(option.value))
+      .filter((option) =>
+        this._selectedValues.some((value) =>
+          option.compareFn(option.value, value)
+        )
+      )
       .map((option) => option.label);
   }
 
@@ -106,20 +106,24 @@ export class Select3Component implements ControlValueAccessor, OnChanges {
     this._onTouched = fn;
   }
 
-  appendOption({ value, label }: any) {
-    this._options.push({ value, label });
+  appendOption({ value, label, compareFn }: any) {
+    this._options.push({ value, label, compareFn });
   }
 
   subscribe(fn: Function): void {
     this._subscriber.push(fn);
   }
 
-  onItemSelectionChanged(item: any, selected: boolean): void {
+  onItemSelectionChanged(
+    item: any,
+    selected: boolean,
+    compareFn: AreEqualFn
+  ): void {
     if (this.multiple) {
       if (selected) {
         this.model = [...this.model, item];
       } else {
-        this.model = this.model.filter((e: any) => e !== item);
+        this.model = this.model.filter((e: any) => !compareFn(e, item));
       }
     } else {
       if (selected) {
@@ -127,6 +131,8 @@ export class Select3Component implements ControlValueAccessor, OnChanges {
       } else {
         this.model = null;
       }
+
+      this._dropdownVisible = false;
     }
   }
 

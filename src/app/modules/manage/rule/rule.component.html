@@ -26,179 +26,307 @@
     </div>
     <div class="row">
       <div class="col-7">
-        <ng-container *ngIf="data.isEditable; else viewModeTemplate">
-          <div class="form-group row mt-4">
-            <div class="col-4">
-              <label
-                class="fs-14 col-form-label"
-                [htmlFor]="data.id + '__status'"
-                >Hoạt động:</label
-              >
-            </div>
-            <div class="col-8">
-              <div class="form-check form-switch">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  [id]="data.id + '__status'"
-                  formControlName="status"
-                />
-              </div>
-            </div>
+        <div class="form-group row mt-4">
+          <div class="col-4">
+            <label class="fs-14 col-form-label" [htmlFor]="data.id + '__status'"
+              >Hoạt động:</label
+            >
           </div>
-          <div class="form-group row mt-2">
-            <div class="col-4">
-              <label
-                class="col-form-label"
-                [htmlFor]="data.id + '__ten-tich-hop'"
-                >Tên tích hợp:</label
-              >
-            </div>
-            <div class="col-8">
+          <div class="col-8">
+            <div
+              class="form-check form-switch"
+              *ngIf="data.isEditable; else statusTemplate"
+            >
               <input
-                type="text"
-                [id]="data.id + '__ten-tich-hop'"
-                class="form-control bg-transparent border-light form-control-sm"
-                formControlName="integration"
+                class="form-check-input"
+                type="checkbox"
+                [id]="data.id + '__status'"
+                formControlName="status"
               />
             </div>
+            <ng-template #statusTemplate>
+              <i
+                class="bi text-white"
+                [ngClass]="data.status ? 'bi-check-lg' : 'bi-x'"
+              ></i>
+            </ng-template>
           </div>
-          <div class="form-group row mt-2">
-            <div class="col-4">
-              <label
-                class="col-form-label"
-                [htmlFor]="data.id + '__diem-giam-sat'"
-                >Điểm giám sát:</label
-              >
-            </div>
-            <div class="col-8">
-              <app-select-2
-                [id]="data.id + '__diem-giam-sat'"
-                [items]="presets"
-                formControlName="preset"
-              ></app-select-2>
-            </div>
+        </div>
+        <div class="form-group row mt-2">
+          <div class="col-4">
+            <label class="col-form-label" [htmlFor]="data.id + '__ten-tich-hop'"
+              >Tên tích hợp:</label
+            >
           </div>
-          <div class="form-group row mt-2">
-            <div class="col-4">
-              <label
-                class="col-form-label"
-                [htmlFor]="data.id + '__loai-quy-tac'"
-                >Loại quy tắc:</label
-              >
-            </div>
-            <div class="col-8">
-              <app-select-2
-                [id]="data.id + '__loai-quy-tac'"
-                class="w-100"
-                [items]="ruleTypes"
-                formControlName="type"
-                placeHolder="Loại quy tắc"
-              ></app-select-2>
-            </div>
+          <div class="col-8">
+            <input
+              type="text"
+              [id]="data.id + '__ten-tich-hop'"
+              class="form-control bg-transparent border-light form-control-sm"
+              formControlName="integration"
+              *ngIf="data.isEditable; else integrationTemplate"
+            />
+            <ng-template #integrationTemplate>
+              <span class="fs-14">{{ data.integrationName }}</span>
+            </ng-template>
           </div>
-          <div class="form-group row mt-2">
-            <div class="col-4">
-              <label
-                class="col-form-label"
-                [htmlFor]="data.id + '__loai-doi-tuong'"
-                >Loại đối tượng:</label
-              >
-            </div>
-            <div class="col-8 d-flex">
-              <app-select-2
-                class="w-100"
-                [id]="data.id + '__loai-doi-tuong'"
-                [items]="objects"
-                [menuItemTemplateRef]="objectTemplate"
-                [contentTemplateRef]="selectedObjectsTemplate"
-                formControlName="objects"
-                [multiple]="true"
-              ></app-select-2>
-              <ng-template #objectTemplate let-item="item">
-                <input type="checkbox" class="mx-1" [checked]="item.selected" />
+        </div>
+        <!-- Điểm giám sát -->
+        <div class="form-group row mt-2">
+          <div class="col-4">
+            <label
+              class="col-form-label"
+              [htmlFor]="data.id + '__diem-giam-sat'"
+              >Điểm giám sát:</label
+            >
+          </div>
+          <div class="col-8">
+            <app-select-3
+              [id]="data.id + '__diem-giam-sat'"
+              formControlName="preset"
+              class="bg-dark"
+              *ngIf="data.isEditable; else presetTemplate"
+            >
+              <app-select-3-option
+                *ngFor="let preset of presets; trackBy: trackById"
+                [value]="preset"
+                [label]="preset.name"
+                value-key="id"
+              ></app-select-3-option>
+            </app-select-3>
+            <ng-template #presetTemplate>
+              <span class="fs-14">{{ data.preset?.name }}</span>
+            </ng-template>
+          </div>
+        </div>
+        <!-- Loại quy tắc -->
+        <div class="form-group row mt-2">
+          <div class="col-4">
+            <label class="col-form-label" [htmlFor]="data.id + '__loai-quy-tac'"
+              >Loại quy tắc:</label
+            >
+          </div>
+          <div class="col-8">
+            <app-select-3
+              [id]="data.id + '__loai-quy-tac'"
+              formControlName="type"
+              place-holder="Loại quy tắc"
+              class="bg-dark"
+              *ngIf="data.isEditable; else typeTemplate"
+            >
+              <app-select-3-option
+                *ngFor="let item of ruleTypes; trackBy: trackByValue"
+                [value]="item"
+                [label]="item.name"
+                value-key="id"
+              ></app-select-3-option>
+            </app-select-3>
+            <ng-template #typeTemplate>
+              <span class="fs-14">{{ data.type?.name }}</span>
+            </ng-template>
+          </div>
+        </div>
+        <!-- Loại đối tượng -->
+        <div class="form-group row mt-2" *ngIf="data.objectsVisible">
+          <div class="col-4">
+            <label
+              class="col-form-label"
+              [htmlFor]="data.id + '__loai-doi-tuong'"
+              >Loại đối tượng:</label
+            >
+          </div>
+          <div class="col-8">
+            <app-select-3
+              [id]="data.id + '__loai-doi-tuong'"
+              [multiple]="true"
+              [template]="selectedObjectsTemplate"
+              class="bg-dark"
+              formControlName="objects"
+              *ngIf="data.isEditable; else objectsTemplate"
+            >
+              <app-select-3-option
+                *ngFor="let item of objects; trackBy: trackById"
+                [value]="item"
+                [label]="item.name"
+                value-key="id"
+                [template]="objectItemTemplate"
+              ></app-select-3-option>
+            </app-select-3>
+            <ng-template #selectedObjectsTemplate let-value="value">
+              <div class="d-flex">
                 <app-svg-icon
+                  *ngFor="let item of value"
                   class="mx-1"
-                  color="black"
                   [icon]="item.icon"
                 ></app-svg-icon>
-                <span class="mx-1">{{ item.label }}</span>
-              </ng-template>
-              <ng-template #selectedObjectsTemplate let-model="model">
-                <div class="d-flex">
-                  <ng-container *ngFor="let item of model">
-                    <app-svg-icon
-                      class="mx-1"
-                      [icon]="item.icon"
-                    ></app-svg-icon>
-                  </ng-container>
-                </div>
-              </ng-template>
-            </div>
-          </div>
-          <div class="form-group row mt-2">
-            <div class="col-4">
-              <label
-                class="col-form-label"
-                [htmlFor]="data.id + '__thoi-gian-vuot'"
-                >Thời gian vượt:</label
-              >
-            </div>
-            <div class="col-8">
-              <div
-                class="input-group input-group-sm border rounded-1 border-light"
-              >
-                <input
-                  type="number"
-                  [id]="data.id + '__thoi-gian-vuot'"
-                  min="1"
-                  max="180"
-                  class="form-control form-control-sm bg-transparent"
-                  formControlName="exceedingTime"
-                />
-                <span class="input-group-text">(1-180s)</span>
               </div>
-            </div>
+            </ng-template>
+            <ng-template
+              #objectItemTemplate
+              let-value="value"
+              let-label="label"
+            >
+              <app-svg-icon class="mx-1" [icon]="value.icon"></app-svg-icon>
+              <span class="mx-1">{{ label }}</span>
+            </ng-template>
+            <ng-template #objectsTemplate>
+              <ng-container *ngFor="let object of data.objects || []">
+                <app-svg-icon [icon]="object.icon" class="mx-1"></app-svg-icon>
+              </ng-container>
+            </ng-template>
           </div>
-          <div class="form-group row mt-2">
-            <div class="col-4">
-              <label class="col-form-label" [htmlFor]="data.id + '__severity'"
-                >Mức độ nghiêm trọng:</label
-              >
-            </div>
-            <div class="col-8">
-              <app-select-2
-                [id]="data.id + '__severity'"
-                [items]="severities"
-                formControlName="severity"
-              ></app-select-2>
-            </div>
+        </div>
+        <!-- Thời gian vượt -->
+        <div class="form-group row mt-2" *ngIf="data.timeStandVisible">
+          <div class="col-4">
+            <label class="col-form-label">Thời gian vượt:</label>
           </div>
-          <div class="form-group row mt-2">
-            <div class="col-4">
-              <label class="col-form-label" [htmlFor]="data.id + '__lich-trinh'"
-                >Lịch trình:</label
-              >
+          <div class="col-8">
+            <div
+              class="input-group input-group-sm border rounded-1 border-light"
+              *ngIf="data.isEditable; else timeStandTemplate"
+            >
+              <input
+                type="number"
+                min="5"
+                max="180"
+                class="form-control form-control-sm bg-transparent"
+                formControlName="time_stand"
+              />
+              <span class="input-group-text">(1-180s)</span>
             </div>
-            <div class="col-8">
-              <app-select-2
-                [id]="data.id + '__lich-trinh'"
-                [items]="schedules"
-                formControlName="schedule"
-              ></app-select-2>
-            </div>
+            <ng-template #timeStandTemplate>
+              <span class="fs-14">{{ data.time_stand }} (1 - 180s)</span>
+            </ng-template>
           </div>
-          <div class="form-group row mt-2">
-            <div class="col-4">
-              <label
-                class="col-form-label"
-                [htmlFor]="data.id + '__tac-dong-ptz'"
-                >Tác động PTZ:</label
-              >
-            </div>
-            <div class="col-8"></div>
+        </div>
+        <!-- Thời gian bỏ lại (Đối tượng bỏ lại) -->
+        <div class="form-group row mt-2" *ngIf="data.losingTimeVisible">
+          <div class="col-4">
+            <label class="col-form-label">Thời gian bỏ lại:</label>
           </div>
-          <div class="form-group d-flex justify-content-end mt-2">
+          <div class="col-8">
+            <div
+              class="input-group input-group-sm border rounded-1 border-light"
+              *ngIf="data.isEditable; else losingTimeTemplate"
+            >
+              <input
+                type="number"
+                min="0"
+                max="30"
+                class="form-control form-control-sm bg-transparent"
+                formControlName="losing_time"
+              />
+              <span class="input-group-text">(0-30s)</span>
+            </div>
+            <ng-template #losingTimeTemplate>
+              <span class="fs-14">{{ data.losing_time }} (0 - 30s)</span>
+            </ng-template>
+          </div>
+        </div>
+        <!-- Thời gian bỏ lại (Đối tượng lấy đi) -->
+        <div class="form-group row mt-2" *ngIf="data.abandonTimeVisible">
+          <div class="col-4">
+            <label class="col-form-label">Thời gian bỏ lại:</label>
+          </div>
+          <div class="col-8">
+            <div
+              class="input-group input-group-sm border rounded-1 border-light"
+              *ngIf="data.isEditable; else abandonTimeTemplate"
+            >
+              <input
+                type="number"
+                min="0"
+                max="30"
+                class="form-control form-control-sm bg-transparent"
+                formControlName="abandon_time"
+              />
+              <span class="input-group-text">(0-30s)</span>
+            </div>
+            <ng-template #abandonTimeTemplate>
+              <span class="fs-14">{{ data.abandon_time }} (0 - 30s)</span>
+            </ng-template>
+          </div>
+        </div>
+        <!-- Độ nhạy -->
+        <div class="form-group row mt-2" *ngIf="data.sensitiveVisible">
+          <div class="col-4">
+            <label class="col-form-label">Độ nhạy:</label>
+          </div>
+          <div class="col-8">
+            <div
+              class="input-group input-group-sm border rounded-1 border-light"
+              *ngIf="data.isEditable; else sensitiveTemplate"
+            >
+              <input
+                type="number"
+                min="0"
+                max="30"
+                class="form-control form-control-sm bg-transparent"
+                formControlName="sensitive"
+              />
+              <span class="input-group-text">(0-5s, default 3)</span>
+            </div>
+            <ng-template #sensitiveTemplate>
+              <span class="fs-14">{{ data.sensitive }} (0-5s)</span>
+            </ng-template>
+          </div>
+        </div>
+        <!-- Mức độ nghiêm trọng -->
+        <div class="form-group row mt-2">
+          <div class="col-4">
+            <label class="col-form-label" [htmlFor]="data.id + '__severity'"
+              >Mức độ nghiêm trọng:</label
+            >
+          </div>
+          <div class="col-8">
+            <app-select-3
+              [id]="data.id + '__severity'"
+              formControlName="severity"
+              class="bg-dark"
+              *ngIf="data.isEditable; else severityTemplate"
+            >
+              <app-select-3-option
+                *ngFor="let item of severities; trackBy: trackById"
+                [value]="item"
+                [label]="item.name"
+                value-key="id"
+              ></app-select-3-option>
+            </app-select-3>
+            <ng-template #severityTemplate>
+              <span class="fs-14">{{ data.severity.name }}</span>
+            </ng-template>
+          </div>
+        </div>
+        <!-- Lịch trình -->
+        <div class="form-group row mt-2">
+          <div class="col-4">
+            <label class="col-form-label" [htmlFor]="data.id + '__lich-trinh'"
+              >Lịch trình:</label
+            >
+          </div>
+          <div class="col-8">
+            <app-select-3
+              [id]="data.id + '__lich-trinh'"
+              formControlName="schedule"
+              class="bg-dark"
+              *ngIf="data.isEditable; else scheduleTemplate"
+            >
+              <app-select-3-option
+                *ngFor="let item of schedules; trackBy: trackById"
+                [value]="item"
+                [label]="item.name"
+                value-key="id"
+              ></app-select-3-option>
+            </app-select-3>
+            <ng-template #scheduleTemplate>
+              <span class="fs-14">{{ data.schedule.name }}</span>
+            </ng-template>
+          </div>
+        </div>
+        <!-- Footer -->
+        <div class="form-group d-flex justify-content-end mt-2">
+          <ng-container *ngIf="data.isEditable; else footerTemplate">
             <button
               type="button"
               class="my-button cancel mx-1"
@@ -213,87 +341,8 @@
             >
               Lưu
             </button>
-          </div>
-        </ng-container>
-        <ng-template #viewModeTemplate>
-          <div class="form-group row mt-4">
-            <div class="col-4">
-              <span>Hoạt động:</span>
-            </div>
-            <div class="col-8">
-              <i
-                class="bi text-white"
-                [ngClass]="data.status ? 'bi-check-lg' : 'bi-x'"
-              ></i>
-            </div>
-          </div>
-          <div class="form-group row mt-2">
-            <div class="col-4">
-              <span class="fs-14">Tên tích hợp:</span>
-            </div>
-            <div class="col-8">
-              <span class="fs-14">{{ data.integrationName }}</span>
-            </div>
-          </div>
-          <div class="form-group row mt-2">
-            <div class="col-4">
-              <span class="fs-14">Điểm giám sát:</span>
-            </div>
-            <div class="col-8">
-              <span class="fs-14">{{ data.preset.label }}</span>
-            </div>
-          </div>
-          <div class="form-group row mt-2">
-            <div class="col-4">
-              <span class="fs-14">Loại quy tắc:</span>
-            </div>
-            <div class="col-8">
-              <span class="fs-14">{{ data.type.label }}</span>
-            </div>
-          </div>
-          <div class="form-group row mt-2">
-            <div class="col-4">
-              <span class="fs-14">Loại đối tượng:</span>
-            </div>
-            <div class="col-8">
-              <ng-container *ngFor="let item of data.objects || []">
-                <app-svg-icon [icon]="item.icon" class="mx-1"></app-svg-icon>
-              </ng-container>
-            </div>
-          </div>
-          <div class="form-group row mt-2">
-            <div class="col-4">
-              <span class="fs-14">Thời gian vượt:</span>
-            </div>
-            <div class="col-8">
-              <span class="fs-14">{{ data.exceedingTime }} (1 - 180s)</span>
-            </div>
-          </div>
-          <div class="form-group row mt-2">
-            <div class="col-4">
-              <span class="fs-14">Mức độ nghiêm trọng:</span>
-            </div>
-            <div class="col-8">
-              <span class="fs-14">{{ data.severity?.label }}</span>
-            </div>
-          </div>
-          <div class="form-group row mt-2">
-            <div class="col-4">
-              <span class="fs-14">Lịch trình:</span>
-            </div>
-            <div class="col-8">
-              <span class="fs-14">{{ data.schedule?.label }}</span>
-            </div>
-          </div>
-          <div class="form-group row mt-2">
-            <div class="col-4">
-              <span class="fs-14">Tác động PTZ:</span>
-            </div>
-            <div class="col-8">
-              <span class="fs-14"></span>
-            </div>
-          </div>
-          <div class="form-group d-flex justify-content-end">
+          </ng-container>
+          <ng-template #footerTemplate>
             <button
               type="button"
               class="my-button cancel mx-1"
@@ -308,8 +357,8 @@
             >
               Chỉnh
             </button>
-          </div>
-        </ng-template>
+          </ng-template>
+        </div>
       </div>
       <div class="col-5">
         <div class="d-flex align-items-center justify-content-center">
@@ -317,12 +366,25 @@
             style="aspect-ratio: 16/9; width: 80%"
             [type]="data.boundingBoxType"
             formControlName="points"
+            [direction]="data.direction"
             [src]="{
             nodeId,
             deviceId: cameraId,
             presetId: data.preset?.value
           }"
           ></app-bounding-box-editor>
+        </div>
+        <div
+          class="d-flex align-items-center justify-content-center"
+          *ngIf="data.directionSelectionVisible"
+        >
+          <button class="my-btn-primary" (click)="toggleDirection(data)">
+            Đổi hướng
+          </button>
+          <label class="ms-2 cursor-pointer user-select-none"
+            ><input type="checkbox" formControlName="bothDirection" /> Cả 2
+            hướng</label
+          >
         </div>
       </div>
     </div>

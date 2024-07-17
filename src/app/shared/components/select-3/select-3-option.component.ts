@@ -1,11 +1,4 @@
-import {
-  Component,
-  HostListener,
-  Input,
-  OnInit,
-  Optional,
-  TemplateRef,
-} from '@angular/core';
+import { Component, Input, OnInit, Optional, TemplateRef } from '@angular/core';
 import { Select3Component } from './select-3.component';
 
 @Component({
@@ -23,29 +16,37 @@ export class Select3OptionComponent implements OnInit {
 
   constructor(@Optional() private root: Select3Component) {}
 
-  onItemClicked() {
+  onItemClicked(event: MouseEvent) {
+    event.stopPropagation();
+
     if (this.disabled || (!this.root.multiple && this.selected)) {
       return;
     }
 
-    const value = this.valueKey ? this.value[this.valueKey] : this.value;
-    this.root.onItemSelectionChanged(value, !this.selected);
+    this.root.onItemSelectionChanged(this.value, !this.selected, (a, b) =>
+      this.areEqual(a, b)
+    );
   }
 
   ngOnInit(): void {
     this.root.subscribe(() => {
-      const value = this.valueKey ? this.value[this.valueKey] : this.value;
-
       if (this.root.multiple) {
-        this.selected = this.root.model.includes(value);
+        this.selected = this.root.model.some((e: any) =>
+          this.areEqual(e, this.value)
+        );
       } else {
-        this.selected = this.root.model === value;
+        this.selected = this.areEqual(this.root.model, this.value);
       }
     });
 
     this.root.appendOption({
-      value: this.valueKey ? this.value[this.valueKey] : this.value,
+      value: this.value,
       label: this.label,
+      compareFn: (a: any, b: any) => this.areEqual(a, b),
     });
+  }
+
+  areEqual(a: any, b: any): boolean {
+    return this.valueKey ? a?.[this.valueKey] === b?.[this.valueKey] : a === b;
   }
 }

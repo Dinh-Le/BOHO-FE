@@ -1,9 +1,6 @@
-export const Objects: {
-  id: string;
-  name: string;
-  icon: string;
-  bounding_box_color: string;
-}[] = [
+import { ObjectModel } from '../schema/boho-v2';
+
+export const Objects: ObjectModel[] = [
   {
     id: 'people',
     name: 'Người',
@@ -26,18 +23,18 @@ export const Objects: {
     id: 'truck',
     name: 'Xe tải lớn',
     icon: 'side-truck',
-    bounding_box_color: 'blue'
+    bounding_box_color: 'blue',
   },
   {
     id: 'ambulance',
     name: 'Xe cứu thương',
     icon: 'pickup',
-    bounding_box_color: 'indigo'
+    bounding_box_color: 'indigo',
   },
   {
     id: 'bus',
     name: 'Xe buýt',
     icon: 'bus-side-view',
-    bounding_box_color: 'purple'
+    bounding_box_color: 'purple',
   },
 ];

@@ -1,3 +1,27 @@
+export interface LoiteringOptions {
+  time_stand: number;
+}
+
+export interface SabotageOptions {
+  fov_sensitive: number;
+  occlusion_sensitive: number;
+  defocus_sensitive: number;
+}
+
+export interface TripwireOptions {
+  direction: 'right to left' | 'left to right' | string;
+}
+
+export interface LostOptions {
+  losing_time: number;
+  sensitive: number;
+}
+
+export interface AbandonOptions {
+  abandon_time: number;
+  sensitive: number;
+}
+
 export interface Rule {
   id: number;
   name: string;
@@ -10,13 +34,11 @@ export interface Rule {
   preset_id: number;
   schedule_id: number;
   alarm_metadata: {
-    loitering?: {
-      time_stand: string;
-    };
-    sobatage?: any;
-    tripwire?: {
-      direction: 'right to left' | 'left to right' | string;
-    };
+    loitering?: LoiteringOptions;
+    sobatage?: SabotageOptions;
+    tripwire?: TripwireOptions;
+    lost?: LostOptions;
+    abandon?: AbandonOptions;
   };
   objects: string[];
 }

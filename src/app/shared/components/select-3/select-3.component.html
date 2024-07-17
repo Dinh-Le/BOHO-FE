@@ -7,13 +7,13 @@
   </ng-template>
 </ng-template>
 
-<button class="select-3" (click)="onClick($event)">
+<button type="button" class="select-3" (click)="onClick($event)">
   <div class="d-flex">
     <div>
       <ng-container
         *ngIf="template; else default"
         [ngTemplateOutlet]="template"
-        [ngTemplateOutletContext]="{labels}"
+        [ngTemplateOutletContext]="{labels, value: model}"
       ></ng-container>
       <span
         class="select-3__placeholder"
