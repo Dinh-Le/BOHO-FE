@@ -54,7 +54,7 @@ export class BoundingBoxEditorComponent
     'left to right';
   @Input() src: {
     nodeId?: string | null;
-    deviceId?: string | null;
+    deviceId?: string | number | null;
     presetId?: number | null;
   } = {};
 

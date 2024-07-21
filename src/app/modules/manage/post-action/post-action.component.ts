@@ -10,11 +10,13 @@ import {
 } from 'src/app/data/service/navigation.service';
 import { RuleService } from 'src/app/data/service/rule.service';
 import { PostActionItemModel } from './models';
-import {
-  AutoTrackingOptions,
-  ZoomAndFocusOptions,
-} from '../camera-detail/models';
 import { Rule } from 'src/app/data/schema/boho-v2/rule';
+import {
+  AutoTrackOptions,
+  ZoomAndCentralizeOptions,
+} from 'src/app/data/schema/boho-v2';
+import { InvalidId } from 'src/app/data/constants';
+import { Nullable } from '@shared/shared.types';
 
 @Component({
   selector: 'app-post-action',
@@ -40,17 +42,10 @@ export class PostActionComponent {
   parentPath = '';
   rules: Rule[] = [];
   tableItemsSource: PostActionItemModel[] = [];
-  editingItem?: PostActionItemModel;
-  postActionOptions?:
-    | ZoomAndFocusOptions
-    | (AutoTrackingOptions & {
-        nodeId: string;
-        deviceId: string;
-        presetId: number;
-      });
+  editingItem: Nullable<PostActionItemModel>;
   selectedRuleIds: number[] = [];
-  presetId: number = 0;
-  deviceId: string = '';
+  presetId: number = +InvalidId;
+  deviceId: number = +InvalidId;
   nodeId: string = '';
 
   constructor(
@@ -65,8 +60,7 @@ export class PostActionComponent {
       this.nodeId = nodeId;
       this.deviceId = deviceId;
       this.selectedRuleIds = [];
-      this.editingItem = undefined;
-      this.postActionOptions = undefined;
+      this.editingItem = null;
       this.tableItemsSource = [];
 
       ruleService
@@ -85,9 +79,7 @@ export class PostActionComponent {
   }
 
   onAddClicked() {
-    const newItem = new PostActionItemModel();
-    newItem.id = this.tableItemsSource.length;
-    this.tableItemsSource.push(newItem);
+    this.tableItemsSource.push(new PostActionItemModel());
   }
 
   onDeleteClicked() {
@@ -100,30 +92,6 @@ export class PostActionComponent {
 
   onSaveClicked() {}
 
-  onPostActionChanged(item: PostActionItemModel) {
-    console.log(item);
-    switch (item.postAction) {
-      case 'focusAndZoom':
-        item.postActionOptions = {
-          zoomInLevel: 1,
-          trackingDuration: 2,
-        };
-        break;
-      case 'autoTracking':
-        item.postActionOptions = {
-          zoomInLevel: 1,
-          trackingDuration: 30,
-          pan: 3,
-          tilt: 3,
-          waitingTime: 5,
-        };
-        break;
-      default:
-        this.postActionOptions = undefined;
-        break;
-    }
-  }
-
   trackById(_: any, item: any): any {
     return item.id;
   }
@@ -132,25 +100,15 @@ export class PostActionComponent {
     return item.value;
   }
 
-  canEnterSettingMode(item: PostActionItemModel) {
-    return item.ruleIds.length > 0;
-  }
-
   enterSettingMode(item: PostActionItemModel) {
-    this.postActionOptions = Object.assign({}, item.postActionOptions, {
-      nodeId: this.nodeId,
-      deviceId: this.deviceId,
-    });
-    console.log(this.postActionOptions);
     this.editingItem = item;
   }
 
   exitSettingMode() {
     this.editingItem = undefined;
-    this.postActionOptions = undefined;
   }
 
-  saveAndExitSettingMode(data: ZoomAndFocusOptions | AutoTrackingOptions) {
+  saveAndExitSettingMode(data: ZoomAndCentralizeOptions | AutoTrackOptions) {
     this.editingItem!.postActionOptions = data;
     this.exitSettingMode();
   }

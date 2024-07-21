@@ -77,7 +77,7 @@ export abstract class DeviceService extends RestfullApiService {
 
   public abstract snapshot(
     nodeId: string,
-    deviceId: string
+    deviceId: string | number
   ): Observable<
     ResponseBase & {
       data: Snapshot;
@@ -86,12 +86,12 @@ export abstract class DeviceService extends RestfullApiService {
 
   public abstract pauseDevice(
     nodeId: string,
-    deviceId: string
+    deviceId: string | number
   ): Observable<ResponseBase>;
 
   public abstract resumeDevice(
     nodeId: string,
-    deviceId: string
+    deviceId: string | number
   ): Observable<ResponseBase>;
 }
 

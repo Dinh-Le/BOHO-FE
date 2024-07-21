@@ -1,7 +1,10 @@
 <app-post-action-options
   *ngIf="!!editingRowItem; else elseBlock"
-  [type]="editingRowItem.postAction"
-  [data]="postActionOptions"
+  [type]="editingRowItem.postActionType"
+  [data]="editingRowItem.postActionOptions"
+  [nodeId]="editingRowItem.nodeId"
+  [deviceId]="editingRowItem.deviceId"
+  [presetId]="editingRowItem.presetId"
   (exit)="exitSettingMode()"
   (save)="saveAndExitSettingMode($event)"
 >
@@ -23,60 +26,41 @@
       <th></th>
     </thead>
     <tbody>
-      <tr *ngFor="let item of tableItemsSource">
-        <td><input type="checkbox" [(ngModel)]="item.selected" /></td>
-        <td>{{ item.id }}</td>
+      <tr *ngFor="let rowItem of tableItemsSource" [formGroup]="rowItem.form">
+        <td><input type="checkbox" formControlName="selected" /></td>
+        <td>{{ rowItem.id }}</td>
         <td>
-          <select
-            [(ngModel)]="item.device"
-            (ngModelChange)="onDeviceChanged(item)"
-            aria-placeholder="Không"
-          >
-            <option [value]="undefined" disabled selected class="d-none">
-              Không
-            </option>
-            <option
+          <app-select-3 place-holder="Không" formControlName="device_id">
+            <app-select-3-option
               *ngFor="let device of devices; trackBy: trackById"
-              [ngValue]="device"
-            >
-              {{ device.name }}
-            </option>
-          </select>
+              [value]="device.id"
+              [label]="device.name"
+            ></app-select-3-option>
+          </app-select-3>
         </td>
         <td>
-          <select [(ngModel)]="item.preset">
-            <option [value]="undefined" disabled selected class="d-none">
-              Không
-            </option>
-            <option
-              *ngFor="let preset of item.presets; trackBy: trackById"
-              [ngValue]="preset"
-            >
-              {{ preset.name }}
-            </option>
-          </select>
+          <app-select-3 place-holder="Không" formControlName="preset_id">
+            <app-select-3-option
+              *ngFor="let preset of rowItem.presets; trackBy: trackById"
+              [value]="preset.id"
+              [label]="preset.name"
+            ></app-select-3-option>
+          </app-select-3>
         </td>
         <td>
-          <select
-            [(ngModel)]="item.postAction"
-            (ngModelChange)="onPostActionChanged(item)"
-          >
-            <option
-              *ngFor="
-                let option of postActionItemsSource;
-                trackBy: trackByValue
-              "
-              [value]="option.value"
-            >
-              {{ option.label }}
-            </option>
-          </select>
+          <app-select-3 formControlName="post_action_type">
+            <app-select-3-option
+              *ngFor="let item of postActionItemsSource; trackBy: trackById"
+              [value]="item.value"
+              [label]="item.label"
+            ></app-select-3-option>
+          </app-select-3>
         </td>
         <td>
           <button
             class="my-btn bg-primary"
-            (click)="enterSettingMode(item)"
-            [disabled]="!canEnterSettingMode(item)"
+            (click)="enterSettingMode(rowItem)"
+            [disabled]="rowItem.canConfigurePostAction"
           >
             Cài đặt
           </button>

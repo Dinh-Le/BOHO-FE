@@ -1,21 +1,21 @@
 import { Nullable } from '@shared/shared.types';
 
 export interface AutoTrackOptions {
-  working_time: number;
+  roi: number[][];
+  pantilt_speed: number;
   timeout: number;
   zoom_level: number;
-  roi: number[][];
+  zoom_speed: number;
+  working_time: number;
 }
 
 export interface ZoomAndCentralizeOptions {
   zoom_level: number;
   working_time: number;
-  pantilt_speed: number;
-  zoom_speed: number;
 }
 
 export interface ActionOptions {
-  auto_track: Nullable<ActionOptions>;
+  auto_track: Nullable<AutoTrackOptions>;
   zoom_and_centralize: Nullable<ZoomAndCentralizeOptions>;
 }
 

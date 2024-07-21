@@ -13,5 +13,3 @@ export class AutoTrackingOptions {
   trackingDuration: number = 30;
   roi: Point[] = [];
 }
-
-export type PostActionType = 'none' | 'focusAndZoom' | 'autoTracking';

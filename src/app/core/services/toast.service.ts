@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 export interface ToastInfo {
@@ -18,6 +19,14 @@ export class ToastService {
     this._toasts.push({
       className: 'bg-danger text-light',
       message,
+      delay: delaySec * 1000,
+    });
+  }
+
+  showHttpError(error: HttpErrorResponse, delaySec: number = 3) {
+    this._toasts.push({
+      className: 'bg-danger text-light',
+      message: error.error?.message ?? error.message,
       delay: delaySec * 1000,
     });
   }

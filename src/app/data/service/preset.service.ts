@@ -27,7 +27,7 @@ export abstract class PresetService extends RestfullApiService {
   ): Observable<ResponseBase & { data: any[] }>;
   public abstract control(
     nodeId: string,
-    deviceId: string,
+    deviceId: string | number,
     presetId: number
   ): Observable<ResponseBase>;
 }

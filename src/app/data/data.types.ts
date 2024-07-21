@@ -13,3 +13,5 @@ export type ObjectType =
   | 'people'
   | 'ambulance'
   | 'car';
+
+export type PostActionType = 'none' | 'auto_track' | 'zoom_and_centralize';

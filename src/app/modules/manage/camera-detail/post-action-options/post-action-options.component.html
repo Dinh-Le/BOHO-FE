@@ -4,7 +4,7 @@
     <div>Cài đặt căn giữa và phóng to</div>
   </div>
   <div class="form-body p-5">
-    <ng-container *ngIf="type === 'focusAndZoom'">
+    <ng-container *ngIf="type === 'zoom_and_centralize'">
       <div class="form-item">
         <label style="width: 150px">Mức độc phóng to:</label>
         <select formControlName="zoomInLevel">
@@ -27,7 +27,7 @@
         <span>(1 ~ 10s, default 2s)</span>
       </div>
     </ng-container>
-    <ng-container *ngIf="type === 'autoTracking'">
+    <ng-container *ngIf="type === 'auto_track'">
       <div class="form-item">
         <label style="width: 200px">Vùng kích hoạt theo dõi:</label>
         <div style="grid-column: 2 / span 2">

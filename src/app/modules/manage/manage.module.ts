@@ -39,7 +39,7 @@ import { FormDialogComponent } from '@shared/components/form-dialog/form-dialog.
 import { LicenseManagerComponent } from './license-manager/license-manager.component';
 import { EventChartComponent } from './event-chart/event-chart.component';
 import { HandoverSettingsComponent } from './camera-detail/handover-settings/handover-settings.component';
-import { PostActionOptions } from './camera-detail/post-action-options/post-action-options.component';
+import { PostActionOptionsComponent } from './camera-detail/post-action-options/post-action-options.component';
 import { PostActionComponent } from './post-action/post-action.component';
 import { RuleMenuComponent } from './rule-menu/rule-menu.component';
 
@@ -74,7 +74,7 @@ import { RuleMenuComponent } from './rule-menu/rule-menu.component';
     LicenseManagerComponent,
     EventChartComponent,
     HandoverSettingsComponent,
-    PostActionOptions,
+    PostActionOptionsComponent,
     PostActionComponent,
     RuleMenuComponent,
   ],

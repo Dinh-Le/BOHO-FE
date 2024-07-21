@@ -1,7 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   Component,
-  Host,
   HostBinding,
   OnDestroy,
   OnInit,
@@ -10,37 +9,24 @@ import {
 import { ActivatedRoute } from '@angular/router';
 import { ToastService } from '@app/services/toast.service';
 import { SelectItemModel } from '@shared/models/select-item-model';
-import {
-  Observable,
-  Subscription,
-  catchError,
-  filter,
-  of,
-  switchMap,
-} from 'rxjs';
+import { Subscription, catchError, of, switchMap, tap } from 'rxjs';
 import { DeviceService } from 'src/app/data/service/device.service';
 import {
   Level3Menu,
   NavigationService,
 } from 'src/app/data/service/navigation.service';
 import { PresetService } from 'src/app/data/service/preset.service';
-import { Device } from 'src/app/data/schema/boho-v2';
-import { Preset } from 'src/app/data/schema/boho-v2/preset';
 import {
-  AutoTrackingOptions,
-  PostActionType,
-  ZoomAndFocusOptions,
-} from '../models';
-
-class RowItemModel {
-  id?: number;
-  selected: boolean = false;
-  device?: Device;
-  preset?: Preset;
-  presets: Preset[] = [];
-  postAction: PostActionType = 'none';
-  postActionOptions?: AutoTrackingOptions | ZoomAndFocusOptions;
-}
+  AutoTrackOptions,
+  Device,
+  Handover,
+  ZoomAndCentralizeOptions,
+} from 'src/app/data/schema/boho-v2';
+import { AutoTrackingOptions, ZoomAndFocusOptions } from '../models';
+import { HandoverService } from 'src/app/data/service/handover.service';
+import { InvalidId } from 'src/app/data/constants';
+import { Nullable } from '@shared/shared.types';
+import { RowItemModel } from './models';
 
 @Component({
   selector: 'app-handover-settings',
@@ -72,32 +58,37 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
   private _presetService = inject(PresetService);
   private _deviceService = inject(DeviceService);
   private _toastService = inject(ToastService);
+  private _handoverService = inject(HandoverService);
   private _nodeId: string = '';
+  private _deviceId: number = +InvalidId;
 
-  editingRowItem?: RowItemModel;
-  postActionOptions?:
-    | ZoomAndFocusOptions
-    | (AutoTrackingOptions & {
-        nodeId: string;
-        deviceId: string;
-        presetId: number;
-      });
+  editingRowItem: Nullable<RowItemModel>;
+  postActionOptions: Nullable<
+    (ZoomAndFocusOptions | AutoTrackingOptions) & {
+      nodeId: string;
+      deviceId: number;
+      presetId: number;
+    }
+  >;
   tableItemsSource: RowItemModel[] = [];
   devices: Device[] = [];
+  handovers: Handover[] = [];
 
   constructor() {
     this._navigationService.level3 = Level3Menu.CHUYEN_PTZ;
-  }
-
-  ngOnInit(): void {
-    this._activatedRoute.parent?.params.subscribe(({ nodeId }) => {
-      this.tableItemsSource = [];
-      this.editingRowItem = undefined;
-      this.postActionOptions = undefined;
-
-      if (this._nodeId !== nodeId) {
-        this._nodeId = nodeId;
-        this.devices = [];
+    this._activatedRoute.parent?.params
+      .pipe(
+        tap(({ nodeId, cameraId }) => {
+          this._nodeId = nodeId;
+          this._deviceId = +cameraId;
+          this.tableItemsSource = [];
+          this.editingRowItem = undefined;
+          this.postActionOptions = null;
+          this.devices = [];
+          this.handovers = [];
+        })
+      )
+      .subscribe(() => {
         this._deviceService
           .findAll(this._nodeId)
           .pipe(
@@ -115,77 +106,49 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
             })
           )
           .subscribe((devices) => (this.devices = devices));
-      }
-    });
+
+        this._handoverService
+          .findAll(this._nodeId, this._deviceId)
+          .pipe(
+            switchMap((response) => of(response.data)),
+            catchError((error: HttpErrorResponse) => {
+              const errorMessage = error.error?.message ?? error.message;
+              this._toastService.showError(errorMessage);
+              return [];
+            })
+          )
+          .subscribe((handovers) => (this.handovers = handovers));
+      });
   }
+
+  ngOnInit(): void {}
 
   ngOnDestroy(): void {
     this._subscriptions.forEach((e) => e.unsubscribe());
   }
 
-  onDeviceChanged(item: RowItemModel) {
-    this._presetService
-      .findAll(item.device!.node_id!, item.device!.id)
+  private initialize(): void {
+    this._deviceService
+      .findAll(this._nodeId)
       .pipe(
-        switchMap((response) => of(response.data)),
+        switchMap((response) =>
+          of(
+            response.data.filter(
+              (device) => device.camera.type.toLowerCase() !== 'static'
+            )
+          )
+        ),
         catchError((error: HttpErrorResponse) => {
           const errorMessage = error.error?.message ?? error.message;
           this._toastService.showError(errorMessage);
           return [];
         })
       )
-      .subscribe((presets) => (item.presets = presets));
-  }
-
-  onPostActionChanged(item: RowItemModel) {
-    switch (item.postAction) {
-      case 'focusAndZoom':
-        item.postActionOptions = {
-          zoomInLevel: 1,
-          trackingDuration: 2,
-        };
-        break;
-      case 'autoTracking':
-        item.postActionOptions = {
-          zoomInLevel: 1,
-          trackingDuration: 30,
-          pan: 3,
-          tilt: 3,
-          waitingTime: 5,
-        };
-        break;
-      default:
-        item.postActionOptions = undefined;
-        break;
-    }
+      .subscribe((devices) => (this.devices = devices));
   }
 
   enterSettingMode(item: RowItemModel) {
     this.editingRowItem = item;
-
-    if (item.postAction == 'autoTracking') {
-      this.postActionOptions = Object.assign({}, item.postActionOptions, {
-        nodeId: item.device?.node_id,
-        deviceId: item.device?.id,
-        presetId: item.preset?.id,
-      });
-    } else if (item.postAction == 'focusAndZoom') {
-      this.postActionOptions = Object.assign({}, item.postActionOptions);
-    } else {
-      this.postActionOptions = undefined;
-    }
-  }
-
-  canEnterSettingMode(item: RowItemModel) {
-    if (item.postAction === 'focusAndZoom') {
-      return true;
-    }
-
-    if (item.postAction === 'autoTracking' && !!item.device && !!item.preset) {
-      return true;
-    }
-
-    return false;
   }
 
   exitSettingMode() {
@@ -193,13 +156,17 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
     this.postActionOptions = undefined;
   }
 
-  saveAndExitSettingMode(data: ZoomAndFocusOptions | AutoTrackingOptions) {
+  saveAndExitSettingMode(data: ZoomAndCentralizeOptions | AutoTrackOptions) {
     this.editingRowItem!.postActionOptions = data;
     this.exitSettingMode();
   }
 
   add() {
-    const item = new RowItemModel();
+    const item = new RowItemModel(
+      this._nodeId,
+      this._presetService,
+      this._toastService
+    );
     this.tableItemsSource.push(item);
   }
 
