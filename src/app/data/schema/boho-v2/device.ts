@@ -1,3 +1,4 @@
+import { CameraType } from '../../data.types';
 import { LatLng } from './latlng';
 
 export interface DeviceMetadata {
@@ -39,7 +40,7 @@ export interface ConnectionMetadata {
 
 export interface Camera {
   driver: string;
-  type: string;
+  type: CameraType;
   connection_metadata: ConnectionMetadata;
 }
 

@@ -16,6 +16,7 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ToastService } from '@app/services/toast.service';
 import { ControlValueAccessorImpl } from '@shared/helpers/control-value-accessor-impl';
 import { switchMap } from 'rxjs';
+import { TripwireDirectionType } from 'src/app/data/data.types';
 import { DeviceService } from 'src/app/data/service/device.service';
 import { PresetService } from 'src/app/data/service/preset.service';
 import { v4 } from 'uuid';
@@ -50,8 +51,7 @@ export class BoundingBoxEditorComponent
   tabIndex: string = v4();
 
   @Input() type: 'line' | 'polygon' = 'line';
-  @Input() direction: 'left to right' | 'right to left' | 'both' =
-    'left to right';
+  @Input() direction: TripwireDirectionType = 'left to right';
   @Input() src: {
     nodeId?: string | null;
     deviceId?: string | number | null;
@@ -128,7 +128,6 @@ export class BoundingBoxEditorComponent
     }
   }
 
-  @HostListener('')
   ngAfterViewInit(): void {
     if (this.canvas) {
       const { width, height } =
@@ -190,7 +189,7 @@ export class BoundingBoxEditorComponent
   }
 
   onKeyDown(ev: KeyboardEvent): boolean {
-    if (this._isDisabled) {
+    if (this._isDisabled || this.model.length === 0) {
       return false;
     }
 
@@ -202,15 +201,17 @@ export class BoundingBoxEditorComponent
     }
 
     if (ev.key === 'Escape') {
+      let points = [...this.model];
       this._isDrawing = false;
 
       if (this.type === 'polygon') {
-        if (this.model.length > 3) {
-          this.model.pop();
+        if (points.length > 3) {
+          points.pop();
         } else {
-          this.model = [];
+          points = [];
         }
       }
+      this.model = points;
 
       this.update();
       return true;
@@ -318,7 +319,7 @@ export class BoundingBoxEditorComponent
 
         context.stroke();
 
-        if (this.model.length == 2) {
+        if (this.model.length == 2 && this.type === 'line') {
           if (this.direction === 'both') {
             this.drawDirection(context, 'left to right');
             this.drawDirection(context, 'right to left');

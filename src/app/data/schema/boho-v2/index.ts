@@ -1,4 +1,4 @@
-import { AlarmType, ObjectType } from '../../data.types';
+import { AlarmType, CameraType, ObjectType } from '../../data.types';
 
 export * from './device';
 export * from './group-management';
@@ -19,5 +19,5 @@ export interface ObjectModel {
 export interface RuleTypeModel {
   id: AlarmType;
   name: string;
-  cameraTypes: ('Static' | 'PTZ')[];
+  cameraTypes: CameraType[];
 }

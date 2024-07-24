@@ -88,9 +88,9 @@
               *ngIf="data.isEditable; else presetTemplate"
             >
               <app-select-3-option
-                *ngFor="let preset of presets; trackBy: trackById"
-                [value]="preset"
-                [label]="preset.name"
+                *ngFor="let item of presets | keyvalue; trackBy: trackById"
+                [value]="item.value"
+                [label]="item.value.name"
                 value-key="id"
               ></app-select-3-option>
             </app-select-3>
@@ -376,9 +376,13 @@
         </div>
         <div
           class="d-flex align-items-center justify-content-center"
-          *ngIf="data.directionSelectionVisible"
+          *ngIf="data.directionSelectionVisible && data.isEditable"
         >
-          <button class="my-btn-primary" (click)="toggleDirection(data)">
+          <button
+            type="button"
+            class="my-btn-primary"
+            (click)="toggleDirection(data)"
+          >
             Đổi hướng
           </button>
           <label class="ms-2 cursor-pointer user-select-none"

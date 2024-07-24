@@ -10,7 +10,6 @@ import {
   inject,
 } from '@angular/core';
 import { ColumnConfig } from '../expandable-table/expandable-table.component';
-import { SelectItemModel } from '@shared/models/select-item-model';
 import { ActivatedRoute } from '@angular/router';
 import {
   Level3Menu,
@@ -31,8 +30,13 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { NodeService } from 'src/app/data/service/node.service';
 import { Schedule } from 'src/app/data/schema/boho-v2/shedule';
 import { Preset } from 'src/app/data/schema/boho-v2/preset';
-import { RowItemModel } from './models';
-import { ObjectModel, RuleTypeModel } from 'src/app/data/schema/boho-v2';
+import { RuleItemModel } from './models';
+import {
+  Device,
+  ObjectModel,
+  RuleTypeModel,
+} from 'src/app/data/schema/boho-v2';
+import { CameraType } from 'src/app/data/data.types';
 
 @Component({
   selector: 'app-rule',
@@ -58,9 +62,12 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
   private _ruleService = inject(RuleService);
   private _nodeService = inject(NodeService);
 
-  data: RowItemModel[] = [];
-  presets: Preset[] = [];
-  _cameraType?: 'Static' | 'PTZ' = 'Static';
+  data: RuleItemModel[] = [];
+  presets: Record<number, Preset> = {};
+
+  private get _cameraType(): CameraType {
+    return (this._navigationService.sideMenu.data as Device).camera.type;
+  }
 
   get ruleTypes(): RuleTypeModel[] {
     return RuleTypeItemsSource.filter((rule) =>
@@ -89,12 +96,15 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
           this.cameraId = cameraId;
           this.nodeId = nodeId;
           this.data = [];
-          this.presets = [];
+          this.presets = {};
           this.schedules = [];
           return this._presetService.findAll(this.nodeId, this.cameraId);
         }),
         switchMap((response) => {
-          this.presets = response.data;
+          this.presets = response.data.reduce(
+            (dict, item) => Object.assign(dict, { [item.id]: item }),
+            {} as Record<number, Preset>
+          );
 
           return this._scheduleService.findAll(this.nodeId, this.cameraId);
         }),
@@ -106,14 +116,14 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
       )
       .subscribe({
         next: ({ data: rules }) => {
-          this.data = rules.map((e) => {
-            const item = new RowItemModel();
-            item.setData(e, this.schedules, this.presets);
+          this.data = rules.map((rule) => {
+            const item = new RuleItemModel();
+            item.setData(rule, this.schedules, this.presets[rule.preset_id]);
             return item;
           });
         },
         error: (err: HttpErrorResponse) =>
-          this._toastService.showError(err.error?.message ?? err.message),
+          this._toastService.showHttpError(err),
       });
   }
 
@@ -156,7 +166,7 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   add(): void {
-    const newItem = new RowItemModel();
+    const newItem = new RuleItemModel();
     const index =
       this.data.filter((it) => /Quy tắc mới \d\d\d/.test(it.name ?? ''))
         .length + 1;
@@ -170,7 +180,7 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
     this.data.push(newItem);
   }
 
-  submit(item: RowItemModel) {
+  submit(item: RuleItemModel) {
     const data = Object.assign({}, item.data, {
       id: undefined,
     });
@@ -211,12 +221,12 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  edit(item: RowItemModel) {
+  edit(item: RuleItemModel) {
     item.isEditable = true;
-    item.form.enable();
+    item.form.enable({ emitEvent: false });
   }
 
-  cancel(item: RowItemModel) {
+  cancel(item: RuleItemModel) {
     if (item.isNew) {
       this.data = this.data.filter((e) => e.id !== item.id);
       return;
@@ -224,19 +234,19 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this._ruleService.find(this.nodeId, this.cameraId, item.id).subscribe({
       next: ({ data }) => {
-        item.setData(data, this.schedules, this.presets);
+        item.setData(data, this.schedules, this.presets[data.preset_id]);
       },
       error: (err: HttpErrorResponse) => {
         this._toastService.showError(err.error.message ?? err.message);
       },
       complete: () => {
         item.isEditable = false;
-        item.form.disable();
+        item.form.disable({ emitEvent: false });
       },
     });
   }
 
-  remove(item: RowItemModel) {
+  remove(item: RuleItemModel) {
     if (item.isNew) {
       this.data = this.data.filter((e) => e.id !== item.id);
       this._toastService.showSuccess('Delete rule successfully');
@@ -252,7 +262,7 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
           this._toastService.showSuccess('Delete rule successfully');
         },
         error: (err: HttpErrorResponse) =>
-          this._toastService.showError(err.error?.message ?? err.message),
+          this._toastService.showHttpError(err),
       });
   }
 
@@ -264,7 +274,7 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
     return value;
   }
 
-  toggleDirection(data: RowItemModel) {
+  toggleDirection(data: RuleItemModel) {
     switch (data.form.controls.direction.value) {
       case 'left to right':
         data.form.controls.direction.setValue('right to left');

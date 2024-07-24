@@ -1,9 +1,9 @@
 export type AlarmType =
-  | 'loitering'
-  | 'sabotage'
-  | 'tripwire'
-  | 'lost'
-  | 'abandon';
+  | 'loitering event'
+  | 'sabotage event'
+  | 'tripwire event'
+  | 'lost event'
+  | 'abandon event';
 
 export type ObjectType =
   | 'firetruck'
@@ -15,3 +15,7 @@ export type ObjectType =
   | 'car';
 
 export type PostActionType = 'none' | 'auto_track' | 'zoom_and_centralize';
+
+export type TripwireDirectionType = 'left to right' | 'right to left' | 'both';
+
+export type CameraType = 'Static' | 'PTZ';

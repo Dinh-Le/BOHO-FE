@@ -1,4 +1,11 @@
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import {
+  FormGroup,
+  FormControl,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+  ValidatorFn,
+} from '@angular/forms';
 import { Point } from '@shared/components/bounding-box-editor/bounding-box-editor.component';
 import {
   Severity,
@@ -13,8 +20,9 @@ import { v4 } from 'uuid';
 import { ExpandableTableRowItemModelBase } from '../expandable-table/expandable-table.component';
 import { ObjectModel, RuleTypeModel } from 'src/app/data/schema/boho-v2';
 import { Nullable } from '@shared/shared.types';
+import { TripwireDirectionType } from 'src/app/data/data.types';
 
-export class RowItemModel extends ExpandableTableRowItemModelBase {
+export class RuleItemModel extends ExpandableTableRowItemModelBase {
   id = v4();
   form = new FormGroup({
     name: new FormControl<string>('', [Validators.required]),
@@ -24,14 +32,22 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
     type: new FormControl<Nullable<RuleTypeModel>>(null, [Validators.required]),
     points: new FormControl<Point[]>(
       [],
-      [Validators.required, Validators.minLength(1)]
+      [
+        (control: AbstractControl): ValidationErrors | null => {
+          const value = control.value;
+
+          if (Array.isArray(value) && value.length > 0) {
+            return null;
+          }
+
+          return { required: true };
+        },
+      ]
     ),
     severity: new FormControl<Severity>(Severities[0], [Validators.required]),
     schedule: new FormControl<Nullable<Schedule>>(null, [Validators.required]),
     time_stand: new FormControl<number>(5),
-    direction: new FormControl<'left to right' | 'right to left' | 'both'>(
-      'left to right'
-    ),
+    direction: new FormControl<TripwireDirectionType>('left to right'),
     losing_time: new FormControl<number>(5),
     sensitive: new FormControl<number>(5),
     abandon_time: new FormControl<number>(5),
@@ -49,9 +65,9 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
         this.form.controls.direction.setValue('left to right');
       }
     });
-    this.form.get('type')?.valueChanges.subscribe((ruleType) => {
-      switch (ruleType?.id) {
-        case 'loitering':
+    this.form.get('type')?.valueChanges.subscribe((value) => {
+      switch (value?.id) {
+        case 'loitering event':
           this.form.controls['time_stand'].setValue(5);
           this.form.controls['time_stand'].setValidators([
             Validators.required,
@@ -66,7 +82,7 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
           this.form.controls['abandon_time'].clearValidators();
           this.form.controls['direction'].clearValidators();
           break;
-        case 'sabotage':
+        case 'sabotage event':
           this.form.controls['objects'].setValidators([Validators.required]);
 
           this.form.controls['time_stand'].clearValidators();
@@ -75,12 +91,12 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
           this.form.controls['abandon_time'].clearValidators();
           this.form.controls['direction'].clearValidators();
           break;
-        case 'tripwire':
+        case 'tripwire event':
           this.form.controls.bothDirection.setValue(false);
           this.form.controls.direction.setValue('left to right');
 
           this.form.controls['objects'].setValidators([Validators.required]);
-          this.form.controls['direction'].setValue('right to left');
+          // this.form.controls['direction'].setValue('right to left');
           this.form.controls['direction'].setValidators([Validators.required]);
 
           this.form.controls['time_stand'].clearValidators();
@@ -88,7 +104,7 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
           this.form.controls['sensitive'].clearValidators();
           this.form.controls['abandon_time'].clearValidators();
           break;
-        case 'lost':
+        case 'lost event':
           this.form.controls['losing_time'].setValue(5);
           this.form.controls['losing_time'].setValidators([
             Validators.required,
@@ -109,7 +125,7 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
           this.form.controls['abandon_time'].clearValidators();
           this.form.controls['direction'].clearValidators();
           break;
-        case 'abandon':
+        case 'abandon event':
           this.form.controls['sensitive'].setValue(5);
           this.form.controls['sensitive'].setValidators([
             Validators.required,
@@ -133,8 +149,6 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
         default:
           break;
       }
-
-      // this.form.updateValueAndValidity();
     });
   }
 
@@ -167,7 +181,7 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
   }
 
   get timeStandVisible() {
-    return this.type?.id == 'loitering';
+    return this.type?.id == 'loitering event';
   }
 
   get time_stand(): Nullable<number> {
@@ -175,7 +189,7 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
   }
 
   get boundingBoxType(): 'line' | 'polygon' {
-    return this.type?.id === 'tripwire' ? 'line' : 'polygon';
+    return this.type?.id === 'tripwire event' ? 'line' : 'polygon';
   }
 
   get points(): Point[] {
@@ -183,7 +197,7 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
   }
 
   get losingTimeVisible(): boolean {
-    return this.type?.id === 'lost';
+    return this.type?.id === 'lost event';
   }
 
   get losing_time(): Nullable<number> {
@@ -191,7 +205,7 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
   }
 
   get abandonTimeVisible(): boolean {
-    return this.type?.id === 'abandon';
+    return this.type?.id === 'abandon event';
   }
 
   get abandon_time(): Nullable<number> {
@@ -215,10 +229,10 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
   }
 
   get directionSelectionVisible(): boolean {
-    return this.form.controls.type.value?.id === 'tripwire';
+    return this.form.controls.type.value?.id === 'tripwire event';
   }
 
-  get direction(): Nullable<'left to right' | 'right to left' | 'both'> {
+  get direction(): Nullable<TripwireDirectionType> {
     return this.form.controls['direction'].value;
   }
 
@@ -242,25 +256,25 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
     };
 
     switch (this.type?.id) {
-      case 'loitering':
+      case 'loitering event':
         rule.alarm_metadata.loitering = {
           time_stand: this.time_stand!,
         };
         break;
-      case 'sabotage':
+      case 'sabotage event':
         break;
-      case 'tripwire':
+      case 'tripwire event':
         rule.alarm_metadata.tripwire = {
           direction: this.form.controls['direction'].value!,
         };
         break;
-      case 'lost':
+      case 'lost event':
         rule.alarm_metadata.lost = {
           losing_time: this.form.controls['losing_time'].value!,
           sensitive: this.form.controls['sensitive'].value!,
         };
         break;
-      case 'abandon':
+      case 'abandon event':
         rule.alarm_metadata.abandon = {
           abandon_time: this.form.controls['abandon_time'].value!,
           sensitive: this.form.controls['sensitive'].value!,
@@ -273,7 +287,7 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
     return rule;
   }
 
-  setData(rule: Rule, schedules: Schedule[], presets: Preset[]) {
+  setData(rule: Rule, schedules: Schedule[], preset: Preset) {
     this.id = rule.id.toString();
 
     this.form.reset(
@@ -285,7 +299,7 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
           x: e[0],
           y: e[1],
         })),
-        preset: presets.find((e) => e.id === rule.preset_id),
+        preset: preset,
         schedule: schedules.find((e) => e.id === rule.schedule_id),
         severity: Severities.find((e) => rule.level === e.id),
         status: rule.active,
@@ -298,7 +312,7 @@ export class RowItemModel extends ExpandableTableRowItemModelBase {
           rule.alarm_metadata.abandon?.sensitive,
       },
       {
-        emitEvent: true,
+        emitEvent: false,
       }
     );
   }

@@ -38,27 +38,27 @@ export const RuleTypes: RuleType[] = [
 
 export const RuleTypeItemsSource: RuleTypeModel[] = [
   {
-    id: 'loitering',
+    id: 'loitering event',
     name: 'Luẩn quẩn',
     cameraTypes: ['Static', 'PTZ'],
   },
   {
-    id: 'sabotage',
+    id: 'sabotage event',
     name: 'Xâm nhập trái phép',
     cameraTypes: ['Static', 'PTZ'],
   },
   {
-    id: 'tripwire',
+    id: 'tripwire event',
     name: 'Vượt đường kẻ',
     cameraTypes: ['Static', 'PTZ'],
   },
   {
-    id: 'lost',
+    id: 'lost event',
     name: 'Đối tượng bị bỏ lại',
     cameraTypes: ['Static'],
   },
   {
-    id: 'abandon',
+    id: 'abandon event',
     name: 'Đối tượng bị lấy đi',
     cameraTypes: ['Static'],
   },

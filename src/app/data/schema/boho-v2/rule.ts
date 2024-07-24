@@ -1,3 +1,5 @@
+import { TripwireDirectionType } from '../../data.types';
+
 export interface LoiteringOptions {
   time_stand: number;
 }
@@ -9,7 +11,7 @@ export interface SabotageOptions {
 }
 
 export interface TripwireOptions {
-  direction: 'right to left' | 'left to right' | string;
+  direction: TripwireDirectionType;
 }
 
 export interface LostOptions {

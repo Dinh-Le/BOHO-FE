@@ -2,7 +2,6 @@ import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { ViewMode } from '@shared/components/tree-view/view-mode.enum';
-import { CameraType_Static } from '../constants';
 
 export enum Level1Menu {
   SEARCH = 'SEARCH',
