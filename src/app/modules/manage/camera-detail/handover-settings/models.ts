@@ -15,6 +15,7 @@ import { PresetService } from 'src/app/data/service/preset.service';
 import { v4 } from 'uuid';
 
 export class RowItemModel {
+  _isNew: boolean = true;
   presets: Preset[] = [];
   private _postActionOptions: Nullable<
     ZoomAndCentralizeOptions | AutoTrackOptions
@@ -30,8 +31,17 @@ export class RowItemModel {
     ]),
   });
 
+  get isNew(): boolean {
+    return this._isNew;
+  }
+
   get id(): string | number {
     return this.form.controls.id.value!;
+  }
+
+  set id(value: string | number) {
+    this.form.controls.id.setValue(+value);
+    this._isNew = false;
   }
 
   get selected(): boolean {
@@ -57,13 +67,13 @@ export class RowItemModel {
   get postActionOptions(): Nullable<
     ZoomAndCentralizeOptions | AutoTrackOptions
   > {
-    return Object.assign({}, this._postActionOptions);
+    return this._postActionOptions;
   }
 
   set postActionOptions(
     value: Nullable<ZoomAndCentralizeOptions | AutoTrackOptions>
   ) {
-    this.postActionOptions = value ? Object.assign({}, value) : null;
+    this._postActionOptions = value;
   }
 
   get canConfigurePostAction(): boolean {
@@ -117,6 +127,8 @@ export class RowItemModel {
   }
 
   setData(data: Handover) {
+    this._isNew = !Number.isInteger(data.id);
+
     this.form.patchValue({
       id: data.id,
       device_id: data.device_id,

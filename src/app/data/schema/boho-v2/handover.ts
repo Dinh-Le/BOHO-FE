@@ -15,8 +15,8 @@ export interface ZoomAndCentralizeOptions {
 }
 
 export interface ActionOptions {
-  auto_track: Nullable<AutoTrackOptions>;
-  zoom_and_centralize: Nullable<ZoomAndCentralizeOptions>;
+  auto_track?: Nullable<AutoTrackOptions>;
+  zoom_and_centralize?: Nullable<ZoomAndCentralizeOptions>;
 }
 
 export interface Handover {
@@ -24,6 +24,6 @@ export interface Handover {
   device_id: number;
   preset_id: number;
   target_device_id: number;
-  action: Nullable<ActionOptions>;
+  action?: Nullable<ActionOptions>;
   is_enabled: boolean;
 }

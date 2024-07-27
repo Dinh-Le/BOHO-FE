@@ -28,7 +28,7 @@
     <tbody>
       <tr *ngFor="let rowItem of tableItemsSource" [formGroup]="rowItem.form">
         <td><input type="checkbox" formControlName="selected" /></td>
-        <td>{{ rowItem.id }}</td>
+        <td>{{ rowItem.isNew ? "" : rowItem.id }}</td>
         <td>
           <app-select-3 place-holder="Không" formControlName="device_id">
             <app-select-3-option
@@ -60,7 +60,7 @@
           <button
             class="my-btn bg-primary"
             (click)="enterSettingMode(rowItem)"
-            [disabled]="rowItem.canConfigurePostAction"
+            [disabled]="!rowItem.canConfigurePostAction"
           >
             Cài đặt
           </button>

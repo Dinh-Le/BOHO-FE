@@ -7,23 +7,17 @@
     <ng-container *ngIf="type === 'zoom_and_centralize'">
       <div class="form-item">
         <label style="width: 150px">Mức độc phóng to:</label>
-        <select formControlName="zoomInLevel">
-          <option
-            *ngFor="let item of zoomLevelItemsSource"
+        <app-select-3 formControlName="zoom_level">
+          <app-select-3-option
+            *ngFor="let item of zoomLevelItemsSource; trackBy: trackByValue"
             [value]="item.value"
-          >
-            {{ item.label }}
-          </option>
-        </select>
+            [label]="item.label"
+          ></app-select-3-option>
+        </app-select-3>
       </div>
       <div class="form-item">
         <label style="width: 200px">Thời gian dừng:</label>
-        <input
-          formControlName="trackingDuration"
-          min="1"
-          max="10"
-          type="number"
-        />
+        <input formControlName="working_time" min="1" max="10" type="number" />
         <span>(1 ~ 10s, default 2s)</span>
       </div>
     </ng-container>
@@ -40,52 +34,46 @@
         </div>
       </div>
       <div class="form-item">
-        <label style="width: 200px">Tốc đọ Pan:</label>
-        <input formControlName="pan" min="1" max="5" type="number" />
+        <label style="width: 200px">Tốc đọ PanTilt:</label>
+        <input formControlName="pantilt_speed" min="1" max="5" type="number" />
         <span>(1 ~ 5, default 3)</span>
       </div>
       <div class="form-item">
-        <label style="width: 200px">Tốc đọ Tilt:</label>
-        <input formControlName="tilt" min="1" max="5" type="number" />
+        <label style="width: 200px">Tốc đọ Zoom:</label>
+        <input formControlName="zoom_speed" min="1" max="5" type="number" />
         <span>(1 ~ 5, default 3)</span>
       </div>
       <div class="form-item">
         <label style="width: 200px">Thời gian chờ:</label>
-        <input formControlName="waitingTime" min="1" max="10" type="number" />
+        <input formControlName="timeout" min="1" max="10" type="number" />
         <span>(1 ~ 10s, default 5s)</span>
       </div>
       <div class="form-item">
         <label style="width: 200px">Mức độ phóng lớn:</label>
-        <select formControlName="zoomInLevel">
-          <option
+        <app-select-3 formControlName="zoom_level">
+          <app-select-3-option
             *ngFor="let item of zoomLevelItemsSource"
             [value]="item.value"
-          >
-            {{ item.label }}
-          </option>
-        </select>
+            [label]="item.label"
+          ></app-select-3-option>
+        </app-select-3>
       </div>
       <div class="form-item">
         <label style="width: 200px">Thời gian theo dõi:</label>
-        <input
-          formControlName="trackingDuration"
-          min="5"
-          max="60"
-          type="number"
-        />
+        <input formControlName="working_time" min="5" max="60" type="number" />
         <span>(5 ~ 60s, default 30s)</span>
       </div>
     </ng-container>
   </div>
   <div class="form-footer d-flex justify-content-center mt-5">
-    <button class="my-btn bg-secondary mx-3" style="width: 80px" type="reset">
+    <button class="my-btn bg-secondary mx-3" style="width: 80px" type="button">
       Hủy
     </button>
     <button
       type="submit"
       class="my-btn bg-primary"
       style="width: 100px"
-      [disabled]="!canSubmit"
+      [disabled]="formGroup.invalid"
     >
       Lưu
     </button>

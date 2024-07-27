@@ -9,7 +9,19 @@ import {
 import { ActivatedRoute } from '@angular/router';
 import { ToastService } from '@app/services/toast.service';
 import { SelectItemModel } from '@shared/models/select-item-model';
-import { Subscription, catchError, of, switchMap, tap } from 'rxjs';
+import {
+  EMPTY,
+  Observable,
+  Subscription,
+  catchError,
+  concat,
+  forkJoin,
+  map,
+  of,
+  switchMap,
+  takeWhile,
+  tap,
+} from 'rxjs';
 import { DeviceService } from 'src/app/data/service/device.service';
 import {
   Level3Menu,
@@ -23,7 +35,10 @@ import {
   ZoomAndCentralizeOptions,
 } from 'src/app/data/schema/boho-v2';
 import { AutoTrackingOptions, ZoomAndFocusOptions } from '../models';
-import { HandoverService } from 'src/app/data/service/handover.service';
+import {
+  CreateOrUpdateHandoverRequest,
+  HandoverService,
+} from 'src/app/data/service/handover.service';
 import { InvalidId } from 'src/app/data/constants';
 import { Nullable } from '@shared/shared.types';
 import { RowItemModel } from './models';
@@ -44,11 +59,11 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
     },
     {
       label: 'Căn giữa & phóng to',
-      value: 'focusAndZoom',
+      value: 'zoom_and_centralize',
     },
     {
       label: 'Tự động theo dõi',
-      value: 'autoTracking',
+      value: 'auto_track',
     },
   ];
 
@@ -81,44 +96,56 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
         tap(({ nodeId, cameraId }) => {
           this._nodeId = nodeId;
           this._deviceId = +cameraId;
-          this.tableItemsSource = [];
-          this.editingRowItem = undefined;
-          this.postActionOptions = null;
-          this.devices = [];
-          this.handovers = [];
-        })
-      )
-      .subscribe(() => {
-        this._deviceService
-          .findAll(this._nodeId)
-          .pipe(
-            switchMap((response) =>
-              of(
+          this.resetState();
+        }),
+        switchMap(() =>
+          forkJoin([
+            this._deviceService.findAll(this._nodeId).pipe(
+              map((response) =>
                 response.data.filter(
                   (device) => device.camera.type.toLowerCase() !== 'static'
                 )
+              ),
+              catchError(
+                this.handleHttpErrorAndReturnEmptyArray.bind(
+                  this,
+                  'Error fetching camera list'
+                )
               )
             ),
-            catchError((error: HttpErrorResponse) => {
-              const errorMessage = error.error?.message ?? error.message;
-              this._toastService.showError(errorMessage);
-              return [];
-            })
-          )
-          .subscribe((devices) => (this.devices = devices));
-
-        this._handoverService
-          .findAll(this._nodeId, this._deviceId)
-          .pipe(
-            switchMap((response) => of(response.data)),
-            catchError((error: HttpErrorResponse) => {
-              const errorMessage = error.error?.message ?? error.message;
-              this._toastService.showError(errorMessage);
-              return [];
-            })
-          )
-          .subscribe((handovers) => (this.handovers = handovers));
+            this._handoverService.findAll(this._nodeId, this._deviceId).pipe(
+              map((response) => response.data),
+              catchError(
+                this.handleHttpErrorAndReturnEmptyArray.bind(
+                  this,
+                  'Error fetching handover list'
+                )
+              )
+            ),
+          ])
+        )
+      )
+      .subscribe(([devices, handovers]) => {
+        this.devices = devices;
+        this.handovers = handovers;
       });
+  }
+
+  private handleHttpErrorAndReturnEmptyArray(
+    errorMessage: string,
+    error: HttpErrorResponse
+  ): Observable<any[]> {
+    const message = error.error?.message ?? error.message;
+    this._toastService.showError(errorMessage + ': ' + message);
+    return of([]);
+  }
+
+  private resetState(): void {
+    this.tableItemsSource = [];
+    this.editingRowItem = undefined;
+    this.postActionOptions = null;
+    this.devices = [];
+    this.handovers = [];
   }
 
   ngOnInit(): void {}
@@ -184,5 +211,47 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
 
   onCancelClicked() {}
 
-  onSaveClicked() {}
+  onSaveClicked() {
+    const observables = this.tableItemsSource.map((rowItem) =>
+      this.createOrUpdate(rowItem)
+    );
+    concat(...observables).subscribe({
+      error: (error: HttpErrorResponse) => {
+        this._toastService.showHttpError(error);
+      },
+      complete: () => {
+        this._toastService.showSuccess('Update succesffully');
+      },
+    });
+  }
+
+  private createOrUpdate(rowItem: RowItemModel): Observable<any> {
+    const data: CreateOrUpdateHandoverRequest = {
+      is_enabled: true,
+      preset_id: rowItem.presetId,
+      target_device_id: rowItem.deviceId,
+    };
+
+    if (rowItem.postActionType === 'auto_track') {
+      data.action = {
+        auto_track: rowItem.postActionOptions as AutoTrackOptions,
+      };
+    } else if (rowItem.postActionType === 'zoom_and_centralize') {
+      data.action = {
+        zoom_and_centralize:
+          rowItem.postActionOptions as ZoomAndCentralizeOptions,
+      };
+    }
+
+    return rowItem.isNew
+      ? this._handoverService
+          .create(this._nodeId, this._deviceId, data)
+          .pipe(tap((response) => (rowItem.id = response.data.id)))
+      : this._handoverService.update(
+          this._nodeId,
+          this._deviceId,
+          +rowItem.id,
+          data
+        );
+  }
 }
