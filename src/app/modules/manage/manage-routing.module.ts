@@ -24,6 +24,7 @@ import { EmptyComponent } from './empty/empty.component';
 import { LicenseManagerComponent } from './license-manager/license-manager.component';
 import { HandoverSettingsComponent } from './camera-detail/handover-settings/handover-settings.component';
 import { PostActionComponent } from './post-action/post-action.component';
+import { PTZPostActionComponent } from './ptz-post-action/ptz-post-action.component';
 
 @NgModule({
   imports: [
@@ -127,6 +128,10 @@ import { PostActionComponent } from './post-action/post-action.component';
               {
                 path: 'node/:nodeId/camera/:cameraId/post-action',
                 component: PostActionComponent,
+              },
+              {
+                path: 'node/:nodeId/camera/:cameraId/ptz-post-action',
+                component: PTZPostActionComponent,
               },
             ],
           },

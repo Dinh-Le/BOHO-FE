@@ -1,4 +1,9 @@
-import { AlarmType, CameraType, ObjectType } from '../../data.types';
+import {
+  AlarmType,
+  CameraType,
+  ObjectType,
+  PostActionType,
+} from '../../data.types';
 
 export * from './device';
 export * from './group-management';
@@ -8,6 +13,7 @@ export * from './node-operator';
 export * from './node';
 export * from './integration';
 export * from './handover';
+export * from './post-action';
 
 export interface ObjectModel {
   id: ObjectType;
@@ -20,4 +26,9 @@ export interface RuleTypeModel {
   id: AlarmType;
   name: string;
   cameraTypes: CameraType[];
+}
+
+export interface PostActionTypeModel {
+  id: PostActionType;
+  name: string;
 }

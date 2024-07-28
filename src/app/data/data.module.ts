@@ -47,6 +47,11 @@ import {
   HandoverService,
   HandoverServiceImpl,
 } from './service/handover.service';
+import {
+  PostActionService,
+  PostActionServiceImpl,
+  PostActionServiceMockImpl,
+} from './service/post-action.service';
 
 const providers = [
   { provide: UserService, useClass: UserServiceImpl },
@@ -68,6 +73,7 @@ const providers = [
   { provide: IntegrationService, useClass: IntegrationServiceImpl },
   { provide: LicenseKeyService, useClass: LicenseKeyServiceImpl },
   { provide: HandoverService, useClass: HandoverServiceImpl },
+  { provide: PostActionService, useClass: PostActionServiceMockImpl },
 ];
 
 @NgModule({

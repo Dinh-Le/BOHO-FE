@@ -33,6 +33,7 @@ export enum Level3Menu {
   LICENSE_MANAGER = 'LICENSE_MANAGER',
   CHUYEN_PTZ = 'CHUYEN_PTZ',
   POST_ACTION = 'POST_ACTION',
+  PTZ_POST_ACTION = 'PTZ_POST_ACTION',
 }
 
 export enum SideMenuItemType {
@@ -262,6 +263,8 @@ export class NavigationService {
         if (this.sideMenu?.type === SideMenuItemType.DEVICE) {
           if (this.level3 === Level3Menu.POST_ACTION) {
             targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/post-action`;
+          } else if (this.level3 === Level3Menu.PTZ_POST_ACTION) {
+            targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/ptz-post-action`;
           } else if (this.level3 === Level3Menu.SCHEDULE) {
             targetUrl += `/node/${nodeId}/camera/${this.sideMenu.id}/schedule`;
           } else {

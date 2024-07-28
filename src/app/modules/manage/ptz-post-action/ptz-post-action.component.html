@@ -1,0 +1,84 @@
+<app-rule-menu
+  class="menu-container"
+  [buttonsTemplate]="buttonsTemplate"
+></app-rule-menu>
+<ng-template #buttonsTemplate>
+  <button class="my-btn my-bg-primary me-2" (click)="onAddClicked()">
+    + Thêm
+  </button>
+  <button class="my-btn my-bg-secondary" (click)="onDeleteClicked()">
+    - Xóa
+  </button>
+</ng-template>
+<app-post-action-options
+  *ngIf="!!editingItem; else elseBlock"
+  [type]="editingItem.postActionType"
+  [data]="editingItem.postActionOptions"
+  (exit)="exitSettingMode()"
+  (save)="saveAndExitSettingMode($event)"
+>
+</app-post-action-options>
+<ng-template #elseBlock>
+  <table class="w-100">
+    <colgroup>
+      <col width="24" />
+      <col width="300" />
+      <col width="300" />
+      <col width="auto" />
+    </colgroup>
+    <thead>
+      <th><input type="checkbox" [indeterminate]="true" /></th>
+      <th>Quy tắc kích hoạt</th>
+      <th>Hành động sau</th>
+      <th></th>
+    </thead>
+    <tbody>
+      <tr *ngFor="let rowItem of tableItemsSource" [formGroup]="rowItem.form">
+        <td><input type="checkbox" formControlName="selected" /></td>
+        <td>
+          <app-select-3 place-holder="Không" formControlName="presetId">
+            <app-select-3-option
+              *ngFor="let item of presets; trackBy: trackById"
+              [value]="item.id"
+              [label]="item.name"
+            ></app-select-3-option>
+          </app-select-3>
+        </td>
+        <td>
+          <app-select-3 formControlName="postActionType" place-holder="Không">
+            <app-select-3-option
+              *ngFor="let item of postActionTypesSource; trackBy: trackById"
+              [value]="item.id"
+              [label]="item.name"
+            ></app-select-3-option>
+          </app-select-3>
+        </td>
+        <td class="text-start">
+          <button
+            class="my-btn bg-primary"
+            (click)="enterSettingMode(rowItem)"
+            [disabled]="rowItem.form.invalid"
+          >
+            Cài đặt
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="d-flex justify-content-center mt-5">
+    <button
+      class="my-btn bg-secondary mx-3"
+      style="width: 80px"
+      (click)="onCancelClicked()"
+    >
+      Hủy
+    </button>
+    <button
+      class="my-btn bg-primary"
+      style="width: 80px"
+      (click)="onSaveClicked()"
+    >
+      Lưu
+    </button>
+  </div>
+</ng-template>

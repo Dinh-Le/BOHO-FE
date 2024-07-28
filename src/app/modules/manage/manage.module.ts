@@ -42,6 +42,7 @@ import { HandoverSettingsComponent } from './camera-detail/handover-settings/han
 import { PostActionOptionsComponent } from './camera-detail/post-action-options/post-action-options.component';
 import { PostActionComponent } from './post-action/post-action.component';
 import { RuleMenuComponent } from './rule-menu/rule-menu.component';
+import { PTZPostActionComponent } from './ptz-post-action/ptz-post-action.component';
 
 @NgModule({
   declarations: [
@@ -77,6 +78,7 @@ import { RuleMenuComponent } from './rule-menu/rule-menu.component';
     PostActionOptionsComponent,
     PostActionComponent,
     RuleMenuComponent,
+    PTZPostActionComponent,
   ],
   imports: [
     CommonModule,

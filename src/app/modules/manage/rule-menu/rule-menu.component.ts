@@ -5,6 +5,7 @@ import {
   NavigationService,
 } from 'src/app/data/service/navigation.service';
 import { ActivatedRoute } from '@angular/router';
+import { CameraType } from 'src/app/data/data.types';
 
 @Component({
   selector: 'app-rule-menu',
@@ -42,20 +43,30 @@ export class RuleMenuComponent {
     activatedRoute.params.subscribe(({ nodeId, cameraId: deviceId }) => {
       this.parentPath = `/manage/device-rule/node/${nodeId}/camera/${deviceId}/`;
 
+      const cameraType: CameraType = navigationService.sideMenu.data?.camera
+        ?.type as CameraType;
+
+      // Update the path according to the camera type
+      this.menuItemsSource[2].path =
+        cameraType === 'PTZ' ? 'ptz-post-action' : 'post-action';
+
+      // Check if camera type is changed, navigate to the correct url
+      const expectedLevel3Menu =
+        cameraType === 'PTZ'
+          ? Level3Menu.PTZ_POST_ACTION
+          : Level3Menu.POST_ACTION;
+      if (navigationService.level3 !== expectedLevel3Menu) {
+        navigationService.level3 = expectedLevel3Menu;
+        navigationService.navigate();
+        return;
+      }
+
       const lastSegment =
         activatedRoute.snapshot.url[
           activatedRoute.snapshot.url.length - 1
         ].toString();
       for (const menuItem of this.menuItemsSource) {
         menuItem.selected = menuItem.path === lastSegment;
-      }
-
-      if (navigationService.sideMenu.data?.camera?.type !== 'Static') {
-        this.menuItemsSource[2].class = 'd-none';
-        navigationService.level3 = Level3Menu.RULE;
-        navigationService.navigate();
-      } else {
-        this.menuItemsSource[2].class = '';
       }
     });
   }
