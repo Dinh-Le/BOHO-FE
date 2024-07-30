@@ -27,3 +27,15 @@ export interface Handover {
   action?: Nullable<ActionOptions>;
   is_enabled: boolean;
 }
+
+export function getPostActionTypeByHandover(handover: Handover) {
+  if (handover.action?.auto_track) {
+    return 'auto_track';
+  }
+
+  if (handover.action?.zoom_and_centralize) {
+    return 'zoom_and_centralize';
+  }
+
+  return 'none';
+}

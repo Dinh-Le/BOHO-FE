@@ -1,47 +1,55 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ToastService } from '@app/services/toast.service';
+import { getDefaultPostionActionOptions } from '@modules/manage/ptz-post-action/models';
 import { Nullable } from '@shared/shared.types';
-import { filter, tap, switchMap, of, catchError } from 'rxjs';
+import { tap, switchMap, of, catchError } from 'rxjs';
 import { InvalidId } from 'src/app/data/constants';
 import { PostActionType } from 'src/app/data/data.types';
 import {
   ZoomAndCentralizeOptions,
   AutoTrackOptions,
   Handover,
+  getPostActionTypeByHandover,
 } from 'src/app/data/schema/boho-v2';
 import { Preset } from 'src/app/data/schema/boho-v2/preset';
 import { PresetService } from 'src/app/data/service/preset.service';
 import { v4 } from 'uuid';
 
-export class RowItemModel {
-  _isNew: boolean = true;
+export default class HandoverRowItemModel {
   presets: Preset[] = [];
   private _postActionOptions: Nullable<
     ZoomAndCentralizeOptions | AutoTrackOptions
   >;
   form = new FormGroup({
-    id: new FormControl<string | number>(v4(), Validators.required),
-    node_id: new FormControl<string>('', [Validators.required]),
+    key: new FormControl<string>(v4(), Validators.required),
+    id: new FormControl<number>(+InvalidId, Validators.required),
     selected: new FormControl<boolean>(false, [Validators.required]),
-    device_id: new FormControl<Nullable<number>>(null, [Validators.required]),
-    preset_id: new FormControl<Nullable<number>>(null, [Validators.required]),
-    post_action_type: new FormControl<PostActionType>('none', [
+    nodeId: new FormControl<string>('', [Validators.required]),
+    deviceId: new FormControl<number>(+InvalidId, [Validators.required]),
+    targetDeviceId: new FormControl<number>(+InvalidId, [Validators.required]),
+    presetId: new FormControl<Nullable<number>>(+InvalidId, [
+      Validators.required,
+    ]),
+    postActionType: new FormControl<PostActionType>('none', [
       Validators.required,
     ]),
   });
 
   get isNew(): boolean {
-    return this._isNew;
+    return this.id === +InvalidId;
   }
 
-  get id(): string | number {
+  get key(): string {
+    return this.form.controls.key.value!;
+  }
+
+  get id(): number {
     return this.form.controls.id.value!;
   }
 
-  set id(value: string | number) {
-    this.form.controls.id.setValue(+value);
-    this._isNew = false;
+  set id(value: number) {
+    this.form.controls.id.setValue(value);
   }
 
   get selected(): boolean {
@@ -49,19 +57,23 @@ export class RowItemModel {
   }
 
   get nodeId(): string {
-    return this.form.controls.node_id.value ?? '';
+    return this.form.controls.nodeId.value!;
   }
 
   get deviceId(): number {
-    return this.form.controls.device_id.value ?? +InvalidId;
+    return this.form.controls.deviceId.value!;
+  }
+
+  get targetDeviceId(): number {
+    return this.form.controls.targetDeviceId.value!;
   }
 
   get presetId(): number {
-    return this.form.controls.preset_id.value ?? +InvalidId;
+    return this.form.controls.presetId.value!;
   }
 
   get postActionType(): PostActionType {
-    return this.form.controls.post_action_type.value!;
+    return this.form.controls.postActionType.value!;
   }
 
   get postActionOptions(): Nullable<
@@ -77,72 +89,52 @@ export class RowItemModel {
   }
 
   get canConfigurePostAction(): boolean {
-    return this.form.controls.post_action_type.value !== 'none';
+    return (
+      this.form.controls.postActionType.value !== 'none' &&
+      this.targetDeviceId !== +InvalidId &&
+      this.presetId !== +InvalidId
+    );
   }
 
   constructor(
-    nodeId: string,
     private presetService: PresetService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    nodeId: string,
+    deviceId: number,
+    data?: Handover
   ) {
-    this.form.controls.node_id.setValue(nodeId);
-    this.form.controls.post_action_type.valueChanges.subscribe((value) => {
-      switch (value) {
-        case 'auto_track':
-          this._postActionOptions = {
-            pantilt_speed: 3,
-            zoom_speed: 5,
-            timeout: 5,
-            zoom_level: 1,
-            working_time: 30,
-            roi: [],
-          };
-          break;
-        case 'zoom_and_centralize':
-          this._postActionOptions = {
-            zoom_level: 1,
-            working_time: 2,
-          };
-          break;
-        default:
-          this._postActionOptions = null;
-          break;
-      }
+    this.form.controls.nodeId.setValue(nodeId);
+    this.form.controls.deviceId.setValue(deviceId);
+    this.form.controls.postActionType.valueChanges.subscribe((value) => {
+      this.postActionOptions = getDefaultPostionActionOptions(value!);
     });
-    this.form.controls.device_id.valueChanges
-      .pipe(filter((value) => !!value && !!this.form.controls.node_id.value))
-      .subscribe((value) =>
-        this.presetService
-          .findAll(this.form.controls.node_id.value!, value!)
-          .pipe(
-            tap(() => (this.presets = [])),
-            switchMap((response) => of(response.data)),
-            catchError((error: HttpErrorResponse) => {
-              this.toastService.showHttpError(error);
-              return of([]);
-            })
-          )
-          .subscribe((presets) => (this.presets = presets))
-      );
+    this.form.controls.targetDeviceId.valueChanges.subscribe((value) =>
+      this.presetService
+        .findAll(this.form.controls.nodeId.value!, value!)
+        .pipe(
+          tap(() => (this.presets = [])),
+          switchMap((response) => of(response.data)),
+          catchError((error: HttpErrorResponse) => {
+            this.toastService.showHttpError(error);
+            return of([]);
+          })
+        )
+        .subscribe((presets) => (this.presets = presets))
+    );
+
+    if (data) {
+      this.setData(data);
+    }
   }
 
   setData(data: Handover) {
-    this._isNew = !Number.isInteger(data.id);
-
     this.form.patchValue({
       id: data.id,
-      device_id: data.device_id,
-      preset_id: data.preset_id,
+      targetDeviceId: data.target_device_id,
+      presetId: data.preset_id,
       selected: false,
+      postActionType: getPostActionTypeByHandover(data),
     });
-
-    if (data.action?.zoom_and_centralize) {
-      this.form.controls.post_action_type.setValue('zoom_and_centralize');
-    } else if (data.action?.auto_track) {
-      this.form.controls.post_action_type.setValue('auto_track');
-    } else {
-      this.form.controls.post_action_type.setValue('none');
-    }
 
     this.postActionOptions =
       data.action?.auto_track ?? data.action?.zoom_and_centralize;

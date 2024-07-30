@@ -10,15 +10,16 @@ import { ActivatedRoute } from '@angular/router';
 import { ToastService } from '@app/services/toast.service';
 import { SelectItemModel } from '@shared/models/select-item-model';
 import {
-  EMPTY,
   Observable,
   Subscription,
   catchError,
+  combineLatest,
   concat,
   forkJoin,
   map,
   of,
   switchMap,
+  takeLast,
   takeWhile,
   tap,
 } from 'rxjs';
@@ -41,7 +42,7 @@ import {
 } from 'src/app/data/service/handover.service';
 import { InvalidId } from 'src/app/data/constants';
 import { Nullable } from '@shared/shared.types';
-import { RowItemModel } from './models';
+import HandoverRowItemModel from './models';
 
 @Component({
   selector: 'app-handover-settings',
@@ -76,8 +77,9 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
   private _handoverService = inject(HandoverService);
   private _nodeId: string = '';
   private _deviceId: number = +InvalidId;
+  private _deleteItems: HandoverRowItemModel[] = [];
 
-  editingRowItem: Nullable<RowItemModel>;
+  editingRowItem: Nullable<HandoverRowItemModel>;
   postActionOptions: Nullable<
     (ZoomAndFocusOptions | AutoTrackingOptions) & {
       nodeId: string;
@@ -85,67 +87,81 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
       presetId: number;
     }
   >;
-  tableItemsSource: RowItemModel[] = [];
-  devices: Device[] = [];
+  tableItemsSource: HandoverRowItemModel[] = [];
+  ptzCameras: Device[] = [];
   handovers: Handover[] = [];
 
   constructor() {
     this._navigationService.level3 = Level3Menu.CHUYEN_PTZ;
-    this._activatedRoute.parent?.params
+    this._activatedRoute.parent?.params.subscribe(
+      ({ nodeId, cameraId: deviceId }) => {
+        this._nodeId = nodeId;
+        this._deviceId = +deviceId;
+        this.tableItemsSource = [];
+        this.editingRowItem = undefined;
+        this.postActionOptions = null;
+        this.ptzCameras = [];
+        this.handovers = [];
+        this._deleteItems = [];
+
+        this._deviceService
+          .findAll(this._nodeId)
+          .pipe(
+            map((response) =>
+              response.data.filter(
+                (device) => device.camera.type.toLowerCase() !== 'static'
+              )
+            ),
+            catchError(
+              this.handleHttpErrorAndReturnDefault.bind(
+                this,
+                'Error fetching camera list',
+                []
+              )
+            )
+          )
+          .subscribe((ptzCameras) => (this.ptzCameras = ptzCameras));
+
+        this.loadHandovers();
+      }
+    );
+  }
+
+  private loadHandovers() {
+    this._handoverService
+      .findAll(this._nodeId, this._deviceId)
       .pipe(
-        tap(({ nodeId, cameraId }) => {
-          this._nodeId = nodeId;
-          this._deviceId = +cameraId;
-          this.resetState();
-        }),
-        switchMap(() =>
-          forkJoin([
-            this._deviceService.findAll(this._nodeId).pipe(
-              map((response) =>
-                response.data.filter(
-                  (device) => device.camera.type.toLowerCase() !== 'static'
-                )
-              ),
-              catchError(
-                this.handleHttpErrorAndReturnEmptyArray.bind(
-                  this,
-                  'Error fetching camera list'
-                )
+        map((response) =>
+          response.data.map(
+            (item) =>
+              new HandoverRowItemModel(
+                this._presetService,
+                this._toastService,
+                this._nodeId,
+                this._deviceId,
+                item
               )
-            ),
-            this._handoverService.findAll(this._nodeId, this._deviceId).pipe(
-              map((response) => response.data),
-              catchError(
-                this.handleHttpErrorAndReturnEmptyArray.bind(
-                  this,
-                  'Error fetching handover list'
-                )
-              )
-            ),
-          ])
+          )
+        ),
+        catchError(
+          this.handleHttpErrorAndReturnDefault.bind(
+            this,
+            'Error fetching handover list',
+            []
+          )
         )
       )
-      .subscribe(([devices, handovers]) => {
-        this.devices = devices;
-        this.handovers = handovers;
-      });
+      .subscribe((items) => (this.tableItemsSource = items));
   }
 
-  private handleHttpErrorAndReturnEmptyArray(
+  private handleHttpErrorAndReturnDefault(
     errorMessage: string,
+    defaultValue: any,
     error: HttpErrorResponse
-  ): Observable<any[]> {
+  ): Observable<any> {
     const message = error.error?.message ?? error.message;
     this._toastService.showError(errorMessage + ': ' + message);
-    return of([]);
-  }
-
-  private resetState(): void {
-    this.tableItemsSource = [];
-    this.editingRowItem = undefined;
-    this.postActionOptions = null;
-    this.devices = [];
-    this.handovers = [];
+    return of(defaultValue);
   }
 
   ngOnInit(): void {}
@@ -154,27 +170,19 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
     this._subscriptions.forEach((e) => e.unsubscribe());
   }
 
-  private initialize(): void {
-    this._deviceService
-      .findAll(this._nodeId)
-      .pipe(
-        switchMap((response) =>
-          of(
-            response.data.filter(
-              (device) => device.camera.type.toLowerCase() !== 'static'
-            )
-          )
-        ),
-        catchError((error: HttpErrorResponse) => {
-          const errorMessage = error.error?.message ?? error.message;
-          this._toastService.showError(errorMessage);
-          return [];
-        })
-      )
-      .subscribe((devices) => (this.devices = devices));
+  trackById(_: any, item: any): any {
+    return item.id;
   }
 
-  enterSettingMode(item: RowItemModel) {
+  trackByValue(_: any, item: any): any {
+    return item.value;
+  }
+
+  trackByKey(_: any, { key }: any): any {
+    return key;
+  }
+
+  enterSettingMode(item: HandoverRowItemModel) {
     this.editingRowItem = item;
   }
 
@@ -189,47 +197,67 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
   }
 
   add() {
-    const item = new RowItemModel(
-      this._nodeId,
-      this._presetService,
-      this._toastService
+    this.tableItemsSource.push(
+      new HandoverRowItemModel(
+        this._presetService,
+        this._toastService,
+        this._nodeId,
+        this._deviceId
+      )
     );
-    this.tableItemsSource.push(item);
   }
 
   remove() {
-    this.tableItemsSource = this.tableItemsSource.filter((e) => !e.selected);
+    this._deleteItems.push(
+      ...this.tableItemsSource.filter((item) => item.selected && !item.isNew)
+    );
+    this.tableItemsSource = this.tableItemsSource.filter(
+      (item) => !item.selected
+    );
   }
 
-  trackById(_: any, item: any): any {
-    return item.id;
+  onCancelClicked() {
+    this._deleteItems = [];
+    this.loadHandovers();
   }
-
-  trackByValue(_: any, item: any): any {
-    return item.value;
-  }
-
-  onCancelClicked() {}
 
   onSaveClicked() {
-    const observables = this.tableItemsSource.map((rowItem) =>
+    const deleteItems$ =
+      this._deleteItems.length > 0
+        ? this._deleteItems.map((item) =>
+            this._handoverService
+              .delete(this._nodeId, this._deviceId, item.id)
+              .pipe(
+                map(() => true),
+                catchError(
+                  this.handleHttpErrorAndReturnDefault.bind(
+                    this,
+                    'Error delete item: ',
+                    false
+                  )
+                )
+              )
+          )
+        : [];
+    const creatOrUpdate$ = this.tableItemsSource.map((rowItem) =>
       this.createOrUpdate(rowItem)
     );
-    concat(...observables).subscribe({
-      error: (error: HttpErrorResponse) => {
-        this._toastService.showHttpError(error);
-      },
-      complete: () => {
-        this._toastService.showSuccess('Update succesffully');
-      },
-    });
+    concat(...deleteItems$, ...creatOrUpdate$)
+      .pipe(
+        takeWhile((result) => result),
+        takeLast(1)
+      )
+      .subscribe({
+        next: (result) =>
+          result && this._toastService.showSuccess('Update succesffully'),
+      });
   }
 
-  private createOrUpdate(rowItem: RowItemModel): Observable<any> {
+  private createOrUpdate(rowItem: HandoverRowItemModel): Observable<any> {
     const data: CreateOrUpdateHandoverRequest = {
       is_enabled: true,
       preset_id: rowItem.presetId,
-      target_device_id: rowItem.deviceId,
+      target_device_id: rowItem.targetDeviceId,
     };
 
     if (rowItem.postActionType === 'auto_track') {
@@ -244,14 +272,28 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
     }
 
     return rowItem.isNew
-      ? this._handoverService
-          .create(this._nodeId, this._deviceId, data)
-          .pipe(tap((response) => (rowItem.id = response.data.id)))
-      : this._handoverService.update(
-          this._nodeId,
-          this._deviceId,
-          +rowItem.id,
-          data
-        );
+      ? this._handoverService.create(this._nodeId, this._deviceId, data).pipe(
+          tap((response) => (rowItem.id = response.data.id)),
+          map(() => true),
+          catchError(
+            this.handleHttpErrorAndReturnDefault.bind(
+              this,
+              'Error creating new handover',
+              false
+            )
+          )
+        )
+      : this._handoverService
+          .update(this._nodeId, this._deviceId, +rowItem.id, data)
+          .pipe(
+            map(() => true),
+            catchError(
+              this.handleHttpErrorAndReturnDefault.bind(
+                this,
+                'Error updating exiting handover',
+                false
+              )
+            )
+          );
   }
 }
