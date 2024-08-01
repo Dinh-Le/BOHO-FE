@@ -10,12 +10,14 @@ import { ActivatedRoute } from '@angular/router';
 import { ToastService } from '@app/services/toast.service';
 import { SelectItemModel } from '@shared/models/select-item-model';
 import {
+  EMPTY,
   Observable,
   Subscription,
   catchError,
   combineLatest,
   concat,
   forkJoin,
+  last,
   map,
   of,
   switchMap,
@@ -32,12 +34,13 @@ import { PresetService } from 'src/app/data/service/preset.service';
 import {
   AutoTrackOptions,
   Device,
+  getPostActionTypeByHandover,
   Handover,
   ZoomAndCentralizeOptions,
 } from 'src/app/data/schema/boho-v2';
 import { AutoTrackingOptions, ZoomAndFocusOptions } from '../models';
 import {
-  CreateOrUpdateHandoverRequest,
+  CreateHandoverDto,
   HandoverService,
 } from 'src/app/data/service/handover.service';
 import { InvalidId } from 'src/app/data/constants';
@@ -131,8 +134,8 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
     this._handoverService
       .findAll(this._nodeId, this._deviceId)
       .pipe(
-        map((response) =>
-          response.data.map(
+        map((handovers) =>
+          handovers.map(
             (item) =>
               new HandoverRowItemModel(
                 this._presetService,
@@ -232,68 +235,110 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
                 catchError(
                   this.handleHttpErrorAndReturnDefault.bind(
                     this,
-                    'Error delete item: ',
+                    'Error delete item',
                     false
                   )
                 )
               )
           )
         : [];
-    const creatOrUpdate$ = this.tableItemsSource.map((rowItem) =>
-      this.createOrUpdate(rowItem)
+
+    const newItems: HandoverRowItemModel[] = this.tableItemsSource.filter(
+      (item) => item.isNew
     );
-    concat(...deleteItems$, ...creatOrUpdate$)
-      .pipe(
-        takeWhile((result) => result),
-        takeLast(1)
-      )
-      .subscribe({
-        next: (result) =>
-          result && this._toastService.showSuccess('Update succesffully'),
-      });
-  }
+    const updateItems = this.tableItemsSource.filter((item) => !item.isNew);
 
-  private createOrUpdate(rowItem: HandoverRowItemModel): Observable<any> {
-    const data: CreateOrUpdateHandoverRequest = {
-      is_enabled: true,
-      preset_id: rowItem.presetId,
-      target_device_id: rowItem.targetDeviceId,
-    };
-
-    if (rowItem.postActionType === 'auto_track') {
-      data.action = {
-        auto_track: rowItem.postActionOptions as AutoTrackOptions,
-      };
-    } else if (rowItem.postActionType === 'zoom_and_centralize') {
-      data.action = {
-        zoom_and_centralize:
-          rowItem.postActionOptions as ZoomAndCentralizeOptions,
-      };
-    }
-
-    return rowItem.isNew
-      ? this._handoverService.create(this._nodeId, this._deviceId, data).pipe(
-          tap((response) => (rowItem.id = response.data.id)),
-          map(() => true),
-          catchError(
-            this.handleHttpErrorAndReturnDefault.bind(
-              this,
-              'Error creating new handover',
-              false
+    const createItems$ =
+      newItems.length > 0
+        ? this._handoverService
+            .create(
+              this._nodeId,
+              this._deviceId,
+              newItems.map((item) => ({
+                preset_id: item.presetId,
+                is_enabled: true,
+                action:
+                  item.postActionType === 'auto_track'
+                    ? {
+                        auto_track: item.postActionOptions as AutoTrackOptions,
+                        zoom_and_centralize: null,
+                      }
+                    : item.postActionType === 'zoom_and_centralize'
+                    ? {
+                        auto_track: null,
+                        zoom_and_centralize:
+                          item.postActionOptions as ZoomAndCentralizeOptions,
+                      }
+                    : null,
+              }))
             )
-          )
-        )
-      : this._handoverService
-          .update(this._nodeId, this._deviceId, +rowItem.id, data)
-          .pipe(
-            map(() => true),
-            catchError(
-              this.handleHttpErrorAndReturnDefault.bind(
-                this,
-                'Error updating exiting handover',
-                false
+            .pipe(
+              map((ids) => {
+                for (let i = 0; i < ids.length; i++) {
+                  newItems[i].id = ids[i];
+                }
+
+                return true;
+              }),
+              catchError(
+                this.handleHttpErrorAndReturnDefault.bind(
+                  this,
+                  'Error creating item',
+                  false
+                )
               )
             )
-          );
+        : of(true);
+
+    const updateItems$ =
+      updateItems.length > 0
+        ? this._handoverService
+            .update(
+              this._nodeId,
+              this._deviceId,
+              updateItems.map((item) => ({
+                handover_id: item.id,
+                is_enabled: true,
+                preset_id: item.presetId,
+                action:
+                  item.postActionType === 'auto_track'
+                    ? {
+                        auto_track: item.postActionOptions as AutoTrackOptions,
+                        zoom_and_centralize: null,
+                      }
+                    : item.postActionType === 'zoom_and_centralize'
+                    ? {
+                        auto_track: null,
+                        zoom_and_centralize:
+                          item.postActionOptions as ZoomAndCentralizeOptions,
+                      }
+                    : null,
+              }))
+            )
+            .pipe(
+              map((_) => true),
+              catchError(
+                this.handleHttpErrorAndReturnDefault.bind(
+                  this,
+                  'Error updating item',
+                  false
+                )
+              )
+            )
+        : of(true);
+
+    concat(...deleteItems$, createItems$, updateItems$)
+      .pipe(
+        takeWhile((result) => result),
+        last()
+      )
+      .subscribe({
+        next: (result) => {
+          console.log('result', result);
+          // if (result) {
+          //   this._toastService.showSuccess('Update succesffully');
+          // }
+        },
+      });
   }
 }

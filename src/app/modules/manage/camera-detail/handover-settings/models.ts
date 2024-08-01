@@ -24,10 +24,9 @@ export default class HandoverRowItemModel {
   form = new FormGroup({
     key: new FormControl<string>(v4(), Validators.required),
     id: new FormControl<number>(+InvalidId, Validators.required),
+    nodeId: new FormControl<string>('', Validators.required),
     selected: new FormControl<boolean>(false, [Validators.required]),
-    nodeId: new FormControl<string>('', [Validators.required]),
     deviceId: new FormControl<number>(+InvalidId, [Validators.required]),
-    targetDeviceId: new FormControl<number>(+InvalidId, [Validators.required]),
     presetId: new FormControl<Nullable<number>>(+InvalidId, [
       Validators.required,
     ]),
@@ -64,10 +63,6 @@ export default class HandoverRowItemModel {
     return this.form.controls.deviceId.value!;
   }
 
-  get targetDeviceId(): number {
-    return this.form.controls.targetDeviceId.value!;
-  }
-
   get presetId(): number {
     return this.form.controls.presetId.value!;
   }
@@ -91,7 +86,7 @@ export default class HandoverRowItemModel {
   get canConfigurePostAction(): boolean {
     return (
       this.form.controls.postActionType.value !== 'none' &&
-      this.targetDeviceId !== +InvalidId &&
+      this.deviceId !== +InvalidId &&
       this.presetId !== +InvalidId
     );
   }
@@ -108,9 +103,9 @@ export default class HandoverRowItemModel {
     this.form.controls.postActionType.valueChanges.subscribe((value) => {
       this.postActionOptions = getDefaultPostionActionOptions(value!);
     });
-    this.form.controls.targetDeviceId.valueChanges.subscribe((value) =>
+    this.form.controls.deviceId.valueChanges.subscribe((value) =>
       this.presetService
-        .findAll(this.form.controls.nodeId.value!, value!)
+        .findAll(this.nodeId, value!)
         .pipe(
           tap(() => (this.presets = [])),
           switchMap((response) => of(response.data)),
@@ -130,7 +125,7 @@ export default class HandoverRowItemModel {
   setData(data: Handover) {
     this.form.patchValue({
       id: data.id,
-      targetDeviceId: data.target_device_id,
+      deviceId: data.device_id,
       presetId: data.preset_id,
       selected: false,
       postActionType: getPostActionTypeByHandover(data),

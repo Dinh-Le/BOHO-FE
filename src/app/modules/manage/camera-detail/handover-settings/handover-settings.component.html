@@ -33,7 +33,7 @@
         <td><input type="checkbox" formControlName="selected" /></td>
         <td>{{ rowItem.isNew ? "" : rowItem.id }}</td>
         <td>
-          <app-select-3 place-holder="Không" formControlName="targetDeviceId">
+          <app-select-3 place-holder="Không" formControlName="deviceId">
             <app-select-3-option
               *ngFor="let device of ptzCameras; trackBy: trackById"
               [value]="device.id"

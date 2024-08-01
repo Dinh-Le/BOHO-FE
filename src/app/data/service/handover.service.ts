@@ -1,12 +1,15 @@
-import { Observable, of } from 'rxjs';
+import { EMPTY, map, Observable, of, switchMap } from 'rxjs';
 import { ResponseBase } from '../schema/boho-v2/response-base';
 import { RestfullApiService } from './restful-api.service';
 import { Handover } from '../schema/boho-v2';
 import { Injectable } from '@angular/core';
 import { environment } from '@env';
 
-export type CreateOrUpdateHandoverRequest = Omit<Handover, 'id' | 'device_id'>;
-export type CreateHandoverResponse = ResponseBase & { data: { id: number } };
+export type CreateHandoverDto = Omit<Handover, 'id' | 'device_id'>;
+export type UpdateHandoverDto = Omit<Handover, 'id' | 'device_id'> & {
+  handover_id: number;
+};
+export type CreateHandoverResponse = ResponseBase & { data: number[] };
 export type FindAllHandoverResponse = ResponseBase & { data: Handover[] };
 export type FindHandoverResponse = ResponseBase & { data: Handover };
 
@@ -14,28 +17,27 @@ export abstract class HandoverService extends RestfullApiService {
   public abstract findAll(
     nodeId: string,
     deviceId: number
-  ): Observable<FindAllHandoverResponse>;
+  ): Observable<Handover[]>;
   public abstract find(
     nodeId: string,
     deviceId: number,
     handoverId: number
-  ): Observable<FindHandoverResponse>;
+  ): Observable<Handover>;
   public abstract create(
     nodeId: string,
     deviceId: number,
-    data: CreateOrUpdateHandoverRequest
-  ): Observable<CreateHandoverResponse>;
+    data: CreateHandoverDto[]
+  ): Observable<number[]>;
   public abstract update(
     nodeId: string,
     deviceId: number,
-    handoverId: number,
-    data: CreateOrUpdateHandoverRequest
-  ): Observable<ResponseBase>;
+    data: UpdateHandoverDto[]
+  ): Observable<never>;
   public abstract delete(
     nodeId: string,
     deviceId: number,
     handoverId: number
-  ): Observable<ResponseBase>;
+  ): Observable<never>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -43,127 +45,54 @@ export class HandoverServiceImpl extends HandoverService {
   public override findAll(
     nodeId: string,
     deviceId: number
-  ): Observable<FindAllHandoverResponse> {
+  ): Observable<Handover[]> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/handover`;
-    return this.httpClient.get<FindAllHandoverResponse>(url);
+    return this.httpClient
+      .get<ResponseBase & { data: Handover[] }>(url)
+      .pipe(map((response) => response.data));
   }
   public override find(
     nodeId: string,
     deviceId: number,
     handoverId: number
-  ): Observable<FindHandoverResponse> {
+  ): Observable<Handover> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/handover/${handoverId}`;
-    return this.httpClient.get<FindHandoverResponse>(url);
+    return this.httpClient
+      .get<ResponseBase & { data: Handover }>(url)
+      .pipe(map((response) => response.data));
   }
   public override create(
     nodeId: string,
     deviceId: number,
-    data: CreateOrUpdateHandoverRequest
-  ): Observable<CreateHandoverResponse> {
+    data: CreateHandoverDto[]
+  ): Observable<number[]> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/handover`;
-    return this.httpClient.post<CreateHandoverResponse>(url, data);
+    return this.httpClient
+      .post<ResponseBase & { data: number[] }>(url, {
+        handovers: data,
+      })
+      .pipe(map((response) => response.data));
   }
   public override update(
     nodeId: string,
     deviceId: number,
-    handoverId: number,
-    data: CreateOrUpdateHandoverRequest
-  ): Observable<ResponseBase> {
-    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/handover/${handoverId}`;
-    return this.httpClient.patch<CreateHandoverResponse>(url, data);
+    data: UpdateHandoverDto[]
+  ): Observable<never> {
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/handover`;
+    return this.httpClient
+      .patch<ResponseBase>(url, {
+        handovers: data,
+      })
+      .pipe(switchMap((_) => EMPTY));
   }
   public override delete(
     nodeId: string,
     deviceId: number,
     handoverId: number
-  ): Observable<ResponseBase> {
+  ): Observable<never> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/handover/${handoverId}`;
-    return this.httpClient.delete<CreateHandoverResponse>(url);
-  }
-}
-
-@Injectable({ providedIn: 'root' })
-export class HandoverServiceMockImpl extends HandoverService {
-  items: Handover[] = [];
-
-  public override findAll(
-    nodeId: string,
-    deviceId: number
-  ): Observable<FindAllHandoverResponse> {
-    return of({
-      success: true,
-      message: 'success',
-      data: this.items,
-    } as FindAllHandoverResponse);
-  }
-  public override find(
-    nodeId: string,
-    deviceId: number,
-    handoverId: number
-  ): Observable<FindHandoverResponse> {
-    const item = this.items.find((item) => item.id === handoverId);
-    return of({
-      success: true,
-      message: 'success',
-      data: item,
-    } as FindHandoverResponse);
-  }
-  public override create(
-    nodeId: string,
-    deviceId: number,
-    data: CreateOrUpdateHandoverRequest
-  ): Observable<CreateHandoverResponse> {
-    console.log('Create new item: ', data);
-    const id = this.items.length + 1;
-    this.items.push({
-      id,
-      device_id: deviceId,
-      is_enabled: data.is_enabled,
-      preset_id: data.preset_id,
-      target_device_id: data.target_device_id,
-      action: data.action,
-    });
-
-    return of({
-      success: true,
-      message: 'success',
-      data: {
-        id,
-      },
-    } as CreateHandoverResponse);
-  }
-  public override update(
-    nodeId: string,
-    deviceId: number,
-    handoverId: number,
-    data: CreateOrUpdateHandoverRequest
-  ): Observable<ResponseBase> {
-    console.log('Update item: ', handoverId, data);
-    const item = this.items.find((item) => item.id === handoverId);
-    if (item) {
-      item.device_id = deviceId;
-      item.is_enabled = data.is_enabled;
-      item.preset_id = data.preset_id;
-      item.target_device_id = data.target_device_id;
-      item.action = data.action;
-    }
-
-    return of({
-      success: true,
-      message: 'success',
-    } as ResponseBase);
-  }
-  public override delete(
-    nodeId: string,
-    deviceId: number,
-    handoverId: number
-  ): Observable<ResponseBase> {
-    console.log('Delete item: ', handoverId);
-    this.items = this.items.filter((item) => item.id !== handoverId);
-
-    return of({
-      success: true,
-      message: 'success',
-    } as ResponseBase);
+    return this.httpClient
+      .delete<ResponseBase>(url)
+      .pipe(switchMap((_) => EMPTY));
   }
 }

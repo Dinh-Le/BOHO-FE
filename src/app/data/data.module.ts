@@ -46,7 +46,6 @@ import {
 import {
   HandoverService,
   HandoverServiceImpl,
-  HandoverServiceMockImpl,
 } from './service/handover.service';
 import {
   PostActionService,
@@ -73,7 +72,7 @@ const providers = [
   { provide: EventService, useClass: EventServiceImpl },
   { provide: IntegrationService, useClass: IntegrationServiceImpl },
   { provide: LicenseKeyService, useClass: LicenseKeyServiceImpl },
-  { provide: HandoverService, useClass: HandoverServiceMockImpl },
+  { provide: HandoverService, useClass: HandoverServiceImpl },
   { provide: PostActionService, useClass: PostActionServiceMockImpl },
 ];
 
