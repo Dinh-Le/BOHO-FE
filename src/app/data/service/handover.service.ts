@@ -6,12 +6,6 @@ import { Injectable } from '@angular/core';
 import { environment } from '@env';
 
 export type CreateHandoverDto = Omit<Handover, 'id' | 'device_id'>;
-export type UpdateHandoverDto = Omit<Handover, 'id' | 'device_id'> & {
-  handover_id: number;
-};
-export type CreateHandoverResponse = ResponseBase & { data: number[] };
-export type FindAllHandoverResponse = ResponseBase & { data: Handover[] };
-export type FindHandoverResponse = ResponseBase & { data: Handover };
 
 export abstract class HandoverService extends RestfullApiService {
   public abstract findAll(
@@ -31,8 +25,7 @@ export abstract class HandoverService extends RestfullApiService {
   public abstract update(
     nodeId: string,
     deviceId: number,
-    handoverId: number,
-    data: UpdateHandoverDto
+    data: CreateHandoverDto[]
   ): Observable<never>;
   public abstract delete(
     nodeId: string,
@@ -77,13 +70,15 @@ export class HandoverServiceImpl extends HandoverService {
   public override update(
     nodeId: string,
     deviceId: number,
-    handoverId: number,
-    data: UpdateHandoverDto
+
+    data: CreateHandoverDto[]
   ): Observable<never> {
-    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/handover/${handoverId}`;
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/handover`;
     return this.httpClient
-      .patch<ResponseBase>(url, data)
-      .pipe(switchMap((_) => EMPTY));
+      .patch<ResponseBase>(url, {
+        handovers: data,
+      })
+      .pipe(switchMap(() => of()));
   }
   public override delete(
     nodeId: string,
@@ -93,6 +88,6 @@ export class HandoverServiceImpl extends HandoverService {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/handover/${handoverId}`;
     return this.httpClient
       .delete<ResponseBase>(url)
-      .pipe(switchMap((_) => EMPTY));
+      .pipe(switchMap(() => EMPTY));
   }
 }

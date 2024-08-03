@@ -40,7 +40,7 @@ import { LicenseManagerComponent } from './license-manager/license-manager.compo
 import { EventChartComponent } from './event-chart/event-chart.component';
 import { HandoverSettingsComponent } from './camera-detail/handover-settings/handover-settings.component';
 import { PostActionOptionsComponent } from './camera-detail/post-action-options/post-action-options.component';
-import { PostActionComponent } from './post-action/post-action.component';
+import { StaticPostActionComponent } from './static-post-action/static-post-action.component';
 import { RuleMenuComponent } from './rule-menu/rule-menu.component';
 import { PTZPostActionComponent } from './ptz-post-action/ptz-post-action.component';
 
@@ -76,7 +76,7 @@ import { PTZPostActionComponent } from './ptz-post-action/ptz-post-action.compon
     EventChartComponent,
     HandoverSettingsComponent,
     PostActionOptionsComponent,
-    PostActionComponent,
+    StaticPostActionComponent,
     RuleMenuComponent,
     PTZPostActionComponent,
   ],

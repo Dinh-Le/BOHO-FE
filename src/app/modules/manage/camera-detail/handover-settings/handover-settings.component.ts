@@ -1,29 +1,25 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import {
-  Component,
-  HostBinding,
-  OnDestroy,
-  OnInit,
-  inject,
-} from '@angular/core';
+import { Component, HostBinding, inject, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ToastService } from '@app/services/toast.service';
 import { SelectItemModel } from '@shared/models/select-item-model';
 import {
-  EMPTY,
+  BehaviorSubject,
   Observable,
-  Subscription,
+  Subject,
   catchError,
-  combineLatest,
   concat,
-  forkJoin,
+  distinctUntilChanged,
+  finalize,
   last,
   map,
+  mergeAll,
   of,
+  skip,
   switchMap,
-  takeLast,
   takeWhile,
   tap,
+  throwError,
 } from 'rxjs';
 import { DeviceService } from 'src/app/data/service/device.service';
 import {
@@ -34,7 +30,6 @@ import { PresetService } from 'src/app/data/service/preset.service';
 import {
   AutoTrackOptions,
   Device,
-  getPostActionTypeByHandover,
   Handover,
   ZoomAndCentralizeOptions,
 } from 'src/app/data/schema/boho-v2';
@@ -52,7 +47,7 @@ import HandoverRowItemModel from './models';
   templateUrl: 'handover-settings.component.html',
   styleUrls: ['handover-settings.component.scss'],
 })
-export class HandoverSettingsComponent implements OnInit, OnDestroy {
+export class HandoverSettingsComponent implements OnDestroy {
   @HostBinding('class') classNames =
     'flex-grow-1 d-flex flex-column my-bg-default';
 
@@ -71,14 +66,13 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
     },
   ];
 
-  private _subscriptions: Subscription[] = [];
   private _activatedRoute = inject(ActivatedRoute);
   private _navigationService = inject(NavigationService);
   private _presetService = inject(PresetService);
   private _deviceService = inject(DeviceService);
   private _toastService = inject(ToastService);
   private _handoverService = inject(HandoverService);
-  private _nodeId: string = '';
+
   private _deviceId: number = +InvalidId;
   private _deleteItems: HandoverRowItemModel[] = [];
 
@@ -91,70 +85,122 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
     }
   >;
   tableItemsSource: HandoverRowItemModel[] = [];
-  ptzCameras: Device[] = [];
+
   handovers: Handover[] = [];
+
+  private _currentNodeId = new BehaviorSubject<string>('');
+  ptzCameras = new BehaviorSubject<Device[]>([]);
+  private _presetIdToDeviceIdMap: Record<number, number> = {};
+  private _refreshTableData = new Subject();
+
+  private _currentNodeIdSubscription = this._currentNodeId
+    .pipe(
+      skip(1),
+      switchMap((nodeId) =>
+        this._deviceService.findAll(nodeId).pipe(
+          map((response) =>
+            response.data.filter((device) => device.camera.type === 'PTZ')
+          ),
+          catchError(
+            this.handleHttpErrorAndReturnDefault.bind(
+              this,
+              'Lỗi lấy danh sách các PTZ camera',
+              []
+            )
+          )
+        )
+      )
+    )
+    .subscribe((devices) => this.ptzCameras.next(devices));
+
+  private _ptzCamerasSubscription = this.ptzCameras
+    .pipe(
+      skip(1),
+      map((devices) => {
+        this._presetIdToDeviceIdMap = {};
+        return concat(
+          ...devices.map((device) =>
+            this._presetService
+              .findAll(this._currentNodeId.value, device.id)
+              .pipe(
+                map((response) => response.data),
+                catchError(
+                  this.handleHttpErrorAndReturnDefault.bind(
+                    this,
+                    `Lỗi lấy danh sách các điểm preset của camera ${device.name}`,
+                    []
+                  )
+                )
+              )
+          )
+        ).pipe(
+          tap((data) => {
+            for (const preset of data) {
+              this._presetIdToDeviceIdMap[preset.id] = preset.device_id;
+            }
+          }),
+          finalize(() => this._refreshTableData.next(0))
+        );
+      }),
+      mergeAll()
+    )
+    .subscribe();
+
+  private _refreshTableDataSubscription = this._refreshTableData
+    .pipe(
+      tap(() => (this.tableItemsSource = [])),
+      switchMap(() =>
+        this._handoverService
+          .findAll(this._currentNodeId.value, this._deviceId)
+          .pipe(
+            catchError(
+              this.handleHttpErrorAndReturnDefault.bind(
+                this,
+                'Lỗi tải danh sách chuyền PTZ',
+                []
+              )
+            )
+          )
+      )
+    )
+    .subscribe(
+      (handovers: Handover[]) =>
+        (this.tableItemsSource = handovers.map(
+          (item) =>
+            new HandoverRowItemModel(
+              this._presetService,
+              this._toastService,
+              this._currentNodeId.value,
+              this._presetIdToDeviceIdMap[item.preset_id] ?? +InvalidId,
+              item
+            )
+        ))
+    );
 
   constructor() {
     this._navigationService.level3 = Level3Menu.CHUYEN_PTZ;
     this._activatedRoute.parent?.params.subscribe(
       ({ nodeId, cameraId: deviceId }) => {
-        this._nodeId = nodeId;
         this._deviceId = +deviceId;
         this.tableItemsSource = [];
         this.editingRowItem = undefined;
         this.postActionOptions = null;
-        this.ptzCameras = [];
         this.handovers = [];
         this._deleteItems = [];
 
-        this._deviceService
-          .findAll(this._nodeId)
-          .pipe(
-            map((response) =>
-              response.data.filter(
-                (device) => device.camera.type.toLowerCase() !== 'static'
-              )
-            ),
-            catchError(
-              this.handleHttpErrorAndReturnDefault.bind(
-                this,
-                'Error fetching camera list',
-                []
-              )
-            )
-          )
-          .subscribe((ptzCameras) => (this.ptzCameras = ptzCameras));
-
-        this.loadHandovers();
+        if (this._currentNodeId.value !== nodeId) {
+          this._currentNodeId.next(nodeId);
+        } else {
+          this._refreshTableData.next(0);
+        }
       }
     );
   }
 
-  private loadHandovers() {
-    this._handoverService
-      .findAll(this._nodeId, this._deviceId)
-      .pipe(
-        map((handovers) =>
-          handovers.map(
-            (item) =>
-              new HandoverRowItemModel(
-                this._presetService,
-                this._toastService,
-                this._nodeId,
-                this._deviceId,
-                item
-              )
-          )
-        ),
-        catchError(
-          this.handleHttpErrorAndReturnDefault.bind(
-            this,
-            'Error fetching handover list',
-            []
-          )
-        )
-      )
-      .subscribe((items) => (this.tableItemsSource = items));
+  ngOnDestroy(): void {
+    this._currentNodeIdSubscription.unsubscribe();
+    this._ptzCamerasSubscription.unsubscribe();
+    this._refreshTableDataSubscription.unsubscribe();
   }
 
   private handleHttpErrorAndReturnDefault(
@@ -162,15 +208,12 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
     defaultValue: any,
     error: HttpErrorResponse
   ): Observable<any> {
+    console.error(error);
+
     const message = error.error?.message ?? error.message;
     this._toastService.showError(errorMessage + ': ' + message);
+
     return of(defaultValue);
-  }
-
-  ngOnInit(): void {}
-
-  ngOnDestroy(): void {
-    this._subscriptions.forEach((e) => e.unsubscribe());
   }
 
   trackById(_: any, item: any): any {
@@ -204,8 +247,8 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
       new HandoverRowItemModel(
         this._presetService,
         this._toastService,
-        this._nodeId,
-        this._deviceId
+        this._currentNodeId.value,
+        +InvalidId
       )
     );
   }
@@ -221,54 +264,59 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
 
   onCancelClicked() {
     this._deleteItems = [];
-    this.loadHandovers();
+    this._refreshTableData.next(0);
   }
 
   onSaveClicked() {
+    const showErrorMessage = (
+      message: string,
+      error: HttpErrorResponse
+    ): Observable<any> => {
+      this._toastService.showError(
+        `${message}: ${error.error?.message ?? error.message}`
+      );
+
+      return throwError(() => error);
+    };
+    const convertToCreateHandoverDto = (
+      item: HandoverRowItemModel
+    ): CreateHandoverDto => ({
+      is_enable: true,
+      preset_id: item.presetId,
+      action:
+        item.postActionType === 'auto_track'
+          ? {
+              auto_track: item.postActionOptions as AutoTrackOptions,
+            }
+          : item.postActionType === 'zoom_and_centralize'
+          ? {
+              zoom_and_centralize:
+                item.postActionOptions as ZoomAndCentralizeOptions,
+            }
+          : {},
+    });
+    const newItems = this.tableItemsSource.filter((item) => item.isNew);
+    const existingItems = this.tableItemsSource.filter((item) => !item.isNew);
+
     const deleteItems$ =
       this._deleteItems.length > 0
         ? this._deleteItems.map((item) =>
             this._handoverService
-              .delete(this._nodeId, this._deviceId, item.id)
+              .delete(this._currentNodeId.value, this._deviceId, item.id)
               .pipe(
                 map(() => true),
-                catchError(
-                  this.handleHttpErrorAndReturnDefault.bind(
-                    this,
-                    'Error delete item',
-                    false
-                  )
-                )
+                catchError(showErrorMessage.bind(this, 'Lỗi xóa chuyền PTZ'))
               )
           )
         : [];
-
-    const newItems: HandoverRowItemModel[] = this.tableItemsSource.filter(
-      (item) => item.isNew
-    );
-    const updateItems = this.tableItemsSource.filter((item) => !item.isNew);
 
     const createItems$ =
       newItems.length > 0
         ? this._handoverService
             .create(
-              this._nodeId,
+              this._currentNodeId.value,
               this._deviceId,
-              newItems.map((item) => ({
-                preset_id: item.presetId,
-                is_enabled: true,
-                action:
-                  item.postActionType === 'auto_track'
-                    ? {
-                        auto_track: item.postActionOptions as AutoTrackOptions,
-                      }
-                    : item.postActionType === 'zoom_and_centralize'
-                    ? {
-                        zoom_and_centralize:
-                          item.postActionOptions as ZoomAndCentralizeOptions,
-                      }
-                    : {},
-              }))
+              newItems.map(convertToCreateHandoverDto)
             )
             .pipe(
               map((ids) => {
@@ -278,59 +326,33 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
 
                 return true;
               }),
-              catchError(
-                this.handleHttpErrorAndReturnDefault.bind(
-                  this,
-                  'Error creating item',
-                  false
-                )
-              )
+              catchError(showErrorMessage.bind(this, 'Lỗi tạo chuyền PTZ'))
             )
         : of(true);
 
     const updateItems$ =
-      updateItems.length > 0
-        ? updateItems.map((item) =>
-            this._handoverService
-              .update(this._nodeId, this._deviceId, item.id, {
-                handover_id: item.id,
-                is_enabled: true,
-                preset_id: item.presetId,
-                action:
-                  item.postActionType === 'auto_track'
-                    ? {
-                        auto_track: item.postActionOptions as AutoTrackOptions,
-                      }
-                    : item.postActionType === 'zoom_and_centralize'
-                    ? {
-                        zoom_and_centralize:
-                          item.postActionOptions as ZoomAndCentralizeOptions,
-                      }
-                    : {},
-              })
-              .pipe(
-                map((_) => true),
-                catchError(
-                  this.handleHttpErrorAndReturnDefault.bind(
-                    this,
-                    'Error updating item',
-                    false
-                  )
-                )
+      existingItems.length > 0
+        ? this._handoverService
+            .update(
+              this._currentNodeId.value,
+              this._deviceId,
+              existingItems.map(convertToCreateHandoverDto)
+            )
+            .pipe(
+              map(() => true),
+              catchError(
+                showErrorMessage.bind(this, 'Lỗi chỉnh sửa chuyền PTZ')
               )
-          )
-        : [of(true)];
+            )
+        : of(true);
 
-    concat(...deleteItems$, createItems$, ...updateItems$)
-      .pipe(
-        takeWhile((result) => result),
-        last()
-      )
+    concat(...deleteItems$, createItems$, updateItems$)
+      .pipe(takeWhile((result) => result))
       .subscribe({
-        next: (result) => {
-          if (result) {
-            this._toastService.showSuccess('Update succesffully');
-          }
+        error: (error) => console.error(error),
+        complete: () => {
+          this._toastService.showSuccess('Lưu thành công');
+          this._deleteItems = [];
         },
       });
   }

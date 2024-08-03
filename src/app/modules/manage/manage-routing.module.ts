@@ -23,7 +23,7 @@ import { CameraDashboardComponent } from './camera-dashboard/camera-dashboard.co
 import { EmptyComponent } from './empty/empty.component';
 import { LicenseManagerComponent } from './license-manager/license-manager.component';
 import { HandoverSettingsComponent } from './camera-detail/handover-settings/handover-settings.component';
-import { PostActionComponent } from './post-action/post-action.component';
+import { StaticPostActionComponent } from './static-post-action/static-post-action.component';
 import { PTZPostActionComponent } from './ptz-post-action/ptz-post-action.component';
 
 @NgModule({
@@ -127,7 +127,7 @@ import { PTZPostActionComponent } from './ptz-post-action/ptz-post-action.compon
               },
               {
                 path: 'node/:nodeId/camera/:cameraId/post-action',
-                component: PostActionComponent,
+                component: StaticPostActionComponent,
               },
               {
                 path: 'node/:nodeId/camera/:cameraId/ptz-post-action',

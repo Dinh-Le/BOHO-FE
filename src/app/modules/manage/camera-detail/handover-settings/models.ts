@@ -3,7 +3,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ToastService } from '@app/services/toast.service';
 import { getDefaultPostionActionOptions } from '@modules/manage/ptz-post-action/models';
 import { Nullable } from '@shared/shared.types';
-import { tap, switchMap, of, catchError } from 'rxjs';
+import { tap, of, catchError, map } from 'rxjs';
 import { InvalidId } from 'src/app/data/constants';
 import { PostActionType } from 'src/app/data/data.types';
 import {
@@ -98,8 +98,6 @@ export default class HandoverRowItemModel {
     deviceId: number,
     data?: Handover
   ) {
-    this.form.controls.nodeId.setValue(nodeId);
-    this.form.controls.deviceId.setValue(deviceId);
     this.form.controls.postActionType.valueChanges.subscribe((value) => {
       this.postActionOptions = getDefaultPostionActionOptions(value!);
     });
@@ -108,30 +106,33 @@ export default class HandoverRowItemModel {
         .findAll(this.nodeId, value!)
         .pipe(
           tap(() => (this.presets = [])),
-          switchMap((response) => of(response.data)),
+          map((response) => response.data),
           catchError((error: HttpErrorResponse) => {
-            this.toastService.showHttpError(error);
+            this.toastService.showError(
+              'Lỗi lấy danh sách preset: ' + error.error?.message ??
+                error.message
+            );
             return of([]);
           })
         )
         .subscribe((presets) => (this.presets = presets))
     );
 
-    if (data) {
-      this.setData(data);
-    }
-  }
-
-  setData(data: Handover) {
-    this.form.patchValue({
-      id: data.id,
-      deviceId: data.device_id,
-      presetId: data.preset_id,
-      selected: false,
-      postActionType: getPostActionTypeByHandover(data),
-    });
+    this.form.patchValue(
+      {
+        nodeId,
+        deviceId,
+        id: data?.id ?? +InvalidId,
+        presetId: data?.preset_id ?? +InvalidId,
+        selected: false,
+        postActionType: data ? getPostActionTypeByHandover(data) : 'none',
+      },
+      {
+        emitEvent: true,
+      }
+    );
 
     this.postActionOptions =
-      data.action?.auto_track ?? data.action?.zoom_and_centralize;
+      data?.action?.auto_track ?? data?.action?.zoom_and_centralize;
   }
 }

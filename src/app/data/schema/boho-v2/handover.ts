@@ -24,7 +24,7 @@ export interface Handover {
   device_id: number;
   preset_id: number;
   action?: Nullable<ActionOptions>;
-  is_enabled: boolean;
+  is_enable: boolean;
 }
 
 export function getPostActionTypeByHandover(handover: Handover) {
@@ -37,4 +37,10 @@ export function getPostActionTypeByHandover(handover: Handover) {
   }
 
   return 'none';
+}
+
+export interface HandoverLinking {
+  id: number;
+  handover_id: number;
+  rule_ids: number[];
 }

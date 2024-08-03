@@ -14,7 +14,7 @@ export abstract class PresetService extends RestfullApiService {
     nodeId: string,
     deviceId: string,
     presetId: number,
-    data: Omit<Preset, 'id'>
+    data: Omit<Preset, 'id' | 'device_id'>
   ): Observable<ResponseBase>;
   public abstract delete(
     nodeId: string,

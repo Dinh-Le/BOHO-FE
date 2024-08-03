@@ -1,0 +1,79 @@
+<ng-template #buttonsTemplate>
+  <button class="my-btn my-bg-primary me-2" (click)="onAddClicked()">
+    + Thêm
+  </button>
+  <button class="my-btn my-bg-secondary" (click)="onDeleteClicked()">
+    - Xóa
+  </button>
+</ng-template>
+
+<app-rule-menu
+  class="menu-container"
+  [buttonsTemplate]="buttonsTemplate"
+></app-rule-menu>
+
+<table class="w-100">
+  <colgroup>
+    <col [width]="24" />
+    <col width="auto" />
+    <col [width]="240" />
+  </colgroup>
+  <thead>
+    <th><input type="checkbox" [indeterminate]="true" /></th>
+    <th>Quy tắc kích hoạt</th>
+    <th>Hành động sau</th>
+  </thead>
+  <tbody>
+    <tr *ngFor="let rowItem of tableItemsSource" [formGroup]="rowItem.form">
+      <td><input type="checkbox" formControlName="selected" /></td>
+      <td>
+        <ng-template #selectedRulesTemplate let-labels="labels">
+          <div class="d-flex">
+            <span *ngFor="let label of labels" class="mx-1">{{ label }};</span>
+          </div>
+        </ng-template>
+        <app-select-3
+          [multiple]="true"
+          place-holder="Không"
+          [template]="selectedRulesTemplate"
+          (open)="onRuleMenuOpen(rowItem)"
+          formControlName="rule_ids"
+        >
+          <app-select-3-option
+            *ngFor="let rule of rules$ | async; trackBy: trackById"
+            [value]="rule"
+            [label]="rule.name"
+            value-key="id"
+            [disabled]="selectedRuleIds.includes(rule.id)"
+          ></app-select-3-option>
+        </app-select-3>
+      </td>
+      <td>
+        <app-select-3 formControlName="post_action_type">
+          <app-select-3-option
+            *ngFor="let item of postActions$ | async; trackBy: trackById"
+            [value]="item.id"
+            [label]="'Chuyền PTZ ' + item.id"
+          ></app-select-3-option>
+        </app-select-3>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="d-flex justify-content-center mt-5">
+  <button
+    class="my-btn bg-secondary mx-3"
+    style="width: 80px"
+    (click)="onCancelClicked()"
+  >
+    Hủy
+  </button>
+  <button
+    class="my-btn bg-primary"
+    style="width: 80px"
+    (click)="onSaveClicked()"
+  >
+    Lưu
+  </button>
+</div>

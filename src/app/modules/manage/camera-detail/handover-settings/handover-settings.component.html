@@ -35,7 +35,7 @@
         <td>
           <app-select-3 place-holder="Không" formControlName="deviceId">
             <app-select-3-option
-              *ngFor="let device of ptzCameras; trackBy: trackById"
+              *ngFor="let device of ptzCameras.value; trackBy: trackById"
               [value]="device.id"
               [label]="device.name"
             ></app-select-3-option>
