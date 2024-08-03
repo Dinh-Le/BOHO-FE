@@ -31,7 +31,8 @@ export abstract class HandoverService extends RestfullApiService {
   public abstract update(
     nodeId: string,
     deviceId: number,
-    data: UpdateHandoverDto[]
+    handoverId: number,
+    data: UpdateHandoverDto
   ): Observable<never>;
   public abstract delete(
     nodeId: string,
@@ -76,13 +77,12 @@ export class HandoverServiceImpl extends HandoverService {
   public override update(
     nodeId: string,
     deviceId: number,
-    data: UpdateHandoverDto[]
+    handoverId: number,
+    data: UpdateHandoverDto
   ): Observable<never> {
-    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/handover`;
+    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/handover/${handoverId}`;
     return this.httpClient
-      .patch<ResponseBase>(url, {
-        handovers: data,
-      })
+      .patch<ResponseBase>(url, data)
       .pipe(switchMap((_) => EMPTY));
   }
   public override delete(

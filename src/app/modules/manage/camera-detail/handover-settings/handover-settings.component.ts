@@ -261,15 +261,13 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
                   item.postActionType === 'auto_track'
                     ? {
                         auto_track: item.postActionOptions as AutoTrackOptions,
-                        zoom_and_centralize: null,
                       }
                     : item.postActionType === 'zoom_and_centralize'
                     ? {
-                        auto_track: null,
                         zoom_and_centralize:
                           item.postActionOptions as ZoomAndCentralizeOptions,
                       }
-                    : null,
+                    : {},
               }))
             )
             .pipe(
@@ -292,11 +290,9 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
 
     const updateItems$ =
       updateItems.length > 0
-        ? this._handoverService
-            .update(
-              this._nodeId,
-              this._deviceId,
-              updateItems.map((item) => ({
+        ? updateItems.map((item) =>
+            this._handoverService
+              .update(this._nodeId, this._deviceId, item.id, {
                 handover_id: item.id,
                 is_enabled: true,
                 preset_id: item.presetId,
@@ -304,40 +300,37 @@ export class HandoverSettingsComponent implements OnInit, OnDestroy {
                   item.postActionType === 'auto_track'
                     ? {
                         auto_track: item.postActionOptions as AutoTrackOptions,
-                        zoom_and_centralize: null,
                       }
                     : item.postActionType === 'zoom_and_centralize'
                     ? {
-                        auto_track: null,
                         zoom_and_centralize:
                           item.postActionOptions as ZoomAndCentralizeOptions,
                       }
-                    : null,
-              }))
-            )
-            .pipe(
-              map((_) => true),
-              catchError(
-                this.handleHttpErrorAndReturnDefault.bind(
-                  this,
-                  'Error updating item',
-                  false
+                    : {},
+              })
+              .pipe(
+                map((_) => true),
+                catchError(
+                  this.handleHttpErrorAndReturnDefault.bind(
+                    this,
+                    'Error updating item',
+                    false
+                  )
                 )
               )
-            )
-        : of(true);
+          )
+        : [of(true)];
 
-    concat(...deleteItems$, createItems$, updateItems$)
+    concat(...deleteItems$, createItems$, ...updateItems$)
       .pipe(
         takeWhile((result) => result),
         last()
       )
       .subscribe({
         next: (result) => {
-          console.log('result', result);
-          // if (result) {
-          //   this._toastService.showSuccess('Update succesffully');
-          // }
+          if (result) {
+            this._toastService.showSuccess('Update succesffully');
+          }
         },
       });
   }
