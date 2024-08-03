@@ -24,7 +24,10 @@
     <th>Hành động sau</th>
   </thead>
   <tbody>
-    <tr *ngFor="let rowItem of tableItemsSource" [formGroup]="rowItem.form">
+    <tr
+      *ngFor="let rowItem of tableItemsSource; trackBy: trackByKey"
+      [formGroup]="rowItem.form"
+    >
       <td><input type="checkbox" formControlName="selected" /></td>
       <td>
         <ng-template #selectedRulesTemplate let-labels="labels">
@@ -37,21 +40,20 @@
           place-holder="Không"
           [template]="selectedRulesTemplate"
           (open)="onRuleMenuOpen(rowItem)"
-          formControlName="rule_ids"
+          formControlName="ruleIds"
         >
           <app-select-3-option
             *ngFor="let rule of rules$ | async; trackBy: trackById"
-            [value]="rule"
+            [value]="rule.id"
             [label]="rule.name"
-            value-key="id"
             [disabled]="selectedRuleIds.includes(rule.id)"
           ></app-select-3-option>
         </app-select-3>
       </td>
       <td>
-        <app-select-3 formControlName="post_action_type">
+        <app-select-3 formControlName="handoverId">
           <app-select-3-option
-            *ngFor="let item of postActions$ | async; trackBy: trackById"
+            *ngFor="let item of handovers$ | async; trackBy: trackById"
             [value]="item.id"
             [label]="'Chuyền PTZ ' + item.id"
           ></app-select-3-option>
@@ -63,6 +65,7 @@
 
 <div class="d-flex justify-content-center mt-5">
   <button
+    type="button"
     class="my-btn bg-secondary mx-3"
     style="width: 80px"
     (click)="onCancelClicked()"
@@ -70,6 +73,7 @@
     Hủy
   </button>
   <button
+    type="button"
     class="my-btn bg-primary"
     style="width: 80px"
     (click)="onSaveClicked()"

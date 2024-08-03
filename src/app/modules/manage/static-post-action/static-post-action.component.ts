@@ -2,18 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, HostBinding, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ToastService } from '@app/services/toast.service';
-import {
-  BehaviorSubject,
-  catchError,
-  concat,
-  distinctUntilChanged,
-  filter,
-  map,
-  Observable,
-  of,
-  switchMap,
-  tap,
-} from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 import {
   Level3Menu,
   NavigationService,
@@ -21,13 +10,12 @@ import {
 import { RuleService } from 'src/app/data/service/rule.service';
 import { StaticPostActionItemModel } from './models';
 import { Rule } from 'src/app/data/schema/boho-v2/rule';
-import { HandoverLinking, PostAction } from 'src/app/data/schema/boho-v2';
+import { Handover, HandoverLinking } from 'src/app/data/schema/boho-v2';
 import { InvalidId } from 'src/app/data/constants';
-import { PostActionService } from 'src/app/data/service/post-action.service';
 import { HandoverLinkingService } from 'src/app/data/service/handover-linking.service';
 import { DeviceService } from 'src/app/data/service/device.service';
 import { PresetService } from 'src/app/data/service/preset.service';
-import { Preset } from 'src/app/data/schema/boho-v2/preset';
+import { HandoverService } from 'src/app/data/service/handover.service';
 
 @Component({
   selector: 'app-post-action',
@@ -44,63 +32,14 @@ export class StaticPostActionComponent implements OnDestroy {
   selectedRuleIds: number[] = [];
   deviceId: number = +InvalidId;
   nodeId: string = '';
-  postActions$?: Observable<PostAction[]>;
+  handovers$?: Observable<Handover[]>;
   rules$?: Observable<Rule[]>;
-
-  _presetDb: Record<number, Preset[]> = {};
-  _currentNodeId = new BehaviorSubject<string>('');
-  _currentNodeIdSubscription = this._currentNodeId
-    .pipe(
-      distinctUntilChanged(),
-      tap(() => (this._presetDb = {})),
-      switchMap((nodeId) =>
-        this.deviceService.findAll(nodeId).pipe(
-          map((response) =>
-            response.data.filter((e) => e.camera.type === 'PTZ')
-          ),
-          map((devices) =>
-            concat(
-              ...devices.map((device) =>
-                this.presetService.findAll(nodeId, device.id).pipe(
-                  map((response) => ({
-                    nodeId,
-                    deviceId: device.id,
-                    presets: response.data,
-                  })),
-                  catchError(
-                    this.showHttpErrorAndReturnDefault.bind(
-                      this,
-                      `'Lỗi lấy danh sách preset của camera ${device.name}`,
-                      {
-                        nodeId,
-                        deviceId: device.id,
-                        presets: [],
-                      }
-                    )
-                  )
-                )
-              )
-            )
-          ),
-          catchError(
-            this.showHttpErrorAndReturnDefault.bind(
-              this,
-              'Lỗi lấy danh sách PTZ camera',
-              []
-            )
-          )
-        )
-      )
-    )
-    .subscribe((data) => (this._presetDb[data.deviceId] = data.preset));
 
   constructor(
     private readonly navigationService: NavigationService,
-    private readonly deviceService: DeviceService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly ruleService: RuleService,
-    private readonly presetService: PresetService,
-    private readonly postActionService: PostActionService,
+    private readonly handoverService: HandoverService,
     private readonly handoverLinkingService: HandoverLinkingService,
     private readonly toastService: ToastService
   ) {
@@ -109,18 +48,15 @@ export class StaticPostActionComponent implements OnDestroy {
       this.nodeId = nodeId;
       this.deviceId = deviceId;
 
-      this._currentNodeId.next(this.nodeId);
-
       this.resetStates();
 
-      this.postActions$ = this.postActionService
+      this.handovers$ = this.handoverService
         .findAll(this.nodeId, this.deviceId)
         .pipe(
-          map((response) => response.data),
           catchError(
             this.showHttpErrorAndReturnDefault.bind(
               this,
-              'Lỗi lấy danh sách các hành động sau',
+              'Lỗi lấy danh sách chuyền PTZ',
               []
             )
           )
@@ -140,9 +76,7 @@ export class StaticPostActionComponent implements OnDestroy {
     });
   }
 
-  ngOnDestroy(): void {
-    this._currentNodeIdSubscription.unsubscribe();
-  }
+  ngOnDestroy(): void {}
 
   private resetStates(): void {
     this.selectedRuleIds = [];
@@ -189,9 +123,6 @@ export class StaticPostActionComponent implements OnDestroy {
   }
 
   onDeleteClicked() {
-    this._removedItems.push(
-      ...this.tableItemsSource.filter((item) => item.selected && item.isNew)
-    );
     this.tableItemsSource = this.tableItemsSource.filter(
       (item) => !item.selected
     );
@@ -201,15 +132,43 @@ export class StaticPostActionComponent implements OnDestroy {
     this.loadTableData();
   }
 
-  onSaveClicked() {}
+  onSaveClicked() {
+    this.handoverLinkingService
+      .update(
+        this.nodeId,
+        this.deviceId,
+        this.tableItemsSource.map((item) => ({
+          handover_id: item.handoverId,
+          rule_ids: item.ruleIds,
+        }))
+      )
+      .subscribe({
+        error: (error: HttpErrorResponse) => {
+          console.error(error);
 
-  trackById(_: any, item: any): any {
-    return item.id;
+          this.toastService.showError(
+            `Lỗi lưu danh sách hành động sau: ${
+              error.error?.message ?? error.message
+            }`
+          );
+        },
+        complete: () => {
+          this.toastService.showSuccess('Lưu thành công');
+        },
+      });
   }
 
-  onRuleMenuOpen({ id }: StaticPostActionItemModel) {
+  trackById(_: any, { id }: any): any {
+    return id;
+  }
+
+  trackByKey(_: any, { key }: any): any {
+    return key;
+  }
+
+  onRuleMenuOpen({ key }: StaticPostActionItemModel) {
     this.selectedRuleIds = this.tableItemsSource.flatMap((item) =>
-      item.id === id ? [] : item.ruleIds
+      item.key === key ? [] : item.ruleIds
     );
   }
 }

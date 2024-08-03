@@ -7,22 +7,17 @@ import { HandoverLinking } from 'src/app/data/schema/boho-v2';
 export class StaticPostActionItemModel {
   public form = new FormGroup({
     key: new FormControl<string>(v4(), [Validators.required]),
-    id: new FormControl<number>(+InvalidId, [Validators.required]),
     selected: new FormControl<boolean>(false, [Validators.required]),
     ruleIds: new FormControl<number[]>([], [notEmptyArrayValidator]),
     handoverId: new FormControl<number>(+InvalidId, [Validators.required]),
   });
 
+  get key(): string {
+    return this.form.controls.key.value!;
+  }
+
   get selected(): boolean {
     return this.form.controls.selected.value!;
-  }
-
-  get isNew(): boolean {
-    return this.id === +InvalidId;
-  }
-
-  get id(): number {
-    return this.form.controls.id.value!;
   }
 
   get handoverId(): number {
@@ -36,7 +31,6 @@ export class StaticPostActionItemModel {
   constructor(data?: HandoverLinking) {
     this.form.patchValue(
       {
-        id: data?.id ?? +InvalidId,
         handoverId: data?.handover_id ?? +InvalidId,
         ruleIds: data?.rule_ids ?? [],
       },

@@ -50,7 +50,6 @@ import {
 import {
   PostActionService,
   PostActionServiceImpl,
-  PostActionServiceMockImpl,
 } from './service/post-action.service';
 import {
   HandoverLinkingService,
@@ -77,7 +76,7 @@ const providers = [
   { provide: IntegrationService, useClass: IntegrationServiceImpl },
   { provide: LicenseKeyService, useClass: LicenseKeyServiceImpl },
   { provide: HandoverService, useClass: HandoverServiceImpl },
-  { provide: PostActionService, useClass: PostActionServiceMockImpl },
+  { provide: PostActionService, useClass: PostActionServiceImpl },
   { provide: HandoverLinkingService, useClass: HandoverLinkingServiceImpl },
 ];
 

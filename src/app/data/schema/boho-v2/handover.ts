@@ -40,7 +40,6 @@ export function getPostActionTypeByHandover(handover: Handover) {
 }
 
 export interface HandoverLinking {
-  id: number;
   handover_id: number;
   rule_ids: number[];
 }
