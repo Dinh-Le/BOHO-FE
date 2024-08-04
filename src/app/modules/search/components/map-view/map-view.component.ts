@@ -50,9 +50,10 @@ export class MapViewComponent implements OnInit, OnChanges, OnDestroy {
     zoom: 16,
     center: { lat: 28.626137, lng: 79.821603 },
   };
-  
+
   deviceEvents: EventData[] = [];
   subscriptions: Subscription[] = [];
+  selectedDevice?: Device;
 
   @Input() events: EventData[] = [];
   @Output() onClick = new EventEmitter<EventData>();
@@ -132,9 +133,9 @@ export class MapViewComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private onMarkerClick({ sourceTarget }: Leaflet.LeafletMouseEvent) {
-    const device = sourceTarget.data as Device;
+    this.selectedDevice = sourceTarget.data as Device;
     this.deviceEvents = this.events.filter(
-      (event) => event.data.device_id === (device.id as any)
+      (event) => event.data.device_id === (this.selectedDevice!.id as any)
     );
     this._modalService.open(this.eventListDialogTemplateRef);
   }

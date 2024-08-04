@@ -15,7 +15,9 @@
         margin: 20px 10px;
       "
     >
-      <span style="color: white; font-size: 14pt">Cổng chính</span>
+      <span style="color: white; font-size: 14pt">{{
+        selectedDevice?.name
+      }}</span>
       <a (click)="closeDialog()"
         ><i class="bi bi-x" style="font-size: 20pt; color: white"></i
       ></a>
