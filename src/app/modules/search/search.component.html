@@ -126,13 +126,13 @@
   </div>
   <div class="form-item">
     <label class="label">Loại quy tắc</label>
-    <app-select-2
-      [styles]="{
-        'border-radius': 0
-      }"
-      [items]="ruleItems"
-      formControlName="rule"
-    ></app-select-2>
+    <app-select-3 formControlName="ruleType">
+      <app-select-3-option
+        *ngFor="let item of ruleItems"
+        [value]="item.id"
+        [label]="item.name"
+      ></app-select-3-option>
+    </app-select-3>
   </div>
   <div class="form-item">
     <label>Đối đối tượng</label>

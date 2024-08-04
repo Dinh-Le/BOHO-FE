@@ -26,7 +26,7 @@ import * as Utils from '@app/helpers/function';
 import { Device } from 'src/app/data/schema/boho-v2';
 import { EventData } from './models';
 import { EventDetailComponent } from '@shared/components/event-detail/event-detail.component';
-import { CameraType_PTZ } from 'src/app/data/constants';
+import { CameraType_PTZ, RuleTypeItemsSource } from 'src/app/data/constants';
 import { ColorNames } from 'src/app/data/constants/colors.constant';
 
 @Component({
@@ -73,7 +73,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     startTime: string;
     endTime: string;
     objectIds?: string[];
-    ruleId?: string;
+    ruleType?: string;
     licensePlate: string;
     showVehicleOnly: boolean;
     pageIndex: number;
@@ -90,19 +90,12 @@ export class SearchComponent implements OnInit, OnDestroy {
       Validators.required,
     ]),
     objects: new FormControl<ObjectItemModel[]>([]),
-    rule: new FormControl<SelectItemModel | undefined>(undefined),
+    ruleType: new FormControl<string>(''),
     licensePlate: new FormControl<string>(''),
     showVehileOnly: new FormControl<boolean>(false),
   });
-  ruleItems: SelectItemModel[] = [
-    'Xâm nhập vùng',
-    'Đi luẩn quẩn',
-    'Vượt đường kẻ',
-    'Đỗ xe sai nơi quy định',
-  ].map((name, index) => ({
-    value: index,
-    label: name,
-  }));
+
+  ruleItems = RuleTypeItemsSource;
 
   get gridRow(): number {
     return Math.ceil(this.paginationInfo.pageLength / this.gridColumn);
@@ -135,7 +128,7 @@ export class SearchComponent implements OnInit, OnDestroy {
               startTime,
               endTime,
               objectIds,
-              ruleId,
+              ruleType,
               pageIndex,
               pageLength,
               licensePlate,
@@ -147,7 +140,7 @@ export class SearchComponent implements OnInit, OnDestroy {
                   tq: 'custom',
                   p: pageIndex,
                   pl: pageLength,
-                  eit: ruleId,
+                  eit: ruleType,
                   ot: objectIds?.map((id) => this.ObjectIdMap[id]),
                   start: startTime,
                   end: endTime,
@@ -215,7 +208,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       pageIndex: this.paginationInfo.pageIndex,
       pageLength: this.paginationInfo.pageLength,
       objectIds: this.selectedObjects.map((object) => object.id),
-      ruleId: this.form.get('rule')?.value?.value,
+      ruleType: this.form.controls.ruleType.value?.split(' ')[0] ?? undefined,
       color: this.selectedObjects.map((o) => {
         /// Not support color for type of people/bike
         if (o.id === 'people' || o.id === 'bike' || o.colors[0] === '') {
@@ -253,7 +246,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       startTime: moment().subtract(3, 'days').format('yyyy-MM-DDTHH:mm'),
       endTime: moment().format('yyyy-MM-DDTHH:mm'),
       objects: [],
-      rule: undefined,
+      ruleType: '',
       licensePlate: '',
       showVehileOnly: false,
     });

@@ -5,7 +5,7 @@
 .select-3 {
   border: 1px solid #fff;
   border-radius: 0.25rem;
-  padding: 0.25rem 0.75rem;
+  padding: 0.25rem 0.5rem;
   position: relative;
   width: 100%;
   background: inherit;
@@ -32,7 +32,7 @@
     z-index: 1000;
     max-height: 150px;
     overflow-y: auto;
-    background: inherit;
+    background: gray;
     width: 100%;
     border: 1px solid #fff;
 
