@@ -9,12 +9,12 @@ export interface PostAction {
   zoom_and_centralize?: Nullable<ZoomAndCentralizeOptions>;
 }
 
-export function getPostActionType(postAction: PostAction) {
-  if (postAction.auto_track) {
+export function getPostActionType(postAction?: PostAction) {
+  if (postAction?.auto_track) {
     return 'auto_track';
   }
 
-  if (postAction.zoom_and_centralize) {
+  if (postAction?.zoom_and_centralize) {
     return 'zoom_and_centralize';
   }
 

@@ -3,7 +3,6 @@ import { PTZPostActionItemModel } from './models';
 import { Nullable } from '@shared/shared.types';
 import {
   AutoTrackOptions,
-  PostAction,
   PostActionTypeModel as PostActionTypeModel,
   ZoomAndCentralizeOptions,
 } from 'src/app/data/schema/boho-v2';
@@ -15,22 +14,10 @@ import {
 } from 'src/app/data/service/navigation.service';
 import { ActivatedRoute } from '@angular/router';
 import { PresetService } from 'src/app/data/service/preset.service';
-import {
-  catchError,
-  concat,
-  finalize,
-  map,
-  Observable,
-  of,
-  takeWhile,
-  zip,
-} from 'rxjs';
+import { catchError, concat, map, Observable, of, tap, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from '@app/services/toast.service';
-import {
-  CreatePostAction,
-  PostActionService,
-} from 'src/app/data/service/post-action.service';
+import { PostActionService } from 'src/app/data/service/post-action.service';
 
 @Component({
   selector: 'app-ptz-post-action',
@@ -112,9 +99,12 @@ export class PTZPostActionComponent {
     defaultValue: any,
     error: HttpErrorResponse
   ) {
+    console.error(error);
+
     this.toastService.showError(
       `${message}: ${error.error?.message ?? error.message}`
     );
+
     return of(defaultValue);
   }
 
@@ -129,9 +119,7 @@ export class PTZPostActionComponent {
 
   onDeleteClicked() {
     this._deleteItems.push(
-      ...this.tableItemsSource.filter(
-        (item) => item.selected && !item.isNewItem
-      )
+      ...this.tableItemsSource.filter((item) => item.selected && !item.isNew)
     );
     this.tableItemsSource = this.tableItemsSource.filter(
       (item) => !item.selected
@@ -144,109 +132,96 @@ export class PTZPostActionComponent {
   }
 
   onSaveClicked() {
-    const observables$: Observable<any>[] = [];
-    const newItems = this.tableItemsSource.filter((item) => item.isNewItem);
-    const updateItems = this.tableItemsSource.filter((item) => !item.isNewItem);
-
-    if (newItems.length > 0) {
-      const data: CreatePostAction[] = newItems.map(
-        (item) =>
-          ({
-            preset_id: item.presetId,
-            auto_track:
-              item.postActionType === 'auto_track'
-                ? item.postActionOptions
-                : null,
-            zoom_and_centralize:
-              item.postActionType === 'zoom_and_centralize'
-                ? item.postActionOptions
-                : null,
-          } as CreatePostAction)
+    const showError = (
+      message: string,
+      error: HttpErrorResponse
+    ): Observable<any> => {
+      this.toastService.showError(
+        `${message}: ${error.error?.message ?? error.message}`
       );
 
-      const createNewItems$ = this.postActionService
-        .create(this.nodeId, this.deviceId, data)
-        .pipe(
-          map((response) => {
-            for (let i = 0; i < newItems.length; i++) {
-              newItems[i].id = response.data[i];
-            }
+      return throwError(() => error);
+    };
+    const newItems = this.tableItemsSource.filter((item) => item.isNew);
+    const existingItems = this.tableItemsSource.filter((item) => !item.isNew);
 
-            return true;
-          }),
-          catchError(
-            this.showHttpErrorAndReturnDefault.bind(
-              this,
-              'Error creating post action',
-              false
+    const deleteItems$ =
+      this._deleteItems.length > 0
+        ? this._deleteItems.map((item) =>
+            this.postActionService
+              .delete(this.nodeId, this.deviceId, item.id)
+              .pipe(
+                map(() => true),
+                catchError(
+                  showError.bind(this, `Lỗi xóa hành động sau ${item.id}`)
+                )
+              )
+          )
+        : [];
+
+    const createItems$ =
+      newItems.length > 0
+        ? this.postActionService
+            .create(
+              this.nodeId,
+              this.deviceId,
+              newItems.map((item) => ({
+                is_enabled: true,
+                preset_id: item.presetId,
+                auto_track:
+                  item.postActionType === 'auto_track'
+                    ? (item.postActionOptions as AutoTrackOptions)
+                    : null,
+                zoom_and_centralize:
+                  item.postActionType === 'zoom_and_centralize'
+                    ? item.postActionOptions
+                    : null,
+              }))
             )
-          )
-        );
-      observables$.push(createNewItems$);
-    } else {
-      observables$.push(of(true));
-    }
-
-    if (updateItems.length > 0) {
-      const data: PostAction[] = updateItems.map((item) => ({
-        id: item.id,
-        is_enabled: true,
-        preset_id: item.presetId,
-        auto_track:
-          item.postActionType === 'auto_track'
-            ? (item.postActionOptions as AutoTrackOptions)
-            : null,
-        zoom_and_centralize:
-          item.postActionType === 'zoom_and_centralize'
-            ? (item.postActionOptions as ZoomAndCentralizeOptions)
-            : null,
-      }));
-
-      const updateItems$ = this.postActionService
-        .update(this.nodeId, this.deviceId, data)
-        .pipe(
-          catchError(
-            this.showHttpErrorAndReturnDefault.bind(
-              this,
-              'Error updating post action',
-              false
+            .pipe(
+              tap((response) => {
+                for (let i = 0; i < response.data.length; i++) {
+                  newItems[i].id = response.data[i];
+                }
+              }),
+              map(() => true),
+              catchError(showError.bind(this, 'Lỗi tạo hành động sau'))
             )
-          )
-        );
-      observables$.push(updateItems$);
-    } else {
-      observables$.push(of(true));
-    }
+        : of(true);
 
-    if (this._deleteItems.length > 0) {
-      const deleteItems$ = concat(
-        ...this._deleteItems.map((item) =>
-          this.postActionService.delete(this.nodeId, this.deviceId, item.id)
-        )
-      ).pipe(
-        map(() => true),
-        catchError(
-          this.showHttpErrorAndReturnDefault.bind(
-            this,
-            'Error removing post action',
-            false
-          )
-        ),
-        takeWhile((result) => !result),
-        finalize(() => (this._deleteItems = []))
-      );
-      observables$.push(deleteItems$);
-    } else {
-      observables$.push(of(true));
-    }
+    const updateItems$ =
+      existingItems.length > 0
+        ? this.postActionService
+            .update(
+              this.nodeId,
+              this.deviceId,
+              existingItems.map((item) => ({
+                id: item.id,
+                is_enabled: true,
+                preset_id: item.presetId,
+                auto_track:
+                  item.postActionType === 'auto_track'
+                    ? (item.postActionOptions as AutoTrackOptions)
+                    : null,
+                zoom_and_centralize:
+                  item.postActionType === 'zoom_and_centralize'
+                    ? item.postActionOptions
+                    : null,
+              }))
+            )
+            .pipe(
+              map(() => true),
+              catchError(showError.bind(this, 'Lỗi cập nhật hành động sau'))
+            )
+        : of(true);
 
-    zip(observables$).subscribe(
-      ([createResult, updateResult, deleteResult]) => {
-        if (createResult && updateResult && deleteResult) {
-          this.toastService.showSuccess('Save successfully');
-        }
-      }
-    );
+    concat(...deleteItems$, createItems$, updateItems$).subscribe({
+      error: console.error,
+      complete: () => {
+        this.toastService.showSuccess('Lưu thành công');
+        this._deleteItems = [];
+      },
+    });
   }
 
   enterSettingMode(rowItem: PTZPostActionItemModel) {

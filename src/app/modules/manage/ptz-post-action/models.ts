@@ -36,9 +36,10 @@ export class PTZPostActionItemModel {
   private _postActionOptions: Nullable<
     ZoomAndCentralizeOptions | AutoTrackOptions
   >;
+
   form = new FormGroup({
-    id: new FormControl<number>(+InvalidId, [Validators.required]),
     key: new FormControl<string>(v4(), [Validators.required]),
+    id: new FormControl<number>(+InvalidId, [Validators.required]),
     selected: new FormControl<boolean>(false, [Validators.required]),
     presetId: new FormControl<number>(+InvalidId, [
       Validators.required,
@@ -49,7 +50,7 @@ export class PTZPostActionItemModel {
     ]),
   });
 
-  get isNewItem(): boolean {
+  get isNew(): boolean {
     return this.form.controls.id.value === +InvalidId;
   }
 
@@ -94,12 +95,10 @@ export class PTZPostActionItemModel {
       this._postActionOptions = getDefaultPostionActionOptions(value ?? 'none');
     });
 
-    if (data) {
-      this.form.patchValue({
-        id: data.id,
-        postActionType: getPostActionType(data),
-        presetId: data.preset_id,
-      });
-    }
+    this.form.patchValue({
+      id: data?.id ?? +InvalidId,
+      postActionType: getPostActionType(data),
+      presetId: data?.preset_id ?? +InvalidId,
+    });
   }
 }
