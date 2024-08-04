@@ -1,17 +1,11 @@
-import {
-  FormGroup,
-  FormControl,
-  Validators,
-  AbstractControl,
-  ValidationErrors,
-  ValidatorFn,
-} from '@angular/forms';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Point } from '@shared/components/bounding-box-editor/bounding-box-editor.component';
 import {
   Severity,
   Severities,
   Objects,
   RuleTypeItemsSource,
+  InvalidId,
 } from 'src/app/data/constants';
 import { Preset } from 'src/app/data/schema/boho-v2/preset';
 import { Rule } from 'src/app/data/schema/boho-v2/rule';
@@ -21,29 +15,18 @@ import { ExpandableTableRowItemModelBase } from '../expandable-table/expandable-
 import { ObjectModel, RuleTypeModel } from 'src/app/data/schema/boho-v2';
 import { Nullable } from '@shared/shared.types';
 import { TripwireDirectionType } from 'src/app/data/data.types';
+import { notEmptyArrayValidator } from '@app/helpers/custom-form-validators';
 
 export class RuleItemModel extends ExpandableTableRowItemModelBase {
-  id = v4();
   form = new FormGroup({
+    key: new FormControl<string>(v4(), [Validators.required]),
+    id: new FormControl<number>(+InvalidId, [Validators.required]),
     name: new FormControl<string>('', [Validators.required]),
     status: new FormControl<boolean>(false, [Validators.required]),
     integration: new FormControl<string>(''),
     preset: new FormControl<Nullable<Preset>>(null, [Validators.required]),
     type: new FormControl<Nullable<RuleTypeModel>>(null, [Validators.required]),
-    points: new FormControl<Point[]>(
-      [],
-      [
-        (control: AbstractControl): ValidationErrors | null => {
-          const value = control.value;
-
-          if (Array.isArray(value) && value.length > 0) {
-            return null;
-          }
-
-          return { required: true };
-        },
-      ]
-    ),
+    points: new FormControl<Point[]>([], [notEmptyArrayValidator]),
     severity: new FormControl<Severity>(Severities[0], [Validators.required]),
     schedule: new FormControl<Nullable<Schedule>>(null, [Validators.required]),
     time_stand: new FormControl<number>(5),
@@ -152,6 +135,18 @@ export class RuleItemModel extends ExpandableTableRowItemModelBase {
     });
   }
 
+  get key(): string {
+    return this.form.controls.key.value!;
+  }
+
+  get id(): number {
+    return this.form.controls.id.value!;
+  }
+
+  set id(value: number) {
+    this.form.controls.id.setValue(value);
+  }
+
   get name(): Nullable<string> {
     return this.form.controls['name'].value;
   }
@@ -240,9 +235,8 @@ export class RuleItemModel extends ExpandableTableRowItemModelBase {
     return this.form.valid;
   }
 
-  get data(): Rule {
-    const rule: Rule = {
-      id: this.isNew ? -1 : parseInt(this.id),
+  get data(): Omit<Rule, 'id'> {
+    const rule: Omit<Rule, 'id'> = {
       active: this.status!,
       name: this.name!,
       level: this.severity!.id,
@@ -257,27 +251,35 @@ export class RuleItemModel extends ExpandableTableRowItemModelBase {
 
     switch (this.type?.id) {
       case 'loitering event':
-        rule.alarm_metadata.loitering = {
-          time_stand: this.time_stand!,
+        rule.alarm_metadata = {
+          loitering: {
+            time_stand: this.time_stand!,
+          },
         };
         break;
       case 'sabotage event':
         break;
       case 'tripwire event':
-        rule.alarm_metadata.tripwire = {
-          direction: this.form.controls['direction'].value!,
+        rule.alarm_metadata = {
+          tripwire: {
+            direction: this.form.controls['direction'].value!,
+          },
         };
         break;
       case 'lost event':
-        rule.alarm_metadata.lost = {
-          losing_time: this.form.controls['losing_time'].value!,
-          sensitive: this.form.controls['sensitive'].value!,
+        rule.alarm_metadata = {
+          lost: {
+            losing_time: this.form.controls['losing_time'].value!,
+            sensitive: this.form.controls['sensitive'].value!,
+          },
         };
         break;
       case 'abandon event':
-        rule.alarm_metadata.abandon = {
-          abandon_time: this.form.controls['abandon_time'].value!,
-          sensitive: this.form.controls['sensitive'].value!,
+        rule.alarm_metadata = {
+          abandon: {
+            abandon_time: this.form.controls['abandon_time'].value!,
+            sensitive: this.form.controls['sensitive'].value!,
+          },
         };
         break;
       default:
@@ -288,10 +290,9 @@ export class RuleItemModel extends ExpandableTableRowItemModelBase {
   }
 
   setData(rule: Rule, schedules: Schedule[], preset: Preset) {
-    this.id = rule.id.toString();
-
-    this.form.reset(
+    this.form.patchValue(
       {
+        id: rule.id,
         name: rule.name,
         time_stand: rule.alarm_metadata.loitering?.time_stand ?? 5,
         objects: Objects.filter((e) => rule.objects.includes(e.id)),

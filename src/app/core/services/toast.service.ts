@@ -23,10 +23,14 @@ export class ToastService {
     });
   }
 
-  showHttpError(error: HttpErrorResponse, delaySec: number = 3) {
+  showHttpError(
+    error: HttpErrorResponse,
+    message?: string,
+    delaySec: number = 3
+  ) {
     this._toasts.push({
       className: 'bg-danger text-light',
-      message: error.error?.message ?? error.message,
+      message: `${message}: ${error.error?.message ?? error.message}`,
       delay: delaySec * 1000,
     });
   }

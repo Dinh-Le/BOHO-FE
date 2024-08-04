@@ -8,13 +8,8 @@ import { environment } from '@env';
 export abstract class RuleService {
   public abstract create(
     nodeId: string,
-    deviceId: string,
-    rule: Required<
-      Omit<Rule, 'id'> & {
-        preset_id: string;
-        schedule_id: string;
-      }
-    >
+    deviceId: string | number,
+    rule: Omit<Rule, 'id'>
   ): Observable<
     ResponseBase & {
       data: number;
@@ -34,23 +29,16 @@ export abstract class RuleService {
 
   public abstract update(
     nodeId: string,
-    deviceId: string,
+    deviceId: string | number,
     ruleId: number,
     rule: Omit<Rule, 'id'>
   ): Observable<ResponseBase>;
 
   public abstract delete(
     nodeId: string,
-    deviceId: string,
-    ruleId: string
+    deviceId: string | number,
+    ruleId: string | number
   ): Observable<ResponseBase>;
-
-  public abstract snapshot(
-    nodeId: string,
-    deviceId: string,
-    cameraId: string,
-    ruleId: string
-  ): Observable<string>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -59,7 +47,7 @@ export class RuleServiceImpl extends RuleService {
 
   public override create(
     nodeId: string,
-    deviceId: string,
+    deviceId: string | number,
     rule: Omit<Rule, 'id'>
   ): Observable<
     ResponseBase & {
@@ -76,7 +64,7 @@ export class RuleServiceImpl extends RuleService {
 
   public override findAll(
     nodeId: string,
-    deviceId: string
+    deviceId: string | number
   ): Observable<ResponseBase & { data: Rule[] }> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/rule`;
     return this.httpClient.get<ResponseBase & { data: Rule[] }>(url);
@@ -84,7 +72,7 @@ export class RuleServiceImpl extends RuleService {
 
   public override find(
     nodeId: string,
-    deviceId: string,
+    deviceId: string | number,
     ruleId: string
   ): Observable<ResponseBase & { data: Rule }> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/rule/${ruleId}`;
@@ -93,7 +81,7 @@ export class RuleServiceImpl extends RuleService {
 
   public override update(
     nodeId: string,
-    deviceId: string,
+    deviceId: string | number,
     ruleId: number,
     rule: Omit<Rule, 'id'>
   ): Observable<ResponseBase> {
@@ -103,20 +91,10 @@ export class RuleServiceImpl extends RuleService {
 
   public override delete(
     nodeId: string,
-    deviceId: string,
-    ruleId: string
+    deviceId: string | number,
+    ruleId: string | number
   ): Observable<ResponseBase> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/rule/${ruleId}`;
     return this.httpClient.delete<ResponseBase>(url);
-  }
-
-  public override snapshot(
-    nodeId: string,
-    deviceId: string,
-    cameraId: string,
-    ruleId: string
-  ): Observable<string> {
-    const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/camera/${cameraId}/rule/${ruleId}/snapshot`;
-    return this.httpClient.get<string>(url);
   }
 }

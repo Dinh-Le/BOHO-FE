@@ -17,9 +17,19 @@ import {
 } from 'src/app/data/service/navigation.service';
 import { PresetService } from 'src/app/data/service/preset.service';
 import { ScheduleService } from 'src/app/data/service/schedule.service';
-import { Subscription, filter, of, switchMap } from 'rxjs';
+import {
+  EMPTY,
+  Subscription,
+  catchError,
+  filter,
+  of,
+  switchMap,
+  tap,
+  throwError,
+} from 'rxjs';
 import { ToastService } from '@app/services/toast.service';
 import {
+  InvalidId,
   Objects,
   RuleTypeItemsSource,
   Severities,
@@ -37,6 +47,7 @@ import {
   RuleTypeModel,
 } from 'src/app/data/schema/boho-v2';
 import { CameraType } from 'src/app/data/data.types';
+import { Rule } from 'src/app/data/schema/boho-v2/rule';
 
 @Component({
   selector: 'app-rule',
@@ -92,38 +103,67 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
     this._activatedRoute.params
       .pipe(
         filter(({ nodeId, cameraId }) => nodeId && cameraId),
-        switchMap(({ nodeId, cameraId }) => {
-          this.cameraId = cameraId;
-          this.nodeId = nodeId;
+        tap(() => {
           this.data = [];
           this.presets = {};
           this.schedules = [];
-          return this._presetService.findAll(this.nodeId, this.cameraId);
         }),
-        switchMap((response) => {
-          this.presets = response.data.reduce(
+        switchMap(({ nodeId, cameraId }) => {
+          this.cameraId = cameraId;
+          this.nodeId = nodeId;
+
+          return this._presetService
+            .findAll(this.nodeId, this.cameraId)
+            .pipe(
+              catchError(
+                this.showHttpErrorAndRethrow.bind(
+                  this,
+                  'Lỗi lấy danh sách các điểm preset'
+                )
+              )
+            );
+        }),
+        switchMap(({ data }) => {
+          this.presets = data.reduce(
             (dict, item) => Object.assign(dict, { [item.id]: item }),
             {} as Record<number, Preset>
           );
 
-          return this._scheduleService.findAll(this.nodeId, this.cameraId);
+          return this._scheduleService
+            .findAll(this.nodeId, this.cameraId)
+            .pipe(
+              catchError(
+                this.showHttpErrorAndRethrow.bind(
+                  this,
+                  'Lỗi lấy danh sách các lịch trình'
+                )
+              )
+            );
         }),
-        switchMap((response) => {
-          this.schedules = response.data;
+        switchMap(({ data }) => {
+          this.schedules = data;
 
-          return this._ruleService.findAll(this.nodeId, this.cameraId);
-        })
-      )
-      .subscribe({
-        next: ({ data: rules }) => {
+          return this._ruleService
+            .findAll(this.nodeId, this.cameraId)
+            .pipe(
+              catchError(
+                this.showHttpErrorAndRethrow.bind(
+                  this,
+                  'Lỗi lấy danh sách các quy tắc'
+                )
+              )
+            );
+        }),
+        tap(({ data: rules }) => {
           this.data = rules.map((rule) => {
             const item = new RuleItemModel();
             item.setData(rule, this.schedules, this.presets[rule.preset_id]);
             return item;
           });
-        },
-        error: (err: HttpErrorResponse) =>
-          this._toastService.showHttpError(err),
+        })
+      )
+      .subscribe({
+        error: (error) => console.error(error),
       });
   }
 
@@ -165,6 +205,12 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
     this._subscriptions.forEach((e) => e.unsubscribe());
   }
 
+  private showHttpErrorAndRethrow(message: string, error: HttpErrorResponse) {
+    this._toastService.showHttpError(error, message);
+
+    return throwError(() => error);
+  }
+
   add(): void {
     const newItem = new RuleItemModel();
     const index =
@@ -175,48 +221,71 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
     );
     newItem.isEditable = true;
     newItem.isExpanded = true;
-    newItem.isNew = true;
     newItem.form.enable();
     this.data.push(newItem);
   }
 
   submit(item: RuleItemModel) {
-    const data = Object.assign({}, item.data, {
-      id: undefined,
-    });
-    if (item.isNew) {
+    if (item.id === +InvalidId) {
       this._ruleService
-        .create(this.nodeId, this.cameraId, data)
+        .create(this.nodeId, this.cameraId, item.data)
         .pipe(
-          switchMap((response) =>
-            this._nodeService
-              .ruleUpdate(this.nodeId)
-              .pipe(switchMap(() => of(response)))
+          tap(({ data: id }) => {
+            item.id = id;
+            item.isEditable = false;
+            item.form.disable();
+          }),
+          switchMap(() =>
+            this._nodeService.ruleUpdate(this.nodeId).pipe(
+              catchError((error: HttpErrorResponse) => {
+                console.error(error);
+
+                this._toastService.showWarning(
+                  'Lỗi đồng bộ các quy tắc đến Node service'
+                );
+
+                return EMPTY;
+              })
+            )
           )
         )
         .subscribe({
-          next: ({ data: id }) => {
-            this._toastService.showSuccess('Create rule successfully');
-            item.isNew = false;
-            item.isEditable = false;
-            item.form.disable();
-            item.id = id.toString();
+          complete: () => {
+            this._toastService.showSuccess('Tạo quy tắc thành công');
           },
           error: (err: HttpErrorResponse) =>
             this._toastService.showError(err.error?.message ?? err.message),
         });
     } else {
       this._ruleService
-        .update(this.nodeId, this.cameraId, parseInt(item.id), data)
-        .pipe(switchMap(() => this._nodeService.ruleUpdate(this.nodeId)))
+        .update(this.nodeId, this.cameraId, item.id, item.data)
+        .pipe(
+          switchMap(() =>
+            this._nodeService.ruleUpdate(this.nodeId).pipe(
+              catchError((error: HttpErrorResponse) => {
+                console.error(error);
+
+                this._toastService.showWarning(
+                  'Lỗi đồng bộ các quy tắc đến Node service'
+                );
+
+                return EMPTY;
+              })
+            )
+          )
+        )
         .subscribe({
-          next: () => {
-            this._toastService.showSuccess('Update rule successfully');
+          complete: () => {
+            this._toastService.showSuccess('Cập nhật quy tắc thành công');
             item.isEditable = false;
-            item.form.disable();
+            item.form.disable({
+              emitEvent: false,
+            });
           },
           error: (err: HttpErrorResponse) =>
-            this._toastService.showError(err.error?.message ?? err.message),
+            this._toastService.showError(
+              'Lỗi cập nhật: ' + err.error?.message ?? err.message
+            ),
         });
     }
   }
@@ -227,7 +296,7 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   cancel(item: RuleItemModel) {
-    if (item.isNew) {
+    if (item.id === +InvalidId) {
       this.data = this.data.filter((e) => e.id !== item.id);
       return;
     }
@@ -247,23 +316,36 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   remove(item: RuleItemModel) {
-    if (item.isNew) {
-      this.data = this.data.filter((e) => e.id !== item.id);
-      this._toastService.showSuccess('Delete rule successfully');
-      return;
-    }
+    const deleteItem$ =
+      item.id === +InvalidId
+        ? EMPTY
+        : this._ruleService.delete(this.nodeId, this.cameraId, item.id).pipe(
+            switchMap(() =>
+              this._nodeService.ruleUpdate(this.nodeId).pipe(
+                catchError((error: HttpErrorResponse) => {
+                  console.error(error);
 
-    this._ruleService
-      .delete(this.nodeId, this.cameraId, item.id)
-      .pipe(switchMap(() => this._nodeService.ruleUpdate(this.nodeId)))
-      .subscribe({
-        next: () => {
-          this.data = this.data.filter((e) => e.id !== item.id);
-          this._toastService.showSuccess('Delete rule successfully');
-        },
-        error: (err: HttpErrorResponse) =>
-          this._toastService.showHttpError(err),
-      });
+                  this._toastService.showWarning(
+                    'Lỗi đồng bộ các quy tắc đến Node service'
+                  );
+
+                  return EMPTY;
+                })
+              )
+            )
+          );
+
+    deleteItem$.subscribe({
+      complete: () => {
+        this.data = this.data.filter((e) => e.id !== item.id);
+        this._toastService.showSuccess('Xóa quy tắc thành công');
+      },
+      error: (err: HttpErrorResponse) => {
+        console.error(err);
+
+        this._toastService.showHttpError(err, 'Lỗi xóa quy tắc');
+      },
+    });
   }
 
   trackById(_: any, { id }: any): any {

@@ -1,7 +1,7 @@
 <app-rule-menu class="menu-container"></app-rule-menu>
 <div class="menu-container d-flex align-items-center px-2">
   <span class="fw-bold my-text-white">Quy tắc sự kiện</span>
-  <button class="my-btn-primary ms-auto" (click)="add()">
+  <button type="button" class="my-btn-primary ms-auto" (click)="add()">
     <i class="bi bi-plus me-2"></i> Thêm
   </button>
 </div>
@@ -10,6 +10,7 @@
     class="w-100"
     classNames="bg-black"
     [data]="data"
+    rowKey="key"
     [columns]="columns"
     [collapseContentTemplateRef]="contentTemplate"
   ></app-expandable-table>

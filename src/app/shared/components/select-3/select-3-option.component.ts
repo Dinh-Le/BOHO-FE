@@ -29,7 +29,7 @@ export class Select3OptionComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.root.subscribe(() => {
+    const updateSelected = (): void => {
       if (this.root.multiple) {
         this.selected = this.root.model.some((e: any) =>
           this.areEqual(e, this.value)
@@ -37,13 +37,17 @@ export class Select3OptionComponent implements OnInit {
       } else {
         this.selected = this.areEqual(this.root.model, this.value);
       }
-    });
+    };
+
+    this.root.subscribe(updateSelected.bind(this));
 
     this.root.appendOption({
       value: this.value,
       label: this.label,
       compareFn: (a: any, b: any) => this.areEqual(a, b),
     });
+
+    updateSelected();
   }
 
   areEqual(a: any, b: any): boolean {
