@@ -62,7 +62,15 @@ export class PostActionServiceImpl extends PostActionService {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/post_action`;
     return this.httpClient
       .patch<ResponseBase>(url, {
-        post_actions: data,
+        post_actions: data.map((item) => {
+          const newItem = Object.assign({}, item, {
+            post_action_id: item.id,
+          }) as any;
+
+          delete newItem.id;
+
+          return newItem;
+        }),
       })
       .pipe(map((response) => response.success));
   }
