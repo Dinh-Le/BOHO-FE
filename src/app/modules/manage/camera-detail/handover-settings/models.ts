@@ -23,12 +23,19 @@ export default class HandoverRowItemModel {
   >;
   form = new FormGroup({
     key: new FormControl<string>(v4(), Validators.required),
-    id: new FormControl<number>(+InvalidId, Validators.required),
+    id: new FormControl<number>(+InvalidId, [
+      Validators.required,
+      Validators.min(0),
+    ]),
     nodeId: new FormControl<string>('', Validators.required),
     selected: new FormControl<boolean>(false, [Validators.required]),
-    deviceId: new FormControl<number>(+InvalidId, [Validators.required]),
+    deviceId: new FormControl<number>(+InvalidId, [
+      Validators.required,
+      Validators.min(0),
+    ]),
     presetId: new FormControl<Nullable<number>>(+InvalidId, [
       Validators.required,
+      Validators.min(0),
     ]),
     postActionType: new FormControl<PostActionType>('none', [
       Validators.required,
@@ -85,9 +92,7 @@ export default class HandoverRowItemModel {
 
   get canConfigurePostAction(): boolean {
     return (
-      this.form.controls.postActionType.value !== 'none' &&
-      this.deviceId !== +InvalidId &&
-      this.presetId !== +InvalidId
+      this.form.valid && this.form.controls.postActionType.value !== 'none'
     );
   }
 
@@ -100,7 +105,8 @@ export default class HandoverRowItemModel {
     this.form.controls.postActionType.valueChanges.subscribe((value) => {
       this.postActionOptions = getDefaultPostionActionOptions(value!);
     });
-    this.form.controls.deviceId.valueChanges.subscribe((value) =>
+    this.form.controls.deviceId.valueChanges.subscribe((value) => {
+      this.form.controls.presetId.setValue(+InvalidId);
       this.presetService
         .findAll(this.nodeId, value!)
         .pipe(
@@ -114,8 +120,8 @@ export default class HandoverRowItemModel {
             return of([]);
           })
         )
-        .subscribe((presets) => (this.presets = presets))
-    );
+        .subscribe((presets) => (this.presets = presets));
+    });
 
     this.form.patchValue({
       nodeId,

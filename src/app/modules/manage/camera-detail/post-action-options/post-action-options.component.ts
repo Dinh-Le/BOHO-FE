@@ -82,10 +82,10 @@ export class PostActionOptionsComponent {
       Validators.required,
     ]),
     pantilt_speed: new FormControl<number>(3),
-    timeout: new FormControl<number>(5),
+    working_time: new FormControl<number>(5),
     zoom_level: new FormControl<number>(1, [Validators.required]),
     zoom_speed: new FormControl<number>(3),
-    working_time: new FormControl<number>(30, [
+    timeout: new FormControl<number>(30, [
       Validators.required,
       Validators.min(5),
       Validators.max(60),
@@ -112,8 +112,8 @@ export class PostActionOptionsComponent {
   constructor() {
     this.formGroup.controls.type.valueChanges.subscribe((value) => {
       if (value === 'auto_track') {
-        this.formGroup.controls.working_time.setValue(30);
-        this.formGroup.controls.working_time.setValidators([
+        this.formGroup.controls.timeout.setValue(30);
+        this.formGroup.controls.timeout.setValidators([
           Validators.required,
           Validators.min(5),
           Validators.max(60),
@@ -128,7 +128,7 @@ export class PostActionOptionsComponent {
           Validators.min(1),
           Validators.max(5),
         ]);
-        this.formGroup.controls.timeout.setValidators([
+        this.formGroup.controls.working_time.setValidators([
           Validators.required,
           Validators.min(1),
           Validators.max(10),

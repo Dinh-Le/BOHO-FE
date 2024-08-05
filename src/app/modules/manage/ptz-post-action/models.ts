@@ -19,8 +19,9 @@ export function getDefaultPostionActionOptions(
         zoom_level: 1,
         pantilt_speed: 3,
         roi: [],
-        timeout: 5,
-        working_time: 30,
+        timeout: 30,
+        working_time: 5,
+        zoom_speed: 3,
       };
     case 'zoom_and_centralize':
       return {
