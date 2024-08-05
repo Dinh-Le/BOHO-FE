@@ -3,7 +3,7 @@ import { AutoTrackOptions, ZoomAndCentralizeOptions } from './handover';
 
 export interface PostAction {
   id: number;
-  is_enabled: boolean;
+  is_enable: boolean;
   preset_id: number;
   auto_track?: Nullable<AutoTrackOptions>;
   zoom_and_centralize?: Nullable<ZoomAndCentralizeOptions>;

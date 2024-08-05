@@ -22,6 +22,7 @@ export interface ActionOptions {
 export interface Handover {
   id: number;
   device_id: number;
+  target_device_id: number;
   preset_id: number;
   action?: Nullable<ActionOptions>;
   is_enable: boolean;

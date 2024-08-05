@@ -95,7 +95,6 @@ export default class HandoverRowItemModel {
     private presetService: PresetService,
     private toastService: ToastService,
     nodeId: string,
-    deviceId: number,
     data?: Handover
   ) {
     this.form.controls.postActionType.valueChanges.subscribe((value) => {
@@ -118,19 +117,14 @@ export default class HandoverRowItemModel {
         .subscribe((presets) => (this.presets = presets))
     );
 
-    this.form.patchValue(
-      {
-        nodeId,
-        deviceId,
-        id: data?.id ?? +InvalidId,
-        presetId: data?.preset_id ?? +InvalidId,
-        selected: false,
-        postActionType: data ? getPostActionTypeByHandover(data) : 'none',
-      },
-      {
-        emitEvent: true,
-      }
-    );
+    this.form.patchValue({
+      nodeId,
+      deviceId: data?.target_device_id ?? +InvalidId,
+      id: data?.id ?? +InvalidId,
+      presetId: data?.preset_id ?? +InvalidId,
+      selected: false,
+      postActionType: data ? getPostActionTypeByHandover(data) : 'none',
+    });
 
     this.postActionOptions =
       data?.action?.auto_track ?? data?.action?.zoom_and_centralize;

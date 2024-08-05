@@ -15,7 +15,19 @@ import {
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ToastService } from '@app/services/toast.service';
 import { ControlValueAccessorImpl } from '@shared/helpers/control-value-accessor-impl';
-import { switchMap } from 'rxjs';
+import {
+  catchError,
+  EMPTY,
+  map,
+  of,
+  switchMap,
+  iif,
+  tap,
+  Observable,
+  concat,
+  throwError,
+  mergeAll,
+} from 'rxjs';
 import { TripwireDirectionType } from 'src/app/data/data.types';
 import { DeviceService } from 'src/app/data/service/device.service';
 import { PresetService } from 'src/app/data/service/preset.service';
@@ -91,39 +103,81 @@ export class BoundingBoxEditorComponent
         return;
       }
 
+      const showHttpErrorAndRethrown = (
+        message: string,
+        error: HttpErrorResponse
+      ): Observable<any> => {
+        console.error(error);
+
+        this._toastService.showHttpError(error, message);
+
+        return throwError(() => error);
+      };
+
+      const showHttpErrorAndIgnore = (
+        message: string,
+        error: HttpErrorResponse
+      ): Observable<any> => {
+        console.error(error);
+
+        this._toastService.showHttpError(error, message);
+
+        return EMPTY;
+      };
+
       if (!presetId) {
-        this._deviceService.snapshot(nodeId, deviceId).subscribe({
-          next: ({ data }) => {
-            this._image = new Image(data.size[0], data.size[1]);
-            this._image.src = `data:image/${data.format};charset=utf-8;base64,${data.img}`;
-            this._image.onload = (_: any) => this.update();
-          },
-          error: (err: HttpErrorResponse) =>
-            this._toastService.showError(err.error.message ?? err.message),
-        });
-      } else {
         this._deviceService
-          .pauseDevice(nodeId, deviceId)
+          .snapshot(nodeId, deviceId)
           .pipe(
-            switchMap(() =>
-              this._presetService.control(
-                this.src.nodeId!,
-                this.src.deviceId!,
-                this.src.presetId!
-              )
-            ),
-            switchMap(() => this._deviceService.snapshot(nodeId, deviceId)),
-            switchMap(({ data }) => {
+            tap(({ data }) => {
               this._image = new Image(data.size[0], data.size[1]);
               this._image.src = `data:image/${data.format};charset=utf-8;base64,${data.img}`;
               this._image.onload = (_: any) => this.update();
-              return this._deviceService.resumeDevice(nodeId, deviceId);
-            })
+            }),
+            catchError(
+              showHttpErrorAndIgnore.bind(this, 'Lỗi lấy hình từ camera')
+            )
           )
-          .subscribe({
-            error: (err: HttpErrorResponse) =>
-              this._toastService.showError(err.error.message ?? err.message),
-          });
+          .subscribe();
+      } else {
+        concat(
+          concat(
+            this._deviceService
+              .pauseDevice(nodeId, deviceId)
+              .pipe(
+                catchError(
+                  showHttpErrorAndRethrown.bind(this, 'Lỗi dừng Node service')
+                )
+              ),
+            this._presetService
+              .control(this.src.nodeId!, this.src.deviceId!, this.src.presetId!)
+              .pipe(
+                catchError(
+                  showHttpErrorAndRethrown.bind(
+                    this,
+                    'Lỗi điều khiển camera đến vị trí điểm giám sát'
+                  )
+                )
+              )
+          ).pipe(catchError(() => EMPTY)),
+          this._deviceService.snapshot(nodeId, deviceId).pipe(
+            tap(({ data }) => {
+              this._image = new Image(data.size[0], data.size[1]);
+              this._image.src = `data:image/${data.format};charset=utf-8;base64,${data.img}`;
+              this._image.onload = (_: any) => this.update();
+            }),
+            catchError(
+              showHttpErrorAndIgnore.bind(this, 'Lỗi lấy hình từ camera')
+            )
+          ),
+          this._deviceService
+            .resumeDevice(nodeId, deviceId)
+            .pipe(
+              catchError(
+                showHttpErrorAndIgnore.bind(this, 'Lỗi khởi chạy Node service')
+              )
+            )
+        ).subscribe();
       }
     }
   }

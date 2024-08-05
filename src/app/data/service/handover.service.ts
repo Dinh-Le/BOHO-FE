@@ -1,11 +1,19 @@
-import { EMPTY, map, Observable, of, switchMap } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { ResponseBase } from '../schema/boho-v2/response-base';
 import { RestfullApiService } from './restful-api.service';
 import { Handover } from '../schema/boho-v2';
 import { Injectable } from '@angular/core';
 import { environment } from '@env';
 
-export type CreateHandoverDto = Omit<Handover, 'id' | 'device_id'>;
+export type CreateHandoverDto = Omit<
+  Handover,
+  'id' | 'device_id' | 'target_device_id'
+>;
+
+export type UpdateHandoverDto = Omit<
+  Handover,
+  'id' | 'device_id' | 'target_device_id'
+> & { handover_id: number };
 
 export abstract class HandoverService extends RestfullApiService {
   public abstract findAll(
@@ -25,13 +33,13 @@ export abstract class HandoverService extends RestfullApiService {
   public abstract update(
     nodeId: string,
     deviceId: number,
-    data: CreateHandoverDto[]
-  ): Observable<never>;
+    data: UpdateHandoverDto[]
+  ): Observable<boolean>;
   public abstract delete(
     nodeId: string,
     deviceId: number,
     handoverId: number
-  ): Observable<never>;
+  ): Observable<boolean>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -70,24 +78,23 @@ export class HandoverServiceImpl extends HandoverService {
   public override update(
     nodeId: string,
     deviceId: number,
-
-    data: CreateHandoverDto[]
-  ): Observable<never> {
+    data: UpdateHandoverDto[]
+  ): Observable<boolean> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/handover`;
     return this.httpClient
       .patch<ResponseBase>(url, {
         handovers: data,
       })
-      .pipe(switchMap(() => of()));
+      .pipe(map((response) => response.success));
   }
   public override delete(
     nodeId: string,
     deviceId: number,
     handoverId: number
-  ): Observable<never> {
+  ): Observable<boolean> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/handover/${handoverId}`;
     return this.httpClient
       .delete<ResponseBase>(url)
-      .pipe(switchMap(() => EMPTY));
+      .pipe(map((response) => response.success));
   }
 }

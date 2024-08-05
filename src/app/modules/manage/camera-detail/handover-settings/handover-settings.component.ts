@@ -9,9 +9,7 @@ import {
   Subject,
   catchError,
   concat,
-  distinctUntilChanged,
   finalize,
-  last,
   map,
   mergeAll,
   of,
@@ -116,33 +114,34 @@ export class HandoverSettingsComponent implements OnDestroy {
   private _ptzCamerasSubscription = this.ptzCameras
     .pipe(
       skip(1),
-      map((devices) => {
-        this._presetIdToDeviceIdMap = {};
-        return concat(
-          ...devices.map((device) =>
-            this._presetService
-              .findAll(this._currentNodeId.value, device.id)
-              .pipe(
-                map((response) => response.data),
-                catchError(
-                  this.handleHttpErrorAndReturnDefault.bind(
-                    this,
-                    `Lỗi lấy danh sách các điểm preset của camera ${device.name}`,
-                    []
-                  )
-                )
-              )
-          )
-        ).pipe(
-          tap((data) => {
-            for (const preset of data) {
-              this._presetIdToDeviceIdMap[preset.id] = preset.device_id;
-            }
-          }),
-          finalize(() => this._refreshTableData.next(0))
-        );
-      }),
-      mergeAll()
+      tap(() => this._refreshTableData.next(0))
+      // map((devices) => {
+      //   this._presetIdToDeviceIdMap = {};
+      //   return concat(
+      //     ...devices.map((device) =>
+      //       this._presetService
+      //         .findAll(this._currentNodeId.value, device.id)
+      //         .pipe(
+      //           map((response) => response.data),
+      //           catchError(
+      //             this.handleHttpErrorAndReturnDefault.bind(
+      //               this,
+      //               `Lỗi lấy danh sách các điểm preset của camera ${device.name}`,
+      //               []
+      //             )
+      //           )
+      //         )
+      //     )
+      //   ).pipe(
+      //     tap((data) => {
+      //       for (const preset of data) {
+      //         this._presetIdToDeviceIdMap[preset.id] = preset.device_id;
+      //       }
+      //     }),
+      //     finalize(() => this._refreshTableData.next(0))
+      //   );
+      // }),
+      // mergeAll()
     )
     .subscribe();
 
@@ -171,7 +170,6 @@ export class HandoverSettingsComponent implements OnDestroy {
               this._presetService,
               this._toastService,
               this._currentNodeId.value,
-              this._presetIdToDeviceIdMap[item.preset_id] ?? +InvalidId,
               item
             )
         ))
@@ -247,8 +245,7 @@ export class HandoverSettingsComponent implements OnDestroy {
       new HandoverRowItemModel(
         this._presetService,
         this._toastService,
-        this._currentNodeId.value,
-        +InvalidId
+        this._currentNodeId.value
       )
     );
   }
@@ -278,23 +275,6 @@ export class HandoverSettingsComponent implements OnDestroy {
 
       return throwError(() => error);
     };
-    const convertToCreateHandoverDto = (
-      item: HandoverRowItemModel
-    ): CreateHandoverDto => ({
-      is_enable: true,
-      preset_id: item.presetId,
-      action:
-        item.postActionType === 'auto_track'
-          ? {
-              auto_track: item.postActionOptions as AutoTrackOptions,
-            }
-          : item.postActionType === 'zoom_and_centralize'
-          ? {
-              zoom_and_centralize:
-                item.postActionOptions as ZoomAndCentralizeOptions,
-            }
-          : {},
-    });
     const newItems = this.tableItemsSource.filter((item) => item.isNew);
     const existingItems = this.tableItemsSource.filter((item) => !item.isNew);
 
@@ -316,7 +296,21 @@ export class HandoverSettingsComponent implements OnDestroy {
             .create(
               this._currentNodeId.value,
               this._deviceId,
-              newItems.map(convertToCreateHandoverDto)
+              newItems.map((item) => ({
+                is_enable: true,
+                preset_id: item.presetId,
+                action:
+                  item.postActionType === 'auto_track'
+                    ? {
+                        auto_track: item.postActionOptions as AutoTrackOptions,
+                      }
+                    : item.postActionType === 'zoom_and_centralize'
+                    ? {
+                        zoom_and_centralize:
+                          item.postActionOptions as ZoomAndCentralizeOptions,
+                      }
+                    : {},
+              }))
             )
             .pipe(
               map((ids) => {
@@ -336,7 +330,22 @@ export class HandoverSettingsComponent implements OnDestroy {
             .update(
               this._currentNodeId.value,
               this._deviceId,
-              existingItems.map(convertToCreateHandoverDto)
+              existingItems.map((item) => ({
+                handover_id: item.id,
+                is_enable: true,
+                preset_id: item.presetId,
+                action:
+                  item.postActionType === 'auto_track'
+                    ? {
+                        auto_track: item.postActionOptions as AutoTrackOptions,
+                      }
+                    : item.postActionType === 'zoom_and_centralize'
+                    ? {
+                        zoom_and_centralize:
+                          item.postActionOptions as ZoomAndCentralizeOptions,
+                      }
+                    : {},
+              }))
             )
             .pipe(
               map(() => true),

@@ -3,6 +3,7 @@ import { PTZPostActionItemModel } from './models';
 import { Nullable } from '@shared/shared.types';
 import {
   AutoTrackOptions,
+  PostAction,
   PostActionTypeModel as PostActionTypeModel,
   ZoomAndCentralizeOptions,
 } from 'src/app/data/schema/boho-v2';
@@ -78,11 +79,6 @@ export class PTZPostActionComponent {
     this.postActionService
       .findAll(this.nodeId, this.deviceId)
       .pipe(
-        map((response) =>
-          response.data.map(
-            (postAction) => new PTZPostActionItemModel(postAction)
-          )
-        ),
         catchError(
           this.showHttpErrorAndReturnDefault.bind(
             this,
@@ -91,7 +87,12 @@ export class PTZPostActionComponent {
           )
         )
       )
-      .subscribe((items) => (this.tableItemsSource = items));
+      .subscribe(
+        (postActions: PostAction[]) =>
+          (this.tableItemsSource = postActions.map(
+            (postAction) => new PTZPostActionItemModel(postAction)
+          ))
+      );
   }
 
   private showHttpErrorAndReturnDefault(
@@ -151,7 +152,6 @@ export class PTZPostActionComponent {
             this.postActionService
               .delete(this.nodeId, this.deviceId, item.id)
               .pipe(
-                map(() => true),
                 catchError(
                   showError.bind(this, `Lỗi xóa hành động sau ${item.id}`)
                 )
@@ -166,7 +166,7 @@ export class PTZPostActionComponent {
               this.nodeId,
               this.deviceId,
               newItems.map((item) => ({
-                is_enabled: true,
+                is_enable: true,
                 preset_id: item.presetId,
                 auto_track:
                   item.postActionType === 'auto_track'
@@ -179,9 +179,9 @@ export class PTZPostActionComponent {
               }))
             )
             .pipe(
-              tap((response) => {
-                for (let i = 0; i < response.data.length; i++) {
-                  newItems[i].id = response.data[i];
+              tap((ids) => {
+                for (let i = 0; i < ids.length; i++) {
+                  newItems[i].id = ids[i];
                 }
               }),
               map(() => true),
@@ -197,7 +197,7 @@ export class PTZPostActionComponent {
               this.deviceId,
               existingItems.map((item) => ({
                 id: item.id,
-                is_enabled: true,
+                is_enable: true,
                 preset_id: item.presetId,
                 auto_track:
                   item.postActionType === 'auto_track'
@@ -210,7 +210,6 @@ export class PTZPostActionComponent {
               }))
             )
             .pipe(
-              map(() => true),
               catchError(showError.bind(this, 'Lỗi cập nhật hành động sau'))
             )
         : of(true);
