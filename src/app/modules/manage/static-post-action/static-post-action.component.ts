@@ -2,7 +2,15 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, HostBinding, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ToastService } from '@app/services/toast.service';
-import { catchError, map, Observable, of } from 'rxjs';
+import {
+  catchError,
+  concat,
+  map,
+  Observable,
+  of,
+  switchMap,
+  throwError,
+} from 'rxjs';
 import {
   Level3Menu,
   NavigationService,
@@ -123,6 +131,9 @@ export class StaticPostActionComponent implements OnDestroy {
   }
 
   onDeleteClicked() {
+    this._removedItems.push(
+      ...this.tableItemsSource.filter((item) => item.selected)
+    );
     this.tableItemsSource = this.tableItemsSource.filter(
       (item) => !item.selected
     );
@@ -133,29 +144,52 @@ export class StaticPostActionComponent implements OnDestroy {
   }
 
   onSaveClicked() {
-    this.handoverLinkingService
-      .update(
-        this.nodeId,
-        this.deviceId,
-        this.tableItemsSource.map((item) => ({
-          handover_id: item.handoverId,
-          rule_ids: item.ruleIds,
-        }))
-      )
-      .subscribe({
-        error: (error: HttpErrorResponse) => {
-          console.error(error);
+    const showHttpError = (
+      message: string,
+      error: HttpErrorResponse
+    ): Observable<any> => {
+      this.toastService.showHttpError(error, message);
 
-          this.toastService.showError(
-            `Lỗi lưu danh sách hành động sau: ${
-              error.error?.message ?? error.message
-            }`
-          );
-        },
-        complete: () => {
-          this.toastService.showSuccess('Lưu thành công');
-        },
-      });
+      return throwError(() => error);
+    };
+
+    const deleteHandoverIds = this._removedItems
+      .map((item) => item.handoverId)
+      .filter(
+        (handoverId) =>
+          !this.tableItemsSource.some((item) => item.handoverId == handoverId)
+      );
+    const deleteHandoverLinking$ =
+      deleteHandoverIds.length > 0
+        ? this.handoverLinkingService
+            .delete(this.nodeId, this.deviceId, deleteHandoverIds)
+            .pipe(catchError(showHttpError.bind(this, 'Lỗi xóa hành động sau')))
+        : of(true);
+
+    const updateHandoverLinking$ =
+      this.tableItemsSource.length > 0
+        ? this.handoverLinkingService
+            .create(
+              this.nodeId,
+              this.deviceId,
+              this.tableItemsSource.map((item) => ({
+                handover_id: item.handoverId,
+                rule_ids: item.ruleIds,
+              }))
+            )
+            .pipe(
+              catchError(
+                showHttpError.bind(this, 'Lỗi cập nhật danh sách hành động sau')
+              )
+            )
+        : of(true);
+    concat(deleteHandoverLinking$, updateHandoverLinking$).subscribe({
+      error: console.error,
+      complete: () => {
+        this.toastService.showSuccess('Lưu thành công');
+        this._removedItems = [];
+      },
+    });
   }
 
   trackById(_: any, { id }: any): any {
