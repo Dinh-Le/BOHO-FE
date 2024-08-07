@@ -5,7 +5,6 @@ import {
   SelectObjectDialogComponent,
 } from './components/select-object-dialog/select-object-dialog.component';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { SelectItemModel } from '@shared/models/select-item-model';
 import { NavigationService } from 'src/app/data/service/navigation.service';
 import { ToastService } from '@app/services/toast.service';
 import { SearchService } from 'src/app/data/service/search.service';
@@ -73,7 +72,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     startTime: string;
     endTime: string;
     objectIds?: string[];
-    ruleType?: string;
+    ruleType: number[];
     licensePlate: string;
     showVehicleOnly: boolean;
     pageIndex: number;
@@ -90,7 +89,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       Validators.required,
     ]),
     objects: new FormControl<ObjectItemModel[]>([]),
-    ruleType: new FormControl<string>(''),
+    ruleType: new FormControl<number[]>([]),
     licensePlate: new FormControl<string>(''),
     showVehileOnly: new FormControl<boolean>(false),
   });
@@ -140,7 +139,7 @@ export class SearchComponent implements OnInit, OnDestroy {
                   tq: 'custom',
                   p: pageIndex,
                   pl: pageLength,
-                  eit: ruleType,
+                  eit: ruleType.length > 0 ? ruleType.join(',') : undefined,
                   ot: objectIds?.map((id) => this.ObjectIdMap[id]),
                   start: startTime,
                   end: endTime,
@@ -208,7 +207,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       pageIndex: this.paginationInfo.pageIndex,
       pageLength: this.paginationInfo.pageLength,
       objectIds: this.selectedObjects.map((object) => object.id),
-      ruleType: this.form.controls.ruleType.value?.split(' ')[0] ?? undefined,
+      ruleType: this.form.controls.ruleType.value ?? [],
       color: this.selectedObjects.map((o) => {
         /// Not support color for type of people/bike
         if (o.id === 'people' || o.id === 'bike' || o.colors[0] === '') {
@@ -246,7 +245,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       startTime: moment().subtract(3, 'days').format('yyyy-MM-DDTHH:mm'),
       endTime: moment().format('yyyy-MM-DDTHH:mm'),
       objects: [],
-      ruleType: '',
+      ruleType: [],
       licensePlate: '',
       showVehileOnly: false,
     });

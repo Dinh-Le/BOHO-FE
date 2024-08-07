@@ -41,25 +41,30 @@ export const RuleTypeItemsSource: RuleTypeModel[] = [
     id: 'loitering event',
     name: 'Luẩn quẩn',
     cameraTypes: ['Static', 'PTZ'],
+    eit: 1,
   },
   {
     id: 'sabotage event',
     name: 'Xâm nhập trái phép',
     cameraTypes: ['Static', 'PTZ'],
+    eit: 3,
   },
   {
     id: 'tripwire event',
     name: 'Vượt đường kẻ',
     cameraTypes: ['Static', 'PTZ'],
+    eit: 2,
   },
   {
     id: 'lost event',
     name: 'Đối tượng bị bỏ lại',
     cameraTypes: ['Static'],
+    eit: 5,
   },
   {
     id: 'abandon event',
     name: 'Đối tượng bị lấy đi',
     cameraTypes: ['Static'],
+    eit: 4,
   },
 ];

@@ -26,6 +26,7 @@ export interface RuleTypeModel {
   id: AlarmType;
   name: string;
   cameraTypes: CameraType[];
+  eit: number;
 }
 
 export interface PostActionTypeModel {

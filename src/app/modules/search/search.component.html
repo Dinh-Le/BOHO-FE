@@ -126,10 +126,22 @@
   </div>
   <div class="form-item">
     <label class="label">Loại quy tắc</label>
-    <app-select-3 formControlName="ruleType">
+    <ng-template #ruleTypeTemplate let-labels="labels">
+      <span
+        style="max-width: 150px"
+        *ngIf="labels.length > 0"
+        class="d-inline-block text-truncate mx-1"
+        >{{ labels.join(";") }}</span
+      >
+    </ng-template>
+    <app-select-3
+      formControlName="ruleType"
+      [multiple]="true"
+      [template]="ruleTypeTemplate"
+    >
       <app-select-3-option
         *ngFor="let item of ruleItems"
-        [value]="item.id"
+        [value]="item.eit"
         [label]="item.name"
       ></app-select-3-option>
     </app-select-3>
