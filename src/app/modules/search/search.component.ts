@@ -242,7 +242,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   resetForm() {
     this.form.reset({
-      startTime: moment().subtract(3, 'days').format('yyyy-MM-DDTHH:mm'),
+      startTime: moment().subtract(1, 'days').format('yyyy-MM-DDTHH:mm'),
       endTime: moment().format('yyyy-MM-DDTHH:mm'),
       objects: [],
       ruleType: [],
