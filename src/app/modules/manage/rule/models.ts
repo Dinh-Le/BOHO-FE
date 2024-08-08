@@ -262,7 +262,10 @@ export class RuleItemModel extends ExpandableTableRowItemModelBase {
       case 'tripwire event':
         rule.alarm_metadata = {
           tripwire: {
-            direction: this.form.controls['direction'].value!,
+            direction:
+              this.form.controls.direction.value == 'both'
+                ? ['left to right', 'right to left']
+                : [this.form.controls.direction.value!],
           },
         };
         break;
@@ -307,7 +310,10 @@ export class RuleItemModel extends ExpandableTableRowItemModelBase {
         type: RuleTypeItemsSource.find((e) => e.id === rule.alarm_type),
         losing_time: rule.alarm_metadata.loitering?.time_stand,
         abandon_time: rule.alarm_metadata.abandon?.abandon_time,
-        direction: rule.alarm_metadata.tripwire?.direction as any,
+        direction:
+          (rule.alarm_metadata.tripwire?.direction.length ?? 1) > 1
+            ? 'both'
+            : rule.alarm_metadata.tripwire?.direction[0] ?? 'left to right',
         sensitive:
           rule.alarm_metadata.lost?.sensitive ??
           rule.alarm_metadata.abandon?.sensitive,

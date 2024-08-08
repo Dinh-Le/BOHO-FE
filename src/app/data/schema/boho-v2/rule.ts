@@ -11,7 +11,7 @@ export interface SabotageOptions {
 }
 
 export interface TripwireOptions {
-  direction: TripwireDirectionType;
+  direction: TripwireDirectionType[];
 }
 
 export interface LostOptions {
