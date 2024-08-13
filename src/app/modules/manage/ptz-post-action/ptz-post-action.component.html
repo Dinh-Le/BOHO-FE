@@ -3,10 +3,18 @@
   [buttonsTemplate]="buttonsTemplate"
 ></app-rule-menu>
 <ng-template #buttonsTemplate>
-  <button class="my-btn my-bg-primary me-2" (click)="onAddClicked()">
+  <button
+    type="button"
+    class="my-btn my-bg-primary me-2"
+    (click)="onAddClicked()"
+  >
     + Thêm
   </button>
-  <button class="my-btn my-bg-secondary" (click)="onDeleteClicked()">
+  <button
+    type="button"
+    class="my-btn my-bg-secondary"
+    (click)="onDeleteClicked()"
+  >
     - Xóa
   </button>
 </ng-template>
@@ -14,6 +22,9 @@
   *ngIf="!!editingItem; else elseBlock"
   [type]="editingItem.postActionType"
   [data]="editingItem.postActionOptions"
+  [nodeId]="nodeId"
+  [deviceId]="deviceId"
+  [presetId]="editingItem.presetId"
   (exit)="exitSettingMode()"
   (save)="saveAndExitSettingMode($event)"
 >
@@ -55,6 +66,7 @@
         </td>
         <td class="text-start">
           <button
+            type="button"
             class="my-btn bg-primary"
             (click)="enterSettingMode(rowItem)"
             [disabled]="rowItem.form.invalid"
@@ -67,6 +79,7 @@
   </table>
   <div class="d-flex justify-content-center mt-5">
     <button
+      type="button"
       class="my-btn bg-secondary mx-3"
       style="width: 80px"
       (click)="onCancelClicked()"
@@ -74,6 +87,7 @@
       Hủy
     </button>
     <button
+      type="button"
       class="my-btn bg-primary"
       style="width: 80px"
       (click)="onSaveClicked()"

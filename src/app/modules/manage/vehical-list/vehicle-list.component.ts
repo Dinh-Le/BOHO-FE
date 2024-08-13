@@ -31,7 +31,7 @@ export class VehicleListComponent {
     this.modelService
       .open(AddVehicleListComponent, {
         size: 'lg',
-        centered: true
+        centered: true,
       })
       .closed.subscribe(({ data }) => {
         this.data.push(
@@ -43,7 +43,6 @@ export class VehicleListComponent {
   }
 
   view(item: RowItemModel) {
-    console.log('View detail: ', item);
     this._router.navigateByUrl('/manage/vehicle-list-detail');
   }
 

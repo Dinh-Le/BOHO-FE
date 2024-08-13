@@ -9,9 +9,7 @@ import {
   Subject,
   catchError,
   concat,
-  finalize,
   map,
-  mergeAll,
   of,
   skip,
   switchMap,
@@ -32,10 +30,7 @@ import {
   ZoomAndCentralizeOptions,
 } from 'src/app/data/schema/boho-v2';
 import { AutoTrackingOptions, ZoomAndFocusOptions } from '../models';
-import {
-  CreateHandoverDto,
-  HandoverService,
-} from 'src/app/data/service/handover.service';
+import { HandoverService } from 'src/app/data/service/handover.service';
 import { InvalidId } from 'src/app/data/constants';
 import { Nullable } from '@shared/shared.types';
 import HandoverRowItemModel from './models';
@@ -75,20 +70,12 @@ export class HandoverSettingsComponent implements OnDestroy {
   private _deleteItems: HandoverRowItemModel[] = [];
 
   editingRowItem: Nullable<HandoverRowItemModel>;
-  postActionOptions: Nullable<
-    (ZoomAndFocusOptions | AutoTrackingOptions) & {
-      nodeId: string;
-      deviceId: number;
-      presetId: number;
-    }
-  >;
   tableItemsSource: HandoverRowItemModel[] = [];
 
   handovers: Handover[] = [];
 
   private _currentNodeId = new BehaviorSubject<string>('');
   ptzCameras = new BehaviorSubject<Device[]>([]);
-  private _presetIdToDeviceIdMap: Record<number, number> = {};
   private _refreshTableData = new Subject();
 
   private _currentNodeIdSubscription = this._currentNodeId
@@ -182,7 +169,6 @@ export class HandoverSettingsComponent implements OnDestroy {
         this._deviceId = +deviceId;
         this.tableItemsSource = [];
         this.editingRowItem = undefined;
-        this.postActionOptions = null;
         this.handovers = [];
         this._deleteItems = [];
 
@@ -232,7 +218,6 @@ export class HandoverSettingsComponent implements OnDestroy {
 
   exitSettingMode() {
     this.editingRowItem = undefined;
-    this.postActionOptions = undefined;
   }
 
   saveAndExitSettingMode(data: ZoomAndCentralizeOptions | AutoTrackOptions) {

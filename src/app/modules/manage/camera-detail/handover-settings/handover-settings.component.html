@@ -61,6 +61,7 @@
         </td>
         <td>
           <button
+            type="button"
             class="my-btn bg-primary"
             (click)="enterSettingMode(rowItem)"
             [disabled]="!rowItem.canConfigurePostAction"
@@ -73,6 +74,7 @@
   </table>
   <div class="d-flex justify-content-center mt-5">
     <button
+      type="button"
       class="my-btn bg-secondary mx-3"
       style="width: 80px"
       (click)="onCancelClicked()"
@@ -80,6 +82,7 @@
       Hủy
     </button>
     <button
+      type="button"
       class="my-btn bg-primary"
       style="width: 80px"
       (click)="onSaveClicked()"

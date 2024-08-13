@@ -118,7 +118,6 @@ export class EventImage implements AfterViewInit, OnInit, OnDestroy, OnChanges {
     const dw = width * scaleFactor;
     const dh = height * scaleFactor;
     context.drawImage(this.image!, sx, sy, width, height, dx, dy, dw, dh);
-    // console.log({ dx, dy, dw, dh });
 
     // Render the bounding box if full image
     if (this.type === 'full') {
@@ -151,7 +150,6 @@ export class EventImage implements AfterViewInit, OnInit, OnDestroy, OnChanges {
 
       context.rect(bx, by, bw, bh);
       context.stroke();
-      // console.log({ bx, by, bw, bh });
 
       if (this.showObject) {
         let text = '';
@@ -191,7 +189,7 @@ export class EventImage implements AfterViewInit, OnInit, OnDestroy, OnChanges {
 
         context.fillStyle =
           context.strokeStyle === '#ffff00' ? 'black' : 'white';
-        // console.log(context.strokeStyle, context.fillStyle);
+
         context.fillText(text, bx, by - 12 * scaleFactor);
       }
     }

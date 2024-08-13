@@ -1,11 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-} from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import {
   AbstractControl,
   FormControl,
@@ -76,6 +69,12 @@ export class PostActionOptionsComponent {
   @Output() save = new EventEmitter<
     ZoomAndCentralizeOptions | AutoTrackOptions
   >();
+
+  get title(): string {
+    return this.type === 'auto_track'
+      ? 'Cài đặt tự động theo dõi'
+      : 'Cài đặt căn giữa và phóng to';
+  }
 
   formGroup = new FormGroup({
     type: new FormControl<PostActionType>('zoom_and_centralize', [

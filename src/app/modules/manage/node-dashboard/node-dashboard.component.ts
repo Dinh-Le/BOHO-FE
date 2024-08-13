@@ -318,7 +318,6 @@ export class NodeDashboardComponent implements OnInit, OnDestroy {
 
   private initialize(nodeId: string) {
     this.nodeId = nodeId;
-    console.log('here');
     this.triggerFetchDeviceIds$.next({ nodeId });
   }
 }

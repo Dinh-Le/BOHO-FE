@@ -1,7 +1,7 @@
 <form class="form" [formGroup]="formGroup" (submit)="onSaveClicked()">
   <div class="form-header d-flex align-items-center p-1">
     <i class="bi bi-chevron-left cursor-pointer me-1" (click)="exit.emit()"></i>
-    <div>Cài đặt căn giữa và phóng to</div>
+    <div>{{ title }}</div>
   </div>
   <div class="form-body p-5">
     <ng-container *ngIf="type === 'zoom_and_centralize'">

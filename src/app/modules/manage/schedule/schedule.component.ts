@@ -264,18 +264,15 @@ export class ScheduleComponent implements OnInit, OnDestroy {
   _state = false;
 
   onMouseUp() {
-    // console.log(`mouseup`);
     this._isMouseDown = false;
   }
 
   onMouseDown(item: RowItemModel, i: number, j: number) {
-    // console.log(`mousedown: ${i}, ${j}`);
     this._isMouseDown = item.isEditable ?? false;
     this._state = item.scheduleData[i][j];
   }
 
   onMouseEnter(item: RowItemModel, i: number, j: number) {
-    // console.log(`mouseenter: ${i}, ${j}`);
     if (!this._isMouseDown) {
       return;
     }
