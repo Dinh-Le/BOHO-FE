@@ -51,7 +51,7 @@ export class HandoverServiceImpl extends HandoverService {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/handover`;
     return this.httpClient
       .get<ResponseBase & { data: Handover[] }>(url)
-      .pipe(map((response) => response.data));
+      .pipe(map((response) => response.data.sort((a, b) => a.id - b.id)));
   }
   public override find(
     nodeId: string,

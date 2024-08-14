@@ -53,9 +53,13 @@
       <td>
         <app-select-3 formControlName="handoverId">
           <app-select-3-option
-            *ngFor="let item of handovers$ | async; trackBy: trackById"
+            *ngFor="
+              let item of handovers$ | async;
+              let i = index;
+              trackBy: trackById
+            "
             [value]="item.id"
-            [label]="'Chuyền PTZ ' + item.id"
+            [label]="'Chuyền PTZ ' + (i + 1)"
           ></app-select-3-option>
         </app-select-3>
       </td>

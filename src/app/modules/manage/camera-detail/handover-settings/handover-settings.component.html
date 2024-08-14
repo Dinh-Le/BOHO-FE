@@ -27,11 +27,15 @@
     </thead>
     <tbody>
       <tr
-        *ngFor="let rowItem of tableItemsSource; trackBy: trackByKey"
+        *ngFor="
+          let rowItem of tableItemsSource;
+          let i = index;
+          trackBy: trackByKey
+        "
         [formGroup]="rowItem.form"
       >
         <td><input type="checkbox" formControlName="selected" /></td>
-        <td>{{ rowItem.isNew ? "" : rowItem.id }}</td>
+        <td>{{ i + 1 }}</td>
         <td>
           <app-select-3 place-holder="Không" formControlName="deviceId">
             <app-select-3-option
