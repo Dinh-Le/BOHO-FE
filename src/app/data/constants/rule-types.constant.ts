@@ -44,7 +44,7 @@ export const RuleTypeItemsSource: RuleTypeModel[] = [
     eit: 1,
   },
   {
-    id: 'sabotage event',
+    id: 'trespassing event',
     name: 'Xâm nhập trái phép',
     cameraTypes: ['Static', 'PTZ'],
     eit: 3,

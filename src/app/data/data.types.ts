@@ -2,6 +2,7 @@ export type AlarmType =
   | 'loitering event'
   | 'sabotage event'
   | 'tripwire event'
+  | 'trespassing event'
   | 'lost event'
   | 'abandon event';
 

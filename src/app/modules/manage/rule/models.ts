@@ -258,6 +258,7 @@ export class RuleItemModel extends ExpandableTableRowItemModelBase {
         };
         break;
       case 'sabotage event':
+      case 'trespassing event':
         break;
       case 'tripwire event':
         rule.alarm_metadata = {
