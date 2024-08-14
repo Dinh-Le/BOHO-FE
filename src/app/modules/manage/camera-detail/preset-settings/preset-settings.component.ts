@@ -2,12 +2,7 @@ import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { EditableListViewItemModel } from '../editable-list-view/editable-list-view-item.model';
 import { PresetService } from 'src/app/data/service/preset.service';
 import { ActivatedRoute } from '@angular/router';
-import {
-  Subscription,
-  filter,
-  finalize,
-  switchMap,
-} from 'rxjs';
+import { Subscription, filter, finalize, switchMap } from 'rxjs';
 import { ToastService } from '@app/services/toast.service';
 import {
   Level3Menu,
@@ -102,6 +97,7 @@ export class PresetSettingsComponent implements OnInit, OnDestroy {
 
   play(img: HTMLImageElement) {
     if (!this.selectedItem) {
+      alert('Không có điểm giám sát nào được chọn');
       return;
     }
 
