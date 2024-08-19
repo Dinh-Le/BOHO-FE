@@ -6,7 +6,7 @@
   <div class="form-body p-5">
     <ng-container *ngIf="type === 'zoom_and_centralize'">
       <div class="form-item">
-        <label style="width: 150px">Mức độc phóng to:</label>
+        <label style="width: 150px">Mức độ phóng to:</label>
         <app-select-3 formControlName="zoom_level">
           <app-select-3-option
             *ngFor="let item of zoomLevelItemsSource; trackBy: trackByValue"
@@ -34,12 +34,12 @@
         </div>
       </div>
       <div class="form-item">
-        <label style="width: 200px">Tốc đọ PanTilt:</label>
+        <label style="width: 200px">Tốc độ PanTilt:</label>
         <input formControlName="pantilt_speed" min="1" max="5" type="number" />
         <span>(1 ~ 5, default 3)</span>
       </div>
       <div class="form-item">
-        <label style="width: 200px">Tốc đọ Zoom:</label>
+        <label style="width: 200px">Tốc độ Zoom:</label>
         <input formControlName="zoom_speed" min="1" max="5" type="number" />
         <span>(1 ~ 5, default 3)</span>
       </div>

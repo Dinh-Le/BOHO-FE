@@ -22,7 +22,6 @@ import {
   Subscription,
   catchError,
   filter,
-  of,
   switchMap,
   tap,
   throwError,
@@ -47,7 +46,6 @@ import {
   RuleTypeModel,
 } from 'src/app/data/schema/boho-v2';
 import { CameraType } from 'src/app/data/data.types';
-import { Rule } from 'src/app/data/schema/boho-v2/rule';
 
 @Component({
   selector: 'app-rule',
