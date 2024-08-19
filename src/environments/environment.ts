@@ -11,7 +11,7 @@ export const environment = {
     name: 'Basic preview',
     attribution:
       '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
-    minzoom: 0,
+    minzoom: 11,
     maxzoom: 20,
     bounds: [106.458, 10.611, 106.949, 11.021],
     format: 'png',
