@@ -101,7 +101,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
   onMapReady(map: Leaflet.Map) {
     this.map = map;
     this.map.on('drag', () => {
-      this.map!.panInsideBounds(this._mapBounds, { animate: false });
+      this.map!.panInsideBounds(this._bounds, { animate: false });
     });
 
     this.update(this.navigationService.selectedDevices$.getValue());

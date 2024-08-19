@@ -74,7 +74,7 @@ export class LocationPickerComponent {
     this.marker.addTo(this.map);
     this.map.panTo(this.marker.getLatLng());
     this.map.on('drag', () => {
-      this.map!.panInsideBounds(this._mapBounds, { animate: false });
+      this.map!.panInsideBounds(this._bounds, { animate: false });
     });
 
     const control = new Geocoder();

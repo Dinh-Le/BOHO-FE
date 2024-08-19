@@ -44,7 +44,7 @@ export class MapViewComponent implements OnInit, OnChanges, OnDestroy {
       environment.tilejson.bounds[2]
     )
   );
-  public readonly mapOptions: Leaflet.MapOptions = {
+  public readonly options: Leaflet.MapOptions = {
     layers: [
       Leaflet.tileLayer(environment.tilejson.tiles[0], {
         attribution: environment.tilejson.attribution,
