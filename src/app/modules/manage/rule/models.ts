@@ -168,7 +168,7 @@ export class RuleItemModel extends ExpandableTableRowItemModelBase {
   }
 
   get objectsVisible() {
-    return !['lost', 'abandon'].includes(this.type?.id ?? '');
+    return !['lost', 'abandon'].includes(this.type?.id.split(' ')[0] ?? '');
   }
 
   get objects(): ObjectModel[] {
@@ -208,7 +208,7 @@ export class RuleItemModel extends ExpandableTableRowItemModelBase {
   }
 
   get sensitiveVisible(): boolean {
-    return ['lost', 'abandon'].includes(this.type?.id ?? '');
+    return ['lost', 'abandon'].includes(this.type?.id.split(' ')[0] ?? '');
   }
 
   get sensitive(): Nullable<number> {
