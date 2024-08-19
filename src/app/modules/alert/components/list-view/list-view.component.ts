@@ -3,16 +3,14 @@ import {
   HostBinding,
   Input,
   OnChanges,
-  OnDestroy,
   SimpleChanges,
 } from '@angular/core';
 import { EventInfo } from '@modules/alert/models';
 import { EventDetailComponent } from '@shared/components/event-detail/event-detail.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Leaflet from 'leaflet';
-import { NavigationService } from 'src/app/data/service/navigation.service';
-import { Subject, Subscription } from 'rxjs';
 import { CameraType_PTZ } from 'src/app/data/constants';
+import { environment } from '@env';
 
 @Component({
   selector: 'app-list-view-alert',
@@ -23,17 +21,35 @@ export class ListViewComponent implements OnChanges {
   @HostBinding('class') classNames = 'd-flex flex-column h-100';
   @Input() events: EventInfo[] = [];
 
-  marker?: Leaflet.Marker;
-  map?: Leaflet.Map;
-  options: Leaflet.MapOptions = {
+  private _marker?: Leaflet.Marker;
+  private _map?: Leaflet.Map;
+  private readonly _bounds = Leaflet.latLngBounds(
+    Leaflet.latLng(
+      environment.tilejson.bounds[1],
+      environment.tilejson.bounds[0]
+    ),
+    Leaflet.latLng(
+      environment.tilejson.bounds[3],
+      environment.tilejson.bounds[2]
+    )
+  );
+  public readonly options: Leaflet.MapOptions = {
     layers: [
-      Leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      Leaflet.tileLayer(environment.tilejson.tiles[0], {
+        attribution: environment.tilejson.attribution,
+        minZoom: environment.tilejson.minzoom,
+        maxZoom: environment.tilejson.maxzoom,
+        bounds: this._bounds,
       }),
     ],
-    zoom: 16,
-    center: { lat: 28.626137, lng: 79.821603 },
+    maxBounds: this._bounds,
+    maxBoundsViscosity: 1.0,
+    zoom: environment.tilejson.maxzoom,
+    center: Leaflet.latLng(
+      environment.tilejson.center[1],
+      environment.tilejson.center[0],
+      environment.tilejson.center[2]
+    ),
   };
 
   event?: EventInfo;
@@ -65,7 +81,10 @@ export class ListViewComponent implements OnChanges {
   }
 
   onMapReady(map: Leaflet.Map) {
-    this.map = map;
+    this._map = map;
+    this._map.on('drag', () => {
+      this._map!.panInsideBounds(this._bounds, { animate: false });
+    });
   }
 
   showEventDetail() {
@@ -85,15 +104,15 @@ export class ListViewComponent implements OnChanges {
   }
 
   private updateMap() {
-    if (this.map) {
-      this.marker?.removeFrom(this.map);
+    if (this._map) {
+      this._marker?.removeFrom(this._map);
 
       if (!this.event) {
         return;
       }
 
       const { lat, long } = this.event.data.device_location;
-      this.marker = new Leaflet.Marker(
+      this._marker = new Leaflet.Marker(
         Leaflet.latLng(parseFloat(lat), parseFloat(long)),
         {
           draggable: false,
@@ -101,8 +120,8 @@ export class ListViewComponent implements OnChanges {
         }
       );
 
-      this.marker.addTo(this.map);
-      this.map.panTo(this.marker.getLatLng());
+      this._marker.addTo(this._map);
+      this._map.panTo(this._marker.getLatLng());
     }
   }
 

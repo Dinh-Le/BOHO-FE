@@ -1,11 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@env';
-import { lastValueFrom } from 'rxjs';
+import { catchError, lastValueFrom, of } from 'rxjs';
 
 export interface AppConfiguration {
   production: boolean;
   baseUrl: string;
+  tileServerBaseUrl: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -19,6 +20,15 @@ export class AppConfigurationService {
       );
       environment.baseUrl = data.baseUrl;
       environment.production = data.production;
+
+      const tilejson = await lastValueFrom(
+        this._http
+          .get<any>(`${data.tileServerBaseUrl}/styles/512/basic-preview.json`)
+          .pipe(catchError(() => of(null)))
+      );
+      if (tilejson) {
+        environment.tilejson = tilejson;
+      }
     } catch (err) {
       console.error(err);
     }

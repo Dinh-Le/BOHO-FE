@@ -3,18 +3,18 @@ import { ChartConfiguration } from 'chart.js';
 import * as moment from 'moment';
 import 'chartjs-adapter-moment';
 import * as Leaflet from 'leaflet';
-import { HoChiMinhCoord } from 'src/app/data/constants';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, EMPTY, Subject, Subscription, concat, of, switchMap, toArray } from 'rxjs';
+import { Subscription, concat, of, switchMap, toArray } from 'rxjs';
 import { DeviceService } from 'src/app/data/service/device.service';
 import { NodeService } from 'src/app/data/service/node.service';
-import { Device, NodeOperator } from 'src/app/data/schema/boho-v2';
+import { Device } from 'src/app/data/schema/boho-v2';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from '@app/services/toast.service';
 import {
   NodeOperatorService,
   NodeOperatorStatus,
 } from 'src/app/data/service/node-operator.service';
+import { environment } from '@env';
 
 @Component({
   selector: 'app-group-node-dashboard',
@@ -22,17 +22,32 @@ import {
   styleUrls: ['group-node-dashboard.component.scss'],
 })
 export class GroupNodeDashboardComponent implements OnInit, OnDestroy {
-  mapOptions: Leaflet.MapOptions = {
+  private readonly _bounds = Leaflet.latLngBounds(
+    Leaflet.latLng(
+      environment.tilejson.bounds[1],
+      environment.tilejson.bounds[0]
+    ),
+    Leaflet.latLng(
+      environment.tilejson.bounds[3],
+      environment.tilejson.bounds[2]
+    )
+  );
+  public readonly mapOptions: Leaflet.MapOptions = {
     layers: [
-      Leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      Leaflet.tileLayer(environment.tilejson.tiles[0], {
+        attribution: environment.tilejson.attribution,
+        minZoom: environment.tilejson.minzoom,
+        maxZoom: environment.tilejson.maxzoom,
+        bounds: this._bounds,
       }),
     ],
-    zoom: 16,
-    center: new Leaflet.LatLng(
-      parseFloat(HoChiMinhCoord.lat),
-      parseFloat(HoChiMinhCoord.long)
+    maxBounds: this._bounds,
+    maxBoundsViscosity: 1.0,
+    zoom: environment.tilejson.maxzoom,
+    center: Leaflet.latLng(
+      environment.tilejson.center[1],
+      environment.tilejson.center[0],
+      environment.tilejson.center[2]
     ),
   };
 
@@ -141,6 +156,10 @@ export class GroupNodeDashboardComponent implements OnInit, OnDestroy {
 
   onMapReady(map: Leaflet.Map) {
     this.map = map;
+    this.map.on('drag', () => {
+      this.map!.panInsideBounds(this._bounds, { animate: false });
+    });
+
     this.updateMap();
   }
 

@@ -1,4 +1,5 @@
-import { Component, HostBinding, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { environment } from '@env';
 import * as Leaflet from 'leaflet';
 
 @Component({
@@ -6,20 +7,45 @@ import * as Leaflet from 'leaflet';
   templateUrl: 'static-map.component.html',
 })
 export class StaticMapComponent {
-  readonly options: Leaflet.MapOptions = {
+  private readonly _bounds = Leaflet.latLngBounds(
+    Leaflet.latLng(
+      environment.tilejson.bounds[1],
+      environment.tilejson.bounds[0]
+    ),
+    Leaflet.latLng(
+      environment.tilejson.bounds[3],
+      environment.tilejson.bounds[2]
+    )
+  );
+  public readonly mapOptions: Leaflet.MapOptions = {
     layers: [
-      Leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      Leaflet.tileLayer(environment.tilejson.tiles[0], {
+        attribution: environment.tilejson.attribution,
+        minZoom: environment.tilejson.minzoom,
+        maxZoom: environment.tilejson.maxzoom,
+        bounds: this._bounds,
       }),
     ],
-    zoom: 16,
-    center: { lat: 28.626137, lng: 79.821603 },
+    maxBounds: this._bounds,
+    maxBoundsViscosity: 1.0,
+    zoom: environment.tilejson.maxzoom,
+    center: Leaflet.latLng(
+      environment.tilejson.center[1],
+      environment.tilejson.center[0],
+      environment.tilejson.center[2]
+    ),
   };
 
   @Input() locationData: Leaflet.LatLng[] = [];
 
+  private map?: Leaflet.Map;
+
   onMapReady(map: Leaflet.Map) {
+    this.map = map;
+    this.map.on('drag', () => {
+      this.map!.panInsideBounds(this._bounds, { animate: false });
+    });
+
     const markers = this.locationData.map(
       (location) =>
         new Leaflet.Marker(location, {
