@@ -2,7 +2,10 @@
   <ul>
     <li
       *ngFor="let item of menuLevel2 | objectEntries"
-      [ngClass]="{ active: item[1].isActive }"
+      [ngClass]="{
+        active: item[1].isActive,
+        'd-none': item[1].hidden ?? false
+      }"
       (click)="onMenuItemClick(item[0])"
       class="user-select-none cursor-pointer"
     >

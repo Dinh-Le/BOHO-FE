@@ -23,6 +23,7 @@ export class ManageComponent implements OnInit {
       text: string;
       path?: string;
       isActive?: boolean;
+      hidden?: boolean;
     };
   } = {
     [Level2Menu.DASHBOARD]: {
@@ -49,11 +50,12 @@ export class ManageComponent implements OnInit {
       text: 'Quy tắc',
       path: '/manage/device-rule',
     },
-    // [Level2Menu.VEHICLE]: {
-    //   icon: 'licence-plate',
-    //   text: 'Biển số xe',
-    //   path: '/manage/vehicle-list',
-    // },
+    [Level2Menu.VEHICLE]: {
+      icon: 'licence-plate',
+      text: 'Biển số xe',
+      path: '/manage/vehicle-list',
+      hidden: true,
+    },
     [Level2Menu.INTEGRATION]: {
       icon: 'integration',
       text: 'Tích hợp',
