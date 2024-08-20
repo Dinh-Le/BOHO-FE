@@ -1,15 +1,17 @@
 version: "3.1"
 
 services:
-  api-server:
-    build:
-      context: ./server
-    volumes:
-      - ./server:/app
+  map:
+    image: maptiler/tileserver-gl
+    restart: always
     ports:
-      - 3000:3000
+      - 8888:8080
+    volumes:
+      - ./data:/data
   webapp:
     image: blackrookie/boho:v1.0
     restart: always
+    volumes:
+      - ./app-configuration.json:/usr/share/nginx/html/boho/assets/app-configuration.json
     ports:
       - 8081:80
