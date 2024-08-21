@@ -9,7 +9,11 @@ import {
   toArray,
 } from 'rxjs';
 import { EventService } from 'src/app/data/service/event.service';
-import { Severities } from 'src/app/data/constants';
+import {
+  Objects,
+  RuleTypeItemsSource,
+  Severities,
+} from 'src/app/data/constants';
 import { NavigationService } from 'src/app/data/service/navigation.service';
 import { SearchService } from 'src/app/data/service/search.service';
 import { EventInfo as EventData } from './models';
@@ -26,6 +30,17 @@ import * as Utils from '@app/helpers/function';
 export class AlertComponent implements OnInit, OnDestroy {
   private readonly POLLING_INTERVAL: number = 3000;
   private readonly MAX_EVENTS: number = 100;
+  private readonly ObjectIdMap: {
+    [key: string]: number;
+  } = {
+    bike: 0,
+    car: 1,
+    bus: 2,
+    truck: 3,
+    ambulance: 4,
+    firetruck: 5,
+    people: 6,
+  };
 
   eventStatues: SelectItemModel[] = [
     { label: 'Tất cả', value: 0 },
@@ -68,48 +83,23 @@ export class AlertComponent implements OnInit, OnDestroy {
   ];
   gridCol: number = 5;
   viewMode: 'grid' | 'map' | 'list' = 'grid';
+
   isMuted: boolean = false;
   isPaused: boolean = false;
-  ruleTypes: SelectItemModel[] = [
-    { label: 'Xâm nhập vùng', value: 0 },
-    { label: 'Đi luẩn quẩn', value: 1 },
-    { label: 'Vượt đường kẻ', value: 2 },
-    { label: 'Đỗ xe sai nơi quy định', value: 3 },
-  ];
+  ruleTypes = RuleTypeItemsSource.map(
+    (item) => ({ value: item.eit, label: item.name } as SelectItemModel)
+  );
   severities: SelectItemModel[] = Severities.map((e) => ({
     value: e.id,
     label: e.name,
   }));
-  objectTypes: SelectItemModel[] = [
-    {
-      value: 0,
-      label: 'Xe máy',
-    },
-    {
-      value: 1,
-      label: 'Xe ô-tô',
-    },
-    {
-      value: 2,
-      label: 'Xe buýt',
-    },
-    {
-      value: 3,
-      label: 'Xe tải',
-    },
-    {
-      value: 4,
-      label: 'Xe cứu thương',
-    },
-    {
-      value: 5,
-      label: 'Xe cứu hỏa',
-    },
-    {
-      value: 6,
-      label: 'Người',
-    },
-  ];
+  objectTypes: SelectItemModel[] = Objects.map(
+    (item) =>
+      ({
+        value: this.ObjectIdMap[item.id],
+        label: item.name,
+      } as SelectItemModel)
+  );
 
   private _subscriptions: Subscription[] = [];
   private _beep = new Audio(

@@ -23,10 +23,16 @@
             <ul class="menu sub-menu">
               <li
                 *ngFor="let item of objectTypes; trackBy: trackByValue"
-                (click)="item.selected = !item.selected; onFilterOptionsChange()"
+                (click)="
+                  item.selected = !item.selected; onFilterOptionsChange()
+                "
                 [ngClass]="item.selected ? 'my-bg-primary' : ''"
+                class="d-flex"
               >
                 {{ item.label }}
+                <span class="icon" style="margin-left: auto">{{
+                  item.selected ? "&#10003;" : ""
+                }}</span>
               </li>
             </ul>
           </li>
@@ -39,10 +45,16 @@
               <li
                 class="cursor-pointer"
                 *ngFor="let item of severities; trackBy: trackByValue"
-                (click)="item.selected = !item.selected; onFilterOptionsChange()"
+                (click)="
+                  item.selected = !item.selected; onFilterOptionsChange()
+                "
                 [ngClass]="item.selected ? 'my-bg-primary' : ''"
+                class="d-flex"
               >
                 {{ item.label }}
+                <span class="icon" style="margin-left: auto">{{
+                  item.selected ? "&#10003;" : ""
+                }}</span>
               </li>
             </ul>
           </li>
@@ -54,10 +66,16 @@
               <li
                 class="cursor-pointer"
                 *ngFor="let item of ruleTypes; trackBy: trackByValue"
-                (click)="item.selected = !item.selected; onFilterOptionsChange()"
+                (click)="
+                  item.selected = !item.selected; onFilterOptionsChange()
+                "
                 [ngClass]="item.selected ? 'my-bg-primary' : ''"
+                class="d-flex"
               >
                 {{ item.label }}
+                <span class="icon" style="margin-left: auto">{{
+                  item.selected ? "&#10003;" : ""
+                }}</span>
               </li>
             </ul>
           </li>
@@ -73,8 +91,12 @@
                 *ngFor="let item of eventStatues; trackBy: trackByValue"
                 [ngClass]="item.selected ? 'my-bg-primary' : ''"
                 (click)="setItem(item, eventStatues); onFilterOptionsChange()"
+                class="d-flex"
               >
                 {{ item.label }}
+                <span class="icon" style="margin-left: auto">{{
+                  item.selected ? "&#10003;" : ""
+                }}</span>
               </li>
             </ul>
           </li>
