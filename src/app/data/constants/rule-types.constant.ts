@@ -47,7 +47,7 @@ export const RuleTypeItemsSource: RuleTypeModel[] = [
     id: 'trespassing event',
     name: 'Xâm nhập trái phép',
     cameraTypes: ['Static', 'PTZ'],
-    eit: 3,
+    eit: 0,
   },
   {
     id: 'tripwire event',
@@ -56,15 +56,15 @@ export const RuleTypeItemsSource: RuleTypeModel[] = [
     eit: 2,
   },
   {
-    id: 'lost event',
+    id: 'abandon event',
     name: 'Đối tượng bị bỏ lại',
     cameraTypes: ['Static'],
-    eit: 5,
+    eit: 4,
   },
   {
-    id: 'abandon event',
+    id: 'lost event',
     name: 'Đối tượng bị lấy đi',
     cameraTypes: ['Static'],
-    eit: 4,
+    eit: 5,
   },
 ];
