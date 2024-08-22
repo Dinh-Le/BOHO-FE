@@ -4,6 +4,7 @@ import { FormDialogComponent } from '@shared/components/form-dialog/form-dialog.
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Leaflet from 'leaflet';
 import Geocoder from 'leaflet-control-geocoder';
+import { environment } from '@env';
 
 @Component({
   selector: 'app-location-picker',
@@ -43,14 +44,28 @@ export class LocationPickerComponent {
   }
 
   map: Leaflet.Map | undefined;
-  options: Leaflet.MapOptions = {
+  private readonly _bounds = Leaflet.latLngBounds(
+    Leaflet.latLng(
+      environment.tilejson.bounds[1],
+      environment.tilejson.bounds[0]
+    ),
+    Leaflet.latLng(
+      environment.tilejson.bounds[3],
+      environment.tilejson.bounds[2]
+    )
+  );
+  public readonly options: Leaflet.MapOptions = {
     layers: [
-      Leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      Leaflet.tileLayer(environment.tilejson.tiles[0], {
+        attribution: environment.tilejson.attribution,
+        minZoom: environment.tilejson.minzoom,
+        maxZoom: environment.tilejson.maxzoom,
+        bounds: this._bounds,
       }),
     ],
-    zoom: 16,
+    maxBounds: this._bounds,
+    maxBoundsViscosity: 1.0,
+    zoom: environment.tilejson.maxzoom,
     center: this.marker.getLatLng(),
   };
 
@@ -58,6 +73,9 @@ export class LocationPickerComponent {
     this.map = $event as Leaflet.Map;
     this.marker.addTo(this.map);
     this.map.panTo(this.marker.getLatLng());
+    this.map.on('drag', () => {
+      this.map!.panInsideBounds(this._bounds, { animate: false });
+    });
 
     const control = new Geocoder();
     control.addTo(this.map);

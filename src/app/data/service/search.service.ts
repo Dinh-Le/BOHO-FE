@@ -55,7 +55,7 @@ export interface SearchEvent {
       recognize_result?: {
         color: string;
         direction: string;
-        lisence_plate: string;
+        license_plate: string;
         model: string;
       };
     }

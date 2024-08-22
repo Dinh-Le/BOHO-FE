@@ -23,6 +23,7 @@ export class ManageComponent implements OnInit {
       text: string;
       path?: string;
       isActive?: boolean;
+      hidden?: boolean;
     };
   } = {
     [Level2Menu.DASHBOARD]: {
@@ -53,6 +54,7 @@ export class ManageComponent implements OnInit {
       icon: 'licence-plate',
       text: 'Biển số xe',
       path: '/manage/vehicle-list',
+      hidden: true,
     },
     [Level2Menu.INTEGRATION]: {
       icon: 'integration',

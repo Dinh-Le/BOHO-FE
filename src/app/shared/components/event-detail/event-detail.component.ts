@@ -4,14 +4,21 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ToastService } from '@app/services/toast.service';
 import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from '@shared/shared.module';
-import { Observable, catchError, finalize, of, switchMap, tap } from 'rxjs';
+import {
+  Observable,
+  catchError,
+  finalize,
+  map,
+  of,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { EventService } from 'src/app/data/service/event.service';
 import { SearchEvent } from 'src/app/data/service/search.service';
 import * as Leaflet from 'leaflet';
 import { PresetService } from 'src/app/data/service/preset.service';
 import { Preset } from 'src/app/data/schema/boho-v2/preset';
 import { RuleService } from 'src/app/data/service/rule.service';
-import { NavigationService } from 'src/app/data/service/navigation.service';
 
 @Component({
   selector: 'app-event-detail-dialog',
@@ -74,12 +81,8 @@ export class EventDetailComponent implements OnInit {
           this.presetService
             .findAll(this.event.node_id, this.event.device_id)
             .pipe(
-              switchMap(({ data: presets }) =>
-                of(
-                  presets.find(
-                    (preset) => preset.id === (data as any).data.preset_id
-                  )
-                )
+              map((response) =>
+                response.data.find((preset) => preset.id === data.preset_id)
               )
             )
         ),

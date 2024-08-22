@@ -39,7 +39,7 @@ export const RuleTypes: RuleType[] = [
 export const RuleTypeItemsSource: RuleTypeModel[] = [
   {
     id: 'loitering event',
-    name: 'Luẩn quẩn',
+    name: 'Đi lảng vảng ',
     cameraTypes: ['Static', 'PTZ'],
     eit: 1,
   },

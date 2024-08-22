@@ -16,6 +16,7 @@ import { EventInfo } from '@modules/alert/models';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventDetailComponent } from '@shared/components/event-detail/event-detail.component';
 import { CameraType_PTZ } from 'src/app/data/constants';
+import { environment } from '@env';
 
 class ExtendedMarker extends Leaflet.Marker {
   private _camera: any;
@@ -46,15 +47,33 @@ export class MapViewComponent implements OnInit, OnDestroy {
 
   map: Leaflet.Map | undefined;
   markers: Leaflet.Marker[] = [];
-  options: Leaflet.MapOptions = {
+  private readonly _bounds = Leaflet.latLngBounds(
+    Leaflet.latLng(
+      environment.tilejson.bounds[1],
+      environment.tilejson.bounds[0]
+    ),
+    Leaflet.latLng(
+      environment.tilejson.bounds[3],
+      environment.tilejson.bounds[2]
+    )
+  );
+  public readonly options: Leaflet.MapOptions = {
     layers: [
-      Leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      Leaflet.tileLayer(environment.tilejson.tiles[0], {
+        attribution: environment.tilejson.attribution,
+        minZoom: environment.tilejson.minzoom,
+        maxZoom: environment.tilejson.maxzoom,
+        bounds: this._bounds,
       }),
     ],
-    zoom: 16,
-    center: { lat: 28.626137, lng: 79.821603 },
+    maxBounds: this._bounds,
+    maxBoundsViscosity: 1.0,
+    zoom: environment.tilejson.maxzoom,
+    center: Leaflet.latLng(
+      environment.tilejson.center[1],
+      environment.tilejson.center[0],
+      environment.tilejson.center[2]
+    ),
   };
 
   @Input() events: EventInfo[] = [];
@@ -81,6 +100,10 @@ export class MapViewComponent implements OnInit, OnDestroy {
 
   onMapReady(map: Leaflet.Map) {
     this.map = map;
+    this.map.on('drag', () => {
+      this.map!.panInsideBounds(this._bounds, { animate: false });
+    });
+
     this.update(this.navigationService.selectedDevices$.getValue());
   }
 

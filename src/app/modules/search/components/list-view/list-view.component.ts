@@ -26,7 +26,7 @@ export class ListViewComponent implements OnChanges {
 
   get licensePlate(): string {
     return (
-      this.currentEvent?.data.images_info[0].recognize_result?.lisence_plate ??
+      this.currentEvent?.data.images_info[0].recognize_result?.license_plate ??
       ''
     );
   }
