@@ -42,7 +42,7 @@ interface PtzSchedule {
   templateUrl: 'tour-settings.component.html',
   styleUrls: ['tour-settings.component.scss', '../../shared/my-input.scss'],
   host: {
-    class: 'flex-grow-1 d-flex flex-column my-bg-default px-5 pb-5 pt-1 gap-4',
+    class: 'flex-grow-1 d-flex flex-column my-bg-default pb-5 pt-1 gap-4',
   },
 })
 export class TourSettingsComponent implements OnInit, OnDestroy {
