@@ -101,5 +101,8 @@ export class PTZPostActionItemModel {
       postActionType: getPostActionType(data),
       presetId: data?.preset_id ?? +InvalidId,
     });
+
+    this._postActionOptions =
+      data?.auto_track ?? data?.zoom_and_centralize ?? null;
   }
 }
