@@ -19,6 +19,7 @@
   </button>
 </ng-template>
 <app-post-action-options
+  class="flex-grow-1 flex-basis-0"
   *ngIf="!!editingItem; else elseBlock"
   [type]="editingItem.postActionType"
   [data]="editingItem.postActionOptions"

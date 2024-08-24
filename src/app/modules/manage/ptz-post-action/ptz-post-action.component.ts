@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostBinding } from '@angular/core';
 import { PTZPostActionItemModel } from './models';
 import { Nullable } from '@shared/shared.types';
 import {
@@ -28,6 +28,9 @@ import { PostActionService } from 'src/app/data/service/post-action.service';
   ],
 })
 export class PTZPostActionComponent {
+  @HostBinding('class')
+  classNames = 'flex-grow-1 d-flex flex-column';
+
   private _deleteItems: PTZPostActionItemModel[] = [];
   tableItemsSource: PTZPostActionItemModel[] = [];
   editingItem: Nullable<PTZPostActionItemModel>;

@@ -1,9 +1,13 @@
-<form class="form" [formGroup]="formGroup" (submit)="onSaveClicked()">
+<form
+  class="form h-100 d-flex flex-column"
+  [formGroup]="formGroup"
+  (submit)="onSaveClicked()"
+>
   <div class="form-header d-flex align-items-center p-1">
     <i class="bi bi-chevron-left cursor-pointer me-1" (click)="exit.emit()"></i>
     <div>{{ title }}</div>
   </div>
-  <div class="form-body p-5">
+  <div class="form-body p-5 flex-grow-1 flex-basis-0 overflow-y-auto">
     <ng-container *ngIf="type === 'zoom_and_centralize'">
       <div class="form-item">
         <label style="width: 150px">Mức độ phóng to:</label>
@@ -65,7 +69,7 @@
       </div>
     </ng-container>
   </div>
-  <div class="form-footer d-flex justify-content-center mt-5">
+  <div class="form-footer d-flex justify-content-center mt-auto mb-5">
     <button class="my-btn bg-secondary mx-3" style="width: 80px" type="button">
       Hủy
     </button>
