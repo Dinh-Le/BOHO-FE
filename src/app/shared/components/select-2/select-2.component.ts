@@ -123,7 +123,9 @@ export class Select2Component implements ControlValueAccessor, OnChanges {
     this.onTouched = fn;
   }
 
-  selectItem(item: SelectItemModel) {
+  selectItem(event: Event, item: SelectItemModel) {
+    event.stopPropagation();
+
     if (!this.multiple && item.selected) {
       return;
     }

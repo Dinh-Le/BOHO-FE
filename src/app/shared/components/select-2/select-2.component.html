@@ -22,7 +22,7 @@
       <li
         *ngFor="let item of items; trackBy: trackByItems"
         class="menu-item cursor-pointer"
-        (click)="selectItem(item)"
+        (click)="selectItem($event, item)"
         [ngClass]="{
           active: item.selected,
           disabled: disabledValues.includes(item.value)
