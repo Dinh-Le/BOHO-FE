@@ -113,58 +113,59 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
           this.nodeId = nodeId;
 
           return this._presetService.findAll(this.nodeId, this.cameraId).pipe(
-            map(({ data }) => data),
-            catchError(
-              this.showHttpErrorAndReturn.bind(
-                this,
-                'Lỗi lấy danh sách các điểm preset',
-                []
-              )
-            )
+            tap(({ data }) => {
+              this.presets = data.reduce(
+                (dict, item) => Object.assign(dict, { [item.id]: item }),
+                {} as Record<number, Preset>
+              );
+            }),
+            catchError((error) => {
+              this._toastService.showHttpError(
+                error,
+                'Lỗi lấy danh sách các điểm preset'
+              );
+              return EMPTY;
+            })
           );
         }),
-        switchMap((data) => {
-          this.presets = data.reduce(
-            (dict, item) => Object.assign(dict, { [item.id]: item }),
-            {} as Record<number, Preset>
-          );
-
+        switchMap(() => {
           return this._scheduleService.findAll(this.nodeId, this.cameraId).pipe(
-            map(({ data }) => data),
-            catchError(
-              this.showHttpErrorAndReturn.bind(
-                this,
-                'Lỗi lấy danh sách các lịch trình',
-                []
-              )
-            )
+            tap(({ data }) => {
+              this.schedules = data;
+            }),
+            catchError((error) => {
+              this._toastService.showHttpError(
+                error,
+                'Lỗi lấy danh sách các lịch trình'
+              );
+              return EMPTY;
+            })
           );
         }),
-        switchMap((data) => {
-          this.schedules = data;
-
+        switchMap(() => {
           return this._ruleService.findAll(this.nodeId, this.cameraId).pipe(
-            map(({ data }) => data),
-            catchError(
-              this.showHttpErrorAndReturn.bind(
-                this,
-                'Lỗi lấy danh sách các quy tắc',
-                []
-              )
-            )
+            tap(({ data: rules }) => {
+              this.data = rules.map((rule) => {
+                const item = new RuleItemModel();
+                item.setData(
+                  rule,
+                  this.schedules,
+                  this.presets[rule.preset_id]
+                );
+                return item;
+              });
+            }),
+            catchError((error) => {
+              this._toastService.showHttpError(
+                error,
+                'Lỗi lấy danh sách các quy tắc'
+              );
+              return EMPTY;
+            })
           );
-        }),
-        tap((rules) => {
-          this.data = rules.map((rule) => {
-            const item = new RuleItemModel();
-            item.setData(rule, this.schedules, this.presets[rule.preset_id]);
-            return item;
-          });
         })
       )
-      .subscribe({
-        error: (error) => console.error(error),
-      });
+      .subscribe();
   }
 
   ngOnInit(): void {}
@@ -213,7 +214,7 @@ export class RuleComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private showHttpErrorAndReturn(
     message: string,
-    returnValue: any[],
+    returnValue: any,
     error: HttpErrorResponse
   ) {
     console.error(error);
