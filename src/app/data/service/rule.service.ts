@@ -1,4 +1,4 @@
-import { Observable, of, switchMap } from 'rxjs';
+import { map, Observable, of, switchMap } from 'rxjs';
 import { ResponseBase } from '../schema/boho-v2/response-base';
 import { Rule } from '../schema/boho-v2/rule';
 import { Injectable, inject } from '@angular/core';
@@ -67,7 +67,15 @@ export class RuleServiceImpl extends RuleService {
     deviceId: string | number
   ): Observable<ResponseBase & { data: Rule[] }> {
     const url = `${environment.baseUrl}/api/rest/v1/node/${nodeId}/device/${deviceId}/rule`;
-    return this.httpClient.get<ResponseBase & { data: Rule[] }>(url);
+    return this.httpClient.get<ResponseBase & { data: Rule[] }>(url).pipe(
+      switchMap((response) => {
+        if (!response.data) {
+          response.data = [];
+        }
+
+        return of(response);
+      })
+    );
   }
 
   public override find(
