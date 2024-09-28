@@ -39,8 +39,11 @@
         (click)="onEventClick(item, i)"
       >
         <td class="py-1 px-2">
-          <label class="custom-checkbox bg-transparent" (click)="$event.stopPropagation()">
-            <input type="checkbox" [(ngModel)]="item.selected"/>
+          <label
+            class="custom-checkbox bg-transparent"
+            (click)="$event.stopPropagation()"
+          >
+            <input type="checkbox" [(ngModel)]="item.selected" />
           </label>
         </td>
         <td class="py-1 px-2">
@@ -49,7 +52,7 @@
               | datetime : "HH:mm:ss DD-MM-YYYY"
           }}
         </td>
-        <td class="py-1 px-2">{{ item.device.address ?? '[Chưa cập nhật]' }}</td>
+        <td class="py-1 px-2">{{ item.device.name || "[Chưa cập nhật]" }}</td>
         <td class="py-1 px-2">{{ item.data.alarm_type }}</td>
         <td class="py-1 px-2">
           <app-svg-icon [icon]="item.object_icon"></app-svg-icon>
